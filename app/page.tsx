@@ -83,43 +83,6 @@ export default function LandingPage() {
             </div>
           </div>
 
-          {/* Exemplo prático */}
-          <div className="mt-14 bg-[#FAFAF8] border border-[#E5E1D8] rounded-2xl p-8">
-            <h3 className="text-xl font-bold text-gray-900 mb-2 text-center">Exemplo prático de Surebet</h3>
-            <p className="text-center text-gray-500 text-sm mb-8">Flamengo x Corinthians — R$ 1.000 investidos</p>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
-              <div className="bg-white rounded-xl border border-[#E5E1D8] p-4 text-center">
-                <p className="text-xs text-gray-400 mb-1">Casa A — Flamengo vence</p>
-                <p className="text-2xl font-bold text-gray-900">@2.15</p>
-                <p className="text-sm text-[#16A34A] font-medium mt-2">Stake: R$ 465,12</p>
-              </div>
-              <div className="bg-white rounded-xl border border-[#E5E1D8] p-4 text-center">
-                <p className="text-xs text-gray-400 mb-1">Casa B — Empate</p>
-                <p className="text-2xl font-bold text-gray-900">@3.40</p>
-                <p className="text-sm text-[#16A34A] font-medium mt-2">Stake: R$ 293,96</p>
-              </div>
-              <div className="bg-white rounded-xl border border-[#E5E1D8] p-4 text-center">
-                <p className="text-xs text-gray-400 mb-1">Casa C — Corinthians vence</p>
-                <p className="text-2xl font-bold text-gray-900">@4.50</p>
-                <p className="text-sm text-[#16A34A] font-medium mt-2">Stake: R$ 240,92</p>
-              </div>
-            </div>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-              <div className="bg-[#16A34A]/10 rounded-xl px-6 py-3 text-center">
-                <p className="text-xs text-gray-500">Retorno garantido</p>
-                <p className="text-xl font-bold text-[#16A34A]">R$ 1.000,01</p>
-              </div>
-              <div className="bg-[#16A34A] rounded-xl px-6 py-3 text-center">
-                <p className="text-xs text-white/70">Lucro líquido</p>
-                <p className="text-xl font-bold text-white">+ R$ 0,01 … R$ 30+</p>
-              </div>
-              <div className="bg-[#2563EB]/10 rounded-xl px-6 py-3 text-center">
-                <p className="text-xs text-gray-500">ROI</p>
-                <p className="text-xl font-bold text-[#2563EB]">~1–3% por aposta</p>
-              </div>
-            </div>
-            <p className="text-center text-xs text-gray-400 mt-4">Arbitragem encontrada quando a soma das probabilidades implícitas &lt; 100%</p>
-          </div>
         </div>
       </section>
 
