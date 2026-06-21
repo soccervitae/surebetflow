@@ -150,8 +150,8 @@ export default function LandingPage() {
               icon: Users,
               color: "bg-purple-100",
               iconColor: "text-purple-600",
-              title: "Múltiplos perfis",
-              desc: "Gerencie perfis diferentes (sua conta, de familiares, etc.) com controle individual de saldo, apostas e histórico."
+              title: "Perfis ilimitados e independentes",
+              desc: "Crie perfis separados para você, familiares ou sócios. Cada perfil tem suas próprias casas de apostas, saldo, apostas e histórico — totalmente isolados."
             },
             {
               icon: Wallet,
@@ -183,6 +183,93 @@ export default function LandingPage() {
               <p className="text-sm text-gray-500 leading-relaxed">{f.desc}</p>
             </div>
           ))}
+        </div>
+      </section>
+
+      {/* Seção Múltiplos Perfis */}
+      <section className="bg-white border-y border-[#E5E1D8] py-20">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6">
+          <div className="text-center mb-12">
+            <div className="inline-flex items-center gap-2 bg-purple-100 text-purple-700 text-sm font-medium px-4 py-1.5 rounded-full mb-4">
+              <Users className="w-4 h-4" />
+              Gestão por perfis
+            </div>
+            <h2 className="text-3xl font-bold text-gray-900 mb-4">
+              Gerencie vários perfis separados<br className="hidden sm:block" /> na mesma conta
+            </h2>
+            <p className="text-gray-500 max-w-2xl mx-auto text-lg">
+              Apostadores profissionais usam múltiplas identidades nas casas de apostas. Com o SureBetFlow, cada perfil é completamente independente — com seu próprio saldo, casas, apostas e histórico.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
+            <div className="space-y-4">
+              {[
+                {
+                  title: "Perfil próprio + perfis de familiares",
+                  desc: "Opere na sua conta e em contas de familiares (cônjuge, pais, irmãos) com controle separado para cada um.",
+                },
+                {
+                  title: "Dados totalmente isolados",
+                  desc: "Cada perfil tem suas próprias casas de apostas cadastradas, com senhas criptografadas individualmente. Um perfil não acessa os dados do outro.",
+                },
+                {
+                  title: "Saldo e lucro por perfil",
+                  desc: "Acompanhe quanto cada perfil tem em cada casa de apostas, lucro realizado e pendente, ROI individual e histórico completo de movimentações.",
+                },
+                {
+                  title: "Visão consolidada no dashboard",
+                  desc: "Além do controle individual, o painel geral soma o desempenho de todos os perfis para você enxergar o resultado total da operação.",
+                },
+              ].map((item) => (
+                <div key={item.title} className="flex items-start gap-3 p-4 rounded-xl bg-[#FAFAF8] border border-[#E5E1D8]">
+                  <CheckCircle className="w-5 h-5 text-purple-600 flex-shrink-0 mt-0.5" />
+                  <div>
+                    <p className="font-semibold text-gray-900 text-sm">{item.title}</p>
+                    <p className="text-sm text-gray-500 mt-0.5">{item.desc}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <div className="bg-[#FAFAF8] border border-[#E5E1D8] rounded-2xl p-6 flex flex-col justify-center">
+              <p className="text-xs text-gray-400 uppercase tracking-wide font-medium mb-4">Exemplo de uso</p>
+              <div className="space-y-3">
+                {[
+                  { nome: "João Silva", apelido: "Conta Principal", casas: 5, saldo: "R$ 3.200,00", lucro: "+ R$ 420,50", cor: "bg-[#16A34A]" },
+                  { nome: "Maria Silva", apelido: "Esposa", casas: 3, saldo: "R$ 1.800,00", lucro: "+ R$ 210,00", cor: "bg-[#2563EB]" },
+                  { nome: "Carlos Silva", apelido: "Irmão", casas: 4, saldo: "R$ 2.500,00", lucro: "+ R$ 315,75", cor: "bg-purple-600" },
+                ].map((p) => (
+                  <div key={p.nome} className="bg-white rounded-xl border border-[#E5E1D8] p-4 flex items-center gap-4">
+                    <div className={`w-10 h-10 ${p.cor} rounded-full flex items-center justify-center text-white font-bold text-sm flex-shrink-0`}>
+                      {p.nome.charAt(0)}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="font-semibold text-gray-900 text-sm">{p.nome}</p>
+                      <p className="text-xs text-gray-400">{p.apelido} · {p.casas} casas</p>
+                    </div>
+                    <div className="text-right flex-shrink-0">
+                      <p className="text-sm font-bold text-gray-900">{p.saldo}</p>
+                      <p className="text-xs font-medium text-[#16A34A]">{p.lucro}</p>
+                    </div>
+                  </div>
+                ))}
+                <div className="bg-[#16A34A]/5 border border-[#16A34A]/20 rounded-xl p-4 flex items-center justify-between">
+                  <p className="text-sm font-semibold text-gray-700">Total consolidado</p>
+                  <div className="text-right">
+                    <p className="text-sm font-bold text-gray-900">R$ 7.500,00</p>
+                    <p className="text-xs font-bold text-[#16A34A]">+ R$ 946,25</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="text-center">
+            <Link href="/cadastro" className="inline-flex items-center gap-2 bg-purple-600 hover:bg-purple-700 text-white font-semibold px-8 py-3.5 rounded-xl transition-colors">
+              Criar minha conta e meus perfis <ArrowRight className="w-4 h-4" />
+            </Link>
+          </div>
         </div>
       </section>
 
