@@ -11,6 +11,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 
 export default function CadastroPage() {
   const router = useRouter()
+  const [nome, setNome] = useState("")
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [confirmPassword, setConfirmPassword] = useState("")
@@ -20,6 +21,11 @@ export default function CadastroPage() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     setError("")
+
+    if (!nome.trim()) {
+      setError("Informe seu nome.")
+      return
+    }
 
     if (password.length < 8) {
       setError("A senha deve ter pelo menos 8 caracteres.")
@@ -33,7 +39,11 @@ export default function CadastroPage() {
 
     setLoading(true)
     const supabase = createClient()
-    const { error } = await supabase.auth.signUp({ email, password })
+    const { error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: { data: { full_name: nome.trim() } },
+    })
 
     if (error) {
       if (error.message.includes("already registered")) {
@@ -57,6 +67,18 @@ export default function CadastroPage() {
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="nome">Nome completo</Label>
+            <Input
+              id="nome"
+              type="text"
+              placeholder="João Silva"
+              value={nome}
+              onChange={e => setNome(e.target.value)}
+              required
+              autoComplete="name"
+            />
+          </div>
           <div className="space-y-2">
             <Label htmlFor="email">E-mail</Label>
             <Input
