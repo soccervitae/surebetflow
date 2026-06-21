@@ -39,6 +39,17 @@ export default function FinanceiroClient({ movimentacoes: initial, profiles, pro
   const { toast } = useToast()
   const supabase = createClient()
 
+  function formatBRL(raw: string) {
+    const digits = raw.replace(/\D/g, "")
+    if (!digits) return ""
+    const num = parseInt(digits, 10) / 100
+    return num.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+  }
+
+  function parseBRL(formatted: string) {
+    return parseFloat(formatted.replace(/\./g, "").replace(",", ".")) || 0
+  }
+
   const filteredProfileBets = formProfile
     ? profileBets.filter(pb => pb.profile_id === formProfile)
     : []
@@ -58,7 +69,7 @@ export default function FinanceiroClient({ movimentacoes: initial, profiles, pro
       toast({ title: "Preencha todos os campos obrigatórios", variant: "destructive" })
       return
     }
-    const valor = parseFloat(formValor)
+    const valor = parseBRL(formValor)
     if (isNaN(valor) || valor <= 0) {
       toast({ title: "Valor inválido", variant: "destructive" })
       return
@@ -208,7 +219,13 @@ export default function FinanceiroClient({ movimentacoes: initial, profiles, pro
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label>Valor (R$) *</Label>
-                  <Input type="number" step="0.01" min="0.01" value={formValor} onChange={e => setFormValor(e.target.value)} placeholder="0,00" />
+                  <Input
+                    type="text"
+                    inputMode="numeric"
+                    value={formValor}
+                    onChange={e => setFormValor(formatBRL(e.target.value))}
+                    placeholder="0,00"
+                  />
                 </div>
                 <div className="space-y-2">
                   <Label>Descrição (opcional)</Label>

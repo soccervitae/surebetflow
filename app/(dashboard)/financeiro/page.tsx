@@ -53,10 +53,21 @@ export default function FinanceiroPage() {
     })
   }, [formProfile])
 
+  function formatBRL(raw: string) {
+    const digits = raw.replace(/\D/g, "")
+    if (!digits) return ""
+    const num = parseInt(digits, 10) / 100
+    return num.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+  }
+
+  function parseBRL(formatted: string) {
+    return parseFloat(formatted.replace(/\./g, "").replace(",", ".")) || 0
+  }
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     setFormError("")
-    const val = parseFloat(formValor.replace(",", "."))
+    const val = parseBRL(formValor)
     if (isNaN(val) || val <= 0) { setFormError("Informe um valor válido."); return }
     setSaving(true)
     const supabase = createClient()
@@ -143,7 +154,7 @@ export default function FinanceiroPage() {
                 </div>
                 <div className="space-y-2">
                   <Label>Valor (R$) *</Label>
-                  <Input type="number" min="0.01" step="0.01" value={formValor} onChange={e => setFormValor(e.target.value)} placeholder="0.00" required />
+                  <Input type="text" inputMode="numeric" value={formValor} onChange={e => setFormValor(formatBRL(e.target.value))} placeholder="0,00" required />
                 </div>
               </div>
               <div className="space-y-2">

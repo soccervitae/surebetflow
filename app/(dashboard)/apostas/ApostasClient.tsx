@@ -37,6 +37,17 @@ export default function ApostasClient({ apostas: initialApostas, profiles }: Pro
   const { toast } = useToast()
   const supabase = createClient()
 
+  function formatBRL(raw: string) {
+    const digits = raw.replace(/\D/g, "")
+    if (!digits) return ""
+    const num = parseInt(digits, 10) / 100
+    return num.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+  }
+
+  function parseBRL(formatted: string) {
+    return parseFloat(formatted.replace(/\./g, "").replace(",", ".")) || 0
+  }
+
   const filtered = apostas.filter(a => {
     if (filterStatus !== "todos" && a.status !== filterStatus) return false
     if (filterProfile !== "todos" && a.profile_id !== filterProfile) return false
@@ -46,7 +57,7 @@ export default function ApostasClient({ apostas: initialApostas, profiles }: Pro
   async function handleFinalizar() {
     if (!finalizarDialog) return
     setFinalizando(true)
-    const valor = parseFloat(resultadoReal)
+    const valor = parseBRL(resultadoReal)
     if (isNaN(valor)) {
       toast({ title: "Valor inválido", variant: "destructive" })
       setFinalizando(false)
@@ -185,7 +196,7 @@ export default function ApostasClient({ apostas: initialApostas, profiles }: Pro
                           className="mt-2"
                           onClick={() => {
                             setFinalizarDialog(aposta)
-                            setResultadoReal(aposta.lucro_garantido.toString())
+                            setResultadoReal(formatBRL((aposta.lucro_garantido * 100).toFixed(0)))
                           }}
                         >
                           Finalizar
@@ -215,11 +226,11 @@ export default function ApostasClient({ apostas: initialApostas, profiles }: Pro
             <div className="space-y-2">
               <Label>Resultado real obtido (R$)</Label>
               <Input
-                type="number"
-                step="0.01"
+                type="text"
+                inputMode="numeric"
                 value={resultadoReal}
-                onChange={e => setResultadoReal(e.target.value)}
-                placeholder="Ex: 25.50"
+                onChange={e => setResultadoReal(formatBRL(e.target.value))}
+                placeholder="0,00"
               />
             </div>
           </div>
