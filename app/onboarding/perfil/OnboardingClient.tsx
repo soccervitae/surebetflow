@@ -6,7 +6,7 @@ export default function OnboardingClient({ userId }: { userId: string }) {
   const router = useRouter()
 
   function handleSuccess() {
-    router.push("/")
+    router.push("/dashboard")
     router.refresh()
   }
 

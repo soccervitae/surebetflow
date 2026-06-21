@@ -14,7 +14,7 @@ export default function OnboardingPerfilPage() {
     supabase.auth.getUser().then(async ({ data: { user } }) => {
       if (!user) { router.push("/login"); return }
       const { count } = await supabase.from("profiles").select("id", { count: "exact", head: true })
-      if (count && count > 0) { router.push("/"); return }
+      if (count && count > 0) { router.push("/dashboard"); return }
       setUserId(user.id)
       setChecking(false)
     })
@@ -43,7 +43,7 @@ export default function OnboardingPerfilPage() {
         <div className="bg-white rounded-xl border border-[#E5E1D8] p-6 shadow-sm">
           <ProfileForm
             userId={userId}
-            onSuccess={() => router.push("/")}
+            onSuccess={() => router.push("/dashboard")}
           />
         </div>
       </div>

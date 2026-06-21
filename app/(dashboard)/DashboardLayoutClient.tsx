@@ -10,7 +10,7 @@ import {
   CreditCard, Settings, LogOut, Menu, X, TrendingUp
 } from "lucide-react"
 const navItems = [
-  { href: "/", label: "Início", icon: Home },
+  { href: "/dashboard", label: "Início", icon: Home },
   { href: "/perfis", label: "Perfis", icon: Users },
   { href: "/calculadora", label: "Calculadora", icon: Calculator },
   { href: "/apostas", label: "Apostas", icon: BookOpen },

@@ -33,9 +33,9 @@ export async function middleware(request: NextRequest) {
 
   const { pathname } = request.nextUrl
 
-  // Public routes that don't need auth
-  const publicRoutes = ['/login', '/cadastro']
-  const isPublicRoute = publicRoutes.some(route => pathname.startsWith(route))
+  // Rotas públicas que não precisam de autenticação
+  const publicRoutes = ['/', '/login', '/cadastro']
+  const isPublicRoute = publicRoutes.some(route => pathname === route || pathname.startsWith(route + '/'))
 
   if (!user && !isPublicRoute) {
     const url = request.nextUrl.clone()
@@ -43,9 +43,10 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(url)
   }
 
-  if (user && isPublicRoute) {
+  // Usuário logado tentando acessar login/cadastro → vai pro dashboard
+  if (user && (pathname === '/login' || pathname === '/cadastro')) {
     const url = request.nextUrl.clone()
-    url.pathname = '/'
+    url.pathname = '/dashboard'
     return NextResponse.redirect(url)
   }
 
