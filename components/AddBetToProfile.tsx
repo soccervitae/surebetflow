@@ -105,7 +105,7 @@ export default function AddBetToProfile({ profileId }: Props) {
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <h3 className="font-medium text-gray-900">Casas de Apostas</h3>
-        <Button size="sm" onClick={() => setShowForm(!showForm)}>
+        <Button size="sm" onClick={() => { setShowForm(v => !v); setSelectedBet(""); setEmail(""); setSenha(""); setSaldo("") }}>
           <Plus className="h-4 w-4 mr-1" />
           Adicionar
         </Button>
@@ -130,7 +130,7 @@ export default function AddBetToProfile({ profileId }: Props) {
               </div>
               <div className="space-y-2">
                 <Label>E-mail da conta *</Label>
-                <Input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="email@casa.com" />
+                <Input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="email@casa.com" autoComplete="off" />
               </div>
               <div className="space-y-2">
                 <Label>Senha *</Label>
@@ -141,6 +141,7 @@ export default function AddBetToProfile({ profileId }: Props) {
                     onChange={e => setSenha(e.target.value)}
                     placeholder="Senha da conta"
                     className="pr-10"
+                    autoComplete="new-password"
                   />
                   <button
                     type="button"
