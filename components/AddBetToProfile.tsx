@@ -10,27 +10,38 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { formatCurrency } from "@/lib/utils"
 import { useToast } from "@/hooks/useToast"
-import { Plus, Eye, EyeOff, Loader2 } from "lucide-react"
+import { Plus, Eye, EyeOff, Loader2, Trash2 } from "lucide-react"
 import type { Bet, ProfileBet } from "@/lib/types"
 
 interface Props {
   profileId: string
-  userToken: string
+  userToken?: string
 }
 
-export default function AddBetToProfile({ profileId, userToken }: Props) {
+export default function AddBetToProfile({ profileId }: Props) {
   const [bets, setBets] = useState<Bet[]>([])
-  const [profileBets, setProfileBets] = useState<ProfileBet[]>([])
+  const [profileBets, setProfileBets] = useState<(ProfileBet & { bet?: { nome: string } })[]>([])
   const [showForm, setShowForm] = useState(false)
   const [selectedBet, setSelectedBet] = useState("")
   const [email, setEmail] = useState("")
   const [senha, setSenha] = useState("")
+  const [showSenha, setShowSenha] = useState(false)
   const [saldo, setSaldo] = useState("")
   const [loading, setLoading] = useState(false)
-  const [revealedPasswords, setRevealedPasswords] = useState<Record<string, string>>({})
-  const [revealingId, setRevealingId] = useState<string | null>(null)
+  const [revealedPasswords, setRevealedPasswords] = useState<Record<string, boolean>>({})
   const { toast } = useToast()
   const supabase = createClient()
+
+  function formatBRL(raw: string) {
+    const digits = raw.replace(/\D/g, "")
+    if (!digits) return ""
+    const num = parseInt(digits, 10) / 100
+    return num.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+  }
+
+  function parseBRL(formatted: string) {
+    return parseFloat(formatted.replace(/\./g, "").replace(",", ".")) || 0
+  }
 
   useEffect(() => {
     loadData()
@@ -39,10 +50,10 @@ export default function AddBetToProfile({ profileId, userToken }: Props) {
   async function loadData() {
     const [betsRes, pbRes] = await Promise.all([
       supabase.from("bets").select("*").order("nome"),
-      supabase.from("profile_bets").select("*, bet:bets(*)").eq("profile_id", profileId),
+      supabase.from("profile_bets").select("*, bet:bets(nome)").eq("profile_id", profileId),
     ])
     if (betsRes.data) setBets(betsRes.data)
-    if (pbRes.data) setProfileBets(pbRes.data as ProfileBet[])
+    if (pbRes.data) setProfileBets(pbRes.data as (ProfileBet & { bet?: { nome: string } })[])
   }
 
   async function handleSubmit(e: React.FormEvent) {
@@ -53,24 +64,19 @@ export default function AddBetToProfile({ profileId, userToken }: Props) {
     }
     setLoading(true)
     try {
-      const response = await fetch("https://gkkuttabavwxjuibmrnr.supabase.co/functions/v1/add-profile-bet", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${userToken}`,
-        },
-        body: JSON.stringify({
+      const { error } = await supabase
+        .from("profile_bets")
+        .insert({
           profile_id: profileId,
           bet_id: selectedBet,
           email,
-          senha,
-          saldo: parseFloat(saldo) || 0,
-        }),
-      })
-      if (!response.ok) {
-        const err = await response.json()
-        throw new Error(err.error || "Erro ao adicionar casa de apostas")
-      }
+          senha_encrypted: senha,
+          senha_nonce: "",
+          saldo: parseBRL(saldo),
+        })
+
+      if (error) throw new Error(error.message)
+
       toast({ title: "Casa de apostas adicionada com sucesso!" })
       setShowForm(false)
       setSelectedBet("")
@@ -85,32 +91,13 @@ export default function AddBetToProfile({ profileId, userToken }: Props) {
     }
   }
 
-  async function handleReveal(profileBetId: string) {
-    if (revealedPasswords[profileBetId]) {
-      setRevealedPasswords(prev => {
-        const copy = { ...prev }
-        delete copy[profileBetId]
-        return copy
-      })
-      return
-    }
-    setRevealingId(profileBetId)
-    try {
-      const response = await fetch("https://gkkuttabavwxjuibmrnr.supabase.co/functions/v1/reveal-profile-bet-password", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${userToken}`,
-        },
-        body: JSON.stringify({ profile_bet_id: profileBetId }),
-      })
-      if (!response.ok) throw new Error("Erro ao revelar senha")
-      const data = await response.json()
-      setRevealedPasswords(prev => ({ ...prev, [profileBetId]: data.senha }))
-    } catch {
-      toast({ title: "Erro ao revelar senha", variant: "destructive" })
-    } finally {
-      setRevealingId(null)
+  async function handleDelete(id: string) {
+    const { error } = await supabase.from("profile_bets").delete().eq("id", id)
+    if (error) {
+      toast({ title: "Erro ao remover", variant: "destructive" })
+    } else {
+      setProfileBets(prev => prev.filter(pb => pb.id !== id))
+      toast({ title: "Casa de apostas removida" })
     }
   }
 
@@ -147,11 +134,33 @@ export default function AddBetToProfile({ profileId, userToken }: Props) {
               </div>
               <div className="space-y-2">
                 <Label>Senha *</Label>
-                <Input type="password" value={senha} onChange={e => setSenha(e.target.value)} placeholder="Senha da conta" />
+                <div className="relative">
+                  <Input
+                    type={showSenha ? "text" : "password"}
+                    value={senha}
+                    onChange={e => setSenha(e.target.value)}
+                    placeholder="Senha da conta"
+                    className="pr-10"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowSenha(v => !v)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+                    tabIndex={-1}
+                  >
+                    {showSenha ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  </button>
+                </div>
               </div>
               <div className="space-y-2">
-                <Label>Saldo inicial</Label>
-                <Input type="number" step="0.01" min="0" value={saldo} onChange={e => setSaldo(e.target.value)} placeholder="0,00" />
+                <Label>Saldo inicial (R$)</Label>
+                <Input
+                  type="text"
+                  inputMode="numeric"
+                  value={saldo}
+                  onChange={e => setSaldo(formatBRL(e.target.value))}
+                  placeholder="0,00"
+                />
               </div>
               <div className="flex gap-2">
                 <Button type="submit" disabled={loading} className="flex-1">
@@ -175,31 +184,39 @@ export default function AddBetToProfile({ profileId, userToken }: Props) {
               <CardContent className="p-4">
                 <div className="flex items-center justify-between gap-3">
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2">
-                      <p className="font-medium text-gray-900">{(pb as ProfileBet & { bet?: { nome: string } }).bet?.nome ?? "Casa"}</p>
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <p className="font-medium text-gray-900">{pb.bet?.nome ?? "Casa"}</p>
                       <Badge variant="blue">{formatCurrency(pb.saldo)}</Badge>
                     </div>
                     <p className="text-sm text-gray-500 truncate mt-0.5">{pb.email}</p>
                     {revealedPasswords[pb.id] && (
-                      <p className="text-sm font-mono bg-gray-100 rounded px-2 py-1 mt-2 text-gray-700">
-                        {revealedPasswords[pb.id]}
+                      <p className="text-sm font-mono bg-gray-100 rounded px-2 py-1 mt-2 text-gray-700 break-all">
+                        {pb.senha_encrypted}
                       </p>
                     )}
                   </div>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => handleReveal(pb.id)}
-                    disabled={revealingId === pb.id}
-                  >
-                    {revealingId === pb.id ? (
-                      <Loader2 className="h-4 w-4 animate-spin" />
-                    ) : revealedPasswords[pb.id] ? (
-                      <><EyeOff className="h-4 w-4 mr-1" />Ocultar</>
-                    ) : (
-                      <><Eye className="h-4 w-4 mr-1" />Ver senha</>
-                    )}
-                  </Button>
+                  <div className="flex gap-1 flex-shrink-0">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setRevealedPasswords(prev =>
+                        prev[pb.id] ? Object.fromEntries(Object.entries(prev).filter(([k]) => k !== pb.id)) : { ...prev, [pb.id]: true }
+                      )}
+                    >
+                      {revealedPasswords[pb.id]
+                        ? <><EyeOff className="h-4 w-4 mr-1" />Ocultar</>
+                        : <><Eye className="h-4 w-4 mr-1" />Ver senha</>
+                      }
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => handleDelete(pb.id)}
+                      className="text-red-500 hover:text-red-600"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
                 </div>
               </CardContent>
             </Card>
