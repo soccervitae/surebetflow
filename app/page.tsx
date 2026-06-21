@@ -22,7 +22,7 @@ export default function LandingPage() {
               Entrar
             </Link>
             <Link href="/cadastro" className="bg-[#16A34A] text-white text-sm font-medium px-4 py-2 rounded-lg hover:bg-[#15803D] transition-colors">
-              Começar grátis
+              Assinar — R$ 97/mês
             </Link>
           </div>
         </div>
@@ -42,13 +42,12 @@ export default function LandingPage() {
         </p>
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
           <Link href="/cadastro" className="inline-flex items-center justify-center gap-2 bg-[#16A34A] hover:bg-[#15803D] text-white font-semibold px-8 py-3.5 rounded-xl text-base transition-colors">
-            Criar conta grátis <ArrowRight className="w-4 h-4" />
+            Assinar agora — R$ 97/mês <ArrowRight className="w-4 h-4" />
           </Link>
           <Link href="/login" className="inline-flex items-center justify-center gap-2 border border-[#E5E1D8] bg-white hover:bg-gray-50 text-gray-700 font-semibold px-8 py-3.5 rounded-xl text-base transition-colors">
-            Já tenho conta
+            Já sou assinante
           </Link>
         </div>
-        <p className="text-sm text-gray-400 mt-4">Sem cartão de crédito · Configuração em minutos</p>
       </section>
 
       {/* O que é Surebet */}
@@ -337,7 +336,7 @@ export default function LandingPage() {
           <p className="text-gray-500 text-sm mb-2">Plano Profissional</p>
           <div className="flex items-end justify-center gap-1 mb-6">
             <span className="text-gray-400 text-lg font-medium">R$</span>
-            <span className="text-5xl font-extrabold text-gray-900">49</span>
+            <span className="text-5xl font-extrabold text-gray-900">97</span>
             <span className="text-gray-400 text-lg font-medium mb-1">,90/mês</span>
           </div>
           <ul className="space-y-3 text-sm text-left mb-8">
@@ -357,9 +356,9 @@ export default function LandingPage() {
             ))}
           </ul>
           <Link href="/cadastro" className="block w-full bg-[#16A34A] hover:bg-[#15803D] text-white font-semibold py-3 rounded-xl transition-colors text-center">
-            Começar agora
+            Assinar agora
           </Link>
-          <p className="text-xs text-gray-400 mt-3">Cancele quando quiser</p>
+          
         </div>
       </section>
 
@@ -371,7 +370,7 @@ export default function LandingPage() {
             Junte-se a apostadores que já profissionalizaram sua operação de surebet com o SureBetFlow.
           </p>
           <Link href="/cadastro" className="inline-flex items-center gap-2 bg-white text-[#16A34A] font-bold px-8 py-3.5 rounded-xl hover:bg-gray-50 transition-colors text-base">
-            Criar conta grátis <ArrowRight className="w-4 h-4" />
+            Assinar agora <ArrowRight className="w-4 h-4" />
           </Link>
         </div>
       </section>
