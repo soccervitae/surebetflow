@@ -1,0 +1,236 @@
+"use client"
+
+import { useState } from "react"
+import { createClient } from "@/lib/supabase/client"
+import { Card, CardContent } from "@/components/ui/card"
+import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
+import { formatCurrency } from "@/lib/utils"
+import { useToast } from "@/hooks/useToast"
+import { BookOpen, Filter } from "lucide-react"
+import type { Aposta, ApostaLeg } from "@/lib/types"
+
+interface Props {
+  apostas: (Aposta & { profile?: { nome: string; sobrenome: string; apelido?: string | null } })[]
+  profiles: { id: string; nome: string; sobrenome: string; apelido?: string | null }[]
+}
+
+function statusBadge(status: string) {
+  switch (status) {
+    case "finalizada": return <Badge variant="default">Finalizada</Badge>
+    case "cancelada": return <Badge variant="destructive">Cancelada</Badge>
+    default: return <Badge variant="yellow">Pendente</Badge>
+  }
+}
+
+export default function ApostasClient({ apostas: initialApostas, profiles }: Props) {
+  const [apostas, setApostas] = useState(initialApostas)
+  const [filterStatus, setFilterStatus] = useState("todos")
+  const [filterProfile, setFilterProfile] = useState("todos")
+  const [finalizarDialog, setFinalizarDialog] = useState<Aposta | null>(null)
+  const [resultadoReal, setResultadoReal] = useState("")
+  const [finalizando, setFinalizando] = useState(false)
+  const { toast } = useToast()
+  const supabase = createClient()
+
+  const filtered = apostas.filter(a => {
+    if (filterStatus !== "todos" && a.status !== filterStatus) return false
+    if (filterProfile !== "todos" && a.profile_id !== filterProfile) return false
+    return true
+  })
+
+  async function handleFinalizar() {
+    if (!finalizarDialog) return
+    setFinalizando(true)
+    const valor = parseFloat(resultadoReal)
+    if (isNaN(valor)) {
+      toast({ title: "Valor inválido", variant: "destructive" })
+      setFinalizando(false)
+      return
+    }
+    const { error } = await supabase
+      .from("apostas")
+      .update({ status: "finalizada", resultado_real: valor, finalizada_at: new Date().toISOString() })
+      .eq("id", finalizarDialog.id)
+
+    if (error) {
+      toast({ title: "Erro ao finalizar aposta", variant: "destructive" })
+    } else {
+      setApostas(prev => prev.map(a => a.id === finalizarDialog.id
+        ? { ...a, status: "finalizada" as const, resultado_real: valor, finalizada_at: new Date().toISOString() }
+        : a
+      ))
+      toast({ title: "Aposta finalizada!" })
+      setFinalizarDialog(null)
+      setResultadoReal("")
+    }
+    setFinalizando(false)
+  }
+
+  return (
+    <div className="space-y-6">
+      <div>
+        <h1 className="text-2xl font-bold text-gray-900">Apostas</h1>
+        <p className="text-gray-500 text-sm mt-1">Histórico completo de todas as suas apostas</p>
+      </div>
+
+      {/* Filters */}
+      <Card>
+        <CardContent className="p-4">
+          <div className="flex items-center gap-2 mb-3">
+            <Filter className="h-4 w-4 text-gray-500" />
+            <span className="text-sm font-medium text-gray-700">Filtros</span>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="space-y-1.5">
+              <Label className="text-xs">Status</Label>
+              <Select value={filterStatus} onValueChange={setFilterStatus}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="todos">Todos</SelectItem>
+                  <SelectItem value="pendente">Pendentes</SelectItem>
+                  <SelectItem value="finalizada">Finalizadas</SelectItem>
+                  <SelectItem value="cancelada">Canceladas</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-1.5">
+              <Label className="text-xs">Perfil</Label>
+              <Select value={filterProfile} onValueChange={setFilterProfile}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="todos">Todos os perfis</SelectItem>
+                  {profiles.map(p => (
+                    <SelectItem key={p.id} value={p.id}>
+                      {p.apelido || `${p.nome} ${p.sobrenome}`}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* List */}
+      {filtered.length === 0 ? (
+        <Card>
+          <CardContent className="flex flex-col items-center justify-center py-16">
+            <BookOpen className="h-12 w-12 text-gray-300 mb-4" />
+            <p className="text-gray-500">Nenhuma aposta encontrada</p>
+          </CardContent>
+        </Card>
+      ) : (
+        <div className="space-y-3">
+          {filtered.map(aposta => (
+            <Card key={aposta.id}>
+              <CardContent className="p-4">
+                <div className="flex items-start justify-between gap-4">
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 flex-wrap mb-1">
+                      <p className="font-medium text-gray-900 truncate">{aposta.evento}</p>
+                      {statusBadge(aposta.status)}
+                      <Badge variant="secondary">{aposta.tipo}</Badge>
+                    </div>
+                    <div className="text-xs text-gray-500 space-y-0.5">
+                      <p>
+                        Perfil: {aposta.profile ? (aposta.profile.apelido || `${aposta.profile.nome} ${aposta.profile.sobrenome}`) : "—"}
+                      </p>
+                      <p>
+                        Investimento: {formatCurrency(aposta.investimento_total)} ·
+                        ROI: {aposta.roi_percentual.toFixed(2)}% ·
+                        {new Date(aposta.created_at).toLocaleDateString("pt-BR")}
+                      </p>
+                    </div>
+                    {/* Legs */}
+                    {(aposta as Aposta & { legs?: ApostaLeg[] }).legs && (aposta as Aposta & { legs?: ApostaLeg[] }).legs!.length > 0 && (
+                      <div className="mt-2 space-y-1">
+                        {(aposta as Aposta & { legs?: ApostaLeg[] }).legs!.map((leg) => (
+                          <div key={leg.id} className="text-xs text-gray-500 flex items-center gap-2">
+                            <span className="bg-gray-100 rounded px-1.5 py-0.5">
+                              {leg.profile_bet?.bet?.nome ?? "Casa"}
+                            </span>
+                            <span>{leg.resultado_apostado}</span>
+                            <span className="font-medium">@{leg.odd}</span>
+                            <span className="text-[#16A34A]">{formatCurrency(leg.stake)}</span>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                  <div className="text-right flex-shrink-0">
+                    {aposta.status === "finalizada" ? (
+                      <>
+                        <p className="text-xs text-gray-400">Resultado real</p>
+                        <p className="text-base font-bold text-[#16A34A]">{formatCurrency(aposta.resultado_real ?? 0)}</p>
+                        {aposta.finalizada_at && (
+                          <p className="text-xs text-gray-400">{new Date(aposta.finalizada_at).toLocaleDateString("pt-BR")}</p>
+                        )}
+                      </>
+                    ) : aposta.status === "pendente" ? (
+                      <>
+                        <p className="text-xs text-gray-400">Lucro esperado</p>
+                        <p className="text-base font-bold text-yellow-600">{formatCurrency(aposta.lucro_garantido)}</p>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          className="mt-2"
+                          onClick={() => {
+                            setFinalizarDialog(aposta)
+                            setResultadoReal(aposta.lucro_garantido.toString())
+                          }}
+                        >
+                          Finalizar
+                        </Button>
+                      </>
+                    ) : (
+                      <p className="text-sm text-gray-400">Cancelada</p>
+                    )}
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      )}
+
+      <Dialog open={!!finalizarDialog} onOpenChange={open => !open && setFinalizarDialog(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Finalizar Aposta</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <p className="text-sm text-gray-600">
+              Evento: <strong>{finalizarDialog?.evento}</strong><br />
+              Lucro esperado: <strong>{formatCurrency(finalizarDialog?.lucro_garantido ?? 0)}</strong>
+            </p>
+            <div className="space-y-2">
+              <Label>Resultado real obtido (R$)</Label>
+              <Input
+                type="number"
+                step="0.01"
+                value={resultadoReal}
+                onChange={e => setResultadoReal(e.target.value)}
+                placeholder="Ex: 25.50"
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setFinalizarDialog(null)}>Cancelar</Button>
+            <Button onClick={handleFinalizar} disabled={finalizando}>
+              {finalizando ? "Finalizando..." : "Confirmar"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </div>
+  )
+}
