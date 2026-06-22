@@ -470,10 +470,6 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
                 ))}
               </select>
             )}
-            <Button size="sm" className="ml-auto" onClick={() => setFinShowForm(true)}>
-              <PlusCircle className="h-4 w-4 mr-2" />
-              Nova movimentação
-            </Button>
           </div>
 
           {/* Modal form */}

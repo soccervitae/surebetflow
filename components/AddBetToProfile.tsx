@@ -7,10 +7,11 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { formatCurrency } from "@/lib/utils"
 import { useToast } from "@/hooks/useToast"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
-import { Plus, Eye, EyeOff, Loader2, Trash2, Search, X } from "lucide-react"
+import { Plus, Eye, EyeOff, Loader2, Trash2, Search, X, PlusCircle } from "lucide-react"
 import type { Bet, ProfileBet } from "@/lib/types"
 
 interface Props {
@@ -36,6 +37,13 @@ export default function AddBetToProfile({ profileId }: Props) {
   const [deletando, setDeletando] = useState(false)
   const [ativoDialog, setAtivoDialog] = useState<ProfileBetWithBet | null>(null)
   const [togglingAtivo, setTogglingAtivo] = useState(false)
+  // Movimentação
+  const [movDialog, setMovDialog] = useState<ProfileBetWithBet | null>(null)
+  const [movTipo, setMovTipo] = useState<"deposito" | "saque">("deposito")
+  const [movValor, setMovValor] = useState("")
+  const [movDescricao, setMovDescricao] = useState("")
+  const [movSaving, setMovSaving] = useState(false)
+
   const betSearchRef = useRef<HTMLInputElement>(null)
   const { toast } = useToast()
   const supabase = createClient()
@@ -53,6 +61,17 @@ export default function AddBetToProfile({ profileId }: Props) {
     loadData()
   }, [loadData])
 
+  function formatBRL(raw: string) {
+    const digits = raw.replace(/\D/g, "")
+    if (!digits) return ""
+    const num = parseInt(digits, 10) / 100
+    return num.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+  }
+
+  function parseBRL(v: string) {
+    return parseFloat(v.replace(/\./g, "").replace(",", ".")) || 0
+  }
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     if (!selectedBet || !email || !senha) {
@@ -61,19 +80,15 @@ export default function AddBetToProfile({ profileId }: Props) {
     }
     setLoading(true)
     try {
-      const { error } = await supabase
-        .from("profile_bets")
-        .insert({
-          profile_id: profileId,
-          bet_id: selectedBet,
-          email,
-          senha_encrypted: senha,
-          senha_nonce: "",
-          saldo: 0,
-        })
-
+      const { error } = await supabase.from("profile_bets").insert({
+        profile_id: profileId,
+        bet_id: selectedBet,
+        email,
+        senha_encrypted: senha,
+        senha_nonce: "",
+        saldo: 0,
+      })
       if (error) throw new Error(error.message)
-
       toast({ title: "Casa de apostas adicionada com sucesso!" })
       setShowForm(false)
       setSelectedBet("")
@@ -105,10 +120,7 @@ export default function AddBetToProfile({ profileId }: Props) {
     if (!ativoDialog) return
     setTogglingAtivo(true)
     const novoAtivo = !ativoDialog.ativo
-    const { error } = await supabase
-      .from("profile_bets")
-      .update({ ativo: novoAtivo })
-      .eq("id", ativoDialog.id)
+    const { error } = await supabase.from("profile_bets").update({ ativo: novoAtivo }).eq("id", ativoDialog.id)
     if (error) {
       toast({ title: "Erro ao atualizar status", variant: "destructive" })
     } else {
@@ -117,6 +129,33 @@ export default function AddBetToProfile({ profileId }: Props) {
       setAtivoDialog(null)
     }
     setTogglingAtivo(false)
+  }
+
+  async function handleMovSave() {
+    if (!movDialog) return
+    const valor = parseBRL(movValor)
+    if (!valor || valor <= 0) {
+      toast({ title: "Informe um valor válido", variant: "destructive" })
+      return
+    }
+    setMovSaving(true)
+    const { error } = await supabase.from("movimentacoes_financeiras").insert({
+      profile_id: profileId,
+      profile_bet_id: movDialog.id,
+      tipo: movTipo,
+      valor,
+      descricao: movDescricao.trim() || null,
+    })
+    if (error) {
+      toast({ title: "Erro ao registrar movimentação", variant: "destructive" })
+    } else {
+      toast({ title: "Movimentação registrada!" })
+      setMovDialog(null)
+      setMovTipo("deposito")
+      setMovValor("")
+      setMovDescricao("")
+    }
+    setMovSaving(false)
   }
 
   return (
@@ -166,24 +205,21 @@ export default function AddBetToProfile({ profileId }: Props) {
                     />
                   </div>
                 )}
-
                 {betDropdownOpen && (
                   <div className="absolute z-50 mt-1 w-full max-h-52 overflow-y-auto rounded-md border border-[var(--border)] bg-[var(--bg-surface)] shadow-lg">
                     {bets.filter(b => b.nome.toLowerCase().includes(betSearch.toLowerCase())).length === 0 ? (
                       <p className="text-sm text-[var(--text-muted)] text-center py-4">Nenhuma casa encontrada</p>
                     ) : (
-                      bets
-                        .filter(b => b.nome.toLowerCase().includes(betSearch.toLowerCase()))
-                        .map(b => (
-                          <button
-                            key={b.id}
-                            type="button"
-                            className="w-full text-left px-3 py-2.5 text-sm text-[var(--text-primary)] hover:bg-[var(--bg-elevated)] transition-colors"
-                            onClick={() => { setSelectedBet(b.id); setBetSearch(""); setBetDropdownOpen(false) }}
-                          >
-                            {b.nome}
-                          </button>
-                        ))
+                      bets.filter(b => b.nome.toLowerCase().includes(betSearch.toLowerCase())).map(b => (
+                        <button
+                          key={b.id}
+                          type="button"
+                          className="w-full text-left px-3 py-2.5 text-sm text-[var(--text-primary)] hover:bg-[var(--bg-elevated)] transition-colors"
+                          onClick={() => { setSelectedBet(b.id); setBetSearch(""); setBetDropdownOpen(false) }}
+                        >
+                          {b.nome}
+                        </button>
+                      ))
                     )}
                   </div>
                 )}
@@ -221,6 +257,43 @@ export default function AddBetToProfile({ profileId }: Props) {
               </Button>
             </DialogFooter>
           </form>
+        </DialogContent>
+      </Dialog>
+
+      {/* Dialog Nova Movimentação */}
+      <Dialog open={!!movDialog} onOpenChange={open => { if (!open) { setMovDialog(null); setMovTipo("deposito"); setMovValor(""); setMovDescricao("") } }}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Nova Movimentação — {movDialog?.bet?.nome}</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-1.5">
+                <Label>Tipo</Label>
+                <Select value={movTipo} onValueChange={v => setMovTipo(v as "deposito" | "saque")}>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="deposito">Depósito</SelectItem>
+                    <SelectItem value="saque">Saque</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-1.5">
+                <Label>Valor (R$)</Label>
+                <Input placeholder="0,00" value={movValor} onChange={e => setMovValor(formatBRL(e.target.value))} />
+              </div>
+            </div>
+            <div className="space-y-1.5">
+              <Label>Descrição (opcional)</Label>
+              <Input placeholder="Ex: Depósito inicial" value={movDescricao} onChange={e => setMovDescricao(e.target.value)} />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setMovDialog(null)}>Cancelar</Button>
+            <Button onClick={handleMovSave} disabled={movSaving}>
+              {movSaving ? "Salvando..." : "Salvar"}
+            </Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
 
@@ -271,7 +344,7 @@ export default function AddBetToProfile({ profileId }: Props) {
         <div className="space-y-3">
           {profileBets.map(pb => (
             <Card key={pb.id} className={!pb.ativo ? "opacity-60" : ""}>
-              <CardContent className="p-4">
+              <CardContent className="p-4 space-y-3">
                 <div className="flex items-center justify-between gap-3">
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 flex-wrap">
@@ -320,6 +393,17 @@ export default function AddBetToProfile({ profileId }: Props) {
                     </Button>
                   </div>
                 </div>
+
+                {/* Nova movimentação */}
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="w-full text-[#16A34A] border-[#16A34A]/30 hover:bg-[#16A34A]/5"
+                  onClick={() => { setMovDialog(pb); setMovTipo("deposito"); setMovValor(""); setMovDescricao("") }}
+                >
+                  <PlusCircle className="h-4 w-4 mr-2" />
+                  Nova movimentação
+                </Button>
               </CardContent>
             </Card>
           ))}
