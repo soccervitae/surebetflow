@@ -129,7 +129,7 @@ export default async function LandingPage() {
             { icon: Calculator, color: "bg-[#1e3a8a]/10", iconColor: "text-[var(--accent-text)]", title: "Calculadora 2-way e 3-way", desc: "Detecta arbitragem em tempo real e calcula automaticamente a distribuição ideal das stakes." },
             { icon: Lock, color: "bg-blue-500/10", iconColor: "text-blue-400", title: "Senhas criptografadas AES-256", desc: "Suas credenciais das casas de apostas ficam protegidas com criptografia de nível militar." },
             { icon: Users, color: "bg-purple-500/10", iconColor: "text-purple-400", title: "Perfis ilimitados", desc: "Crie perfis separados para você, familiares ou sócios. Cada perfil é totalmente isolado." },
-            { icon: Wallet, color: "bg-yellow-500/10", iconColor: "text-yellow-400", title: "Controle financeiro", desc: "Registre depósitos e saques por casa de apostas. Visualize saldo, lucro realizado e pendente." },
+            { icon: Wallet, color: "bg-yellow-500/10", iconColor: "text-yellow-400", title: "Controle financeiro", desc: "Registre depósitos e saques por bet. Visualize saldo, lucro realizado e pendente." },
             { icon: BarChart3, color: "bg-[#1e3a8a]/10", iconColor: "text-[var(--accent-text)]", title: "Dashboard com gráficos", desc: "Acompanhe a evolução do lucro acumulado. Veja ROI, total investido e apostas ativas." },
             { icon: RefreshCw, color: "bg-blue-500/10", iconColor: "text-blue-400", title: "Histórico completo", desc: "Todas as apostas com legs detalhados, odds, stakes e resultado real. Filtre por perfil e período." },
           ].map((f) => (

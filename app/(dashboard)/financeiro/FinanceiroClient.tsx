@@ -216,7 +216,7 @@ export default function FinanceiroClient({ movimentacoes: initial, profiles, pro
               </div>
               {formProfile && filteredProfileBets.length > 0 && (
                 <div className="space-y-2">
-                  <Label>Casa de Apostas (opcional)</Label>
+                  <Label>Bet (opcional)</Label>
                   <Select value={formProfileBet} onValueChange={setFormProfileBet}>
                     <SelectTrigger>
                       <SelectValue placeholder="Selecionar casa (opcional)..." />

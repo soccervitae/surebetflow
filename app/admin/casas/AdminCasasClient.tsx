@@ -58,7 +58,7 @@ export default function AdminCasasClient({ bets: initial }: { bets: Bet[] }) {
 
       {showForm && (
         <div className="bg-gray-900 border border-gray-700 rounded-xl p-5 space-y-4">
-          <h2 className="font-semibold text-white">{editingId ? "Editar Casa" : "Nova Casa de Apostas"}</h2>
+          <h2 className="font-semibold text-white">{editingId ? "Editar Casa" : "Nova Bet"}</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="space-y-1.5">
               <label className="text-xs text-gray-400">Nome *</label>

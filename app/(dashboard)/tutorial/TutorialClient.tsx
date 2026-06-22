@@ -700,7 +700,7 @@ export default function TutorialClient() {
                   {[
                     { icon: BarChart2,   label: "Evolução da banca",    desc: "Gráfico do crescimento do saldo ao longo do tempo com filtros de período." },
                     { icon: ArrowUpRight,label: "ROI por período",      desc: "Retorno sobre investimento filtrado por dia, semana, mês ou ano." },
-                    { icon: Filter,      label: "Filtros avançados",    desc: "Filtre por perfil e casa de apostas para análises específicas." },
+                    { icon: Filter,      label: "Filtros avançados",    desc: "Filtre por perfil e bet para análises específicas." },
                   ].map(({ icon: Icon, label, desc }) => (
                     <div key={label} className="flex items-start gap-3 bg-[var(--bg-surface)] border border-[var(--border)] rounded-xl p-4">
                       <div className="w-8 h-8 bg-[#1e3a8a]/10 rounded-lg flex items-center justify-center shrink-0">

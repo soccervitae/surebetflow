@@ -261,7 +261,7 @@ export default function ApostaDetailClient({ aposta: initial }: { aposta: Aposta
       <Card>
         <CardHeader className="pb-3">
           <div className="flex items-center justify-between">
-            <CardTitle className="text-base">Entradas por Casa de Apostas</CardTitle>
+            <CardTitle className="text-base">Entradas por Bet</CardTitle>
             {legs.length > 0 && (
               <p className="text-xs text-[var(--text-secondary)]">
                 {aposta.status === "finalizada" ? "Clique para alterar resultado" : "Selecione qual deu green"}
@@ -281,65 +281,55 @@ export default function ApostaDetailClient({ aposta: initial }: { aposta: Aposta
                 return (
                   <div
                     key={leg.id}
-                    className={`p-3 rounded-xl transition-all ${
+                    className={`text-xs rounded-lg px-2 py-2 flex items-center gap-2 ${
                       isGreen ? "bg-green-500/10" :
                       isRed ? "bg-[#DC2626]/5" :
-                      "bg-[var(--bg-muted)]"
+                      "bg-[var(--bg-elevated)]"
                     }`}
                   >
-                    {/* Top row: number + casa + toggle buttons */}
-                    <div className="flex items-center gap-2 mb-2">
-                      <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 ${
-                        isGreen ? "bg-green-600 text-white" :
-                        isRed ? "bg-[#DC2626] text-white" :
-                        "bg-[var(--bg-elevated)] text-[var(--text-secondary)]"
-                      }`}>
-                        {i + 1}
+                    {/* Info: bet name + resultado + odd/stake */}
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-1.5 flex-wrap min-w-0">
+                        <span className={`font-medium flex-shrink-0 ${isGreen ? "text-green-600" : isRed ? "text-[#DC2626]" : "text-[var(--text-secondary)]"}`}>
+                          {leg.profile_bet?.bet?.nome ?? "Bet"}
+                        </span>
+                        <span className="text-[var(--text-secondary)] truncate">{leg.resultado_apostado}</span>
                       </div>
-                      <p className="font-medium text-sm text-[var(--text-primary)] flex-1 min-w-0 truncate">
-                        {leg.profile_bet?.bet?.nome ?? "Casa desconhecida"}
-                      </p>
-                      <div className="flex gap-1 flex-shrink-0">
-                        <button
-                          type="button"
-                          onClick={() => handleLegClick(leg.id, "green")}
-                          className={`px-2 py-0.5 rounded text-xs font-bold border transition-all ${
-                            isGreen
-                              ? "bg-green-600 text-white border-green-600"
-                              : "bg-transparent text-green-600 border-green-600/40 hover:bg-green-500/10"
-                          }`}
-                        >
-                          GREEN
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => handleLegClick(leg.id, "red")}
-                          className={`px-2 py-0.5 rounded text-xs font-bold border transition-all ${
-                            isRed
-                              ? "bg-[#DC2626] text-white border-[#DC2626]"
-                              : "bg-transparent text-[#DC2626] border-[#DC2626]/40 hover:bg-[#DC2626]/10"
-                          }`}
-                        >
-                          RED
-                        </button>
-                      </div>
-                    </div>
-
-                    {/* Bottom row: resultado + odd/stake + retorno */}
-                    <div className="flex items-center justify-between gap-2 pl-8">
-                      <p className="text-xs text-[var(--text-secondary)] truncate">
-                        {leg.resultado_apostado}
-                      </p>
-                      <div className="text-right flex-shrink-0">
-                        <p className="text-xs text-[var(--text-secondary)]">@{Number(leg.odd).toFixed(2)} · {formatCurrency(leg.stake)}</p>
+                      <div className="flex items-center gap-2 mt-0.5 flex-wrap">
+                        <p className="text-[var(--text-muted)]">@{Number(leg.odd).toFixed(2)} · {formatCurrency(leg.stake)}</p>
                         {calc && (
-                          <p className={`text-xs font-bold mt-0.5 ${calc.valor >= 0 ? "text-green-600" : "text-[#DC2626]"}`}>
+                          <p className={`font-bold ${calc.valor >= 0 ? "text-green-600" : "text-[#DC2626]"}`}>
                             {calc.tipo === "green"
                               ? `Retorno: ${formatCurrency(calc.valor)}`
                               : `Perda: ${formatCurrency(calc.valor)}`}
                           </p>
                         )}
                       </div>
+                    </div>
+                    {/* GREEN/RED toggle badges */}
+                    <div className="flex flex-col gap-1 flex-shrink-0">
+                      <button
+                        type="button"
+                        onClick={() => handleLegClick(leg.id, "green")}
+                        className={`px-2 py-0.5 rounded text-[10px] font-bold border transition-all ${
+                          isGreen
+                            ? "bg-green-600 text-white border-green-600"
+                            : "bg-transparent text-green-600 border-green-600/40 hover:bg-green-500/10"
+                        }`}
+                      >
+                        GREEN
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleLegClick(leg.id, "red")}
+                        className={`px-2 py-0.5 rounded text-[10px] font-bold border transition-all ${
+                          isRed
+                            ? "bg-[#DC2626] text-white border-[#DC2626]"
+                            : "bg-transparent text-[#DC2626] border-[#DC2626]/40 hover:bg-[#DC2626]/10"
+                        }`}
+                      >
+                        RED
+                      </button>
                     </div>
                   </div>
                 )

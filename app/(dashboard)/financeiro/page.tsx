@@ -225,7 +225,7 @@ export default function FinanceiroPage() {
                   </select>
                 </div>
                 <div className="space-y-2">
-                  <Label>Casa de Apostas (opcional)</Label>
+                  <Label>Bet (opcional)</Label>
                   <select
                     className="w-full h-10 px-3 rounded-xl border border-[var(--border)] bg-[var(--bg-surface)] text-[var(--text-primary)] text-sm"
                     value={formBet} onChange={e => setFormBet(e.target.value)}
@@ -353,9 +353,9 @@ export default function FinanceiroPage() {
               </select>
             </div>
 
-            {/* Casa de apostas */}
+            {/* Bet */}
             <div>
-              <p className="text-xs text-[var(--text-muted)] mb-2 uppercase tracking-wide font-medium">Casa de Apostas</p>
+              <p className="text-xs text-[var(--text-muted)] mb-2 uppercase tracking-wide font-medium">Bet</p>
               <select
                 value={filterBet}
                 onChange={e => setFilterBet(e.target.value)}

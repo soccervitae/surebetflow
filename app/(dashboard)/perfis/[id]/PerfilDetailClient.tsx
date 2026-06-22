@@ -594,7 +594,7 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
                 </div>
                 {profileBetsFinanceiro.length > 0 && (
                   <div className="space-y-1.5">
-                    <Label>Casa de apostas (opcional)</Label>
+                    <Label>Bet (opcional)</Label>
                     <Select value={finFormBet} onValueChange={setFinFormBet}>
                       <SelectTrigger><SelectValue placeholder="Selecione..." /></SelectTrigger>
                       <SelectContent>
