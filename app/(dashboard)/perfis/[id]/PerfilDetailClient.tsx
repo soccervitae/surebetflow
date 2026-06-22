@@ -35,7 +35,8 @@ function statusBadge(status: string) {
 }
 
 export default function PerfilDetailClient({ profile, dashboard, apostas, userToken }: Props) {
-  const [currentProfile] = useState(profile)
+  const [currentProfile, setCurrentProfile] = useState(profile)
+  const [togglingAtivo, setTogglingAtivo] = useState(false)
   const [currentApostas, setCurrentApostas] = useState(apostas)
   const [showCalculadora, setShowCalculadora] = useState(false)
   const [finalizarDialog, setFinalizarDialog] = useState<Aposta | null>(null)
@@ -69,6 +70,22 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
     return parseFloat(formatted.replace(/\./g, "").replace(",", ".")) || 0
   }
   const supabase = createClient()
+
+  async function handleToggleAtivo() {
+    setTogglingAtivo(true)
+    const novoAtivo = !currentProfile.ativo
+    const { error } = await supabase
+      .from("profiles")
+      .update({ ativo: novoAtivo, updated_at: new Date().toISOString() })
+      .eq("id", currentProfile.id)
+    if (error) {
+      toast({ title: "Erro ao atualizar status", variant: "destructive" })
+    } else {
+      setCurrentProfile(prev => ({ ...prev, ativo: novoAtivo }))
+      toast({ title: novoAtivo ? "Perfil ativado" : "Perfil desativado" })
+    }
+    setTogglingAtivo(false)
+  }
 
   async function loadMovimentacoes() {
     const [movRes, betsRes] = await Promise.all([
@@ -230,6 +247,19 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
           <Button onClick={() => setShowCalculadora(true)} size="sm">
             <Calculator className="h-4 w-4 mr-2" />
             Nova Aposta
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleToggleAtivo}
+            disabled={togglingAtivo}
+            className={currentProfile.ativo
+              ? "text-[#16A34A] border-[#16A34A]/40 hover:bg-[#16A34A]/5"
+              : "text-[#DC2626] border-[#DC2626]/40 hover:bg-[#DC2626]/5"
+            }
+          >
+            <span className={`w-2 h-2 rounded-full mr-2 ${currentProfile.ativo ? "bg-[#16A34A]" : "bg-[#DC2626]"}`} />
+            {togglingAtivo ? "..." : currentProfile.ativo ? "Ativo" : "Inativo"}
           </Button>
           <Link href={`/perfis/${profile.id}/editar`}>
             <Button variant="outline" size="sm">
