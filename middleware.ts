@@ -77,6 +77,6 @@ function redirect(request: NextRequest, pathname: string) {
 
 export const config = {
   matcher: [
-    '/((?!_next/static|_next/image|favicon.ico|api/stripe|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
+    '/((?!_next/static|_next/image|favicon.ico|api/mp|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
   ],
 }

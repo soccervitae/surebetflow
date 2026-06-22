@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState } from "react"
 import { useSearchParams } from "next/navigation"
 import { CreditCard, CheckCircle, Zap, Star, ExternalLink, AlertCircle, Clock } from "lucide-react"
 
@@ -38,7 +38,7 @@ export default function AssinaturaClient({ subscription }: { subscription: Subsc
 
   async function handleCheckout(plan: "starter" | "pro") {
     setLoading(plan)
-    const res = await fetch("/api/stripe/checkout", {
+    const res = await fetch("/api/mp/checkout", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ plan }),
@@ -49,11 +49,8 @@ export default function AssinaturaClient({ subscription }: { subscription: Subsc
   }
 
   async function handlePortal() {
-    setLoading("portal")
-    const res = await fetch("/api/stripe/portal", { method: "POST" })
-    const data = await res.json()
-    if (data.url) window.location.href = data.url
-    else setLoading(null)
+    // MercadoPago doesn't have a self-serve portal — send to support
+    window.location.href = "/suporte"
   }
 
   return (
@@ -121,7 +118,7 @@ export default function AssinaturaClient({ subscription }: { subscription: Subsc
             className="inline-flex items-center gap-2 text-sm text-[var(--text-secondary)] hover:text-[var(--text-primary)] border border-[var(--border)] hover:border-[#1e3a8a]/30 px-4 py-2 rounded-xl transition-colors disabled:opacity-50"
           >
             <ExternalLink className="w-4 h-4" />
-            {loading === "portal" ? "Abrindo..." : "Gerenciar assinatura"}
+            Cancelar / Gerenciar via Suporte
           </button>
         </div>
       ) : (
