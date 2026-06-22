@@ -2,14 +2,13 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { LayoutDashboard, Users, UserCircle, Building2, ClipboardList, LogOut } from "lucide-react"
+import { LayoutDashboard, Users, Building2, ClipboardList, LogOut } from "lucide-react"
 import { createClient } from "@/lib/supabase/client"
 import { useRouter } from "next/navigation"
 
 const navItems = [
   { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
   { href: "/admin/usuarios", label: "Usuários", icon: Users },
-  { href: "/admin/perfis", label: "Perfis", icon: UserCircle },
   { href: "/admin/casas", label: "Casas de Apostas", icon: Building2 },
   { href: "/admin/apostas", label: "Apostas", icon: ClipboardList },
 ]
