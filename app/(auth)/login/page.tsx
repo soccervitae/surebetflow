@@ -4,10 +4,6 @@ import { useState } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { createClient } from "@/lib/supabase/client"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Eye, EyeOff } from "lucide-react"
 
 export default function LoginPage() {
@@ -24,7 +20,7 @@ export default function LoginPage() {
     setLoading(true)
 
     const supabase = createClient()
-    const { data, error } = await supabase.auth.signInWithPassword({ email, password })
+    const { error } = await supabase.auth.signInWithPassword({ email, password })
 
     if (error) {
       setError("E-mail ou senha incorretos. Verifique seus dados e tente novamente.")
@@ -37,64 +33,65 @@ export default function LoginPage() {
   }
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Entrar na sua conta</CardTitle>
-        <CardDescription>Digite seu e-mail e senha para acessar o sistema</CardDescription>
-      </CardHeader>
-      <CardContent>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="email">E-mail</Label>
-            <Input
-              id="email"
-              type="email"
-              placeholder="seu@email.com"
-              value={email}
-              onChange={e => setEmail(e.target.value)}
+    <>
+      <h2 className="text-xl font-bold text-white mb-1">Entrar na sua conta</h2>
+      <p className="text-gray-500 text-sm mb-6">Digite seu e-mail e senha para acessar</p>
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <div className="space-y-1.5">
+          <label htmlFor="email" className="text-sm font-medium text-gray-300">E-mail</label>
+          <input
+            id="email"
+            type="email"
+            placeholder="seu@email.com"
+            value={email}
+            onChange={e => setEmail(e.target.value)}
+            required
+            autoComplete="email"
+            className="w-full bg-[#0a0a0a] border border-white/10 rounded-xl px-4 py-3 text-white placeholder-gray-600 text-sm focus:outline-none focus:border-[#16A34A]/50 transition-colors"
+          />
+        </div>
+        <div className="space-y-1.5">
+          <label htmlFor="password" className="text-sm font-medium text-gray-300">Senha</label>
+          <div className="relative">
+            <input
+              id="password"
+              type={showPassword ? "text" : "password"}
+              placeholder="••••••••"
+              value={password}
+              onChange={e => setPassword(e.target.value)}
               required
-              autoComplete="email"
+              autoComplete="current-password"
+              className="w-full bg-[#0a0a0a] border border-white/10 rounded-xl px-4 py-3 pr-10 text-white placeholder-gray-600 text-sm focus:outline-none focus:border-[#16A34A]/50 transition-colors"
             />
+            <button
+              type="button"
+              onClick={() => setShowPassword(v => !v)}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-300 transition-colors"
+              tabIndex={-1}
+            >
+              {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+            </button>
           </div>
-          <div className="space-y-2">
-            <Label htmlFor="password">Senha</Label>
-            <div className="relative">
-              <Input
-                id="password"
-                type={showPassword ? "text" : "password"}
-                placeholder="••••••••"
-                value={password}
-                onChange={e => setPassword(e.target.value)}
-                required
-                autoComplete="current-password"
-                className="pr-10"
-              />
-              <button
-                type="button"
-                onClick={() => setShowPassword(v => !v)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
-                tabIndex={-1}
-              >
-                {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-              </button>
-            </div>
-          </div>
-          {error && (
-            <p className="text-sm text-[#DC2626] bg-[#DC2626]/5 border border-[#DC2626]/20 rounded-lg px-3 py-2">
-              {error}
-            </p>
-          )}
-          <Button type="submit" className="w-full" disabled={loading}>
-            {loading ? "Entrando..." : "Entrar"}
-          </Button>
-        </form>
-        <p className="text-center text-sm text-gray-500 mt-4">
-          Não tem uma conta?{" "}
-          <Link href="/cadastro" className="text-[#16A34A] font-medium hover:underline">
-            Cadastre-se
-          </Link>
-        </p>
-      </CardContent>
-    </Card>
+        </div>
+        {error && (
+          <p className="text-sm text-red-400 bg-red-500/5 border border-red-500/20 rounded-xl px-4 py-3">
+            {error}
+          </p>
+        )}
+        <button
+          type="submit"
+          disabled={loading}
+          className="w-full bg-[#16A34A] hover:bg-[#15803D] disabled:opacity-60 text-white font-semibold py-3 rounded-xl transition-colors text-sm"
+        >
+          {loading ? "Entrando..." : "Entrar"}
+        </button>
+      </form>
+      <p className="text-center text-sm text-gray-500 mt-6">
+        Não tem uma conta?{" "}
+        <Link href="/cadastro" className="text-[#16A34A] font-medium hover:underline">
+          Cadastre-se
+        </Link>
+      </p>
+    </>
   )
 }
