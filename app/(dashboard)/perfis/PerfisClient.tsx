@@ -36,7 +36,8 @@ export default function PerfisClient({ profiles: initialProfiles, userId }: Prop
         </div>
         <Button onClick={() => setShowCreate(true)}>
           <Plus className="h-4 w-4 mr-2" />
-          Novo perfil
+          <span className="hidden sm:inline">Novo perfil</span>
+          <span className="sm:hidden">Novo</span>
         </Button>
       </div>
 
