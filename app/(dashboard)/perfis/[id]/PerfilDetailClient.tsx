@@ -4,7 +4,7 @@ import { useState } from "react"
 import Link from "next/link"
 import { createClient } from "@/lib/supabase/client"
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
@@ -16,7 +16,6 @@ import AddBetToProfile from "@/components/AddBetToProfile"
 import { formatCurrency } from "@/lib/utils"
 import { useToast } from "@/hooks/useToast"
 import { ArrowLeft, DollarSign, TrendingUp, Clock, ArrowUpRight, Pencil, Calculator } from "lucide-react"
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts"
 import SurebetCalculator from "@/components/SurebetCalculator"
 import type { Profile, ProfileDashboard, Aposta } from "@/lib/types"
 
@@ -57,20 +56,6 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
     return parseFloat(formatted.replace(/\./g, "").replace(",", ".")) || 0
   }
   const supabase = createClient()
-
-  // Chart data
-  const apostasFinalizadas = currentApostas
-    .filter(a => a.status === "finalizada")
-    .sort((a, b) => new Date(a.finalizada_at!).getTime() - new Date(b.finalizada_at!).getTime())
-
-  let cumulative = 0
-  const chartData = apostasFinalizadas.map(a => {
-    cumulative += a.resultado_real ?? a.lucro_garantido
-    return {
-      date: new Date(a.finalizada_at!).toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit" }),
-      lucro: parseFloat(cumulative.toFixed(2)),
-    }
-  })
 
   // Casas únicas extraídas das legs de todas as apostas
   const casasUnicas = Array.from(
