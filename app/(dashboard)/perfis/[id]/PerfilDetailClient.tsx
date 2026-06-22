@@ -437,28 +437,34 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
 
                         {/* Legs */}
                         {legs.length > 0 && (
-                          <div className="space-y-1 mb-3">
+                          <div className="space-y-1.5 mb-3">
                             {legs.map(leg => {
                               const isGreen = greenLegId === leg.id
                               const isRed = greenLegId !== null && greenLegId !== leg.id
                               return (
-                                <div key={leg.id} className={`text-xs rounded-lg px-2 py-1.5 ${
+                                <div key={leg.id} className={`text-xs rounded-lg px-2 py-2 flex items-center gap-2 ${
                                   isGreen ? "bg-[#1e3a8a]/5" : isRed ? "bg-[#DC2626]/5" : "bg-[var(--bg-elevated)]"
                                 }`}>
-                                  <div className="flex items-center gap-1.5 flex-wrap min-w-0">
-                                    {(isGreen || isRed) && (
-                                      <span className={`px-1.5 py-0.5 rounded text-[10px] font-bold flex-shrink-0 ${
-                                        isGreen ? "bg-[#1e3a8a] text-white" : "bg-[#DC2626] text-white"
-                                      }`}>
-                                        {isGreen ? "GREEN" : "RED"}
+                                  {/* Info: casa + evento + odd/stake */}
+                                  <div className="flex-1 min-w-0">
+                                    <div className="flex items-center gap-1.5 flex-wrap min-w-0">
+                                      <span className={`font-medium flex-shrink-0 ${isGreen ? "text-[var(--accent-text)]" : isRed ? "text-[#DC2626]" : "text-[var(--text-secondary)]"}`}>
+                                        {leg.profile_bet?.bet?.nome ?? "Casa"}
                                       </span>
-                                    )}
-                                    <span className={`font-medium flex-shrink-0 ${isGreen ? "text-[var(--accent-text)]" : isRed ? "text-[#DC2626]" : "text-[var(--text-secondary)]"}`}>
-                                      {leg.profile_bet?.bet?.nome ?? "Casa"}
-                                    </span>
-                                    <span className="text-[var(--text-secondary)] truncate min-w-0">{leg.resultado_apostado}</span>
-                                    <span className="text-[var(--text-muted)] flex-shrink-0 ml-auto">@{Number(leg.odd).toFixed(2)} · {formatCurrency(leg.stake)}</span>
+                                      <span className="text-[var(--text-secondary)] truncate">{leg.resultado_apostado}</span>
+                                    </div>
+                                    <p className="text-[var(--text-muted)] mt-0.5">
+                                      @{Number(leg.odd).toFixed(2)} · {formatCurrency(leg.stake)}
+                                    </p>
                                   </div>
+                                  {/* GREEN / RED badge no canto direito */}
+                                  {(isGreen || isRed) && (
+                                    <span className={`px-2 py-1 rounded-lg text-[10px] font-bold flex-shrink-0 ${
+                                      isGreen ? "bg-[#1e3a8a] text-white" : "bg-[#DC2626] text-white"
+                                    }`}>
+                                      {isGreen ? "GREEN" : "RED"}
+                                    </span>
+                                  )}
                                 </div>
                               )
                             })}
