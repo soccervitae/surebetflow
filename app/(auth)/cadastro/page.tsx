@@ -43,8 +43,14 @@ export default function CadastroPage() {
       return
     }
 
-    router.push("/dashboard")
-    router.refresh()
+    // Send verification code via Resend
+    await fetch("/api/auth/send-code", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ nome: nome.trim() }),
+    })
+
+    router.push(`/verificar-email?email=${encodeURIComponent(email)}&nome=${encodeURIComponent(nome.trim())}`)
   }
 
   const inputClass = "w-full bg-[#0a0a0a] border border-white/10 rounded-xl px-4 py-3 text-white placeholder-gray-600 text-sm focus:outline-none focus:border-[#1e3a8a]/50 transition-colors"

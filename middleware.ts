@@ -24,7 +24,7 @@ export async function middleware(request: NextRequest) {
   const { data: { user } } = await supabase.auth.getUser()
   const { pathname } = request.nextUrl
 
-  const publicRoutes = ['/', '/login', '/cadastro']
+  const publicRoutes = ['/', '/login', '/cadastro', '/verificar-email']
   const isPublicRoute = publicRoutes.some(r => pathname === r || pathname.startsWith(r + '/'))
 
   // Admin routes: require auth + admin email
@@ -40,6 +40,14 @@ export async function middleware(request: NextRequest) {
 
   // Authenticated user trying to access login/cadastro
   if (user && (pathname === '/login' || pathname === '/cadastro')) return redirect(request, '/dashboard')
+
+  // Check email verification for protected routes
+  if (user && !isPublicRoute && !pathname.startsWith('/admin')) {
+    const adminEmails = (process.env.ADMIN_EMAILS ?? "").split(",").map(e => e.trim()).filter(Boolean)
+    if (!adminEmails.includes(user.email ?? "") && !user.email_confirmed_at) {
+      return redirect(request, `/verificar-email?email=${encodeURIComponent(user.email ?? "")}`)
+    }
+  }
 
   // Check subscription for dashboard routes (skip /assinatura, /api/stripe, /onboarding)
   if (user && !isPublicRoute) {
@@ -78,6 +86,6 @@ function redirect(request: NextRequest, pathname: string) {
 
 export const config = {
   matcher: [
-    '/((?!_next/static|_next/image|favicon.ico|api/mp|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
+    '/((?!_next/static|_next/image|favicon.ico|api/mp|api/auth|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
   ],
 }
