@@ -79,6 +79,10 @@ export default function AddBetToProfile({ profileId }: Props) {
       toast({ title: "Preencha todos os campos obrigatórios", variant: "destructive" })
       return
     }
+    if (profileBets.some(pb => pb.bet_id === selectedBet)) {
+      toast({ title: "Esta casa já foi adicionada a este perfil", variant: "destructive" })
+      return
+    }
     setLoading(true)
     try {
       const { error } = await supabase.from("profile_bets").insert({
@@ -155,6 +159,16 @@ export default function AddBetToProfile({ profileId }: Props) {
     if (error) {
       toast({ title: "Erro ao registrar movimentação", variant: "destructive" })
     } else {
+      // Atualiza saldo local: deposito soma, saque subtrai
+      const delta = movTipo === "deposito" ? valor : -valor
+      setProfileBets(prev => prev.map(pb =>
+        pb.id === movDialog.id ? { ...pb, saldo: pb.saldo + delta } : pb
+      ))
+      // Persiste saldo no DB
+      await supabase
+        .from("profile_bets")
+        .update({ saldo: movDialog.saldo + delta })
+        .eq("id", movDialog.id)
       toast({ title: "Movimentação registrada!" })
       setMovDialog(null)
       setMovTipo("deposito")
