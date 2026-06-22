@@ -7,7 +7,7 @@ import { createClient } from "@/lib/supabase/client"
 import { cn } from "@/lib/utils"
 import {
   Home, Users, Calculator, BookOpen, DollarSign,
-  CreditCard, Settings, LogOut, Menu, X, TrendingUp
+  CreditCard, Settings, LogOut, Menu, X, TrendingUp, HelpCircle
 } from "lucide-react"
 const navItems = [
   { href: "/dashboard", label: "Início", icon: Home },
@@ -16,6 +16,7 @@ const navItems = [
   { href: "/apostas", label: "Apostas", icon: BookOpen },
   { href: "/financeiro", label: "Financeiro", icon: DollarSign },
   { href: "/assinatura", label: "Assinatura", icon: CreditCard },
+  { href: "/tutorial", label: "Tutorial", icon: HelpCircle },
   { href: "/configuracoes", label: "Configurações", icon: Settings },
 ]
 
