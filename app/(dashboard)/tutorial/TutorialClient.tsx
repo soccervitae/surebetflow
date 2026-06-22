@@ -126,7 +126,7 @@ export default function TutorialClient() {
 
   return (
     <div className="max-w-5xl mx-auto">
-      <div className="flex items-center gap-3 mb-8">
+      <div className="flex items-center gap-3 mb-6">
         <div className="w-9 h-9 bg-[#1e3a8a]/10 rounded-xl flex items-center justify-center">
           <BookOpen className="w-5 h-5 text-[var(--accent-text)]" />
         </div>
@@ -136,9 +136,29 @@ export default function TutorialClient() {
         </div>
       </div>
 
+      {/* Mobile: horizontal scrollable tabs */}
+      <div className="md:hidden mb-6 -mx-4 px-4">
+        <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
+          {SECTIONS.map(({ id, label, icon: Icon }) => (
+            <button
+              key={id}
+              onClick={() => setActive(id)}
+              className={`flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm font-medium whitespace-nowrap flex-shrink-0 border transition-colors ${
+                active === id
+                  ? "bg-[#1e3a8a] text-white border-[#1e3a8a]"
+                  : "bg-[var(--bg-surface)] text-[var(--text-secondary)] border-[var(--border)]"
+              }`}
+            >
+              <Icon className="w-3.5 h-3.5 shrink-0" />
+              {label}
+            </button>
+          ))}
+        </div>
+      </div>
+
       <div className="flex gap-6">
-        {/* Sidebar nav */}
-        <div className="w-52 shrink-0">
+        {/* Desktop sidebar nav */}
+        <div className="hidden md:block w-52 shrink-0">
           <div className="bg-[var(--bg-surface)] border border-[var(--border)] rounded-2xl overflow-hidden sticky top-6">
             <div className="px-3 py-2 border-b border-[var(--border)]">
               <p className="text-xs font-semibold text-[var(--text-muted)] uppercase tracking-wider">Seções</p>
@@ -173,7 +193,7 @@ export default function TutorialClient() {
                 <p className="text-sm text-[var(--text-secondary)]">Visão consolidada de todos os seus perfis e apostas.</p>
               </div>
 
-              <MockShell url="/dashboard">
+              <div className="hidden sm:block"><MockShell url="/dashboard">
                 <p className="text-[10px] font-bold text-white mb-3">Painel Geral 📊</p>
                 {/* 4 stat cards */}
                 <div className="grid grid-cols-4 gap-2 mb-3">
@@ -217,7 +237,7 @@ export default function TutorialClient() {
                     ))}
                   </div>
                 </div>
-              </MockShell>
+              </MockShell></div>
 
               <div className="space-y-3">
                 <h3 className="text-sm font-semibold text-[var(--text-primary)]">O que você encontra aqui</h3>
@@ -250,7 +270,7 @@ export default function TutorialClient() {
                 <p className="text-sm text-[var(--text-secondary)]">Organize suas apostas separando diferentes estratégias ou bancas.</p>
               </div>
 
-              <MockShell url="/perfis">
+              <div className="hidden sm:block"><MockShell url="/perfis">
                 <div className="flex items-center justify-between mb-3">
                   <div>
                     <p className="text-[11px] font-bold text-white">Perfis</p>
@@ -289,7 +309,7 @@ export default function TutorialClient() {
                     </div>
                   ))}
                 </div>
-              </MockShell>
+              </MockShell></div>
 
               <div className="space-y-3">
                 <h3 className="text-sm font-semibold text-[var(--text-primary)]">Como criar um perfil</h3>
@@ -313,7 +333,7 @@ export default function TutorialClient() {
                 <p className="text-sm text-[var(--text-secondary)]">Calcule apostas 2-way e 3-way para garantir lucro independente do resultado.</p>
               </div>
 
-              <MockShell url="/calculadora">
+              <div className="hidden sm:block"><MockShell url="/calculadora">
                 <p className="text-[10px] font-bold text-white mb-1">Calculadora de Surebet</p>
                 <p className="text-[8px] text-gray-500 mb-3">Calcule suas surebets 2-way e 3-way</p>
                 <div className="grid grid-cols-2 gap-2 mb-2">
@@ -346,7 +366,7 @@ export default function TutorialClient() {
                     <p className="text-[7px] text-white font-medium">Registrar apostas</p>
                   </div>
                 </div>
-              </MockShell>
+              </MockShell></div>
 
               <div className="space-y-3">
                 <h3 className="text-sm font-semibold text-[var(--text-primary)]">Como usar a calculadora</h3>
@@ -370,7 +390,7 @@ export default function TutorialClient() {
                 <p className="text-sm text-[var(--text-secondary)]">Registre e acompanhe todas as suas apostas em um só lugar.</p>
               </div>
 
-              <MockShell url="/apostas">
+              <div className="hidden sm:block"><MockShell url="/apostas">
                 <div className="flex items-center justify-between mb-3">
                   <div>
                     <p className="text-[11px] font-bold text-white">Apostas</p>
@@ -407,7 +427,7 @@ export default function TutorialClient() {
                     </div>
                   ))}
                 </div>
-              </MockShell>
+              </MockShell></div>
 
               <div className="space-y-3">
                 <h3 className="text-sm font-semibold text-[var(--text-primary)]">Como registrar uma aposta</h3>
@@ -443,7 +463,7 @@ export default function TutorialClient() {
                 <p className="text-sm text-[var(--text-secondary)]">Análise detalhada do seu desempenho financeiro.</p>
               </div>
 
-              <MockShell url="/financeiro">
+              <div className="hidden sm:block"><MockShell url="/financeiro">
                 <p className="text-[10px] font-bold text-white mb-3">Financeiro</p>
                 <div className="grid grid-cols-4 gap-1.5 mb-3">
                   {[
@@ -473,7 +493,7 @@ export default function TutorialClient() {
                     ))}
                   </div>
                 </div>
-              </MockShell>
+              </MockShell></div>
 
               <div className="space-y-3">
                 <h3 className="text-sm font-semibold text-[var(--text-primary)]">O que você encontra aqui</h3>
@@ -507,7 +527,7 @@ export default function TutorialClient() {
                 <p className="text-sm text-[var(--text-secondary)]">Gerencie seu plano e forma de pagamento.</p>
               </div>
 
-              <MockShell url="/assinatura">
+              <div className="hidden sm:block"><MockShell url="/assinatura">
                 <div className="flex items-center gap-2 mb-3">
                   <div className="w-6 h-6 bg-[#1e3a8a]/10 rounded-lg flex items-center justify-center">
                     <CreditCard className="w-3 h-3 text-[var(--accent-text)]" />
@@ -554,7 +574,7 @@ export default function TutorialClient() {
                     </div>
                   ))}
                 </div>
-              </MockShell>
+              </MockShell></div>
 
               <div className="space-y-3">
                 <h3 className="text-sm font-semibold text-[var(--text-primary)]">Como assinar o plano</h3>
@@ -567,7 +587,7 @@ export default function TutorialClient() {
                 </div>
               </div>
 
-              <MockShell url="/assinatura/checkout">
+              <div className="hidden sm:block"><MockShell url="/assinatura/checkout">
                 <div className="flex items-center gap-2 mb-3">
                   <ChevronLeft className="w-3 h-3 text-gray-400" />
                   <div>
@@ -619,7 +639,7 @@ export default function TutorialClient() {
                     </div>
                   </div>
                 </div>
-              </MockShell>
+              </MockShell></div>
               <Tip text="Para cancelar a assinatura, abra um ticket no Suporte. Nossa equipe responde em até 24 horas." />
             </div>
           )}
@@ -632,7 +652,7 @@ export default function TutorialClient() {
                 <p className="text-sm text-[var(--text-secondary)]">Personalize sua conta e preferências.</p>
               </div>
 
-              <MockShell url="/configuracoes">
+              <div className="hidden sm:block"><MockShell url="/configuracoes">
                 <p className="text-[10px] font-bold text-white mb-3">Configurações</p>
                 <div className="space-y-1.5">
                   {[
@@ -650,7 +670,7 @@ export default function TutorialClient() {
                     </div>
                   ))}
                 </div>
-              </MockShell>
+              </MockShell></div>
 
               <div className="space-y-3">
                 <h3 className="text-sm font-semibold text-[var(--text-primary)]">O que você pode configurar</h3>
@@ -683,7 +703,7 @@ export default function TutorialClient() {
                 <p className="text-sm text-[var(--text-secondary)]">Abra tickets e acompanhe o atendimento da nossa equipe.</p>
               </div>
 
-              <MockShell url="/suporte">
+              <div className="hidden sm:block"><MockShell url="/suporte">
                 <div className="flex items-center justify-between mb-3">
                   <div>
                     <p className="text-[11px] font-bold text-white">Suporte</p>
@@ -738,7 +758,7 @@ export default function TutorialClient() {
                     <span className={`text-[7px] font-medium border px-1.5 py-0.5 rounded-full ${badge} ${cor}`}>{status}</span>
                   </div>
                 ))}
-              </MockShell>
+              </MockShell></div>
 
               <div className="space-y-3">
                 <h3 className="text-sm font-semibold text-[var(--text-primary)]">Como abrir um ticket</h3>
