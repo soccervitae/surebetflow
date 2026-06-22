@@ -321,12 +321,12 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
             <Card>
               <CardContent className="p-5">
                 <div className="flex items-center gap-3">
-                  <div className="p-2 bg-yellow-100 rounded-lg">
-                    <Clock className="h-5 w-5 text-yellow-600" />
+                  <div className="p-2 bg-[#D97706]/10 rounded-lg">
+                    <Clock className="h-5 w-5 text-[#D97706]" />
                   </div>
                   <div className="min-w-0">
                     <p className="text-xs text-[var(--text-secondary)]">Lucro Pendente</p>
-                    <p className="text-base font-bold text-yellow-600 truncate">{formatCurrency(dashboard?.lucro_pendente ?? 0)}</p>
+                    <p className="text-base font-bold text-[#D97706] truncate">{formatCurrency(dashboard?.lucro_pendente ?? 0)}</p>
                   </div>
                 </div>
               </CardContent>
@@ -334,12 +334,12 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
             <Card>
               <CardContent className="p-5">
                 <div className="flex items-center gap-3">
-                  <div className="p-2 bg-purple-100 rounded-lg">
-                    <ArrowUpRight className="h-5 w-5 text-purple-600" />
+                  <div className="p-2 bg-[#7C3AED]/10 rounded-lg">
+                    <ArrowUpRight className="h-5 w-5 text-[#7C3AED]" />
                   </div>
                   <div className="min-w-0">
                     <p className="text-xs text-[var(--text-secondary)]">ROI</p>
-                    <p className="text-base font-bold text-purple-600 truncate">{(dashboard?.roi_percentual ?? 0).toFixed(2)}%</p>
+                    <p className="text-base font-bold text-[#7C3AED] truncate">{(dashboard?.roi_percentual ?? 0).toFixed(2)}%</p>
                   </div>
                 </div>
               </CardContent>
