@@ -1,10 +1,15 @@
+import { redirect } from "next/navigation"
+import { createClient } from "@/lib/supabase/server"
 import Link from "next/link"
 import {
   TrendingUp, ShieldCheck, Calculator, Wallet, Lock, BarChart3,
   CheckCircle, ArrowRight, Zap, Users, Target, RefreshCw
 } from "lucide-react"
 
-export default function LandingPage() {
+export default async function LandingPage() {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (user) redirect("/dashboard")
   return (
     <div className="min-h-screen bg-[#FAFAF8] text-gray-900">
 
