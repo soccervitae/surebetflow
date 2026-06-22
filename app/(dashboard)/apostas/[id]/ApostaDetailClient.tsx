@@ -12,7 +12,7 @@ import { formatCurrency } from "@/lib/utils"
 import { useToast } from "@/hooks/useToast"
 import {
   ArrowLeft, TrendingUp, DollarSign, Clock, BarChart2,
-  CheckCircle2, XCircle, AlertCircle, CalendarDays, Tag
+  CheckCircle2, XCircle, AlertCircle, CalendarDays, Tag, Trash2
 } from "lucide-react"
 import type { Aposta } from "@/lib/types"
 
@@ -50,9 +50,11 @@ function statusBadge(status: string) {
 export default function ApostaDetailClient({ aposta: initial }: { aposta: ApostaWithDetails }) {
   const [aposta, setAposta] = useState(initial)
   const [finalizarOpen, setFinalizarOpen] = useState(false)
+  const [deletarOpen, setDeletarOpen] = useState(false)
   const [greenLegId, setGreenLegId] = useState<string | null>(null)
   const [finalizando, setFinalizando] = useState(false)
   const [cancelando, setCancelando] = useState(false)
+  const [deletando, setDeletando] = useState(false)
   const { toast } = useToast()
   const router = useRouter()
   const supabase = createClient()
@@ -100,6 +102,19 @@ export default function ApostaDetailClient({ aposta: initial }: { aposta: Aposta
     setFinalizando(false)
   }
 
+  async function handleDeletar() {
+    setDeletando(true)
+    const { error } = await supabase.from("apostas").delete().eq("id", aposta.id)
+    if (error) {
+      toast({ title: "Erro ao deletar aposta", variant: "destructive" })
+      setDeletando(false)
+    } else {
+      toast({ title: "Aposta deletada" })
+      router.push("/apostas")
+      router.refresh()
+    }
+  }
+
   async function handleCancelar() {
     setCancelando(true)
     const { error } = await supabase
@@ -139,6 +154,14 @@ export default function ApostaDetailClient({ aposta: initial }: { aposta: Aposta
         <div className="flex items-center gap-2 flex-shrink-0">
           <StatusIcon status={aposta.status} />
           {statusBadge(aposta.status)}
+          <Button
+            variant="ghost"
+            size="icon"
+            className="text-[#DC2626] hover:bg-[#DC2626]/10"
+            onClick={() => setDeletarOpen(true)}
+          >
+            <Trash2 className="h-4 w-4" />
+          </Button>
         </div>
       </div>
 
@@ -359,6 +382,28 @@ export default function ApostaDetailClient({ aposta: initial }: { aposta: Aposta
           </Button>
         </div>
       )}
+
+      {/* Dialog Deletar */}
+      <Dialog open={deletarOpen} onOpenChange={setDeletarOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Deletar Aposta</DialogTitle>
+          </DialogHeader>
+          <p className="text-sm text-[var(--text-secondary)]">
+            Tem certeza que deseja deletar a aposta <strong className="text-[var(--text-primary)]">{aposta.evento}</strong>? Esta ação não pode ser desfeita.
+          </p>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setDeletarOpen(false)}>Cancelar</Button>
+            <Button
+              variant="destructive"
+              onClick={handleDeletar}
+              disabled={deletando}
+            >
+              {deletando ? "Deletando..." : "Deletar"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       {/* Dialog Finalizar */}
       <Dialog open={finalizarOpen} onOpenChange={open => { setFinalizarOpen(open); if (!open) setGreenLegId(null) }}>

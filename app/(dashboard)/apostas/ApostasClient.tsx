@@ -12,7 +12,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
 import { formatCurrency } from "@/lib/utils"
 import { useToast } from "@/hooks/useToast"
-import { BookOpen, Filter } from "lucide-react"
+import { BookOpen, Filter, Trash2 } from "lucide-react"
 import type { Aposta, ApostaLeg } from "@/lib/types"
 
 interface Props {
@@ -33,8 +33,10 @@ export default function ApostasClient({ apostas: initialApostas, profiles }: Pro
   const [filterStatus, setFilterStatus] = useState("todos")
   const [filterProfile, setFilterProfile] = useState("todos")
   const [finalizarDialog, setFinalizarDialog] = useState<Aposta | null>(null)
+  const [deletarDialog, setDeletarDialog] = useState<Aposta | null>(null)
   const [resultadoReal, setResultadoReal] = useState("")
   const [finalizando, setFinalizando] = useState(false)
+  const [deletando, setDeletando] = useState(false)
   const { toast } = useToast()
   const supabase = createClient()
 
@@ -81,6 +83,20 @@ export default function ApostasClient({ apostas: initialApostas, profiles }: Pro
       setResultadoReal("")
     }
     setFinalizando(false)
+  }
+
+  async function handleDeletar() {
+    if (!deletarDialog) return
+    setDeletando(true)
+    const { error } = await supabase.from("apostas").delete().eq("id", deletarDialog.id)
+    if (error) {
+      toast({ title: "Erro ao deletar aposta", variant: "destructive" })
+    } else {
+      setApostas(prev => prev.filter(a => a.id !== deletarDialog.id))
+      toast({ title: "Aposta deletada" })
+      setDeletarDialog(null)
+    }
+    setDeletando(false)
   }
 
   return (
@@ -179,7 +195,14 @@ export default function ApostasClient({ apostas: initialApostas, profiles }: Pro
                       </div>
                     )}
                   </div>
-                  <div className="text-right flex-shrink-0">
+                  <div className="flex flex-col items-end gap-2 flex-shrink-0">
+                  <button
+                    onClick={e => { e.preventDefault(); setDeletarDialog(aposta) }}
+                    className="p-1 rounded text-gray-400 hover:text-[#DC2626] hover:bg-[#DC2626]/10 transition-colors"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </button>
+                  <div className="text-right">
                     {aposta.status === "finalizada" ? (
                       <>
                         <p className="text-xs text-[var(--text-muted)]">Resultado real</p>
@@ -209,6 +232,7 @@ export default function ApostasClient({ apostas: initialApostas, profiles }: Pro
                       <p className="text-sm text-[var(--text-muted)]">Cancelada</p>
                     )}
                   </div>
+                  </div>
                 </div>
               </CardContent>
             </Card>
@@ -216,6 +240,23 @@ export default function ApostasClient({ apostas: initialApostas, profiles }: Pro
           ))}
         </div>
       )}
+
+      <Dialog open={!!deletarDialog} onOpenChange={open => !open && setDeletarDialog(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Deletar Aposta</DialogTitle>
+          </DialogHeader>
+          <p className="text-sm text-[var(--text-secondary)]">
+            Tem certeza que deseja deletar a aposta <strong className="text-[var(--text-primary)]">{deletarDialog?.evento}</strong>? Esta ação não pode ser desfeita.
+          </p>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setDeletarDialog(null)}>Cancelar</Button>
+            <Button variant="destructive" onClick={handleDeletar} disabled={deletando}>
+              {deletando ? "Deletando..." : "Deletar"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       <Dialog open={!!finalizarDialog} onOpenChange={open => !open && setFinalizarDialog(null)}>
         <DialogContent>
