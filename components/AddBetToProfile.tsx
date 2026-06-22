@@ -241,12 +241,12 @@ export default function AddBetToProfile({ profileId }: Props) {
                         onClick={() => setSelectedBet(selected ? "" : b.id)}
                         className={`relative flex flex-col items-center gap-1.5 p-2.5 rounded-xl border transition-all text-center
                           ${added ? "opacity-40 cursor-not-allowed border-[var(--border)] bg-[var(--bg-muted)]" : selected
-                            ? "border-[#16A34A] bg-[#16A34A]/5 shadow-sm"
-                            : "border-[var(--border)] bg-[var(--bg-surface)] hover:border-[#16A34A]/40 hover:bg-[#16A34A]/5"
+                            ? "border-[#1e3a8a] bg-[#1e3a8a]/5 shadow-sm"
+                            : "border-[var(--border)] bg-[var(--bg-surface)] hover:border-[#1e3a8a]/40 hover:bg-[#1e3a8a]/5"
                           }`}
                       >
                         {selected && (
-                          <span className="absolute top-1.5 right-1.5 w-4 h-4 rounded-full bg-[#16A34A] flex items-center justify-center">
+                          <span className="absolute top-1.5 right-1.5 w-4 h-4 rounded-full bg-[#1e3a8a] flex items-center justify-center">
                             <Check className="w-2.5 h-2.5 text-white" />
                           </span>
                         )}
@@ -398,7 +398,7 @@ export default function AddBetToProfile({ profileId }: Props) {
             <Button
               onClick={handleToggleAtivo}
               disabled={togglingAtivo}
-              className={ativoDialog?.ativo ? "bg-[#DC2626] hover:bg-[#B91C1C] text-white" : "bg-[#16A34A] hover:bg-[#15803D] text-white"}
+              className={ativoDialog?.ativo ? "bg-[#DC2626] hover:bg-[#B91C1C] text-white" : "bg-[#1e3a8a] hover:bg-[#1e40af] text-white"}
             >
               {togglingAtivo ? "Salvando..." : ativoDialog?.ativo ? "Desativar" : "Ativar"}
             </Button>
@@ -445,12 +445,12 @@ export default function AddBetToProfile({ profileId }: Props) {
                   <div className="flex flex-col items-end gap-1.5 flex-shrink-0">
                     <div className="text-right">
                       <p className="text-xs text-[var(--text-muted)]">Saldo</p>
-                      <p className={`text-base font-bold ${pb.saldo > 0 ? "text-[#16A34A]" : pb.saldo < 0 ? "text-[#DC2626]" : "text-[var(--text-secondary)]"}`}>
+                      <p className={`text-base font-bold ${pb.saldo > 0 ? "text-[#1e3a8a]" : pb.saldo < 0 ? "text-[#DC2626]" : "text-[var(--text-secondary)]"}`}>
                         {formatCurrency(pb.saldo)}
                       </p>
                     </div>
                     <button
-                      className="flex items-center gap-1 text-xs text-[#16A34A] hover:text-[#15803D] transition-colors"
+                      className="flex items-center gap-1 text-xs text-[#1e3a8a] hover:text-[#1e40af] transition-colors"
                       onClick={() => { setMovDialog(pb); setMovTipo("deposito"); setMovValor(""); setMovDescricao("") }}
                     >
                       <PlusCircle className="h-3.5 w-3.5" />

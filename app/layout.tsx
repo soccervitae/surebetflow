@@ -6,9 +6,63 @@ import { ThemeProvider } from "@/components/ThemeProvider"
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" })
 
+const BASE_URL = "https://www.surebetflow.bet"
+
 export const metadata: Metadata = {
-  title: "SureBetFlow - Gerenciador de Apostas Seguras",
-  description: "Gerencie suas apostas seguras com análise e controle financeiro completo",
+  metadataBase: new URL(BASE_URL),
+  title: {
+    default: "SureBetFlow — Calculadora e Gerenciador de Surebet",
+    template: "%s | SureBetFlow",
+  },
+  description:
+    "A plataforma completa para apostadores de arbitragem esportiva. Calcule surebets 2-way e 3-way, gerencie perfis, controle finanças e acompanhe lucros garantidos com segurança total.",
+  keywords: [
+    "surebet",
+    "arbitragem esportiva",
+    "calculadora surebet",
+    "apostas seguras",
+    "lucro garantido",
+    "gerenciador de apostas",
+    "arbitragem",
+    "surebet brasil",
+    "calculadora arbitragem",
+    "apostas esportivas",
+  ],
+  authors: [{ name: "SureBetFlow", url: BASE_URL }],
+  creator: "SureBetFlow",
+  publisher: "SureBetFlow",
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: { index: true, follow: true, "max-image-preview": "large" },
+  },
+  openGraph: {
+    type: "website",
+    locale: "pt_BR",
+    url: BASE_URL,
+    siteName: "SureBetFlow",
+    title: "SureBetFlow — Calculadora e Gerenciador de Surebet",
+    description:
+      "Calcule surebets, gerencie perfis de apostador, controle finanças e acompanhe lucros garantidos. Senhas criptografadas AES-256.",
+    images: [
+      {
+        url: "/og-image.png",
+        width: 1200,
+        height: 630,
+        alt: "SureBetFlow — Calculadora e Gerenciador de Surebet",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "SureBetFlow — Calculadora e Gerenciador de Surebet",
+    description:
+      "Calcule surebets, gerencie perfis de apostador e acompanhe lucros garantidos com segurança total.",
+    images: ["/og-image.png"],
+  },
+  alternates: {
+    canonical: BASE_URL,
+  },
 }
 
 export default function RootLayout({

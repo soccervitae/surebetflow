@@ -8,7 +8,7 @@ import { useTheme } from "@/components/ThemeProvider"
 import {
   Home, Users, Wallet, CreditCard,
   Settings, LogOut, TrendingUp, Bell, ChevronLeft, ChevronRight,
-  Circle, Sun, Moon
+  Circle, Sun, Moon, MessageCircle
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 
@@ -17,6 +17,7 @@ const navItems = [
   { href: "/perfis", icon: Users, label: "Perfis" },
   { href: "/financeiro", icon: Wallet, label: "Financeiro" },
   { href: "/assinatura", icon: CreditCard, label: "Assinatura" },
+  { href: "/suporte", icon: MessageCircle, label: "Suporte" },
   { href: "/configuracoes", icon: Settings, label: "Configurações" },
 ]
 
@@ -28,6 +29,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const [collapsed, setCollapsed] = useState(false)
   const [userName, setUserName] = useState("")
   const [userInitials, setUserInitials] = useState("")
+  const [confirmLogout, setConfirmLogout] = useState(false)
 
   useEffect(() => {
     const supabase = createClient()
@@ -64,7 +66,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     return (
       <div className="min-h-screen bg-[var(--bg-base)] flex items-center justify-center">
         <div className="flex items-center gap-3">
-          <div className="w-2 h-2 bg-[#16A34A] rounded-full animate-pulse" />
+          <div className="w-2 h-2 bg-[#1e3a8a] rounded-full animate-pulse" />
           <p className="text-[var(--text-secondary)] text-sm">Carregando...</p>
         </div>
       </div>
@@ -87,7 +89,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           "flex items-center gap-3 px-4 py-5 border-b border-[var(--border)]",
           collapsed && "justify-center px-0"
         )}>
-          <div className="w-8 h-8 bg-[#16A34A] rounded-lg flex items-center justify-center flex-shrink-0">
+          <div className="w-8 h-8 bg-[#1e3a8a] rounded-lg flex items-center justify-center flex-shrink-0">
             <TrendingUp className="w-4 h-4 text-white" />
           </div>
           {!collapsed && <span className="font-bold text-[var(--text-primary)] text-sm">SureBetFlow</span>}
@@ -111,7 +113,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                   "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all",
                   collapsed && "justify-center px-0",
                   active
-                    ? "bg-[#16A34A]/15 text-[#16A34A] border border-[#16A34A]/20"
+                    ? "bg-[#1e3a8a]/15 text-[#1e3a8a] border border-[#1e3a8a]/20"
                     : "text-[var(--text-secondary)] hover:bg-[var(--bg-elevated)] hover:text-[var(--text-primary)]"
                 )}
               >
@@ -133,18 +135,18 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             "flex items-center gap-3 px-3 py-2 rounded-lg bg-[var(--bg-elevated)]",
             collapsed && "justify-center px-0"
           )}>
-            <div className="w-7 h-7 bg-[#16A34A] rounded-full flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
+            <div className="w-7 h-7 bg-[#1e3a8a] rounded-full flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
               {userInitials}
             </div>
             {!collapsed && (
               <div className="flex-1 min-w-0">
                 <p className="text-xs font-medium text-[var(--text-primary)] truncate">{userName}</p>
-                <p className="text-[10px] text-[#16A34A] font-semibold">APOSTADOR</p>
+                <p className="text-[10px] text-[#1e3a8a] font-semibold">APOSTADOR</p>
               </div>
             )}
           </div>
           <button
-            onClick={handleLogout}
+            onClick={() => setConfirmLogout(true)}
             title={collapsed ? "Sair" : undefined}
             className={cn(
               "flex items-center gap-3 px-3 py-2 w-full rounded-lg text-sm font-medium text-[var(--text-secondary)] hover:bg-[var(--bg-elevated)] hover:text-[var(--text-primary)] transition-colors",
@@ -177,12 +179,12 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         {/* Top bar */}
         <header className="hidden md:flex items-center justify-between px-6 py-3 bg-[var(--bg-surface)] border-b border-[var(--border)] sticky top-0 z-10">
           <div className="flex items-center gap-2 text-sm text-[var(--text-secondary)]">
-            <Circle className="w-2 h-2 fill-[#16A34A] text-[#16A34A]" />
+            <Circle className="w-2 h-2 fill-[#1e3a8a] text-[#1e3a8a]" />
             <span>Sessão ativa</span>
             <span className="opacity-30">•</span>
             <span className="text-[var(--text-primary)] font-medium">{userName}</span>
             <span className="opacity-30">•</span>
-            <span className="text-xs font-semibold bg-[#16A34A]/20 text-[#16A34A] px-2 py-0.5 rounded border border-[#16A34A]/30">
+            <span className="text-xs font-semibold bg-[#1e3a8a]/20 text-[#1e3a8a] px-2 py-0.5 rounded border border-[#1e3a8a]/30">
               APOSTADOR
             </span>
           </div>
@@ -198,7 +200,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             <button className="w-8 h-8 flex items-center justify-center rounded-lg text-[var(--text-secondary)] hover:bg-[var(--bg-elevated)] hover:text-[var(--text-primary)] transition-colors">
               <Bell className="w-4 h-4" />
             </button>
-            <div className="w-8 h-8 bg-[#16A34A] rounded-full flex items-center justify-center text-white text-xs font-bold">
+            <div className="w-8 h-8 bg-[#1e3a8a] rounded-full flex items-center justify-center text-white text-xs font-bold">
               {userInitials}
             </div>
           </div>
@@ -220,7 +222,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               href={href}
               className={cn(
                 "flex-1 flex flex-col items-center py-2 text-xs gap-1",
-                active ? "text-[#16A34A]" : "text-[var(--text-secondary)]"
+                active ? "text-[#1e3a8a]" : "text-[var(--text-secondary)]"
               )}
             >
               <Icon className="w-5 h-5" />
@@ -229,6 +231,35 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           )
         })}
       </nav>
+
+      {/* Logout confirmation dialog */}
+      {confirmLogout && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-[var(--bg-surface)] border border-[var(--border)] rounded-2xl p-6 w-full max-w-sm shadow-xl">
+            <div className="flex items-center justify-center w-12 h-12 bg-red-500/10 rounded-full mx-auto mb-4">
+              <LogOut className="w-6 h-6 text-red-500" />
+            </div>
+            <h2 className="text-lg font-semibold text-[var(--text-primary)] text-center mb-1">Sair da conta?</h2>
+            <p className="text-[var(--text-secondary)] text-sm text-center mb-6">
+              Você será desconectado e precisará fazer login novamente.
+            </p>
+            <div className="flex gap-3">
+              <button
+                onClick={() => setConfirmLogout(false)}
+                className="flex-1 px-4 py-2.5 rounded-xl border border-[var(--border)] text-[var(--text-secondary)] hover:bg-[var(--bg-elevated)] text-sm font-medium transition-colors"
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={handleLogout}
+                className="flex-1 px-4 py-2.5 rounded-xl bg-red-600 hover:bg-red-700 text-white text-sm font-semibold transition-colors"
+              >
+                Sair
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

@@ -40,7 +40,7 @@ export default function DashboardLayoutClient({ children }: { children: React.Re
       {/* Desktop Sidebar */}
       <aside className="hidden lg:flex lg:flex-col w-64 bg-[var(--bg-surface)] border-r border-[var(--border)] flex-shrink-0">
         <div className="flex items-center gap-3 p-6 border-b border-[var(--border)]">
-          <div className="flex items-center justify-center w-9 h-9 bg-[#16A34A] rounded-lg">
+          <div className="flex items-center justify-center w-9 h-9 bg-[#1e3a8a] rounded-lg">
             <TrendingUp className="h-5 w-5 text-white" />
           </div>
           <span className="font-bold text-[var(--text-primary)]">SureBetFlow</span>
@@ -53,7 +53,7 @@ export default function DashboardLayoutClient({ children }: { children: React.Re
               className={cn(
                 "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors",
                 isActive(item.href)
-                  ? "bg-[#16A34A]/10 text-[#16A34A]"
+                  ? "bg-[#1e3a8a]/10 text-[#1e3a8a]"
                   : "text-[var(--text-secondary)] hover:bg-[var(--bg-elevated)] hover:text-[var(--text-primary)]"
               )}
             >
@@ -80,7 +80,7 @@ export default function DashboardLayoutClient({ children }: { children: React.Re
           <aside className="absolute left-0 top-0 bottom-0 w-72 bg-[var(--bg-surface)] flex flex-col shadow-xl">
             <div className="flex items-center justify-between p-6 border-b border-[var(--border)]">
               <div className="flex items-center gap-3">
-                <div className="flex items-center justify-center w-9 h-9 bg-[#16A34A] rounded-lg">
+                <div className="flex items-center justify-center w-9 h-9 bg-[#1e3a8a] rounded-lg">
                   <TrendingUp className="h-5 w-5 text-white" />
                 </div>
                 <span className="font-bold text-[var(--text-primary)]">SureBetFlow</span>
@@ -98,7 +98,7 @@ export default function DashboardLayoutClient({ children }: { children: React.Re
                   className={cn(
                     "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors",
                     isActive(item.href)
-                      ? "bg-[#16A34A]/10 text-[#16A34A]"
+                      ? "bg-[#1e3a8a]/10 text-[#1e3a8a]"
                       : "text-[var(--text-secondary)] hover:bg-[var(--bg-elevated)] hover:text-[var(--text-primary)]"
                   )}
                 >
@@ -128,7 +128,7 @@ export default function DashboardLayoutClient({ children }: { children: React.Re
             <Menu className="h-5 w-5 text-[var(--text-secondary)]" />
           </button>
           <div className="flex items-center gap-2">
-            <div className="flex items-center justify-center w-7 h-7 bg-[#16A34A] rounded-lg">
+            <div className="flex items-center justify-center w-7 h-7 bg-[#1e3a8a] rounded-lg">
               <TrendingUp className="h-4 w-4 text-white" />
             </div>
             <span className="font-bold text-[var(--text-primary)] text-sm">SureBetFlow</span>
@@ -150,7 +150,7 @@ export default function DashboardLayoutClient({ children }: { children: React.Re
                 href={item.href}
                 className={cn(
                   "flex flex-col items-center gap-1 px-2 py-1.5 rounded-lg transition-colors min-w-0",
-                  isActive(item.href) ? "text-[#16A34A]" : "text-[var(--text-secondary)]"
+                  isActive(item.href) ? "text-[#1e3a8a]" : "text-[var(--text-secondary)]"
                 )}
               >
                 <item.icon className="h-5 w-5 flex-shrink-0" />

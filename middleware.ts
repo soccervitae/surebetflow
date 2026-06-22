@@ -2,23 +2,17 @@ import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 
 export async function middleware(request: NextRequest) {
-  let supabaseResponse = NextResponse.next({
-    request,
-  })
+  let supabaseResponse = NextResponse.next({ request })
 
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
       cookies: {
-        getAll() {
-          return request.cookies.getAll()
-        },
+        getAll() { return request.cookies.getAll() },
         setAll(cookiesToSet) {
           cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value))
-          supabaseResponse = NextResponse.next({
-            request,
-          })
+          supabaseResponse = NextResponse.next({ request })
           cookiesToSet.forEach(({ name, value, options }) =>
             supabaseResponse.cookies.set(name, value, options)
           )
@@ -27,41 +21,71 @@ export async function middleware(request: NextRequest) {
     }
   )
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-
+  const { data: { user } } = await supabase.auth.getUser()
   const { pathname } = request.nextUrl
 
-  // Rotas públicas que não precisam de autenticação
-  const publicRoutes = ['/', '/login', '/cadastro']
-  const isPublicRoute = publicRoutes.some(route => pathname === route || pathname.startsWith(route + '/'))
+  const publicRoutes = ['/', '/login', '/cadastro', '/verificar-email']
+  const isPublicRoute = publicRoutes.some(r => pathname === r || pathname.startsWith(r + '/'))
 
-  // Admin routes require auth but are handled by the admin layout itself
-  if (!user && pathname.startsWith('/admin')) {
-    const url = request.nextUrl.clone()
-    url.pathname = '/login'
-    return NextResponse.redirect(url)
+  // Admin routes: require auth + admin email
+  if (pathname.startsWith('/admin')) {
+    if (!user) return redirect(request, '/login')
+    const adminEmails = (process.env.ADMIN_EMAILS ?? "").split(",").map(e => e.trim()).filter(Boolean)
+    if (!adminEmails.includes(user.email ?? "")) return redirect(request, '/dashboard')
+    return supabaseResponse
   }
 
-  if (!user && !isPublicRoute) {
-    const url = request.nextUrl.clone()
-    url.pathname = '/login'
-    return NextResponse.redirect(url)
+  // Unauthenticated on protected route
+  if (!user && !isPublicRoute) return redirect(request, '/login')
+
+  // Authenticated user trying to access login/cadastro
+  if (user && (pathname === '/login' || pathname === '/cadastro')) return redirect(request, '/dashboard')
+
+  // Check email verification for protected routes
+  if (user && !isPublicRoute && !pathname.startsWith('/admin')) {
+    const adminEmails = (process.env.ADMIN_EMAILS ?? "").split(",").map(e => e.trim()).filter(Boolean)
+    if (!adminEmails.includes(user.email ?? "") && !user.email_confirmed_at) {
+      return redirect(request, `/verificar-email?email=${encodeURIComponent(user.email ?? "")}`)
+    }
   }
 
-  // Usuário logado tentando acessar login/cadastro → vai pro dashboard
-  if (user && (pathname === '/login' || pathname === '/cadastro')) {
-    const url = request.nextUrl.clone()
-    url.pathname = '/dashboard'
-    return NextResponse.redirect(url)
+  // Check subscription for dashboard routes (skip /assinatura, /api/stripe, /onboarding)
+  if (user && !isPublicRoute) {
+    const isDashboardRoute = pathname.startsWith('/dashboard') ||
+      pathname.startsWith('/perfis') ||
+      pathname.startsWith('/financeiro') ||
+      pathname.startsWith('/configuracoes') ||
+      pathname.startsWith('/suporte') ||
+      pathname.startsWith('/calculadora')
+
+    if (isDashboardRoute) {
+      const adminEmails = (process.env.ADMIN_EMAILS ?? "").split(",").map(e => e.trim()).filter(Boolean)
+      const isAdmin = adminEmails.includes(user.email ?? "")
+
+      if (!isAdmin) {
+        const { data: sub } = await supabase
+          .from("subscriptions")
+          .select("status")
+          .eq("user_id", user.id)
+          .single()
+
+        const hasAccess = sub?.status === "active" || sub?.status === "trialing"
+        if (!hasAccess) return redirect(request, '/assinatura')
+      }
+    }
   }
 
   return supabaseResponse
 }
 
+function redirect(request: NextRequest, pathname: string) {
+  const url = request.nextUrl.clone()
+  url.pathname = pathname
+  return NextResponse.redirect(url)
+}
+
 export const config = {
   matcher: [
-    '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
+    '/((?!_next/static|_next/image|favicon.ico|api/mp|api/auth|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
   ],
 }

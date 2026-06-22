@@ -39,8 +39,3 @@ export async function getMpWebhookSecret(): Promise<string> {
   const settings = await getSettings()
   return settings["mp_webhook_secret"] ?? ""
 }
-
-export async function getResendApiKey(): Promise<string> {
-  const settings = await getSettings()
-  return settings["resend_api_key"] ?? process.env.RESEND_API_KEY ?? ""
-}

@@ -160,7 +160,7 @@ export default function ApostasClient({ apostas: initialApostas, profiles }: Pro
         <div className="space-y-3">
           {filtered.map(aposta => (
             <Link key={aposta.id} href={`/apostas/${aposta.id}`}>
-            <Card className="hover:border-[#16A34A]/40 transition-colors cursor-pointer">
+            <Card className="hover:border-[#1e3a8a]/40 transition-colors cursor-pointer">
               <CardContent className="p-4">
                 <div className="flex items-start justify-between gap-4">
                   <div className="flex-1 min-w-0">
@@ -189,7 +189,7 @@ export default function ApostasClient({ apostas: initialApostas, profiles }: Pro
                             </span>
                             <span>{leg.resultado_apostado}</span>
                             <span className="font-medium">@{leg.odd}</span>
-                            <span className="text-[#16A34A]">{formatCurrency(leg.stake)}</span>
+                            <span className="text-[#1e3a8a]">{formatCurrency(leg.stake)}</span>
                           </div>
                         ))}
                       </div>
@@ -206,7 +206,7 @@ export default function ApostasClient({ apostas: initialApostas, profiles }: Pro
                     {aposta.status === "finalizada" ? (
                       <>
                         <p className="text-xs text-[var(--text-muted)]">Resultado real</p>
-                        <p className="text-base font-bold text-[#16A34A]">{formatCurrency(aposta.resultado_real ?? 0)}</p>
+                        <p className="text-base font-bold text-[#1e3a8a]">{formatCurrency(aposta.resultado_real ?? 0)}</p>
                         {aposta.finalizada_at && (
                           <p className="text-xs text-[var(--text-muted)]">{new Date(aposta.finalizada_at).toLocaleDateString("pt-BR")}</p>
                         )}
