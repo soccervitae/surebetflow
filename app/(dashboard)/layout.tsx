@@ -6,19 +6,22 @@ import Link from "next/link"
 import { createClient } from "@/lib/supabase/client"
 import { useTheme } from "@/components/ThemeProvider"
 import {
-  Home, Users, Wallet, CreditCard,
+  Home, Users, Wallet, CreditCard, Calculator, BookOpen,
   Settings, LogOut, TrendingUp, Bell, ChevronLeft, ChevronRight,
-  Circle, Sun, Moon, MessageCircle
+  Circle, Sun, Moon, MessageCircle, HelpCircle
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 
 const navItems = [
-  { href: "/dashboard", icon: Home, label: "Dashboard" },
-  { href: "/perfis", icon: Users, label: "Perfis" },
-  { href: "/financeiro", icon: Wallet, label: "Financeiro" },
-  { href: "/assinatura", icon: CreditCard, label: "Assinatura" },
-  { href: "/suporte", icon: MessageCircle, label: "Suporte" },
-  { href: "/configuracoes", icon: Settings, label: "Configurações" },
+  { href: "/dashboard",     icon: Home,          label: "Dashboard" },
+  { href: "/perfis",        icon: Users,         label: "Perfis" },
+  { href: "/calculadora",   icon: Calculator,    label: "Calculadora" },
+  { href: "/apostas",       icon: BookOpen,      label: "Apostas" },
+  { href: "/financeiro",    icon: Wallet,        label: "Financeiro" },
+  { href: "/assinatura",    icon: CreditCard,    label: "Assinatura" },
+  { href: "/tutorial",      icon: HelpCircle,    label: "Tutorial" },
+  { href: "/suporte",       icon: MessageCircle, label: "Suporte" },
+  { href: "/configuracoes", icon: Settings,      label: "Configurações" },
 ]
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
