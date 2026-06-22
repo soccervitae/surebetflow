@@ -4,7 +4,7 @@ import Link from "next/link"
 import { formatCurrency } from "@/lib/utils"
 import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
-import { DollarSign, TrendingUp, Clock, Calculator, ArrowUpRight, Users, ClipboardList, Wallet, ChevronRight } from "lucide-react"
+import { DollarSign, TrendingUp, Clock, ArrowUpRight, Users, ClipboardList, Wallet, ChevronRight } from "lucide-react"
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts"
 import type { DashboardGeral, ProfileDashboard, Aposta } from "@/lib/types"
 
@@ -24,7 +24,6 @@ function statusBadge(status: string) {
 }
 
 const quickActions = [
-  { href: "/calculadora", icon: Calculator, label: "Calculadora", sub: "Calcular", color: "text-[#3b82f6]", bg: "bg-[#3b82f6]/10 border-[#3b82f6]/20" },
   { href: "/perfis", icon: Users, label: "Perfis", sub: "Gerenciar", color: "text-[#a855f7]", bg: "bg-[#a855f7]/10 border-[#a855f7]/20" },
   { href: "/apostas", icon: ClipboardList, label: "Apostas", sub: "Registrar", color: "text-[#16A34A]", bg: "bg-[#16A34A]/10 border-[#16A34A]/20" },
   { href: "/financeiro", icon: Wallet, label: "Financeiro", sub: "Movimentar", color: "text-[#f97316]", bg: "bg-[#f97316]/10 border-[#f97316]/20" },
@@ -52,20 +51,11 @@ export default function HomeDashboard({ dashboard, profiles, recentApostas, apos
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-[var(--text-primary)]">
-            Painel Geral <span>📊</span>
-          </h1>
-          <p className="text-[var(--text-secondary)] text-sm mt-1">Visão consolidada de todos os seus perfis</p>
-        </div>
-        <Link
-          href="/calculadora"
-          className="flex items-center gap-2 px-4 py-2 bg-[#16A34A] hover:bg-[#15803D] text-white text-sm font-medium rounded-lg transition-colors"
-        >
-          <Calculator className="h-4 w-4" />
-          Calculadora
-        </Link>
+      <div>
+        <h1 className="text-2xl font-bold text-[var(--text-primary)]">
+          Painel Geral <span>📊</span>
+        </h1>
+        <p className="text-[var(--text-secondary)] text-sm mt-1">Visão consolidada de todos os seus perfis</p>
       </div>
 
       {/* Stats */}
