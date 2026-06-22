@@ -6,7 +6,7 @@ import Link from "next/link"
 import { createClient } from "@/lib/supabase/client"
 import { useTheme } from "@/components/ThemeProvider"
 import {
-  Home, Users, Calculator, ClipboardList, Wallet, CreditCard,
+  Home, Users, Wallet, CreditCard,
   Settings, LogOut, TrendingUp, Bell, ChevronLeft, ChevronRight,
   Circle, Sun, Moon
 } from "lucide-react"
@@ -15,8 +15,6 @@ import { cn } from "@/lib/utils"
 const navItems = [
   { href: "/dashboard", icon: Home, label: "Dashboard" },
   { href: "/perfis", icon: Users, label: "Perfis" },
-  { href: "/calculadora", icon: Calculator, label: "Calculadora" },
-  { href: "/apostas", icon: ClipboardList, label: "Apostas" },
   { href: "/financeiro", icon: Wallet, label: "Financeiro" },
   { href: "/assinatura", icon: CreditCard, label: "Assinatura" },
   { href: "/configuracoes", icon: Settings, label: "Configurações" },

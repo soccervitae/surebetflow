@@ -21,9 +21,11 @@ interface Leg {
 interface Props {
   profiles: Profile[]
   defaultProfileId?: string
+  onSaved?: () => void
 }
 
-export default function SurebetCalculator({ profiles }: Props) {
+export default function SurebetCalculator({ profiles, defaultProfileId, onSaved }: Props) {
+  const filteredProfiles = defaultProfileId ? profiles.filter(p => p.id === defaultProfileId) : profiles
   const [tipo, setTipo] = useState<"2-way" | "3-way">("2-way")
   const [evento, setEvento] = useState("")
   const [investimentoTotal, setInvestimentoTotal] = useState("100")
@@ -54,13 +56,13 @@ export default function SurebetCalculator({ profiles }: Props) {
 
   useEffect(() => {
     loadProfileBets()
-  }, [profiles])
+  }, [filteredProfiles])
 
   async function loadProfileBets() {
     const { data } = await supabase
       .from("profile_bets")
       .select("*, bet:bets(*)")
-      .in("profile_id", profiles.map(p => p.id))
+      .in("profile_id", filteredProfiles.map(p => p.id))
     if (data) {
       const grouped: Record<string, ProfileBet[]> = {}
       data.forEach((pb: ProfileBet) => {
@@ -152,6 +154,7 @@ export default function SurebetCalculator({ profiles }: Props) {
       toast({ title: "Aposta salva com sucesso!" })
       setEvento("")
       setLegs(Array(numLegs).fill({ profileBetId: "", resultadoApostado: "", odd: "" }))
+      onSaved?.()
     } catch (err: unknown) {
       toast({ title: (err as Error)?.message ?? "Erro ao salvar aposta", variant: "destructive" })
     } finally {
@@ -217,7 +220,7 @@ export default function SurebetCalculator({ profiles }: Props) {
                   <SelectValue placeholder="Selecionar conta..." />
                 </SelectTrigger>
                 <SelectContent>
-                  {profiles.map(profile => {
+                  {filteredProfiles.map(profile => {
                     const bets = profileBets[profile.id] ?? []
                     if (bets.length === 0) return null
                     return bets.map(pb => (

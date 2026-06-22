@@ -15,8 +15,9 @@ import { ProfileForm } from "@/components/ProfileForm"
 import AddBetToProfile from "@/components/AddBetToProfile"
 import { formatCurrency } from "@/lib/utils"
 import { useToast } from "@/hooks/useToast"
-import { ArrowLeft, DollarSign, TrendingUp, Clock, ArrowUpRight, Pencil } from "lucide-react"
+import { ArrowLeft, DollarSign, TrendingUp, Clock, ArrowUpRight, Pencil, Calculator } from "lucide-react"
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts"
+import SurebetCalculator from "@/components/SurebetCalculator"
 import type { Profile, ProfileDashboard, Aposta } from "@/lib/types"
 
 interface Props {
@@ -37,6 +38,7 @@ function statusBadge(status: string) {
 export default function PerfilDetailClient({ profile, dashboard, apostas, userToken }: Props) {
   const [currentProfile, setCurrentProfile] = useState(profile)
   const [currentApostas, setCurrentApostas] = useState(apostas)
+  const [showCalculadora, setShowCalculadora] = useState(false)
   const [finalizarDialog, setFinalizarDialog] = useState<Aposta | null>(null)
   const [resultadoReal, setResultadoReal] = useState("")
   const [finalizando, setFinalizando] = useState(false)
@@ -127,12 +129,18 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
             )}
           </div>
         </div>
-        <Link href={`/perfis/${profile.id}/editar`}>
-          <Button variant="outline" size="sm">
-            <Pencil className="h-4 w-4 mr-2" />
-            Editar
+        <div className="flex items-center gap-2">
+          <Button onClick={() => setShowCalculadora(true)} size="sm">
+            <Calculator className="h-4 w-4 mr-2" />
+            Nova Aposta
           </Button>
-        </Link>
+          <Link href={`/perfis/${profile.id}/editar`}>
+            <Button variant="outline" size="sm">
+              <Pencil className="h-4 w-4 mr-2" />
+              Editar
+            </Button>
+          </Link>
+        </div>
       </div>
 
       <Tabs defaultValue="dashboard">
@@ -296,6 +304,32 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
           </Card>
         </TabsContent>
       </Tabs>
+
+      {/* Calculadora Dialog */}
+      <Dialog open={showCalculadora} onOpenChange={setShowCalculadora}>
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Calculator className="h-5 w-5 text-[#16A34A]" />
+              Nova Aposta — {currentProfile.apelido ?? `${currentProfile.nome} ${currentProfile.sobrenome}`}
+            </DialogTitle>
+          </DialogHeader>
+          <SurebetCalculator
+            profiles={[currentProfile]}
+            defaultProfileId={currentProfile.id}
+            onSaved={async () => {
+              setShowCalculadora(false)
+              const supabase = createClient()
+              const { data } = await supabase
+                .from("apostas")
+                .select("*, legs:aposta_legs(*, profile_bet:profile_bets(*, bet:bets(*)))")
+                .eq("profile_id", currentProfile.id)
+                .order("created_at", { ascending: false })
+              if (data) setCurrentApostas(data)
+            }}
+          />
+        </DialogContent>
+      </Dialog>
 
       {/* Finalizar Dialog */}
       <Dialog open={!!finalizarDialog} onOpenChange={open => !open && setFinalizarDialog(null)}>
