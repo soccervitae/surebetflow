@@ -2,7 +2,7 @@
 
 import { useSearchParams } from "next/navigation"
 import Link from "next/link"
-import { CreditCard, CheckCircle, Star, ExternalLink, AlertCircle, Clock } from "lucide-react"
+import { CreditCard, CheckCircle, Star, AlertCircle, Clock, RefreshCw, Calendar, Hash, Activity } from "lucide-react"
 
 type Subscription = {
   status: string
@@ -39,6 +39,38 @@ export default function AssinaturaClient({ subscription }: { subscription: Subsc
   const statusInfo = STATUS_INFO[subscription?.status ?? "inactive"]
   const StatusIcon = statusInfo.icon
 
+  const paymentDetails = [
+    {
+      icon: Activity,
+      label: "Status",
+      value: (
+        <span className={`inline-flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-full ${statusInfo.bg} ${statusInfo.color}`}>
+          <StatusIcon className="w-3 h-3" />
+          {statusInfo.label}
+        </span>
+      ),
+    },
+    {
+      icon: Star,
+      label: "Plano",
+      value: <span className="text-[var(--text-primary)] font-medium">Pro — R$ 99,00/mês</span>,
+    },
+    ...(subscription?.current_period_end ? [{
+      icon: Calendar,
+      label: subscription?.cancel_at_period_end ? "Cancela em" : "Próxima cobrança",
+      value: (
+        <span className={subscription?.cancel_at_period_end ? "text-red-400 font-medium" : "text-[var(--text-primary)] font-medium"}>
+          {new Date(subscription.current_period_end).toLocaleDateString("pt-BR")}
+        </span>
+      ),
+    }] : []),
+    ...(subscription?.stripe_subscription_id ? [{
+      icon: Hash,
+      label: "ID da assinatura",
+      value: <span className="text-[var(--text-muted)] font-mono text-xs">{subscription.stripe_subscription_id}</span>,
+    }] : []),
+  ]
+
   return (
     <div className="max-w-lg mx-auto space-y-6">
       <div className="flex items-center gap-3">
@@ -73,26 +105,11 @@ export default function AssinaturaClient({ subscription }: { subscription: Subsc
         <div className="flex items-center gap-2 mb-3">
           <Star className="w-5 h-5 text-[#1e3a8a]" />
           <span className="text-lg font-bold text-[var(--text-primary)]">Pro</span>
-          {isActive && (
-            <span className={`inline-flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-full ml-auto ${statusInfo.bg} ${statusInfo.color}`}>
-              <StatusIcon className="w-3 h-3" />
-              {statusInfo.label}
-            </span>
-          )}
         </div>
 
         <p className="text-4xl font-bold text-[var(--text-primary)] mb-0.5">
           R$ 99<span className="text-xl font-normal text-[var(--text-muted)]">,00/mês</span>
         </p>
-
-        {isActive && subscription?.current_period_end && (
-          <p className="text-sm text-[var(--text-secondary)] mt-2">
-            {subscription.cancel_at_period_end
-              ? <span className="text-red-400">Cancela em {new Date(subscription.current_period_end).toLocaleDateString("pt-BR")}</span>
-              : <>Próxima cobrança em <strong className="text-[var(--text-primary)]">{new Date(subscription.current_period_end).toLocaleDateString("pt-BR")}</strong></>
-            }
-          </p>
-        )}
 
         <ul className="space-y-2 my-6">
           {PRO_FEATURES.map(f => (
@@ -104,13 +121,13 @@ export default function AssinaturaClient({ subscription }: { subscription: Subsc
         </ul>
 
         {isActive ? (
-          <button
-            onClick={() => window.location.href = "/suporte"}
-            className="inline-flex items-center gap-2 text-sm text-[var(--text-secondary)] hover:text-[var(--text-primary)] border border-[var(--border)] hover:border-[#1e3a8a]/30 px-4 py-2.5 rounded-xl transition-colors"
+          <Link
+            href="/assinatura/checkout"
+            className="inline-flex items-center gap-2 text-sm font-semibold bg-[#1e3a8a] hover:bg-[#1e40af] text-white px-4 py-2.5 rounded-xl transition-colors"
           >
-            <ExternalLink className="w-4 h-4" />
-            Cancelar / Gerenciar via Suporte
-          </button>
+            <RefreshCw className="w-4 h-4" />
+            Atualizar pagamento
+          </Link>
         ) : (
           <Link
             href="/assinatura/checkout"
@@ -121,9 +138,29 @@ export default function AssinaturaClient({ subscription }: { subscription: Subsc
         )}
       </div>
 
+      {/* Payment details list */}
+      {subscription && (
+        <div className="bg-[var(--bg-surface)] border border-[var(--border)] rounded-2xl overflow-hidden">
+          <div className="px-5 py-4 border-b border-[var(--border)]">
+            <h2 className="text-sm font-semibold text-[var(--text-primary)]">Detalhes da assinatura</h2>
+          </div>
+          <ul className="divide-y divide-[var(--border)]">
+            {paymentDetails.map(({ icon: Icon, label, value }) => (
+              <li key={label} className="flex items-center justify-between px-5 py-3.5 gap-4">
+                <div className="flex items-center gap-2.5 text-sm text-[var(--text-secondary)] min-w-0">
+                  <Icon className="w-4 h-4 text-[var(--text-muted)] flex-shrink-0" />
+                  {label}
+                </div>
+                <div className="text-sm text-right">{value}</div>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+
       {!isActive && (
         <p className="text-xs text-center text-[var(--text-muted)]">
-          Pagamento via cartão de crédito ou PIX · Cancele quando quiser
+          Pagamento via cartão de crédito · Cancele quando quiser
         </p>
       )}
     </div>
