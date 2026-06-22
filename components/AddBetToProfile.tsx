@@ -6,7 +6,6 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { formatCurrency } from "@/lib/utils"
 import { useToast } from "@/hooks/useToast"
@@ -381,66 +380,75 @@ export default function AddBetToProfile({ profileId }: Props) {
         <div className="space-y-3">
           {profileBets.map(pb => (
             <Card key={pb.id} className={!pb.ativo ? "opacity-60" : ""}>
-              <CardContent className="p-4 space-y-3">
-                <div className="flex items-center justify-between gap-3">
+              <CardContent className="p-4">
+                {/* Linha principal: nome + saldo + status */}
+                <div className="flex items-start justify-between gap-3 mb-3">
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 flex-wrap">
-                      <p className="font-medium text-[var(--text-primary)]">{pb.bet?.nome ?? "Casa"}</p>
-                      <Badge variant="blue">{formatCurrency(pb.saldo)}</Badge>
+                      <p className="font-semibold text-[var(--text-primary)]">{pb.bet?.nome ?? "Casa"}</p>
                       <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium ${pb.ativo ? "bg-green-500/10 text-green-600" : "bg-red-500/10 text-red-500"}`}>
                         <span className={`w-1.5 h-1.5 rounded-full ${pb.ativo ? "bg-green-500" : "bg-red-500"}`} />
                         {pb.ativo ? "Ativa" : "Inativa"}
                       </span>
                     </div>
-                    <p className="text-sm text-[var(--text-secondary)] truncate mt-0.5">{pb.email}</p>
-                    {revealedPasswords[pb.id] && (
-                      <p className="text-sm font-mono bg-[var(--bg-elevated)] rounded px-2 py-1 mt-2 text-[var(--text-primary)] break-all">
-                        {pb.senha_encrypted}
-                      </p>
-                    )}
+                    <p className="text-xs text-[var(--text-secondary)] truncate mt-0.5">{pb.email}</p>
                   </div>
-                  <div className="flex gap-1 flex-shrink-0">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => setRevealedPasswords(prev =>
-                        prev[pb.id] ? Object.fromEntries(Object.entries(prev).filter(([k]) => k !== pb.id)) : { ...prev, [pb.id]: true }
-                      )}
-                    >
-                      {revealedPasswords[pb.id]
-                        ? <><EyeOff className="h-4 w-4 mr-1" />Ocultar</>
-                        : <><Eye className="h-4 w-4 mr-1" />Ver senha</>
-                      }
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => setAtivoDialog(pb)}
-                      className={pb.ativo ? "text-orange-500 hover:text-orange-600 hover:bg-orange-50" : "text-green-600 hover:text-green-700 hover:bg-green-50"}
-                    >
-                      {pb.ativo ? "Desativar" : "Ativar"}
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => setDeletarDialog(pb)}
-                      className="text-red-500 hover:text-red-600 hover:bg-red-50"
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
+                  {/* Saldo em destaque */}
+                  <div className="text-right flex-shrink-0">
+                    <p className="text-xs text-[var(--text-muted)]">Saldo</p>
+                    <p className={`text-base font-bold ${pb.saldo > 0 ? "text-[#16A34A]" : pb.saldo < 0 ? "text-[#DC2626]" : "text-[var(--text-secondary)]"}`}>
+                      {formatCurrency(pb.saldo)}
+                    </p>
                   </div>
                 </div>
 
-                {/* Nova movimentação */}
-                <Button
-                  size="sm"
-                  variant="outline"
-                  className="w-full text-[#16A34A] border-[#16A34A]/30 hover:bg-[#16A34A]/5"
-                  onClick={() => { setMovDialog(pb); setMovTipo("deposito"); setMovValor(""); setMovDescricao("") }}
-                >
-                  <PlusCircle className="h-4 w-4 mr-2" />
-                  Nova movimentação
-                </Button>
+                {/* Senha revelada */}
+                {revealedPasswords[pb.id] && (
+                  <p className="text-sm font-mono bg-[var(--bg-elevated)] rounded px-2 py-1 mb-3 text-[var(--text-primary)] break-all">
+                    {pb.senha_encrypted}
+                  </p>
+                )}
+
+                {/* Botões numa linha só */}
+                <div className="flex flex-wrap gap-1.5">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setRevealedPasswords(prev =>
+                      prev[pb.id] ? Object.fromEntries(Object.entries(prev).filter(([k]) => k !== pb.id)) : { ...prev, [pb.id]: true }
+                    )}
+                  >
+                    {revealedPasswords[pb.id]
+                      ? <><EyeOff className="h-4 w-4 mr-1" />Ocultar</>
+                      : <><Eye className="h-4 w-4 mr-1" />Ver senha</>
+                    }
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="text-[#16A34A] border-[#16A34A]/30 hover:bg-[#16A34A]/5"
+                    onClick={() => { setMovDialog(pb); setMovTipo("deposito"); setMovValor(""); setMovDescricao("") }}
+                  >
+                    <PlusCircle className="h-4 w-4 mr-1" />
+                    Movimentação
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setAtivoDialog(pb)}
+                    className={pb.ativo ? "text-orange-500 hover:text-orange-600 hover:bg-orange-50" : "text-green-600 hover:text-green-700 hover:bg-green-50"}
+                  >
+                    {pb.ativo ? "Desativar" : "Ativar"}
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setDeletarDialog(pb)}
+                    className="text-red-500 hover:text-red-600 hover:bg-red-50"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </div>
               </CardContent>
             </Card>
           ))}
