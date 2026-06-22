@@ -8,7 +8,7 @@ import {
   Search, CreditCard, MessageSquare, Star, Zap,
   BarChart2, ChevronLeft, Circle, Bell, Sun,
   Filter, ArrowRight, QrCode, Activity, Hash,
-  Calendar, RefreshCw, Lock,
+  Calendar, RefreshCw, Lock, MoreHorizontal,
 } from "lucide-react"
 
 const SECTIONS = [
@@ -42,7 +42,76 @@ function Step({ num, text }: { num: number; text: string }) {
   )
 }
 
-/* ── MOCKUP SHELL ── */
+/* ── MOCKUP SHELL MOBILE ── */
+function MockShellMobile({ activeNav, children }: { activeNav: string; children: React.ReactNode }) {
+  const nav = [
+    { href: "/dashboard", icon: Home,     label: "Dashboard" },
+    { href: "/perfis",    icon: Users,    label: "Perfis" },
+    { href: "/apostas",   icon: BookOpen, label: "Apostas" },
+    { href: "/financeiro",icon: Wallet,   label: "Financeiro" },
+  ]
+  return (
+    <div className="rounded-2xl border border-[var(--border)] shadow-xl overflow-hidden mx-auto" style={{ maxWidth: 320 }}>
+      {/* Phone chrome */}
+      <div className="bg-[#1a1a1a] px-4 py-1.5 flex items-center justify-between border-b border-white/5">
+        <span className="text-[9px] text-gray-500 font-mono">9:41</span>
+        <div className="w-14 h-3 bg-black/60 rounded-full" />
+        <div className="flex items-center gap-1">
+          <div className="w-3 h-1.5 bg-gray-500 rounded-sm" />
+          <div className="w-1.5 h-1.5 bg-gray-500 rounded-full" />
+        </div>
+      </div>
+      {/* App */}
+      <div className="bg-[#0d0d0d] flex flex-col" style={{ minHeight: 400 }}>
+        {/* Mobile header */}
+        <div className="flex items-center justify-between px-3 py-2 bg-[#111] border-b border-white/5">
+          <div className="w-6 h-6 bg-[#1e3a8a] rounded-lg flex items-center justify-center">
+            <TrendingUp className="w-3 h-3 text-white" />
+          </div>
+          <span className="text-[10px] font-bold text-white">SureBetFlow</span>
+          <div className="w-6 h-6 bg-[#1e3a8a] rounded-full flex items-center justify-center text-white text-[7px] font-bold">JS</div>
+        </div>
+        {/* Content */}
+        <div className="flex-1 p-3 overflow-hidden">
+          {children}
+        </div>
+        {/* Bottom nav */}
+        <div className="bg-[#111] border-t border-white/5 flex items-center justify-around px-2 py-1.5">
+          {nav.map(({ href, icon: Icon, label }) => {
+            const isActive = activeNav === href
+            return (
+              <div key={href} className="flex flex-col items-center gap-0.5">
+                {isActive && <div className="w-4 h-0.5 bg-[#60a5fa] rounded-full -mt-1.5 mb-0.5" />}
+                <Icon className={`w-4 h-4 ${isActive ? "text-[#60a5fa]" : "text-gray-500"}`} />
+                <span className={`text-[7px] font-medium ${isActive ? "text-[#60a5fa]" : "text-gray-500"}`}>{label}</span>
+              </div>
+            )
+          })}
+          <div className="flex flex-col items-center gap-0.5">
+            <MoreHorizontal className="w-4 h-4 text-gray-500" />
+            <span className="text-[7px] font-medium text-gray-500">Mais</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+/* ── WRAPPER: shows mobile on small, desktop on md+ ── */
+function MockBoth({ url, activeNav, mobileContent, children }: {
+  url: string; activeNav: string;
+  mobileContent: React.ReactNode;
+  children: React.ReactNode
+}) {
+  return (
+    <>
+      <div className="md:hidden"><MockShellMobile activeNav={activeNav}>{mobileContent}</MockShellMobile></div>
+      <div className="hidden md:block"><MockShell url={url}>{children}</MockShell></div>
+    </>
+  )
+}
+
+/* ── MOCKUP SHELL DESKTOP ── */
 function MockShell({ url, children }: { url: string; children: React.ReactNode }) {
   return (
     <div className="rounded-2xl border border-[var(--border)] shadow-xl overflow-x-auto">
@@ -195,9 +264,33 @@ export default function TutorialClient() {
                 <p className="text-sm text-[var(--text-secondary)]">Visão consolidada de todos os seus perfis e apostas.</p>
               </div>
 
-              <MockShell url="/dashboard">
+              <MockBoth url="/dashboard" activeNav="/dashboard" mobileContent={
+                <>
+                  <p className="text-[10px] font-bold text-white mb-2">Dashboard</p>
+                  <div className="grid grid-cols-2 gap-1.5 mb-2">
+                    {[
+                      { l: "Saldo Total", v: "R$ 2.000,00", c: "text-blue-400", bg: "bg-blue-500/10 border-blue-500/20" },
+                      { l: "Lucro Realizado", v: "R$ 120,00", c: "text-[#60a5fa]", bg: "bg-blue-500/10 border-blue-500/20" },
+                      { l: "Lucro Pendente", v: "R$ 0,00", c: "text-yellow-400", bg: "bg-yellow-500/10 border-yellow-500/20" },
+                      { l: "ROI", v: "5.00%", c: "text-purple-400", bg: "bg-purple-500/10 border-purple-500/20" },
+                    ].map(({ l, v, c, bg }) => (
+                      <div key={l} className={`rounded-xl border ${bg} p-2`}>
+                        <p className="text-[7px] text-gray-400 mb-0.5">{l}</p>
+                        <p className={`text-[9px] font-bold ${c}`}>{v}</p>
+                      </div>
+                    ))}
+                  </div>
+                  <div className="bg-white/5 border border-white/10 rounded-xl p-2">
+                    <p className="text-[8px] font-semibold text-gray-300 mb-1.5">Lucro Acumulado</p>
+                    <div className="flex items-end gap-1 h-12 px-1">
+                      {[2,5,3,8,6,9,7].map((h,i) => (
+                        <div key={i} className="flex-1 bg-[#1e3a8a]/60 rounded-t" style={{ height:`${h*10}%` }} />
+                      ))}
+                    </div>
+                  </div>
+                </>
+              }>
                 <p className="text-[10px] font-bold text-white mb-3">Painel Geral 📊</p>
-                {/* 4 stat cards */}
                 <div className="grid grid-cols-4 gap-2 mb-3">
                   {[
                     { l: "Saldo Total", v: "R$ 2.000,00", c: "text-blue-400", bg: "bg-blue-500/10 border-blue-500/20" },
@@ -211,7 +304,6 @@ export default function TutorialClient() {
                     </div>
                   ))}
                 </div>
-                {/* Chart + summary */}
                 <div className="grid grid-cols-3 gap-2">
                   <div className="col-span-2 rounded-xl border border-white/5 bg-white/5 p-2">
                     <div className="flex items-center justify-between mb-2">
@@ -239,7 +331,7 @@ export default function TutorialClient() {
                     ))}
                   </div>
                 </div>
-              </MockShell>
+              </MockBoth>
 
               <div className="space-y-3">
                 <h3 className="text-sm font-semibold text-[var(--text-primary)]">O que você encontra aqui</h3>
@@ -272,7 +364,32 @@ export default function TutorialClient() {
                 <p className="text-sm text-[var(--text-secondary)]">Organize suas apostas separando diferentes estratégias ou bancas.</p>
               </div>
 
-              <MockShell url="/perfis">
+              <MockBoth url="/perfis" activeNav="/perfis" mobileContent={
+                <>
+                  <div className="flex items-center justify-between mb-2">
+                    <p className="text-[10px] font-bold text-white">Perfis</p>
+                    <div className="flex items-center gap-1 bg-[#1e3a8a] px-2 py-1 rounded-lg">
+                      <Plus className="w-2.5 h-2.5 text-white" /><span className="text-[7px] text-white">Novo</span>
+                    </div>
+                  </div>
+                  {["Perfil Principal", "Banca Conservadora"].map((name, i) => (
+                    <div key={i} className="bg-white/5 border border-white/10 rounded-xl p-2.5 mb-1.5">
+                      <div className="flex items-center gap-2 mb-1.5">
+                        <div className="w-7 h-7 rounded-full bg-[#1e3a8a] flex items-center justify-center text-white text-[8px] font-bold shrink-0">{name[0]}S</div>
+                        <div>
+                          <p className="text-[9px] font-semibold text-white">{name}</p>
+                          <span className="text-[7px] bg-green-500/10 text-green-400 px-1 rounded-full border border-green-500/20">Ativo</span>
+                        </div>
+                      </div>
+                      <div className="grid grid-cols-3 gap-1 text-center">
+                        {["12 apostas","R$ 120","5% ROI"].map(v=>(
+                          <div key={v} className="bg-black/30 rounded-lg p-1"><p className="text-[7px] font-bold text-white">{v}</p></div>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+                </>
+              }>
                 <div className="flex items-center justify-between mb-3">
                   <div>
                     <p className="text-[11px] font-bold text-white">Perfis</p>
@@ -311,7 +428,7 @@ export default function TutorialClient() {
                     </div>
                   ))}
                 </div>
-              </MockShell>
+              </MockBoth>
 
               <div className="space-y-3">
                 <h3 className="text-sm font-semibold text-[var(--text-primary)]">Como criar um perfil</h3>
@@ -335,7 +452,33 @@ export default function TutorialClient() {
                 <p className="text-sm text-[var(--text-secondary)]">Calcule apostas 2-way e 3-way para garantir lucro independente do resultado.</p>
               </div>
 
-              <MockShell url="/calculadora">
+              <MockBoth url="/calculadora" activeNav="/dashboard" mobileContent={
+                <>
+                  <p className="text-[10px] font-bold text-white mb-2">Calculadora de Surebet</p>
+                  <div className="space-y-1.5 mb-2">
+                    {["Resultado 1 — Casa A","Resultado 2 — Casa B"].map((label,i)=>(
+                      <div key={i} className="bg-white/5 border border-white/10 rounded-xl p-2">
+                        <p className="text-[7px] text-gray-400 mb-1">{label}</p>
+                        <div className="flex gap-2">
+                          <div className="flex-1 bg-black/40 border border-white/10 rounded-lg px-2 py-1">
+                            <p className="text-[6px] text-gray-500">Odd</p>
+                            <p className="text-[9px] text-white font-mono">{["2.10","2.20"][i]}</p>
+                          </div>
+                          <div className="flex-1 bg-black/40 border border-white/10 rounded-lg px-2 py-1">
+                            <p className="text-[6px] text-gray-500">Stake</p>
+                            <p className="text-[9px] text-[#60a5fa] font-mono font-bold">{["R$95,24","R$90,91"][i]}</p>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                  <div className="bg-green-500/10 border border-green-500/20 rounded-xl p-2 flex items-center justify-between">
+                    <div><p className="text-[7px] text-gray-400">Lucro garantido</p><p className="text-[10px] font-bold text-green-400">R$ 9,83</p></div>
+                    <div className="text-right"><p className="text-[7px] text-gray-400">ROI</p><p className="text-[10px] font-bold text-green-400">5.2%</p></div>
+                  </div>
+                </>
+              }>
+
                 <p className="text-[10px] font-bold text-white mb-1">Calculadora de Surebet</p>
                 <p className="text-[8px] text-gray-500 mb-3">Calcule suas surebets 2-way e 3-way</p>
                 <div className="grid grid-cols-2 gap-2 mb-2">
@@ -368,7 +511,7 @@ export default function TutorialClient() {
                     <p className="text-[7px] text-white font-medium">Registrar apostas</p>
                   </div>
                 </div>
-              </MockShell>
+              </MockBoth>
 
               <div className="space-y-3">
                 <h3 className="text-sm font-semibold text-[var(--text-primary)]">Como usar a calculadora</h3>
@@ -392,7 +535,35 @@ export default function TutorialClient() {
                 <p className="text-sm text-[var(--text-secondary)]">Registre e acompanhe todas as suas apostas em um só lugar.</p>
               </div>
 
-              <MockShell url="/apostas">
+              <MockBoth url="/apostas" activeNav="/apostas" mobileContent={
+                <>
+                  <div className="flex items-center justify-between mb-2">
+                    <p className="text-[10px] font-bold text-white">Apostas</p>
+                    <div className="bg-[#1e3a8a] rounded-lg px-2 py-1 flex items-center gap-1">
+                      <Plus className="w-2.5 h-2.5 text-white"/><span className="text-[7px] text-white">Nova</span>
+                    </div>
+                  </div>
+                  <div className="space-y-1.5">
+                    {[
+                      { ev: "Flamengo x Corinthians", casa: "Bet365 · R$ 95,24", lucro: "+R$ 9,83", s: "green" },
+                      { ev: "Real Madrid x Barcelona", casa: "Betano · R$ 100,00", lucro: "-R$ 100,00", s: "red" },
+                      { ev: "Djokovic x Alcaraz", casa: "Superbet · R$ 80,00", lucro: "Pendente", s: "yellow" },
+                    ].map(({ ev, casa, lucro, s }, i) => (
+                      <div key={i} className="bg-white/5 border border-white/10 rounded-xl px-2.5 py-2 flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <div className={`w-1.5 h-8 rounded-full ${s==="green"?"bg-green-500":s==="red"?"bg-red-500":"bg-yellow-500"}`} />
+                          <div>
+                            <p className="text-[8px] font-semibold text-white truncate max-w-[120px]">{ev}</p>
+                            <p className="text-[7px] text-gray-500">{casa}</p>
+                          </div>
+                        </div>
+                        <span className={`text-[8px] font-bold ${s==="green"?"text-green-400":s==="red"?"text-red-400":"text-yellow-400"}`}>{lucro}</span>
+                      </div>
+                    ))}
+                  </div>
+                </>
+              }>
+
                 <div className="flex items-center justify-between mb-3">
                   <div>
                     <p className="text-[11px] font-bold text-white">Apostas</p>
@@ -429,7 +600,7 @@ export default function TutorialClient() {
                     </div>
                   ))}
                 </div>
-              </MockShell>
+              </MockBoth>
 
               <div className="space-y-3">
                 <h3 className="text-sm font-semibold text-[var(--text-primary)]">Como registrar uma aposta</h3>
@@ -465,7 +636,33 @@ export default function TutorialClient() {
                 <p className="text-sm text-[var(--text-secondary)]">Análise detalhada do seu desempenho financeiro.</p>
               </div>
 
-              <MockShell url="/financeiro">
+              <MockBoth url="/financeiro" activeNav="/financeiro" mobileContent={
+                <>
+                  <p className="text-[10px] font-bold text-white mb-2">Financeiro</p>
+                  <div className="grid grid-cols-2 gap-1.5 mb-2">
+                    {[
+                      { l:"Total Investido", v:"R$ 2.400", c:"text-white" },
+                      { l:"Lucro Realizado", v:"R$ 120,00", c:"text-[#60a5fa]" },
+                      { l:"Lucro Pendente", v:"R$ 0,00", c:"text-yellow-400" },
+                      { l:"ROI Médio", v:"5.00%", c:"text-green-400" },
+                    ].map(({l,v,c})=>(
+                      <div key={l} className="bg-white/5 border border-white/10 rounded-xl p-2 text-center">
+                        <p className="text-[6px] text-gray-500 mb-0.5">{l}</p>
+                        <p className={`text-[9px] font-bold ${c}`}>{v}</p>
+                      </div>
+                    ))}
+                  </div>
+                  <div className="bg-white/5 border border-white/10 rounded-xl p-2">
+                    <p className="text-[8px] font-semibold text-gray-300 mb-1.5">Evolução da Banca</p>
+                    <div className="flex items-end gap-0.5 h-12 px-1">
+                      {[3,5,4,7,5,9,8,6,8,10].map((h,i)=>(
+                        <div key={i} className="flex-1 bg-[#1e3a8a]/60 rounded-t" style={{height:`${h*9}%`}} />
+                      ))}
+                    </div>
+                  </div>
+                </>
+              }>
+
                 <p className="text-[10px] font-bold text-white mb-3">Financeiro</p>
                 <div className="grid grid-cols-4 gap-1.5 mb-3">
                   {[
@@ -495,7 +692,7 @@ export default function TutorialClient() {
                     ))}
                   </div>
                 </div>
-              </MockShell>
+              </MockBoth>
 
               <div className="space-y-3">
                 <h3 className="text-sm font-semibold text-[var(--text-primary)]">O que você encontra aqui</h3>
@@ -529,7 +726,40 @@ export default function TutorialClient() {
                 <p className="text-sm text-[var(--text-secondary)]">Gerencie seu plano e forma de pagamento.</p>
               </div>
 
-              <MockShell url="/assinatura">
+              <MockBoth url="/assinatura" activeNav="/dashboard" mobileContent={
+                <>
+                  <div className="flex items-center gap-2 mb-2">
+                    <CreditCard className="w-3.5 h-3.5 text-[#60a5fa]" />
+                    <p className="text-[10px] font-bold text-white">Assinatura</p>
+                  </div>
+                  <div className="bg-white/5 border border-[#1e3a8a]/30 rounded-xl p-2.5 mb-2">
+                    <div className="flex items-center gap-1.5 mb-1">
+                      <Star className="w-3 h-3 text-[#60a5fa]" />
+                      <span className="text-[9px] font-bold text-white">Pro</span>
+                      <span className="text-[7px] bg-green-500/20 text-green-400 px-1.5 rounded-full border border-green-500/20 ml-1">Ativa</span>
+                    </div>
+                    <p className="text-[11px] font-bold text-white">R$ 99<span className="text-[8px] font-normal text-gray-500">,00/mês</span></p>
+                    <p className="text-[7px] text-gray-400 mt-0.5">Próxima cobrança em <span className="text-white">21/07/2026</span></p>
+                    <div className="mt-2 flex items-center gap-1 bg-[#1e3a8a] w-fit px-2 py-1 rounded-lg">
+                      <RefreshCw className="w-2.5 h-2.5 text-white" />
+                      <span className="text-[7px] text-white font-medium">Atualizar pagamento</span>
+                    </div>
+                  </div>
+                  <div className="bg-white/5 border border-white/10 rounded-xl overflow-hidden">
+                    {[
+                      { l:"Status", v:"Ativa", c:"text-green-400" },
+                      { l:"Plano", v:"Pro · R$ 99/mês", c:"text-white" },
+                      { l:"Próx. cobrança", v:"21/07/2026", c:"text-white" },
+                    ].map(({l,v,c})=>(
+                      <div key={l} className="flex items-center justify-between px-2.5 py-1.5 border-b border-white/5 last:border-0">
+                        <span className="text-[7px] text-gray-500">{l}</span>
+                        <span className={`text-[7px] font-medium ${c}`}>{v}</span>
+                      </div>
+                    ))}
+                  </div>
+                </>
+              }>
+
                 <div className="flex items-center gap-2 mb-3">
                   <div className="w-6 h-6 bg-[#1e3a8a]/10 rounded-lg flex items-center justify-center">
                     <CreditCard className="w-3 h-3 text-[var(--accent-text)]" />
@@ -576,7 +806,7 @@ export default function TutorialClient() {
                     </div>
                   ))}
                 </div>
-              </MockShell>
+              </MockBoth>
 
               <div className="space-y-3">
                 <h3 className="text-sm font-semibold text-[var(--text-primary)]">Como assinar o plano</h3>
@@ -589,7 +819,41 @@ export default function TutorialClient() {
                 </div>
               </div>
 
-              <MockShell url="/assinatura/checkout">
+              <MockBoth url="/assinatura/checkout" activeNav="/dashboard" mobileContent={
+                <>
+                  <p className="text-[10px] font-bold text-white mb-2">Finalizar assinatura</p>
+                  <div className="bg-white/5 border border-white/10 rounded-xl p-2 mb-2">
+                    <div className="flex gap-1 bg-black/30 rounded-lg p-0.5 mb-2">
+                      <div className="flex-1 flex items-center justify-center gap-1 py-1 rounded-md bg-[#1e3a8a]">
+                        <QrCode className="w-2.5 h-2.5 text-white" /><span className="text-[7px] text-white font-medium">PIX</span>
+                      </div>
+                      <div className="flex-1 flex items-center justify-center gap-1 py-1">
+                        <CreditCard className="w-2.5 h-2.5 text-gray-500" /><span className="text-[7px] text-gray-500">Cartão</span>
+                      </div>
+                    </div>
+                    <div className="text-center py-2">
+                      <p className="text-[7px] text-gray-400 mb-2">Gere um QR Code para pagar R$ 99,00</p>
+                      <div className="bg-[#1e3a8a] rounded-lg py-1.5 flex items-center justify-center gap-1">
+                        <QrCode className="w-2.5 h-2.5 text-white" /><span className="text-[7px] text-white font-medium">Gerar QR Code PIX</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="bg-white/5 border border-white/10 rounded-xl p-2">
+                    <p className="text-[6px] text-gray-500 uppercase tracking-wider mb-1">Resumo</p>
+                    <div className="flex justify-between mb-1">
+                      <span className="text-[7px] text-white">Plano Pro</span>
+                      <span className="text-[7px] font-bold text-white">R$ 99,00</span>
+                    </div>
+                    {["Perfis ilimitados","Calculadora","Dashboard","Suporte"].map(f=>(
+                      <div key={f} className="flex items-center gap-1 mb-0.5">
+                        <CheckCircle className="w-2 h-2 text-[#60a5fa]" />
+                        <span className="text-[6px] text-gray-400">{f}</span>
+                      </div>
+                    ))}
+                  </div>
+                </>
+              }>
+
                 <div className="flex items-center gap-2 mb-3">
                   <ChevronLeft className="w-3 h-3 text-gray-400" />
                   <div>
@@ -641,7 +905,7 @@ export default function TutorialClient() {
                     </div>
                   </div>
                 </div>
-              </MockShell>
+              </MockBoth>
               <Tip text="Para cancelar a assinatura, abra um ticket no Suporte. Nossa equipe responde em até 24 horas." />
             </div>
           )}
@@ -654,7 +918,28 @@ export default function TutorialClient() {
                 <p className="text-sm text-[var(--text-secondary)]">Personalize sua conta e preferências.</p>
               </div>
 
-              <MockShell url="/configuracoes">
+              <MockBoth url="/configuracoes" activeNav="/dashboard" mobileContent={
+                <>
+                  <p className="text-[10px] font-bold text-white mb-2">Configurações</p>
+                  <div className="space-y-1.5">
+                    {[
+                      { label:"Meu perfil",   sub:"Altere nome, foto e e-mail" },
+                      { label:"Segurança",    sub:"Alterar senha de acesso" },
+                      { label:"Aparência",    sub:"Tema claro ou escuro" },
+                      { label:"Notificações", sub:"Gerencie alertas por e-mail" },
+                    ].map(({label,sub})=>(
+                      <div key={label} className="bg-white/5 border border-white/10 rounded-xl px-3 py-2 flex items-center justify-between">
+                        <div>
+                          <p className="text-[9px] font-medium text-white">{label}</p>
+                          <p className="text-[7px] text-gray-500">{sub}</p>
+                        </div>
+                        <ArrowRight className="w-3 h-3 text-gray-600" />
+                      </div>
+                    ))}
+                  </div>
+                </>
+              }>
+
                 <p className="text-[10px] font-bold text-white mb-3">Configurações</p>
                 <div className="space-y-1.5">
                   {[
@@ -672,7 +957,7 @@ export default function TutorialClient() {
                     </div>
                   ))}
                 </div>
-              </MockShell>
+              </MockBoth>
 
               <div className="space-y-3">
                 <h3 className="text-sm font-semibold text-[var(--text-primary)]">O que você pode configurar</h3>
@@ -705,7 +990,41 @@ export default function TutorialClient() {
                 <p className="text-sm text-[var(--text-secondary)]">Abra tickets e acompanhe o atendimento da nossa equipe.</p>
               </div>
 
-              <MockShell url="/suporte">
+              <MockBoth url="/suporte" activeNav="/dashboard" mobileContent={
+                <>
+                  <div className="flex items-center justify-between mb-2">
+                    <p className="text-[10px] font-bold text-white">Suporte</p>
+                    <div className="flex items-center gap-1 bg-[#1e3a8a] px-2 py-1 rounded-lg">
+                      <Plus className="w-2.5 h-2.5 text-white"/><span className="text-[7px] text-white">Novo ticket</span>
+                    </div>
+                  </div>
+                  <div className="bg-white/5 border border-white/10 rounded-xl p-2 mb-2">
+                    <p className="text-[8px] font-semibold text-white mb-1.5">Novo Ticket</p>
+                    <div className="space-y-1.5">
+                      <div className="bg-black/40 border border-white/10 rounded-lg px-2 py-1.5 flex items-center justify-between">
+                        <span className="text-[7px] text-gray-400">Selecione o assunto</span>
+                        <ChevronRight className="w-2 h-2 text-gray-600 rotate-90" />
+                      </div>
+                      <div className="bg-black/40 border border-white/10 rounded-lg px-2 py-3">
+                        <p className="text-[6px] text-gray-600">Descreva seu problema...</p>
+                      </div>
+                      <div className="bg-[#1e3a8a] rounded-lg py-1.5 text-center">
+                        <span className="text-[7px] text-white font-medium">Abrir ticket</span>
+                      </div>
+                    </div>
+                  </div>
+                  {[
+                    { assunto:"Dúvidas", status:"respondido", cor:"text-blue-400", badge:"bg-blue-500/10 border-blue-500/20" },
+                    { assunto:"Sugestões", status:"aberto", cor:"text-yellow-400", badge:"bg-yellow-500/10 border-yellow-500/20" },
+                  ].map(({assunto,status,cor,badge})=>(
+                    <div key={assunto} className="bg-white/5 border border-white/10 rounded-xl p-2 mb-1 flex items-center justify-between">
+                      <p className="text-[8px] font-semibold text-white">{assunto}</p>
+                      <span className={`text-[7px] font-medium border px-1.5 py-0.5 rounded-full ${badge} ${cor}`}>{status}</span>
+                    </div>
+                  ))}
+                </>
+              }>
+
                 <div className="flex items-center justify-between mb-3">
                   <div>
                     <p className="text-[11px] font-bold text-white">Suporte</p>
@@ -760,7 +1079,7 @@ export default function TutorialClient() {
                     <span className={`text-[7px] font-medium border px-1.5 py-0.5 rounded-full ${badge} ${cor}`}>{status}</span>
                   </div>
                 ))}
-              </MockShell>
+              </MockBoth>
 
               <div className="space-y-3">
                 <h3 className="text-sm font-semibold text-[var(--text-primary)]">Como abrir um ticket</h3>
