@@ -197,8 +197,9 @@ export default function TutorialClient() {
 
   return (
     <div className="max-w-5xl mx-auto">
+      {/* Header */}
       <div className="flex items-center gap-3 mb-6">
-        <div className="hidden md:flex w-9 h-9 bg-[#1e3a8a]/10 rounded-xl items-center justify-center">
+        <div className="hidden md:flex w-9 h-9 bg-[#1e3a8a]/10 rounded-xl items-center justify-center shrink-0">
           <BookOpen className="w-5 h-5 text-[var(--accent-text)]" />
         </div>
         <div>
@@ -207,17 +208,17 @@ export default function TutorialClient() {
         </div>
       </div>
 
-      {/* Mobile: horizontal scrollable tabs */}
-      <div className="md:hidden mb-6 -mx-4">
-        <div className="flex gap-2 overflow-x-auto px-4 pb-2 scrollbar-hide">
+      {/* Mobile scrollable tabs */}
+      <div className="-mx-4 mb-6 md:hidden">
+        <div className="flex overflow-x-auto px-4 pb-0 scrollbar-hide border-b border-[var(--border)]">
           {SECTIONS.map(({ id, label, icon: Icon }) => (
             <button
               key={id}
               onClick={() => setActive(id)}
-              className={`flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm font-medium whitespace-nowrap flex-shrink-0 border transition-colors ${
+              className={`flex items-center gap-1.5 px-3 py-2.5 text-sm font-medium whitespace-nowrap flex-shrink-0 border-b-2 -mb-px transition-colors ${
                 active === id
-                  ? "bg-[#1e3a8a] text-white border-[#1e3a8a]"
-                  : "bg-[var(--bg-surface)] text-[var(--text-secondary)] border-[var(--border)]"
+                  ? "border-[#1e3a8a] text-[var(--accent-text)]"
+                  : "border-transparent text-[var(--text-secondary)]"
               }`}
             >
               <Icon className="w-3.5 h-3.5 shrink-0" />
@@ -227,7 +228,7 @@ export default function TutorialClient() {
         </div>
       </div>
 
-      <div className="flex gap-6 min-w-0">
+      <div className="flex gap-6">
         {/* Desktop sidebar nav */}
         <div className="hidden md:block w-52 shrink-0">
           <div className="bg-[var(--bg-surface)] border border-[var(--border)] rounded-2xl overflow-hidden sticky top-6">
@@ -253,8 +254,8 @@ export default function TutorialClient() {
           </div>
         </div>
 
-        {/* Content */}
-        <div className="flex-1 min-w-0 space-y-8">
+        {/* Content — shared mobile + desktop */}
+        <div className="flex-1 min-w-0 space-y-8 overflow-hidden">
 
           {/* ── DASHBOARD ── */}
           {active === "inicio" && (
