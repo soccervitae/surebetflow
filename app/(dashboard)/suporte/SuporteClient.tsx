@@ -94,14 +94,17 @@ export default function SuporteClient({ tickets: initial, userId }: { tickets: T
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <div className="sm:col-span-2 space-y-1.5">
                 <label className="text-sm font-medium text-[var(--text-secondary)]">Assunto</label>
-                <input
-                  type="text"
+                <select
                   value={assunto}
                   onChange={e => setAssunto(e.target.value)}
-                  placeholder="Descreva brevemente o problema"
                   required
-                  className="w-full bg-[var(--bg-elevated)] border border-[var(--border)] rounded-xl px-4 py-2.5 text-[var(--text-primary)] placeholder-[var(--text-muted)] text-sm focus:outline-none focus:border-[#1e3a8a]/50 transition-colors"
-                />
+                  className="w-full bg-[var(--bg-elevated)] border border-[var(--border)] rounded-xl px-4 py-2.5 text-[var(--text-primary)] text-sm focus:outline-none focus:border-[#1e3a8a]/50 transition-colors"
+                >
+                  <option value="" disabled>Selecione o assunto</option>
+                  <option value="Dúvidas">Dúvidas</option>
+                  <option value="Sugestões">Sugestões</option>
+                  <option value="Críticas">Críticas</option>
+                </select>
               </div>
               <div className="space-y-1.5">
                 <label className="text-sm font-medium text-[var(--text-secondary)]">Prioridade</label>
