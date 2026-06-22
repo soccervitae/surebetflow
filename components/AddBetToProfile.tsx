@@ -10,6 +10,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { formatCurrency } from "@/lib/utils"
 import { useToast } from "@/hooks/useToast"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
 import { Plus, Eye, EyeOff, Loader2, Trash2 } from "lucide-react"
 import type { Bet, ProfileBet } from "@/lib/types"
 
@@ -105,76 +106,75 @@ export default function AddBetToProfile({ profileId }: Props) {
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <h3 className="font-medium text-[var(--text-primary)]">Casas de Apostas</h3>
-        <Button size="sm" onClick={() => { setShowForm(v => !v); setSelectedBet(""); setEmail(""); setSenha(""); setSaldo("") }}>
+        <Button size="sm" onClick={() => { setShowForm(true); setSelectedBet(""); setEmail(""); setSenha(""); setSaldo("") }}>
           <Plus className="h-4 w-4 mr-1" />
           Adicionar
         </Button>
       </div>
 
-      {showForm && (
-        <Card>
-          <CardContent className="p-4">
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="space-y-2">
-                <Label>Casa de Apostas *</Label>
-                <Select value={selectedBet} onValueChange={setSelectedBet}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Selecionar casa..." />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {bets.map(b => (
-                      <SelectItem key={b.id} value={b.id}>{b.nome}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="space-y-2">
-                <Label>E-mail da conta *</Label>
-                <Input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="email@casa.com" autoComplete="off" />
-              </div>
-              <div className="space-y-2">
-                <Label>Senha *</Label>
-                <div className="relative">
-                  <Input
-                    type={showSenha ? "text" : "password"}
-                    value={senha}
-                    onChange={e => setSenha(e.target.value)}
-                    placeholder="Senha da conta"
-                    className="pr-10"
-                    autoComplete="new-password"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowSenha(v => !v)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors"
-                    tabIndex={-1}
-                  >
-                    {showSenha ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                  </button>
-                </div>
-              </div>
-              <div className="space-y-2">
-                <Label>Saldo inicial (R$)</Label>
+      <Dialog open={showForm} onOpenChange={open => { if (!open) { setShowForm(false); setSelectedBet(""); setEmail(""); setSenha(""); setSaldo("") } }}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Adicionar Casa de Apostas</DialogTitle>
+          </DialogHeader>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="space-y-2">
+              <Label>Casa de Apostas *</Label>
+              <Select value={selectedBet} onValueChange={setSelectedBet}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Selecionar casa..." />
+                </SelectTrigger>
+                <SelectContent>
+                  {bets.map(b => (
+                    <SelectItem key={b.id} value={b.id}>{b.nome}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <Label>E-mail da conta *</Label>
+              <Input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="email@casa.com" autoComplete="off" />
+            </div>
+            <div className="space-y-2">
+              <Label>Senha *</Label>
+              <div className="relative">
                 <Input
-                  type="text"
-                  inputMode="numeric"
-                  value={saldo}
-                  onChange={e => setSaldo(formatBRL(e.target.value))}
-                  placeholder="0,00"
+                  type={showSenha ? "text" : "password"}
+                  value={senha}
+                  onChange={e => setSenha(e.target.value)}
+                  placeholder="Senha da conta"
+                  className="pr-10"
+                  autoComplete="new-password"
                 />
+                <button
+                  type="button"
+                  onClick={() => setShowSenha(v => !v)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors"
+                  tabIndex={-1}
+                >
+                  {showSenha ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </button>
               </div>
-              <div className="flex gap-2">
-                <Button type="submit" disabled={loading} className="flex-1">
-                  {loading ? <><Loader2 className="h-4 w-4 mr-2 animate-spin" />Salvando...</> : "Salvar"}
-                </Button>
-                <Button type="button" variant="outline" onClick={() => setShowForm(false)}>
-                  Cancelar
-                </Button>
-              </div>
-            </form>
-          </CardContent>
-        </Card>
-      )}
+            </div>
+            <div className="space-y-2">
+              <Label>Saldo inicial (R$)</Label>
+              <Input
+                type="text"
+                inputMode="numeric"
+                value={saldo}
+                onChange={e => setSaldo(formatBRL(e.target.value))}
+                placeholder="0,00"
+              />
+            </div>
+            <DialogFooter>
+              <Button type="button" variant="outline" onClick={() => setShowForm(false)}>Cancelar</Button>
+              <Button type="submit" disabled={loading}>
+                {loading ? <><Loader2 className="h-4 w-4 mr-2 animate-spin" />Salvando...</> : "Salvar"}
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
 
       {profileBets.length === 0 ? (
         <p className="text-sm text-[var(--text-secondary)] text-center py-6">Nenhuma casa de apostas adicionada</p>
