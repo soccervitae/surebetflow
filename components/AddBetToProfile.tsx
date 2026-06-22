@@ -1,17 +1,16 @@
 "use client"
 
-import { useState, useEffect, useCallback } from "react"
+import { useState, useEffect, useCallback, useRef } from "react"
 import { createClient } from "@/lib/supabase/client"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { formatCurrency } from "@/lib/utils"
 import { useToast } from "@/hooks/useToast"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
-import { Plus, Eye, EyeOff, Loader2, Trash2 } from "lucide-react"
+import { Plus, Eye, EyeOff, Loader2, Trash2, Search, X } from "lucide-react"
 import type { Bet, ProfileBet } from "@/lib/types"
 
 interface Props {
@@ -30,6 +29,9 @@ export default function AddBetToProfile({ profileId }: Props) {
   const [saldo, setSaldo] = useState("")
   const [loading, setLoading] = useState(false)
   const [revealedPasswords, setRevealedPasswords] = useState<Record<string, boolean>>({})
+  const [betSearch, setBetSearch] = useState("")
+  const [betDropdownOpen, setBetDropdownOpen] = useState(false)
+  const betSearchRef = useRef<HTMLInputElement>(null)
   const { toast } = useToast()
   const supabase = createClient()
 
@@ -112,7 +114,7 @@ export default function AddBetToProfile({ profileId }: Props) {
         </Button>
       </div>
 
-      <Dialog open={showForm} onOpenChange={open => { if (!open) { setShowForm(false); setSelectedBet(""); setEmail(""); setSenha(""); setSaldo("") } }}>
+      <Dialog open={showForm} onOpenChange={open => { if (!open) { setShowForm(false); setSelectedBet(""); setEmail(""); setSenha(""); setSaldo(""); setBetSearch(""); setBetDropdownOpen(false) } }}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Adicionar Casa de Apostas</DialogTitle>
@@ -120,16 +122,58 @@ export default function AddBetToProfile({ profileId }: Props) {
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
               <Label>Casa de Apostas *</Label>
-              <Select value={selectedBet} onValueChange={setSelectedBet}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Selecionar casa..." />
-                </SelectTrigger>
-                <SelectContent>
-                  {bets.map(b => (
-                    <SelectItem key={b.id} value={b.id}>{b.nome}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <div className="relative">
+                {/* Selected display / search input */}
+                {selectedBet && !betDropdownOpen ? (
+                  <div className="flex items-center justify-between h-10 px-3 rounded-md border border-[var(--border)] bg-[var(--bg-surface)]">
+                    <span className="text-sm text-[var(--text-primary)]">
+                      {bets.find(b => b.id === selectedBet)?.nome}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => { setSelectedBet(""); setBetSearch(""); setBetDropdownOpen(true); setTimeout(() => betSearchRef.current?.focus(), 50) }}
+                      className="text-[var(--text-muted)] hover:text-[var(--text-primary)]"
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
+                  </div>
+                ) : (
+                  <div className="relative">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--text-muted)]" />
+                    <Input
+                      ref={betSearchRef}
+                      className="pl-9"
+                      placeholder="Buscar casa de apostas..."
+                      value={betSearch}
+                      onChange={e => { setBetSearch(e.target.value); setBetDropdownOpen(true) }}
+                      onFocus={() => setBetDropdownOpen(true)}
+                      autoComplete="off"
+                    />
+                  </div>
+                )}
+
+                {/* Dropdown list */}
+                {betDropdownOpen && (
+                  <div className="absolute z-50 mt-1 w-full max-h-52 overflow-y-auto rounded-md border border-[var(--border)] bg-[var(--bg-surface)] shadow-lg">
+                    {bets.filter(b => b.nome.toLowerCase().includes(betSearch.toLowerCase())).length === 0 ? (
+                      <p className="text-sm text-[var(--text-muted)] text-center py-4">Nenhuma casa encontrada</p>
+                    ) : (
+                      bets
+                        .filter(b => b.nome.toLowerCase().includes(betSearch.toLowerCase()))
+                        .map(b => (
+                          <button
+                            key={b.id}
+                            type="button"
+                            className="w-full text-left px-3 py-2.5 text-sm text-[var(--text-primary)] hover:bg-[var(--bg-elevated)] transition-colors"
+                            onClick={() => { setSelectedBet(b.id); setBetSearch(""); setBetDropdownOpen(false) }}
+                          >
+                            {b.nome}
+                          </button>
+                        ))
+                    )}
+                  </div>
+                )}
+              </div>
             </div>
             <div className="space-y-2">
               <Label>E-mail da conta *</Label>
