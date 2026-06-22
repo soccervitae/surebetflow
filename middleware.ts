@@ -37,6 +37,13 @@ export async function middleware(request: NextRequest) {
   const publicRoutes = ['/', '/login', '/cadastro']
   const isPublicRoute = publicRoutes.some(route => pathname === route || pathname.startsWith(route + '/'))
 
+  // Admin routes require auth but are handled by the admin layout itself
+  if (!user && pathname.startsWith('/admin')) {
+    const url = request.nextUrl.clone()
+    url.pathname = '/login'
+    return NextResponse.redirect(url)
+  }
+
   if (!user && !isPublicRoute) {
     const url = request.nextUrl.clone()
     url.pathname = '/login'

@@ -26,7 +26,6 @@ export default function AddBetToProfile({ profileId }: Props) {
   const [email, setEmail] = useState("")
   const [senha, setSenha] = useState("")
   const [showSenha, setShowSenha] = useState(false)
-  const [saldo, setSaldo] = useState("")
   const [loading, setLoading] = useState(false)
   const [revealedPasswords, setRevealedPasswords] = useState<Record<string, boolean>>({})
   const [betSearch, setBetSearch] = useState("")
@@ -34,17 +33,6 @@ export default function AddBetToProfile({ profileId }: Props) {
   const betSearchRef = useRef<HTMLInputElement>(null)
   const { toast } = useToast()
   const supabase = createClient()
-
-  function formatBRL(raw: string) {
-    const digits = raw.replace(/\D/g, "")
-    if (!digits) return ""
-    const num = parseInt(digits, 10) / 100
-    return num.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })
-  }
-
-  function parseBRL(formatted: string) {
-    return parseFloat(formatted.replace(/\./g, "").replace(",", ".")) || 0
-  }
 
   const loadData = useCallback(async function loadData() {
     const [betsRes, pbRes] = await Promise.all([
@@ -75,7 +63,7 @@ export default function AddBetToProfile({ profileId }: Props) {
           email,
           senha_encrypted: senha,
           senha_nonce: "",
-          saldo: parseBRL(saldo),
+          saldo: 0,
         })
 
       if (error) throw new Error(error.message)
@@ -85,7 +73,6 @@ export default function AddBetToProfile({ profileId }: Props) {
       setSelectedBet("")
       setEmail("")
       setSenha("")
-      setSaldo("")
       await loadData()
     } catch (err: unknown) {
       toast({ title: (err as Error)?.message ?? "Erro ao adicionar", variant: "destructive" })
@@ -108,13 +95,13 @@ export default function AddBetToProfile({ profileId }: Props) {
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <h3 className="font-medium text-[var(--text-primary)]">Casas de Apostas</h3>
-        <Button size="sm" onClick={() => { setShowForm(true); setSelectedBet(""); setEmail(""); setSenha(""); setSaldo("") }}>
+        <Button size="sm" onClick={() => { setShowForm(true); setSelectedBet(""); setEmail(""); setSenha("") }}>
           <Plus className="h-4 w-4 mr-1" />
           Adicionar
         </Button>
       </div>
 
-      <Dialog open={showForm} onOpenChange={open => { if (!open) { setShowForm(false); setSelectedBet(""); setEmail(""); setSenha(""); setSaldo(""); setBetSearch(""); setBetDropdownOpen(false) } }}>
+      <Dialog open={showForm} onOpenChange={open => { if (!open) { setShowForm(false); setSelectedBet(""); setEmail(""); setSenha(""); setBetSearch(""); setBetDropdownOpen(false) } }}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Adicionar Casa de Apostas</DialogTitle>
@@ -199,16 +186,6 @@ export default function AddBetToProfile({ profileId }: Props) {
                   {showSenha ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 </button>
               </div>
-            </div>
-            <div className="space-y-2">
-              <Label>Saldo inicial (R$)</Label>
-              <Input
-                type="text"
-                inputMode="numeric"
-                value={saldo}
-                onChange={e => setSaldo(formatBRL(e.target.value))}
-                placeholder="0,00"
-              />
             </div>
             <DialogFooter>
               <Button type="button" variant="outline" onClick={() => setShowForm(false)}>Cancelar</Button>
