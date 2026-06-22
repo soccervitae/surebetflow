@@ -440,38 +440,41 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
                 ))}
               </select>
             )}
-            <Button size="sm" className="ml-auto" onClick={() => setFinShowForm(v => !v)}>
+            <Button size="sm" className="ml-auto" onClick={() => setFinShowForm(true)}>
               <PlusCircle className="h-4 w-4 mr-2" />
               Nova movimentação
             </Button>
           </div>
 
-          {/* Add form */}
-          {finShowForm && (
-            <Card>
-              <CardContent className="p-4 space-y-3">
+          {/* Modal form */}
+          <Dialog open={finShowForm} onOpenChange={open => { if (!open) { setFinShowForm(false); setFinFormBet(""); setFinFormTipo("deposito"); setFinFormValor(""); setFinFormDescricao("") } }}>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Nova Movimentação</DialogTitle>
+              </DialogHeader>
+              <div className="space-y-4">
                 <div className="grid grid-cols-2 gap-3">
-                  <div className="space-y-1">
-                    <Label className="text-xs">Tipo</Label>
+                  <div className="space-y-1.5">
+                    <Label>Tipo</Label>
                     <Select value={finFormTipo} onValueChange={v => setFinFormTipo(v as "deposito" | "saque")}>
-                      <SelectTrigger className="h-9 text-sm"><SelectValue /></SelectTrigger>
+                      <SelectTrigger><SelectValue /></SelectTrigger>
                       <SelectContent>
                         <SelectItem value="deposito">Depósito</SelectItem>
                         <SelectItem value="saque">Saque</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
-                  <div className="space-y-1">
-                    <Label className="text-xs">Valor (R$)</Label>
-                    <Input className="h-9 text-sm" placeholder="0,00" value={finFormValor}
+                  <div className="space-y-1.5">
+                    <Label>Valor (R$)</Label>
+                    <Input placeholder="0,00" value={finFormValor}
                       onChange={e => setFinFormValor(formatBRL(e.target.value))} />
                   </div>
                 </div>
                 {profileBetsFinanceiro.length > 0 && (
-                  <div className="space-y-1">
-                    <Label className="text-xs">Casa de apostas (opcional)</Label>
+                  <div className="space-y-1.5">
+                    <Label>Casa de apostas (opcional)</Label>
                     <Select value={finFormBet} onValueChange={setFinFormBet}>
-                      <SelectTrigger className="h-9 text-sm"><SelectValue placeholder="Selecione..." /></SelectTrigger>
+                      <SelectTrigger><SelectValue placeholder="Selecione..." /></SelectTrigger>
                       <SelectContent>
                         <SelectItem value="">Nenhuma</SelectItem>
                         {profileBetsFinanceiro.map(pb => (
@@ -481,20 +484,20 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
                     </Select>
                   </div>
                 )}
-                <div className="space-y-1">
-                  <Label className="text-xs">Descrição (opcional)</Label>
-                  <Input className="h-9 text-sm" placeholder="Ex: Depósito inicial" value={finFormDescricao}
+                <div className="space-y-1.5">
+                  <Label>Descrição (opcional)</Label>
+                  <Input placeholder="Ex: Depósito inicial" value={finFormDescricao}
                     onChange={e => setFinFormDescricao(e.target.value)} />
                 </div>
-                <div className="flex gap-2">
-                  <Button size="sm" onClick={handleFinSave} disabled={finSaving}>
-                    {finSaving ? "Salvando..." : "Salvar"}
-                  </Button>
-                  <Button size="sm" variant="outline" onClick={() => setFinShowForm(false)}>Cancelar</Button>
-                </div>
-              </CardContent>
-            </Card>
-          )}
+              </div>
+              <DialogFooter>
+                <Button variant="outline" onClick={() => setFinShowForm(false)}>Cancelar</Button>
+                <Button onClick={handleFinSave} disabled={finSaving}>
+                  {finSaving ? "Salvando..." : "Salvar"}
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
 
           {/* List */}
           {!movLoaded ? (

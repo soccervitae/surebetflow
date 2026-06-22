@@ -214,33 +214,116 @@ export default function ApostaDetailClient({ aposta: initial }: { aposta: Aposta
       {/* Legs */}
       <Card>
         <CardHeader className="pb-3">
-          <CardTitle className="text-base">Entradas por Casa de Apostas</CardTitle>
+          <div className="flex items-center justify-between">
+            <CardTitle className="text-base">Entradas por Casa de Apostas</CardTitle>
+            {aposta.status === "pendente" && legs.length > 0 && (
+              <p className="text-xs text-[var(--text-secondary)]">Selecione qual deu green</p>
+            )}
+          </div>
         </CardHeader>
         <CardContent className="space-y-3">
           {legs.length === 0 ? (
             <p className="text-sm text-[var(--text-muted)] text-center py-4">Nenhuma entrada registrada</p>
           ) : (
-            legs.map((leg, i) => (
-              <div key={leg.id} className="flex items-center justify-between p-3 rounded-xl bg-[var(--bg-muted)] border border-[var(--border)]">
-                <div className="flex items-center gap-3">
-                  <div className="w-7 h-7 rounded-full bg-[#16A34A]/10 flex items-center justify-center text-xs font-bold text-[#16A34A]">
-                    {i + 1}
+            <>
+              {legs.map((leg, i) => {
+                const isGreen = greenLegId === leg.id
+                const isRed = greenLegId !== null && greenLegId !== leg.id
+                const calc = greenRedCalc?.find(r => r.leg.id === leg.id)
+                return (
+                  <div
+                    key={leg.id}
+                    className={`flex items-center p-3 rounded-xl border transition-all ${
+                      isGreen ? "border-[#16A34A] bg-[#16A34A]/5" :
+                      isRed ? "border-[#DC2626] bg-[#DC2626]/5" :
+                      "border-[var(--border)] bg-[var(--bg-muted)]"
+                    }`}
+                  >
+                    {/* Number badge */}
+                    <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 ${
+                      isGreen ? "bg-[#16A34A] text-white" :
+                      isRed ? "bg-[#DC2626] text-white" :
+                      "bg-[#16A34A]/10 text-[#16A34A]"
+                    }`}>
+                      {i + 1}
+                    </div>
+
+                    {/* Info */}
+                    <div className="flex-1 min-w-0 ml-3">
+                      <p className="font-medium text-sm text-[var(--text-primary)]">
+                        {leg.profile_bet?.bet?.nome ?? "Casa desconhecida"}
+                      </p>
+                      <p className="text-xs text-[var(--text-secondary)] mt-0.5">
+                        Resultado: <span className="font-medium text-[var(--text-primary)]">{leg.resultado_apostado}</span>
+                      </p>
+                    </div>
+
+                    {/* Odd + Stake + valor calc */}
+                    <div className="text-right mr-3">
+                      <p className="text-sm font-bold text-[var(--text-primary)]">Odd {Number(leg.odd).toFixed(2)}</p>
+                      <p className="text-xs text-[var(--text-secondary)]">{formatCurrency(leg.stake)}</p>
+                      {calc && (
+                        <p className={`text-xs font-bold mt-0.5 ${calc.valor >= 0 ? "text-[#16A34A]" : "text-[#DC2626]"}`}>
+                          {calc.valor >= 0 ? "+" : ""}{formatCurrency(calc.valor)}
+                        </p>
+                      )}
+                    </div>
+
+                    {/* Green/Red toggle — only for pending */}
+                    {aposta.status === "pendente" && (
+                      <div className="flex flex-col gap-1 flex-shrink-0">
+                        <button
+                          type="button"
+                          onClick={() => setGreenLegId(isGreen ? null : leg.id)}
+                          className={`px-2 py-0.5 rounded text-xs font-bold border transition-all ${
+                            isGreen
+                              ? "bg-[#16A34A] text-white border-[#16A34A]"
+                              : "bg-transparent text-[#16A34A] border-[#16A34A]/40 hover:bg-[#16A34A]/10"
+                          }`}
+                        >
+                          GREEN
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            // Mark this as red = set another as green (if only 2 legs)
+                            if (legs.length === 2) {
+                              const other = legs.find(l => l.id !== leg.id)
+                              if (other) setGreenLegId(other.id)
+                            }
+                          }}
+                          className={`px-2 py-0.5 rounded text-xs font-bold border transition-all ${
+                            isRed
+                              ? "bg-[#DC2626] text-white border-[#DC2626]"
+                              : "bg-transparent text-[#DC2626] border-[#DC2626]/40 hover:bg-[#DC2626]/10"
+                          }`}
+                        >
+                          RED
+                        </button>
+                      </div>
+                    )}
+
+                    {/* Show final badge when already finalized */}
+                    {aposta.status === "finalizada" && (
+                      <div className="flex-shrink-0 ml-1">
+                        {isGreen && <span className="px-2 py-0.5 rounded text-xs font-bold bg-[#16A34A] text-white">GREEN</span>}
+                        {isRed && <span className="px-2 py-0.5 rounded text-xs font-bold bg-[#DC2626] text-white">RED</span>}
+                      </div>
+                    )}
                   </div>
-                  <div>
-                    <p className="font-medium text-sm text-[var(--text-primary)]">
-                      {leg.profile_bet?.bet?.nome ?? "Casa desconhecida"}
-                    </p>
-                    <p className="text-xs text-[var(--text-secondary)] mt-0.5">
-                      Resultado: <span className="font-medium text-[var(--text-primary)]">{leg.resultado_apostado}</span>
-                    </p>
-                  </div>
+                )
+              })}
+
+              {/* Result summary when green is selected */}
+              {greenRedCalc && (
+                <div className="mt-2 p-3 rounded-xl bg-[var(--bg-elevated)] border border-[var(--border)] flex items-center justify-between">
+                  <span className="text-sm text-[var(--text-secondary)]">Resultado líquido</span>
+                  <span className={`text-sm font-bold ${resultadoLiquido! >= 0 ? "text-[#16A34A]" : "text-[#DC2626]"}`}>
+                    {resultadoLiquido! >= 0 ? "+" : ""}{formatCurrency(resultadoLiquido!)}
+                  </span>
                 </div>
-                <div className="text-right">
-                  <p className="text-sm font-bold text-[var(--text-primary)]">Odd {Number(leg.odd).toFixed(2)}</p>
-                  <p className="text-xs text-[var(--text-secondary)]">{formatCurrency(leg.stake)}</p>
-                </div>
-              </div>
-            ))
+              )}
+            </>
           )}
         </CardContent>
       </Card>
@@ -297,67 +380,40 @@ export default function ApostaDetailClient({ aposta: initial }: { aposta: Aposta
       <Dialog open={finalizarOpen} onOpenChange={open => { setFinalizarOpen(open); if (!open) setGreenLegId(null) }}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Finalizar Aposta</DialogTitle>
+            <DialogTitle>Confirmar Finalização</DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
-            <div className="p-3 rounded-xl bg-[var(--bg-muted)] border border-[var(--border)]">
-              <p className="text-sm font-medium text-[var(--text-primary)]">{aposta.evento}</p>
-              <p className="text-xs text-[var(--text-secondary)] mt-1">Lucro garantido esperado: {formatCurrency(aposta.lucro_garantido)}</p>
-            </div>
-
-            <div className="space-y-2">
-              <Label className="text-sm font-medium">Qual casa deu green?</Label>
-              <div className="space-y-2">
-                {legs.map(leg => (
-                  <button
-                    key={leg.id}
-                    type="button"
-                    onClick={() => setGreenLegId(leg.id)}
-                    className={`w-full flex items-center justify-between p-3 rounded-xl border text-left transition-all ${
-                      greenLegId === leg.id
-                        ? "border-[#16A34A] bg-[#16A34A]/10"
-                        : "border-[var(--border)] bg-[var(--bg-muted)] hover:border-[#16A34A]/50"
-                    }`}
-                  >
-                    <div>
-                      <p className="text-sm font-medium text-[var(--text-primary)]">
-                        {leg.profile_bet?.bet?.nome ?? "Casa desconhecida"}
-                      </p>
-                      <p className="text-xs text-[var(--text-secondary)]">
-                        {leg.resultado_apostado} · Odd {Number(leg.odd).toFixed(2)} · Stake {formatCurrency(leg.stake)}
-                      </p>
-                    </div>
-                    <div className={`w-5 h-5 rounded-full border-2 flex-shrink-0 ${
-                      greenLegId === leg.id ? "border-[#16A34A] bg-[#16A34A]" : "border-[var(--border)]"
-                    }`} />
-                  </button>
-                ))}
+            {!greenLegId ? (
+              <div className="p-4 rounded-xl bg-yellow-50 border border-yellow-200 text-sm text-yellow-800">
+                Selecione qual casa deu <strong>GREEN</strong> nos cards acima antes de confirmar.
               </div>
-            </div>
-
-            {greenRedCalc && (
-              <div className="space-y-2 p-3 rounded-xl bg-[var(--bg-muted)] border border-[var(--border)]">
-                <p className="text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wide">Resultado por casa</p>
-                {greenRedCalc.map(r => (
-                  <div key={r.leg.id} className="flex items-center justify-between text-sm">
-                    <div className="flex items-center gap-2">
-                      <span className={`px-1.5 py-0.5 rounded text-xs font-bold ${r.tipo === "green" ? "bg-[#16A34A] text-white" : "bg-[#DC2626] text-white"}`}>
-                        {r.tipo === "green" ? "GREEN" : "RED"}
+            ) : (
+              <>
+                <div className="p-3 rounded-xl bg-[var(--bg-muted)] border border-[var(--border)]">
+                  <p className="text-sm font-medium text-[var(--text-primary)]">{aposta.evento}</p>
+                </div>
+                <div className="space-y-2">
+                  {greenRedCalc?.map(r => (
+                    <div key={r.leg.id} className="flex items-center justify-between text-sm">
+                      <div className="flex items-center gap-2">
+                        <span className={`px-1.5 py-0.5 rounded text-xs font-bold ${r.tipo === "green" ? "bg-[#16A34A] text-white" : "bg-[#DC2626] text-white"}`}>
+                          {r.tipo === "green" ? "GREEN" : "RED"}
+                        </span>
+                        <span className="text-[var(--text-primary)]">{r.leg.profile_bet?.bet?.nome ?? "Casa"}</span>
+                      </div>
+                      <span className={`font-bold ${r.valor >= 0 ? "text-[#16A34A]" : "text-[#DC2626]"}`}>
+                        {r.valor >= 0 ? "+" : ""}{formatCurrency(r.valor)}
                       </span>
-                      <span className="text-[var(--text-primary)]">{r.leg.profile_bet?.bet?.nome ?? "Casa"}</span>
                     </div>
-                    <span className={`font-bold ${r.valor >= 0 ? "text-[#16A34A]" : "text-[#DC2626]"}`}>
-                      {r.valor >= 0 ? "+" : ""}{formatCurrency(r.valor)}
+                  ))}
+                  <div className="pt-2 border-t border-[var(--border)] flex items-center justify-between text-sm font-bold">
+                    <span className="text-[var(--text-primary)]">Resultado líquido</span>
+                    <span className={resultadoLiquido! >= 0 ? "text-[#16A34A]" : "text-[#DC2626]"}>
+                      {resultadoLiquido! >= 0 ? "+" : ""}{formatCurrency(resultadoLiquido!)}
                     </span>
                   </div>
-                ))}
-                <div className="pt-2 border-t border-[var(--border)] flex items-center justify-between text-sm font-bold">
-                  <span className="text-[var(--text-primary)]">Resultado líquido</span>
-                  <span className={resultadoLiquido! >= 0 ? "text-[#16A34A]" : "text-[#DC2626]"}>
-                    {resultadoLiquido! >= 0 ? "+" : ""}{formatCurrency(resultadoLiquido!)}
-                  </span>
                 </div>
-              </div>
+              </>
             )}
           </div>
           <DialogFooter>
