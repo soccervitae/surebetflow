@@ -43,38 +43,10 @@ export default function HomeDashboard({ dashboard, profiles, recentApostas, apos
   })
 
   const stats = [
-    {
-      label: "Saldo Total",
-      value: formatCurrency(dashboard?.saldo_total ?? 0),
-      icon: DollarSign,
-      color: "text-[#3b82f6]",
-      bg: "bg-[#3b82f6]/10",
-      border: "border-[#3b82f6]/20",
-    },
-    {
-      label: "Lucro Realizado",
-      value: formatCurrency(dashboard?.lucro_realizado ?? 0),
-      icon: TrendingUp,
-      color: "text-[#16A34A]",
-      bg: "bg-[#16A34A]/10",
-      border: "border-[#16A34A]/20",
-    },
-    {
-      label: "Lucro Pendente",
-      value: formatCurrency(dashboard?.lucro_pendente ?? 0),
-      icon: Clock,
-      color: "text-yellow-400",
-      bg: "bg-yellow-400/10",
-      border: "border-yellow-400/20",
-    },
-    {
-      label: "ROI",
-      value: `${(dashboard?.roi_percentual ?? 0).toFixed(2)}%`,
-      icon: ArrowUpRight,
-      color: "text-[#a855f7]",
-      bg: "bg-[#a855f7]/10",
-      border: "border-[#a855f7]/20",
-    },
+    { label: "Saldo Total", value: formatCurrency(dashboard?.saldo_total ?? 0), icon: DollarSign, color: "text-[#3b82f6]", ring: "border-[#3b82f6]/20", bg: "bg-[#3b82f6]/10" },
+    { label: "Lucro Realizado", value: formatCurrency(dashboard?.lucro_realizado ?? 0), icon: TrendingUp, color: "text-[#16A34A]", ring: "border-[#16A34A]/20", bg: "bg-[#16A34A]/10" },
+    { label: "Lucro Pendente", value: formatCurrency(dashboard?.lucro_pendente ?? 0), icon: Clock, color: "text-yellow-500", ring: "border-yellow-500/20", bg: "bg-yellow-500/10" },
+    { label: "ROI", value: `${(dashboard?.roi_percentual ?? 0).toFixed(2)}%`, icon: ArrowUpRight, color: "text-[#a855f7]", ring: "border-[#a855f7]/20", bg: "bg-[#a855f7]/10" },
   ]
 
   return (
@@ -82,10 +54,10 @@ export default function HomeDashboard({ dashboard, profiles, recentApostas, apos
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-[#e6edf3]">
-            Painel Geral <span className="text-2xl">📊</span>
+          <h1 className="text-2xl font-bold text-[var(--text-primary)]">
+            Painel Geral <span>📊</span>
           </h1>
-          <p className="text-[#8b949e] text-sm mt-1">Visão consolidada de todos os seus perfis</p>
+          <p className="text-[var(--text-secondary)] text-sm mt-1">Visão consolidada de todos os seus perfis</p>
         </div>
         <Link
           href="/calculadora"
@@ -98,14 +70,14 @@ export default function HomeDashboard({ dashboard, profiles, recentApostas, apos
 
       {/* Stats */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        {stats.map(({ label, value, icon: Icon, color, bg, border }) => (
-          <div key={label} className={`rounded-xl border ${border} bg-[#161b22] p-5`}>
+        {stats.map(({ label, value, icon: Icon, color, ring, bg }) => (
+          <div key={label} className={`rounded-xl border ${ring} bg-[var(--bg-surface)] p-5`}>
             <div className="flex items-center gap-3">
-              <div className={`p-2 ${bg} rounded-lg border ${border}`}>
+              <div className={`p-2 ${bg} rounded-lg border ${ring}`}>
                 <Icon className={`h-5 w-5 ${color}`} />
               </div>
               <div className="min-w-0">
-                <p className="text-xs text-[#8b949e]">{label}</p>
+                <p className="text-xs text-[var(--text-secondary)]">{label}</p>
                 <p className={`text-lg font-bold ${color} truncate`}>{value}</p>
               </div>
             </div>
@@ -115,24 +87,23 @@ export default function HomeDashboard({ dashboard, profiles, recentApostas, apos
 
       {/* Chart + Resumo */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-        {/* Chart */}
-        <div className="lg:col-span-2 rounded-xl border border-[#30363d] bg-[#161b22] p-5">
+        <div className="lg:col-span-2 rounded-xl border border-[var(--border)] bg-[var(--bg-surface)] p-5">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-sm font-semibold text-[#e6edf3] uppercase tracking-wide">Lucro Acumulado</h2>
-            <span className="text-xs text-[#8b949e]">Apostas finalizadas</span>
+            <h2 className="text-sm font-semibold text-[var(--text-primary)] uppercase tracking-wide">Lucro Acumulado</h2>
+            <span className="text-xs text-[var(--text-secondary)]">Apostas finalizadas</span>
           </div>
           {chartData.length === 0 ? (
-            <div className="flex items-center justify-center h-[200px] text-[#8b949e] text-sm">
+            <div className="flex items-center justify-center h-[200px] text-[var(--text-secondary)] text-sm">
               Nenhuma aposta finalizada ainda
             </div>
           ) : (
             <ResponsiveContainer width="100%" height={200}>
               <LineChart data={chartData}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#21262d" />
-                <XAxis dataKey="date" tick={{ fontSize: 10, fill: "#8b949e" }} axisLine={false} tickLine={false} />
-                <YAxis tick={{ fontSize: 10, fill: "#8b949e" }} axisLine={false} tickLine={false} tickFormatter={v => `R$${v}`} />
+                <CartesianGrid strokeDasharray="3 3" stroke="var(--border-subtle)" />
+                <XAxis dataKey="date" tick={{ fontSize: 10, fill: "var(--text-muted)" }} axisLine={false} tickLine={false} />
+                <YAxis tick={{ fontSize: 10, fill: "var(--text-muted)" }} axisLine={false} tickLine={false} tickFormatter={v => `R$${v}`} />
                 <Tooltip
-                  contentStyle={{ backgroundColor: "#21262d", border: "1px solid #30363d", borderRadius: "8px", color: "#e6edf3" }}
+                  contentStyle={{ backgroundColor: "var(--bg-elevated)", border: "1px solid var(--border)", borderRadius: "8px", color: "var(--text-primary)" }}
                   formatter={(v: unknown) => [formatCurrency(v as number), "Lucro"]}
                 />
                 <Line type="monotone" dataKey="lucro" stroke="#16A34A" strokeWidth={2.5} dot={{ fill: "#16A34A", r: 3 }} activeDot={{ r: 5 }} />
@@ -142,25 +113,20 @@ export default function HomeDashboard({ dashboard, profiles, recentApostas, apos
         </div>
 
         {/* Resumo Financeiro */}
-        <div className="rounded-xl border border-[#30363d] bg-[#161b22] p-5 flex flex-col">
-          <h2 className="text-sm font-semibold text-[#e6edf3] uppercase tracking-wide mb-4">Resumo Financeiro</h2>
+        <div className="rounded-xl border border-[var(--border)] bg-[var(--bg-surface)] p-5 flex flex-col">
+          <h2 className="text-sm font-semibold text-[var(--text-primary)] uppercase tracking-wide mb-4">Resumo Financeiro</h2>
           <div className="flex-1 space-y-3">
-            <div className="flex items-center justify-between py-2 border-b border-[#21262d]">
-              <span className="text-sm text-[#8b949e]">Total Investido</span>
-              <span className="text-sm font-semibold text-[#e6edf3]">{formatCurrency(dashboard?.total_investido ?? 0)}</span>
-            </div>
-            <div className="flex items-center justify-between py-2 border-b border-[#21262d]">
-              <span className="text-sm text-[#8b949e]">Lucro Realizado</span>
-              <span className="text-sm font-semibold text-[#16A34A]">{formatCurrency(dashboard?.lucro_realizado ?? 0)}</span>
-            </div>
-            <div className="flex items-center justify-between py-2 border-b border-[#21262d]">
-              <span className="text-sm text-[#8b949e]">Lucro Pendente</span>
-              <span className="text-sm font-semibold text-yellow-400">{formatCurrency(dashboard?.lucro_pendente ?? 0)}</span>
-            </div>
-            <div className="flex items-center justify-between py-2">
-              <span className="text-sm text-[#8b949e]">Total Apostas</span>
-              <span className="text-sm font-semibold text-[#e6edf3]">{dashboard?.total_apostas ?? 0}</span>
-            </div>
+            {[
+              { label: "Total Investido", value: formatCurrency(dashboard?.total_investido ?? 0), cls: "text-[var(--text-primary)]" },
+              { label: "Lucro Realizado", value: formatCurrency(dashboard?.lucro_realizado ?? 0), cls: "text-[#16A34A]" },
+              { label: "Lucro Pendente", value: formatCurrency(dashboard?.lucro_pendente ?? 0), cls: "text-yellow-500" },
+              { label: "Total Apostas", value: String(dashboard?.total_apostas ?? 0), cls: "text-[var(--text-primary)]" },
+            ].map(({ label, value, cls }) => (
+              <div key={label} className="flex items-center justify-between py-2 border-b border-[var(--border-subtle)] last:border-0">
+                <span className="text-sm text-[var(--text-secondary)]">{label}</span>
+                <span className={`text-sm font-semibold ${cls}`}>{value}</span>
+              </div>
+            ))}
           </div>
           <Link
             href="/financeiro"
@@ -174,9 +140,8 @@ export default function HomeDashboard({ dashboard, profiles, recentApostas, apos
 
       {/* Quick Actions + Recent */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-        {/* Quick Actions */}
-        <div className="rounded-xl border border-[#30363d] bg-[#161b22] p-5">
-          <h2 className="text-sm font-semibold text-[#e6edf3] uppercase tracking-wide mb-4">Ações Rápidas</h2>
+        <div className="rounded-xl border border-[var(--border)] bg-[var(--bg-surface)] p-5">
+          <h2 className="text-sm font-semibold text-[var(--text-primary)] uppercase tracking-wide mb-4">Ações Rápidas</h2>
           <div className="grid grid-cols-2 gap-3">
             {quickActions.map(({ href, icon: Icon, label, sub, color, bg }) => (
               <Link
@@ -189,39 +154,39 @@ export default function HomeDashboard({ dashboard, profiles, recentApostas, apos
                 </div>
                 <div className="text-center">
                   <p className={`text-xs font-semibold ${color}`}>{label}</p>
-                  <p className="text-[10px] text-[#8b949e]">{sub}</p>
+                  <p className="text-[10px] text-[var(--text-secondary)]">{sub}</p>
                 </div>
               </Link>
             ))}
           </div>
         </div>
 
-        {/* Recent Apostas */}
-        <div className="lg:col-span-2 rounded-xl border border-[#30363d] bg-[#161b22] p-5">
+        {/* Atividades */}
+        <div className="lg:col-span-2 rounded-xl border border-[var(--border)] bg-[var(--bg-surface)] p-5">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-sm font-semibold text-[#e6edf3] uppercase tracking-wide">Atividades Recentes</h2>
+            <h2 className="text-sm font-semibold text-[var(--text-primary)] uppercase tracking-wide">Atividades Recentes</h2>
             <Link href="/apostas" className="text-xs text-[#16A34A] hover:underline flex items-center gap-1">
               Ver todas <ChevronRight className="w-3 h-3" />
             </Link>
           </div>
           {recentApostas.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-32 gap-2">
-              <div className="w-10 h-10 rounded-full bg-[#21262d] flex items-center justify-center">
-                <ClipboardList className="w-5 h-5 text-[#8b949e]" />
+              <div className="w-10 h-10 rounded-full bg-[var(--bg-elevated)] flex items-center justify-center">
+                <ClipboardList className="w-5 h-5 text-[var(--text-secondary)]" />
               </div>
-              <p className="text-sm text-[#8b949e]">Nenhuma atividade recente</p>
-              <p className="text-xs text-[#8b949e]">As apostas registradas aparecerão aqui.</p>
+              <p className="text-sm text-[var(--text-secondary)]">Nenhuma atividade recente</p>
+              <p className="text-xs text-[var(--text-muted)]">As apostas registradas aparecerão aqui.</p>
             </div>
           ) : (
-            <div className="space-y-2">
+            <div className="space-y-1">
               {recentApostas.slice(0, 6).map(a => (
-                <Link key={a.id} href={`/apostas/${a.id}`} className="flex items-center gap-3 p-3 rounded-lg hover:bg-[#21262d] transition-colors group">
-                  <div className="w-8 h-8 rounded-full bg-[#21262d] flex items-center justify-center flex-shrink-0 group-hover:bg-[#16A34A]/20">
-                    <ClipboardList className="w-4 h-4 text-[#8b949e] group-hover:text-[#16A34A]" />
+                <Link key={a.id} href={`/apostas/${a.id}`} className="flex items-center gap-3 p-3 rounded-lg hover:bg-[var(--bg-elevated)] transition-colors group">
+                  <div className="w-8 h-8 rounded-full bg-[var(--bg-elevated)] flex items-center justify-center flex-shrink-0 group-hover:bg-[#16A34A]/20">
+                    <ClipboardList className="w-4 h-4 text-[var(--text-secondary)] group-hover:text-[#16A34A]" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-[#e6edf3] truncate">{a.evento}</p>
-                    <p className="text-xs text-[#8b949e]">
+                    <p className="text-sm font-medium text-[var(--text-primary)] truncate">{a.evento}</p>
+                    <p className="text-xs text-[var(--text-secondary)]">
                       {a.profile ? (a.profile.apelido ?? `${a.profile.nome} ${a.profile.sobrenome}`) : "—"} · {new Date(a.created_at).toLocaleDateString("pt-BR")}
                     </p>
                   </div>
@@ -236,11 +201,11 @@ export default function HomeDashboard({ dashboard, profiles, recentApostas, apos
         </div>
       </div>
 
-      {/* Profiles row */}
+      {/* Profiles */}
       {profiles.length > 0 && (
-        <div className="rounded-xl border border-[#30363d] bg-[#161b22] p-5">
+        <div className="rounded-xl border border-[var(--border)] bg-[var(--bg-surface)] p-5">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-sm font-semibold text-[#e6edf3] uppercase tracking-wide">Perfis</h2>
+            <h2 className="text-sm font-semibold text-[var(--text-primary)] uppercase tracking-wide">Perfis</h2>
             <Link href="/perfis" className="text-xs text-[#16A34A] hover:underline flex items-center gap-1">
               Ver todos <ChevronRight className="w-3 h-3" />
             </Link>
@@ -250,18 +215,15 @@ export default function HomeDashboard({ dashboard, profiles, recentApostas, apos
               <Link
                 key={p.profile_id}
                 href={`/perfis/${p.profile_id}`}
-                className="flex items-center gap-3 p-3 rounded-xl border border-[#21262d] bg-[#0d1117] hover:border-[#16A34A]/40 hover:bg-[#16A34A]/5 transition-all"
+                className="flex items-center gap-3 p-3 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-muted)] hover:border-[#16A34A]/40 hover:bg-[#16A34A]/5 transition-all"
               >
                 <Avatar className="h-9 w-9 flex-shrink-0">
-                  {p.foto_url && <AvatarFallback className="bg-[#16A34A] text-white text-sm">
-                    {p.nome.charAt(0)}{p.sobrenome.charAt(0)}
-                  </AvatarFallback>}
                   <AvatarFallback className="bg-[#16A34A]/20 text-[#16A34A] text-sm font-bold">
                     {p.nome.charAt(0)}{p.sobrenome.charAt(0)}
                   </AvatarFallback>
                 </Avatar>
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-[#e6edf3] truncate">{p.apelido ?? `${p.nome} ${p.sobrenome}`}</p>
+                  <p className="text-sm font-medium text-[var(--text-primary)] truncate">{p.apelido ?? `${p.nome} ${p.sobrenome}`}</p>
                   <p className="text-xs text-[#16A34A] font-semibold">{formatCurrency(p.saldo_total)}</p>
                 </div>
               </Link>

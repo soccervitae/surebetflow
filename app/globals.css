@@ -3,19 +3,47 @@
 @tailwind utilities;
 
 :root {
-  --background: #FAFAF8;
-  --foreground: #1a1a1a;
+  /* Light mode */
+  --bg-base: #FAFAF8;
+  --bg-surface: #ffffff;
+  --bg-elevated: #f3f4f6;
+  --bg-muted: #f9fafb;
+  --border: #E5E1D8;
+  --border-subtle: #e5e7eb;
+  --text-primary: #111827;
+  --text-secondary: #6b7280;
+  --text-muted: #9ca3af;
   --primary: #16A34A;
   --primary-foreground: #ffffff;
   --destructive: #DC2626;
   --blue: #2563EB;
-  --border: #E5E1D8;
+  --background: #FAFAF8;
+  --foreground: #1a1a1a;
   --radius: 12px;
 }
 
+.dark {
+  /* Dark mode */
+  --bg-base: #0d1117;
+  --bg-surface: #161b22;
+  --bg-elevated: #21262d;
+  --bg-muted: #161b22;
+  --border: #30363d;
+  --border-subtle: #21262d;
+  --text-primary: #e6edf3;
+  --text-secondary: #8b949e;
+  --text-muted: #6e7681;
+  --primary: #16A34A;
+  --primary-foreground: #ffffff;
+  --destructive: #f85149;
+  --blue: #58a6ff;
+  --background: #0d1117;
+  --foreground: #e6edf3;
+}
+
 body {
-  background-color: var(--background);
-  color: var(--foreground);
+  background-color: var(--bg-base);
+  color: var(--text-primary);
   font-family: var(--font-inter), system-ui, -apple-system, sans-serif;
 }
 
@@ -37,9 +65,9 @@ body {
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: #d1cdc5;
+  background: var(--border);
   border-radius: 3px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #b8b3aa;
+  background: var(--text-muted);
 }
