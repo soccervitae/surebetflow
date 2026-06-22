@@ -443,10 +443,9 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
                                   const isGreen = greenLegId === leg.id
                                   const isRed = greenLegId !== null && greenLegId !== leg.id
                                   return (
-                                    <div key={leg.id} className={`text-xs flex items-center gap-2 rounded-lg px-2 py-1 border ${
-                                      isGreen ? "border-[#16A34A]/40 bg-[#16A34A]/5" :
-                                      isRed   ? "border-[#DC2626]/40 bg-[#DC2626]/5" :
-                                               "border-transparent"
+                                    <div key={leg.id} className={`text-xs flex items-center gap-2 rounded-lg px-2 py-1 ${
+                                      isGreen ? "bg-[#16A34A]/5" :
+                                      isRed   ? "bg-[#DC2626]/5" : ""
                                     }`}>
                                       {(isGreen || isRed) && (
                                         <span className={`px-1.5 py-0.5 rounded text-[10px] font-bold flex-shrink-0 ${
@@ -467,24 +466,20 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
                               </div>
                             )}
                           </div>
-                          <div className="text-right flex-shrink-0 min-w-[110px]">
-                            <p className="text-xs text-[var(--text-muted)]">
-                              {formatCurrency(aposta.investimento_total)} · {aposta.roi_percentual.toFixed(2)}%
+                          <div className="text-right flex-shrink-0 min-w-[120px]">
+                            <p className="text-xs text-[var(--text-muted)]">Investimento</p>
+                            <p className="text-base font-bold text-[var(--text-primary)]">{formatCurrency(aposta.investimento_total)}</p>
+                            <p className="text-xs text-[var(--text-muted)] mt-2">
+                              {aposta.status === "finalizada" ? "Lucro" : aposta.status === "pendente" ? "Lucro esperado" : ""}
                             </p>
                             {aposta.status === "finalizada" ? (
-                              <>
-                                <p className="text-xs text-[var(--text-muted)] mt-1">Lucro</p>
-                                <p className={`text-base font-bold ${(aposta.resultado_real ?? 0) >= 0 ? "text-[#16A34A]" : "text-[#DC2626]"}`}>
-                                  {formatCurrency(aposta.resultado_real ?? 0)}
-                                </p>
-                              </>
+                              <p className={`text-base font-bold ${(aposta.resultado_real ?? 0) >= 0 ? "text-[#16A34A]" : "text-[#DC2626]"}`}>
+                                {formatCurrency(aposta.resultado_real ?? 0)}
+                              </p>
                             ) : aposta.status === "pendente" ? (
-                              <>
-                                <p className="text-xs text-[var(--text-muted)] mt-1">Lucro esperado</p>
-                                <p className="text-base font-bold text-[#D97706]">{formatCurrency(aposta.lucro_garantido)}</p>
-                              </>
+                              <p className="text-base font-bold text-[#D97706]">{formatCurrency(aposta.lucro_garantido)}</p>
                             ) : (
-                              <p className="text-sm text-[var(--text-muted)] mt-1">Cancelada</p>
+                              <p className="text-sm text-[var(--text-muted)]">Cancelada</p>
                             )}
                           </div>
                         </div>

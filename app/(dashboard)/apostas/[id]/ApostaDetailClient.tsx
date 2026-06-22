@@ -276,10 +276,10 @@ export default function ApostaDetailClient({ aposta: initial }: { aposta: Aposta
                 return (
                   <div
                     key={leg.id}
-                    className={`flex items-center p-3 rounded-xl border transition-all ${
-                      isGreen ? "border-[#16A34A] bg-[#16A34A]/5" :
-                      isRed ? "border-[#DC2626] bg-[#DC2626]/5" :
-                      "border-[var(--border)] bg-[var(--bg-muted)]"
+                    className={`flex items-center p-3 rounded-xl transition-all ${
+                      isGreen ? "bg-[#16A34A]/5" :
+                      isRed ? "bg-[#DC2626]/5" :
+                      "bg-[var(--bg-muted)]"
                     }`}
                   >
                     {/* Number badge */}
