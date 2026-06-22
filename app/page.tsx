@@ -11,8 +11,31 @@ export default async function LandingPage() {
   const { data: { user } } = await supabase.auth.getUser()
   if (user) redirect("/dashboard")
 
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    name: "SureBetFlow",
+    applicationCategory: "FinanceApplication",
+    operatingSystem: "Web",
+    url: "https://www.surebetflow.bet",
+    description: "Plataforma completa para apostadores de arbitragem esportiva. Calcule surebets, gerencie perfis e controle finanças com segurança total.",
+    offers: [
+      { "@type": "Offer", price: "79.90", priceCurrency: "BRL", name: "Plano Starter" },
+      { "@type": "Offer", price: "199.90", priceCurrency: "BRL", name: "Plano Profissional" },
+    ],
+    aggregateRating: {
+      "@type": "AggregateRating",
+      ratingValue: "4.9",
+      reviewCount: "48",
+    },
+  }
+
   return (
     <div className="min-h-screen bg-[#0a0a0a] text-white">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
 
       {/* Navbar */}
       <nav className="sticky top-0 z-50 bg-[#0a0a0a]/90 backdrop-blur border-b border-white/5">
