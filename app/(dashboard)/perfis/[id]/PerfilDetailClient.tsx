@@ -43,7 +43,7 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
   const [showCalculadora, setShowCalculadora] = useState(false)
   const [minBetsAlertOpen, setMinBetsAlertOpen] = useState(false)
   const [finalizarDialog, setFinalizarDialog] = useState<Aposta | null>(null)
-  const [periodoFiltro, setPeriodoFiltro] = useState<"dia" | "semana" | "mes" | "ano">("semana")
+  const [periodoFiltro, setPeriodoFiltro] = useState<"dia" | "semana" | "mes" | "ano">("dia")
   const [casaFiltro, setCasaFiltro] = useState<string>("todas")
   const [resultadoReal, setResultadoReal] = useState("")
   const [finalizando, setFinalizando] = useState(false)
