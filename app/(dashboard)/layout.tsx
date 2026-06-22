@@ -35,10 +35,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     const supabase = createClient()
     supabase.auth.getUser().then(async ({ data: { user } }) => {
       if (!user) { router.push("/login"); return }
-      if (!pathname.startsWith("/onboarding")) {
-        const { count } = await supabase.from("profiles").select("id", { count: "exact", head: true })
-        if (count === 0) { router.push("/onboarding/perfil"); return }
-      }
       const { data: profile } = await supabase
         .from("profiles")
         .select("nome, sobrenome")
