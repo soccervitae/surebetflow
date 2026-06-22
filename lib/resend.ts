@@ -1,12 +1,13 @@
 import { Resend } from "resend"
-
-export const resend = new Resend(process.env.RESEND_API_KEY!)
+import { getResendApiKey } from "./settings"
 
 export function generateCode(): string {
   return Math.floor(100000 + Math.random() * 900000).toString()
 }
 
 export async function sendVerificationEmail(email: string, nome: string, code: string) {
+  const apiKey = await getResendApiKey()
+  const resend = new Resend(apiKey)
   return resend.emails.send({
     from: "SureBetFlow <no-reply@surebetflow.bet>",
     to: email,

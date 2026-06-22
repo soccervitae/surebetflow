@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server"
 import { createClient } from "@/lib/supabase/server"
 import { createAdminClient } from "@/lib/supabase/admin"
 
-const ALLOWED_KEYS = ["mp_access_token", "mp_public_key", "mp_plan_pro", "mp_webhook_secret"]
+const ALLOWED_KEYS = ["mp_access_token", "mp_public_key", "mp_plan_pro", "mp_webhook_secret", "resend_api_key"]
 
 export async function POST(req: NextRequest) {
   const supabase = await createClient()

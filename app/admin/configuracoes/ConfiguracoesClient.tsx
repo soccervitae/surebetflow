@@ -32,6 +32,13 @@ const FIELDS = [
     placeholder: "599f3ac3...",
     secret: true,
   },
+  {
+    key: "resend_api_key",
+    label: "Resend API Key",
+    description: "Resend → API Keys → Chave para envio de e-mails transacionais",
+    placeholder: "re_...",
+    secret: true,
+  },
 ]
 
 export default function ConfiguracoesClient({ settings: initial }: { settings: Record<string, string> }) {
