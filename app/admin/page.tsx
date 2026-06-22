@@ -1,6 +1,6 @@
 import { createAdminClient } from "@/lib/supabase/admin"
 import { formatCurrency } from "@/lib/utils"
-import { Users, UserCircle, ClipboardList, DollarSign, TrendingUp, TrendingDown, Wallet, Activity } from "lucide-react"
+import { Users, UserCircle, ClipboardList, DollarSign, TrendingDown, Activity } from "lucide-react"
 
 export default async function AdminDashboardPage() {
   const supabase = createAdminClient()
