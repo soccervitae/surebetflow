@@ -423,63 +423,68 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
 
                   return (
                   <Link key={aposta.id} href={`/apostas/${aposta.id}`}>
-                    <Card className="hover:border-[#1e3a8a]/40 transition-colors cursor-pointer">
+                    <Card className="hover:border-[#1e3a8a]/40 transition-colors cursor-pointer overflow-hidden">
                       <CardContent className="p-4">
-                        <div className="flex items-start justify-between gap-4">
-                          <div className="flex-1 min-w-0">
-                            <div className="flex items-center gap-2 flex-wrap mb-1">
-                              <p className="font-medium text-[var(--text-primary)] truncate">{aposta.evento}</p>
-                              {statusBadge(aposta.status)}
-                              <Badge variant="secondary">{aposta.tipo}</Badge>
-                            </div>
-                            <p className="text-xs text-[var(--text-secondary)]">
-                              {new Date(aposta.created_at).toLocaleDateString("pt-BR")}
-                            </p>
-                            {legs.length > 0 && (
-                              <div className="mt-2 space-y-1">
-                                {legs.map(leg => {
-                                  const isGreen = greenLegId === leg.id
-                                  const isRed = greenLegId !== null && greenLegId !== leg.id
-                                  return (
-                                    <div key={leg.id} className={`text-xs flex items-center gap-2 rounded-lg px-2 py-1 ${
-                                      isGreen ? "bg-[#1e3a8a]/5" :
-                                      isRed   ? "bg-[#DC2626]/5" : ""
-                                    }`}>
-                                      {(isGreen || isRed) && (
-                                        <span className={`px-1.5 py-0.5 rounded text-[10px] font-bold flex-shrink-0 ${
-                                          isGreen ? "bg-[#1e3a8a] text-white" : "bg-[#DC2626] text-white"
-                                        }`}>
-                                          {isGreen ? "GREEN" : "RED"}
-                                        </span>
-                                      )}
-                                      <span className={`font-medium flex-shrink-0 ${isGreen ? "text-[var(--accent-text)]" : isRed ? "text-[#DC2626]" : "text-[var(--text-secondary)]"}`}>
-                                        {leg.profile_bet?.bet?.nome ?? "Casa"}
+                        {/* Linha 1: evento + badges */}
+                        <div className="flex items-center gap-2 flex-wrap mb-1 min-w-0">
+                          <p className="font-medium text-[var(--text-primary)] truncate">{aposta.evento}</p>
+                          {statusBadge(aposta.status)}
+                          <Badge variant="secondary">{aposta.tipo}</Badge>
+                        </div>
+                        <p className="text-xs text-[var(--text-secondary)] mb-2">
+                          {new Date(aposta.created_at).toLocaleDateString("pt-BR")}
+                        </p>
+
+                        {/* Legs */}
+                        {legs.length > 0 && (
+                          <div className="space-y-1 mb-3">
+                            {legs.map(leg => {
+                              const isGreen = greenLegId === leg.id
+                              const isRed = greenLegId !== null && greenLegId !== leg.id
+                              return (
+                                <div key={leg.id} className={`text-xs rounded-lg px-2 py-1.5 ${
+                                  isGreen ? "bg-[#1e3a8a]/5" : isRed ? "bg-[#DC2626]/5" : "bg-[var(--bg-elevated)]"
+                                }`}>
+                                  <div className="flex items-center gap-1.5 flex-wrap min-w-0">
+                                    {(isGreen || isRed) && (
+                                      <span className={`px-1.5 py-0.5 rounded text-[10px] font-bold flex-shrink-0 ${
+                                        isGreen ? "bg-[#1e3a8a] text-white" : "bg-[#DC2626] text-white"
+                                      }`}>
+                                        {isGreen ? "GREEN" : "RED"}
                                       </span>
-                                      <span className="text-[var(--text-secondary)] truncate">{leg.resultado_apostado}</span>
-                                      <span className="text-[var(--text-muted)] flex-shrink-0">@{Number(leg.odd).toFixed(2)}</span>
-                                      <span className="flex-shrink-0 text-[var(--text-secondary)]">{formatCurrency(leg.stake)}</span>
-                                    </div>
-                                  )
-                                })}
-                              </div>
-                            )}
+                                    )}
+                                    <span className={`font-medium flex-shrink-0 ${isGreen ? "text-[var(--accent-text)]" : isRed ? "text-[#DC2626]" : "text-[var(--text-secondary)]"}`}>
+                                      {leg.profile_bet?.bet?.nome ?? "Casa"}
+                                    </span>
+                                    <span className="text-[var(--text-secondary)] truncate min-w-0">{leg.resultado_apostado}</span>
+                                    <span className="text-[var(--text-muted)] flex-shrink-0 ml-auto">@{Number(leg.odd).toFixed(2)} · {formatCurrency(leg.stake)}</span>
+                                  </div>
+                                </div>
+                              )
+                            })}
                           </div>
-                          <div className="text-right flex-shrink-0">
+                        )}
+
+                        {/* Linha final: Investimento + Lucro lado a lado */}
+                        <div className="flex items-end justify-between gap-2 pt-2 border-t border-[var(--border)]">
+                          <div>
                             <p className="text-xs text-[var(--text-muted)]">Investimento</p>
-                            <p className="text-base font-bold text-[var(--text-primary)]">{formatCurrency(aposta.investimento_total)}</p>
-                            <p className="text-xs text-[var(--text-muted)] mt-2">
-                              {aposta.status === "finalizada" ? "Lucro" : aposta.status === "pendente" ? "Lucro esperado" : ""}
-                            </p>
-                            {aposta.status === "finalizada" ? (
-                              <p className={`text-base font-bold ${(aposta.resultado_real ?? 0) >= 0 ? "text-[var(--accent-text)]" : "text-[#DC2626]"}`}>
-                                {formatCurrency(aposta.resultado_real ?? 0)}
-                              </p>
-                            ) : aposta.status === "pendente" ? (
-                              <p className="text-base font-bold text-[#D97706]">{formatCurrency(aposta.lucro_garantido)}</p>
-                            ) : (
-                              <p className="text-sm text-[var(--text-muted)]">Cancelada</p>
-                            )}
+                            <p className="text-sm font-bold text-[var(--text-primary)]">{formatCurrency(aposta.investimento_total)}</p>
                           </div>
+                          {aposta.status !== "cancelada" && (
+                            <div className="text-right">
+                              <p className="text-xs text-[var(--text-muted)]">
+                                {aposta.status === "finalizada" ? "Lucro" : "Lucro esperado"}
+                              </p>
+                              {aposta.status === "finalizada" ? (
+                                <p className={`text-sm font-bold ${(aposta.resultado_real ?? 0) >= 0 ? "text-[var(--accent-text)]" : "text-[#DC2626]"}`}>
+                                  {formatCurrency(aposta.resultado_real ?? 0)}
+                                </p>
+                              ) : (
+                                <p className="text-sm font-bold text-[#D97706]">{formatCurrency(aposta.lucro_garantido)}</p>
+                              )}
+                            </div>
+                          )}
                         </div>
                       </CardContent>
                     </Card>
