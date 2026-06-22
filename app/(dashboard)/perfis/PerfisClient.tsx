@@ -65,9 +65,17 @@ export default function PerfisClient({ profiles: initialProfiles, userId }: Prop
                       </AvatarFallback>
                     </Avatar>
                     <div className="flex-1 min-w-0">
-                      <h3 className="font-semibold text-[var(--text-primary)] truncate">
-                        {profile.apelido || `${profile.nome} ${profile.sobrenome}`}
-                      </h3>
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <h3 className="font-semibold text-[var(--text-primary)] truncate">
+                          {profile.apelido || `${profile.nome} ${profile.sobrenome}`}
+                        </h3>
+                        <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium flex-shrink-0 ${
+                          profile.ativo ? "bg-green-500/10 text-green-600" : "bg-red-500/10 text-red-500"
+                        }`}>
+                          <span className={`w-1.5 h-1.5 rounded-full ${profile.ativo ? "bg-green-500" : "bg-red-500"}`} />
+                          {profile.ativo ? "Ativo" : "Inativo"}
+                        </span>
+                      </div>
                       {profile.email && (
                         <p className="text-sm text-[var(--text-secondary)] truncate">{profile.email}</p>
                       )}

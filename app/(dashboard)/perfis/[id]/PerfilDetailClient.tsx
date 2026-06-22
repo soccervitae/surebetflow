@@ -380,21 +380,43 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
                   <Link key={aposta.id} href={`/apostas/${aposta.id}`}>
                     <Card className="hover:border-[#16A34A]/40 transition-colors cursor-pointer">
                       <CardContent className="p-4">
-                        <div className="flex items-center justify-between gap-3">
+                        <div className="flex items-start justify-between gap-4">
                           <div className="flex-1 min-w-0">
-                            <div className="flex items-center gap-2 flex-wrap">
-                              <p className="font-medium text-[var(--text-primary)] text-sm truncate">{aposta.evento}</p>
+                            <div className="flex items-center gap-2 flex-wrap mb-1">
+                              <p className="font-medium text-[var(--text-primary)] truncate">{aposta.evento}</p>
                               {statusBadge(aposta.status)}
+                              <Badge variant="secondary">{aposta.tipo}</Badge>
                             </div>
-                            <p className="text-xs text-[var(--text-secondary)] mt-0.5">
-                              {new Date(aposta.created_at).toLocaleDateString("pt-BR")} · {aposta.tipo} · ROI {aposta.roi_percentual.toFixed(2)}%
+                            <p className="text-xs text-[var(--text-secondary)]">
+                              Investimento: {formatCurrency(aposta.investimento_total)} · ROI: {aposta.roi_percentual.toFixed(2)}% · {new Date(aposta.created_at).toLocaleDateString("pt-BR")}
                             </p>
+                            {(aposta as Aposta & { legs?: { id: string; resultado_apostado: string; odd: number; stake: number; profile_bet?: { bet?: { nome: string } } }[] }).legs?.length ? (
+                              <div className="mt-2 space-y-1">
+                                {(aposta as Aposta & { legs?: { id: string; resultado_apostado: string; odd: number; stake: number; profile_bet?: { bet?: { nome: string } } }[] }).legs!.map(leg => (
+                                  <div key={leg.id} className="text-xs text-[var(--text-secondary)] flex items-center gap-2">
+                                    <span className="bg-[var(--bg-elevated)] rounded px-1.5 py-0.5">{leg.profile_bet?.bet?.nome ?? "Casa"}</span>
+                                    <span>{leg.resultado_apostado}</span>
+                                    <span className="font-medium">@{Number(leg.odd).toFixed(2)}</span>
+                                    <span className="text-[#16A34A]">{formatCurrency(leg.stake)}</span>
+                                  </div>
+                                ))}
+                              </div>
+                            ) : null}
                           </div>
                           <div className="text-right flex-shrink-0">
-                            <p className={`text-sm font-bold ${aposta.status === "finalizada" ? "text-[#16A34A]" : "text-yellow-500"}`}>
-                              {formatCurrency(aposta.status === "finalizada" ? (aposta.resultado_real ?? aposta.lucro_garantido) : aposta.lucro_garantido)}
-                            </p>
-                            <p className="text-xs text-[var(--text-muted)]">{formatCurrency(aposta.investimento_total)} investido</p>
+                            {aposta.status === "finalizada" ? (
+                              <>
+                                <p className="text-xs text-[var(--text-muted)]">Resultado real</p>
+                                <p className="text-base font-bold text-[#16A34A]">{formatCurrency(aposta.resultado_real ?? 0)}</p>
+                              </>
+                            ) : aposta.status === "pendente" ? (
+                              <>
+                                <p className="text-xs text-[var(--text-muted)]">Lucro esperado</p>
+                                <p className="text-base font-bold text-yellow-600">{formatCurrency(aposta.lucro_garantido)}</p>
+                              </>
+                            ) : (
+                              <p className="text-sm text-[var(--text-muted)]">Cancelada</p>
+                            )}
                           </div>
                         </div>
                       </CardContent>
