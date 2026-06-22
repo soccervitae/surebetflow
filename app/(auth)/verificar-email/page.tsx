@@ -1,11 +1,12 @@
 "use client"
 
+import { Suspense } from "react"
 import { useState, useRef, useEffect } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import { Mail, RefreshCw, CheckCircle, ArrowLeft } from "lucide-react"
 import Link from "next/link"
 
-export default function VerificarEmailPage() {
+function VerificarEmailContent() {
   const [code, setCode] = useState(["", "", "", "", "", ""])
   const [loading, setLoading] = useState(false)
   const [resending, setResending] = useState(false)
@@ -18,7 +19,6 @@ export default function VerificarEmailPage() {
   const email = searchParams.get("email") ?? ""
   const nome = searchParams.get("nome") ?? "usuário"
 
-  // Countdown for resend
   useEffect(() => {
     if (countdown <= 0) return
     const t = setTimeout(() => setCountdown(c => c - 1), 1000)
@@ -104,7 +104,6 @@ export default function VerificarEmailPage() {
 
       {!success && (
         <>
-          {/* Code inputs */}
           <div className="flex gap-3 justify-center mb-5" onPaste={handlePaste}>
             {code.map((digit, i) => (
               <input
@@ -135,7 +134,6 @@ export default function VerificarEmailPage() {
             <p className="text-center text-sm text-gray-500 mb-4">Verificando...</p>
           )}
 
-          {/* Resend */}
           <div className="text-center">
             {countdown > 0 ? (
               <p className="text-sm text-gray-500">
@@ -162,5 +160,13 @@ export default function VerificarEmailPage() {
         </>
       )}
     </>
+  )
+}
+
+export default function VerificarEmailPage() {
+  return (
+    <Suspense fallback={<div className="text-center text-gray-500 text-sm">Carregando...</div>}>
+      <VerificarEmailContent />
+    </Suspense>
   )
 }

@@ -1,3 +1,4 @@
+import { Suspense } from "react"
 import { createClient } from "@/lib/supabase/server"
 import { redirect } from "next/navigation"
 import AssinaturaClient from "./AssinaturaClient"
@@ -13,5 +14,9 @@ export default async function AssinaturaPage() {
     .eq("user_id", user.id)
     .single()
 
-  return <AssinaturaClient subscription={subscription} />
+  return (
+    <Suspense fallback={null}>
+      <AssinaturaClient subscription={subscription} />
+    </Suspense>
+  )
 }
