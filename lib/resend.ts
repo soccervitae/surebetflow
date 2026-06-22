@@ -9,7 +9,7 @@ export async function sendVerificationEmail(email: string, nome: string, code: s
   const apiKey = await getResendApiKey()
   const resend = new Resend(apiKey)
   return resend.emails.send({
-    from: "SureBetFlow <no-reply@surebetflow.bet>",
+    from: "SureBetFlow <naoresponda@surebetflow.bet>",
     to: email,
     subject: `${code} é seu código de verificação — SureBetFlow`,
     html: `
