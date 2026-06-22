@@ -1,8 +1,7 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState } from "react"
 import Link from "next/link"
-import { createClient } from "@/lib/supabase/client"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
@@ -12,80 +11,15 @@ import { useToast } from "@/hooks/useToast"
 import { Plus, User } from "lucide-react"
 import type { Profile } from "@/lib/types"
 
-type Periodo = "dia" | "semana" | "mes" | "ano" | "todos"
-
 interface Props {
   profiles: Profile[]
   userId: string
 }
 
-const PERIODOS: { value: Periodo; label: string }[] = [
-  { value: "dia", label: "Dia" },
-  { value: "semana", label: "Semana" },
-  { value: "mes", label: "Mês" },
-  { value: "ano", label: "Ano" },
-  { value: "todos", label: "Todos" },
-]
-
-function getPeriodStart(periodo: Periodo): Date | null {
-  const now = new Date()
-  if (periodo === "dia") {
-    const d = new Date(now)
-    d.setHours(0, 0, 0, 0)
-    return d
-  }
-  if (periodo === "semana") {
-    const d = new Date(now)
-    d.setDate(now.getDate() - 7)
-    return d
-  }
-  if (periodo === "mes") {
-    const d = new Date(now)
-    d.setDate(1)
-    d.setHours(0, 0, 0, 0)
-    return d
-  }
-  if (periodo === "ano") {
-    return new Date(now.getFullYear(), 0, 1)
-  }
-  return null
-}
-
 export default function PerfisClient({ profiles: initialProfiles, userId }: Props) {
   const [profiles, setProfiles] = useState(initialProfiles)
   const [showCreate, setShowCreate] = useState(false)
-  const [periodo, setPeriodo] = useState<Periodo>("mes")
-  const [apostaCounts, setApostaCounts] = useState<Record<string, number>>({})
   const { toast } = useToast()
-  const supabase = createClient()
-
-  useEffect(() => {
-    async function fetchCounts() {
-      if (profiles.length === 0) return
-      const profileIds = profiles.map(p => p.id)
-      const start = getPeriodStart(periodo)
-
-      let query = supabase
-        .from("apostas")
-        .select("profile_id")
-        .in("profile_id", profileIds)
-
-      if (start) {
-        query = query.gte("created_at", start.toISOString())
-      }
-
-      const { data } = await query
-      if (!data) return
-
-      const counts: Record<string, number> = {}
-      profileIds.forEach(id => { counts[id] = 0 })
-      data.forEach((row: { profile_id: string }) => {
-        counts[row.profile_id] = (counts[row.profile_id] ?? 0) + 1
-      })
-      setApostaCounts(counts)
-    }
-    fetchCounts()
-  }, [profiles, periodo]) // eslint-disable-line react-hooks/exhaustive-deps
 
   function handleCreated(profile: Profile) {
     setProfiles(prev => [profile, ...prev])
@@ -104,26 +38,6 @@ export default function PerfisClient({ profiles: initialProfiles, userId }: Prop
           <Plus className="h-4 w-4 mr-2" />
           Novo perfil
         </Button>
-      </div>
-
-      {/* Filtro de período */}
-      <div className="flex items-center gap-3">
-        <span className="text-xs text-[var(--text-muted)] uppercase tracking-wide font-medium">Período</span>
-        <div className="flex gap-1 bg-[var(--bg-elevated)] rounded-lg p-1">
-          {PERIODOS.map(({ value, label }) => (
-            <button
-              key={value}
-              onClick={() => setPeriodo(value)}
-              className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${
-                periodo === value
-                  ? "bg-[var(--bg-surface)] text-[#16A34A] border border-[var(--border)] shadow-sm"
-                  : "text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
-              }`}
-            >
-              {label}
-            </button>
-          ))}
-        </div>
       </div>
 
       {profiles.length === 0 ? (
