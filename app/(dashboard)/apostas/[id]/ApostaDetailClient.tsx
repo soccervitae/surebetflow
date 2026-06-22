@@ -12,7 +12,7 @@ import { formatCurrency } from "@/lib/utils"
 import { useToast } from "@/hooks/useToast"
 import {
   TrendingUp, DollarSign, Clock, BarChart2,
-  CheckCircle2, XCircle, AlertCircle, CalendarDays, Tag, Trash2
+  CheckCircle2, XCircle, AlertCircle, CalendarDays, Tag, Trash2, Pencil
 } from "lucide-react"
 import type { Aposta } from "@/lib/types"
 
@@ -194,7 +194,7 @@ export default function ApostaDetailClient({ aposta: initial }: { aposta: Aposta
           <Button
             variant="ghost"
             size="icon"
-            className="text-[#DC2626] hover:bg-[#DC2626]/10"
+            className="hidden md:flex text-[#DC2626] hover:bg-[#DC2626]/10"
             onClick={() => setDeletarOpen(true)}
           >
             <Trash2 className="h-4 w-4" />
@@ -374,6 +374,26 @@ export default function ApostaDetailClient({ aposta: initial }: { aposta: Aposta
           )}
         </CardContent>
       </Card>
+
+      {/* Botões Editar / Deletar — apenas mobile */}
+      <div className="flex md:hidden gap-3">
+        <Button
+          variant="outline"
+          className="flex-1 gap-2"
+          onClick={() => {/* TODO: editar aposta */}}
+        >
+          <Pencil className="w-4 h-4" />
+          Editar
+        </Button>
+        <Button
+          variant="outline"
+          className="flex-1 gap-2 text-[#DC2626] border-[#DC2626]/30 hover:bg-[#DC2626]/5"
+          onClick={() => setDeletarOpen(true)}
+        >
+          <Trash2 className="w-4 h-4" />
+          Deletar
+        </Button>
+      </div>
 
       {/* Ações */}
       {aposta.status === "pendente" && (
