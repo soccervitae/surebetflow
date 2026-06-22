@@ -123,6 +123,7 @@ export default function SurebetCalculator({ profiles, defaultProfileId, onSaved 
   ])
   const [pasteText, setPasteText] = useState("")
   const [showPaste, setShowPaste] = useState(false)
+  const [userStakes, setUserStakes] = useState<(number | null)[]>([null, null, null])
   const { toast } = useToast()
   const supabase = createClient()
 
@@ -171,6 +172,11 @@ export default function SurebetCalculator({ profiles, defaultProfileId, onSaved 
   function parseBRL(v: string) {
     return parseFloat(v.replace(/\./g, "").replace(",", ".")) || 0
   }
+
+  // Reset manual stakes when odds or investment change
+  useEffect(() => {
+    setUserStakes([null, null, null])
+  }, [legs.map(l => l.odd).join(","), investimentoTotal]) // eslint-disable-line react-hooks/exhaustive-deps
 
   function updateLeg(index: number, field: keyof Leg, value: string) {
     setLegs(prev => prev.map((leg, i) => i === index ? { ...leg, [field]: value } : leg))
@@ -235,9 +241,11 @@ export default function SurebetCalculator({ profiles, defaultProfileId, onSaved 
   const isArbitrage = sumProbs > 0 && sumProbs < 1
   const investment = parseBRL(investimentoTotal)
 
-  const stakes = isArbitrage && investment > 0
+  const computedStakes = isArbitrage && investment > 0
     ? impliedProbs.map(p => parseFloat(((p / sumProbs) * investment).toFixed(2)))
     : odds.map(() => 0)
+
+  const stakes = computedStakes.map((computed, i) => userStakes[i] ?? computed)
 
   const guaranteedReturn = isArbitrage && stakes.length > 0 && odds[0] > 0
     ? stakes[0] * odds[0]
@@ -466,14 +474,29 @@ export default function SurebetCalculator({ profiles, defaultProfileId, onSaved 
                   <Input
                     inputMode="numeric"
                     value={stakes[i] > 0 ? stakes[i].toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : ""}
+                    readOnly={!isArbitrage}
                     placeholder="0,00"
                     onChange={e => {
-                      const formatted = formatBRL(e.target.value)
-                      const newStake = parseBRL(formatted)
-                      if (newStake > 0 && impliedProbs[i] > 0 && sumProbs > 0) {
-                        const newInvestment = (newStake * sumProbs) / impliedProbs[i]
-                        setInvestimentoTotal(newInvestment.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 }))
-                      }
+                      const newStake = parseBRL(formatBRL(e.target.value))
+                      if (newStake <= 0) return
+                      const remaining = investment - newStake
+                      setUserStakes(prev => {
+                        const next = [...prev]
+                        next[i] = newStake
+                        // distribute remaining among other legs proportionally by implied prob
+                        const otherIndices = Array.from({ length: numLegs }, (_, k) => k).filter(k => k !== i)
+                        const otherSumProbs = otherIndices.reduce((s, k) => s + (impliedProbs[k] || 0), 0)
+                        if (otherIndices.length === 1) {
+                          next[otherIndices[0]] = parseFloat(remaining.toFixed(2))
+                        } else {
+                          otherIndices.forEach(k => {
+                            next[k] = otherSumProbs > 0
+                              ? parseFloat(((impliedProbs[k] / otherSumProbs) * remaining).toFixed(2))
+                              : parseFloat((remaining / otherIndices.length).toFixed(2))
+                          })
+                        }
+                        return next
+                      })
                     }}
                   />
                 </div>
