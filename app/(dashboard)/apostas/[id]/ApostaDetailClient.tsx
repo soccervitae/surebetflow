@@ -11,7 +11,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "
 import { formatCurrency } from "@/lib/utils"
 import { useToast } from "@/hooks/useToast"
 import {
-  ArrowLeft, TrendingUp, DollarSign, Clock, BarChart2,
+  TrendingUp, DollarSign, Clock, BarChart2,
   CheckCircle2, XCircle, AlertCircle, CalendarDays, Tag, Trash2
 } from "lucide-react"
 import type { Aposta } from "@/lib/types"
@@ -179,10 +179,7 @@ export default function ApostaDetailClient({ aposta: initial }: { aposta: Aposta
   return (
     <div className="max-w-2xl md:max-w-4xl mx-auto space-y-6 p-4 md:p-6">
       {/* Cabeçalho */}
-      <div className="flex items-center gap-3">
-        <Button variant="ghost" size="icon" onClick={() => router.back()}>
-          <ArrowLeft className="h-5 w-5" />
-        </Button>
+      <div className="flex items-start gap-3">
         <div className="flex-1 min-w-0">
           <h1 className="text-xl font-bold text-[var(--text-primary)] truncate">{aposta.evento}</h1>
           {perfil && (
@@ -206,26 +203,30 @@ export default function ApostaDetailClient({ aposta: initial }: { aposta: Aposta
       </div>
 
       {/* Métricas */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+      <div className="grid grid-cols-2 gap-3">
         <Card>
           <CardContent className="p-4">
-            <div className="p-2 bg-[#2563EB]/10 rounded-lg w-fit mb-3">
-              <DollarSign className="h-4 w-4 text-[#2563EB]" />
+            <div className="flex items-center gap-2 mb-1">
+              <div className="p-1.5 bg-[#2563EB]/10 rounded-lg flex-shrink-0">
+                <DollarSign className="h-3.5 w-3.5 text-[#2563EB]" />
+              </div>
+              <p className="text-xs text-[var(--text-secondary)]">Investimento</p>
             </div>
-            <p className="text-xs text-[var(--text-secondary)]">Investimento</p>
-            <p className="text-base font-bold text-[var(--text-primary)] mt-0.5">{formatCurrency(aposta.investimento_total)}</p>
+            <p className="text-base font-bold text-[var(--text-primary)]">{formatCurrency(aposta.investimento_total)}</p>
           </CardContent>
         </Card>
 
         <Card>
           <CardContent className="p-4">
-            <div className={`p-2 rounded-lg w-fit mb-3 ${aposta.status === "finalizada" ? "bg-[#1e3a8a]/10" : "bg-[#D97706]/10"}`}>
-              <TrendingUp className={`h-4 w-4 ${aposta.status === "finalizada" ? "text-[var(--accent-text)]" : "text-[#D97706]"}`} />
+            <div className="flex items-center gap-2 mb-1">
+              <div className={`p-1.5 rounded-lg flex-shrink-0 ${aposta.status === "finalizada" ? "bg-green-500/10" : "bg-[#D97706]/10"}`}>
+                <TrendingUp className={`h-3.5 w-3.5 ${aposta.status === "finalizada" ? "text-green-600" : "text-[#D97706]"}`} />
+              </div>
+              <p className="text-xs text-[var(--text-secondary)]">
+                {aposta.status === "finalizada" ? "Lucro Real" : "Lucro Esperado"}
+              </p>
             </div>
-            <p className="text-xs text-[var(--text-secondary)]">
-              {aposta.status === "finalizada" ? "Lucro Real" : "Lucro Esperado"}
-            </p>
-            <p className={`text-base font-bold mt-0.5 ${aposta.status === "finalizada" ? "text-[var(--accent-text)]" : "text-[#D97706]"}`}>
+            <p className={`text-base font-bold ${aposta.status === "finalizada" ? "text-green-600" : "text-[#D97706]"}`}>
               {formatCurrency(lucroExibido)}
             </p>
           </CardContent>
@@ -233,21 +234,25 @@ export default function ApostaDetailClient({ aposta: initial }: { aposta: Aposta
 
         <Card>
           <CardContent className="p-4">
-            <div className="p-2 bg-[#7C3AED]/10 rounded-lg w-fit mb-3">
-              <BarChart2 className="h-4 w-4 text-[#7C3AED]" />
+            <div className="flex items-center gap-2 mb-1">
+              <div className="p-1.5 bg-[#7C3AED]/10 rounded-lg flex-shrink-0">
+                <BarChart2 className="h-3.5 w-3.5 text-[#7C3AED]" />
+              </div>
+              <p className="text-xs text-[var(--text-secondary)]">ROI</p>
             </div>
-            <p className="text-xs text-[var(--text-secondary)]">ROI</p>
-            <p className="text-base font-bold text-[#7C3AED] mt-0.5">{aposta.roi_percentual.toFixed(2)}%</p>
+            <p className="text-base font-bold text-[#7C3AED]">{aposta.roi_percentual.toFixed(2)}%</p>
           </CardContent>
         </Card>
 
         <Card>
           <CardContent className="p-4">
-            <div className="p-2 bg-[var(--bg-elevated)] rounded-lg w-fit mb-3">
-              <Tag className="h-4 w-4 text-[var(--text-secondary)]" />
+            <div className="flex items-center gap-2 mb-1">
+              <div className="p-1.5 bg-[var(--bg-elevated)] rounded-lg flex-shrink-0">
+                <Tag className="h-3.5 w-3.5 text-[var(--text-secondary)]" />
+              </div>
+              <p className="text-xs text-[var(--text-secondary)]">Tipo</p>
             </div>
-            <p className="text-xs text-[var(--text-secondary)]">Tipo</p>
-            <p className="text-base font-bold text-[var(--text-primary)] mt-0.5">{aposta.tipo}</p>
+            <p className="text-base font-bold text-[var(--text-primary)]">{aposta.tipo}</p>
           </CardContent>
         </Card>
       </div>
@@ -276,68 +281,65 @@ export default function ApostaDetailClient({ aposta: initial }: { aposta: Aposta
                 return (
                   <div
                     key={leg.id}
-                    className={`flex items-center p-3 rounded-xl transition-all ${
-                      isGreen ? "bg-[#1e3a8a]/5" :
+                    className={`p-3 rounded-xl transition-all ${
+                      isGreen ? "bg-green-500/10" :
                       isRed ? "bg-[#DC2626]/5" :
                       "bg-[var(--bg-muted)]"
                     }`}
                   >
-                    {/* Number badge */}
-                    <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 ${
-                      isGreen ? "bg-[#1e3a8a] text-white" :
-                      isRed ? "bg-[#DC2626] text-white" :
-                      "bg-[#1e3a8a]/10 text-[var(--accent-text)]"
-                    }`}>
-                      {i + 1}
-                    </div>
-
-                    {/* Info */}
-                    <div className="flex-1 min-w-0 ml-3">
-                      <p className="font-medium text-sm text-[var(--text-primary)]">
+                    {/* Top row: number + casa + toggle buttons */}
+                    <div className="flex items-center gap-2 mb-2">
+                      <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 ${
+                        isGreen ? "bg-green-600 text-white" :
+                        isRed ? "bg-[#DC2626] text-white" :
+                        "bg-[var(--bg-elevated)] text-[var(--text-secondary)]"
+                      }`}>
+                        {i + 1}
+                      </div>
+                      <p className="font-medium text-sm text-[var(--text-primary)] flex-1 min-w-0 truncate">
                         {leg.profile_bet?.bet?.nome ?? "Casa desconhecida"}
                       </p>
-                      <p className="text-xs text-[var(--text-secondary)] mt-0.5">
-                        Resultado: <span className="font-medium text-[var(--text-primary)]">{leg.resultado_apostado}</span>
+                      <div className="flex gap-1 flex-shrink-0">
+                        <button
+                          type="button"
+                          onClick={() => handleLegClick(leg.id, "green")}
+                          className={`px-2 py-0.5 rounded text-xs font-bold border transition-all ${
+                            isGreen
+                              ? "bg-green-600 text-white border-green-600"
+                              : "bg-transparent text-green-600 border-green-600/40 hover:bg-green-500/10"
+                          }`}
+                        >
+                          GREEN
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleLegClick(leg.id, "red")}
+                          className={`px-2 py-0.5 rounded text-xs font-bold border transition-all ${
+                            isRed
+                              ? "bg-[#DC2626] text-white border-[#DC2626]"
+                              : "bg-transparent text-[#DC2626] border-[#DC2626]/40 hover:bg-[#DC2626]/10"
+                          }`}
+                        >
+                          RED
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Bottom row: resultado + odd/stake + retorno */}
+                    <div className="flex items-center justify-between gap-2 pl-8">
+                      <p className="text-xs text-[var(--text-secondary)] truncate">
+                        {leg.resultado_apostado}
                       </p>
-                    </div>
-
-                    {/* Odd + Stake + retorno/perda */}
-                    <div className="text-right mr-3">
-                      <p className="text-sm font-bold text-[var(--text-primary)]">Odd {Number(leg.odd).toFixed(2)}</p>
-                      <p className="text-xs text-[var(--text-secondary)]">Stake: {formatCurrency(leg.stake)}</p>
-                      {calc && (
-                        <p className={`text-sm font-bold mt-0.5 ${calc.valor >= 0 ? "text-[var(--accent-text)]" : "text-[#DC2626]"}`}>
-                          {calc.tipo === "green"
-                            ? `Retorno: ${formatCurrency(calc.valor)}`
-                            : `Perda: ${formatCurrency(calc.valor)}`}
-                        </p>
-                      )}
-                    </div>
-
-                    {/* Green/Red toggle */}
-                    <div className="flex flex-col gap-1 flex-shrink-0">
-                      <button
-                        type="button"
-                        onClick={() => handleLegClick(leg.id, "green")}
-                        className={`px-2 py-0.5 rounded text-xs font-bold border transition-all ${
-                          isGreen
-                            ? "bg-[#1e3a8a] text-white border-[#1e3a8a]"
-                            : "bg-transparent text-[var(--accent-text)] border-[#1e3a8a]/40 hover:bg-[#1e3a8a]/10"
-                        }`}
-                      >
-                        GREEN
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => handleLegClick(leg.id, "red")}
-                        className={`px-2 py-0.5 rounded text-xs font-bold border transition-all ${
-                          isRed
-                            ? "bg-[#DC2626] text-white border-[#DC2626]"
-                            : "bg-transparent text-[#DC2626] border-[#DC2626]/40 hover:bg-[#DC2626]/10"
-                        }`}
-                      >
-                        RED
-                      </button>
+                      <div className="text-right flex-shrink-0">
+                        <p className="text-xs text-[var(--text-secondary)]">@{Number(leg.odd).toFixed(2)} · {formatCurrency(leg.stake)}</p>
+                        {calc && (
+                          <p className={`text-xs font-bold mt-0.5 ${calc.valor >= 0 ? "text-green-600" : "text-[#DC2626]"}`}>
+                            {calc.tipo === "green"
+                              ? `Retorno: ${formatCurrency(calc.valor)}`
+                              : `Perda: ${formatCurrency(calc.valor)}`}
+                          </p>
+                        )}
+                      </div>
                     </div>
                   </div>
                 )
@@ -347,7 +349,7 @@ export default function ApostaDetailClient({ aposta: initial }: { aposta: Aposta
               {greenRedCalc && (
                 <div className="mt-2 p-3 rounded-xl bg-[var(--bg-elevated)] border border-[var(--border)] flex items-center justify-between">
                   <span className="text-sm text-[var(--text-secondary)]">Resultado líquido</span>
-                  <span className={`text-sm font-bold ${resultadoLiquido! >= 0 ? "text-[var(--accent-text)]" : "text-[#DC2626]"}`}>
+                  <span className={`text-sm font-bold ${resultadoLiquido! >= 0 ? "text-green-600" : "text-[#DC2626]"}`}>
                     {resultadoLiquido! >= 0 ? "+" : ""}{formatCurrency(resultadoLiquido!)}
                   </span>
                 </div>
@@ -445,12 +447,12 @@ export default function ApostaDetailClient({ aposta: initial }: { aposta: Aposta
                   {newCalc.map(r => (
                     <div key={r.leg.id} className="flex items-center justify-between text-sm">
                       <div className="flex items-center gap-2">
-                        <span className={`px-1.5 py-0.5 rounded text-xs font-bold ${r.tipo === "green" ? "bg-[#1e3a8a] text-white" : "bg-[#DC2626] text-white"}`}>
+                        <span className={`px-1.5 py-0.5 rounded text-xs font-bold ${r.tipo === "green" ? "bg-green-600 text-white" : "bg-[#DC2626] text-white"}`}>
                           {r.tipo === "green" ? "GREEN" : "RED"}
                         </span>
                         <span className="text-[var(--text-primary)]">{r.leg.profile_bet?.bet?.nome ?? "Casa"}</span>
                       </div>
-                      <span className={`font-bold text-sm ${r.valor >= 0 ? "text-[var(--accent-text)]" : "text-[#DC2626]"}`}>
+                      <span className={`font-bold text-sm ${r.valor >= 0 ? "text-green-600" : "text-[#DC2626]"}`}>
                         {r.valor >= 0 ? "+" : ""}{formatCurrency(r.valor)}
                       </span>
                     </div>
@@ -498,19 +500,19 @@ export default function ApostaDetailClient({ aposta: initial }: { aposta: Aposta
                   {greenRedCalc?.map(r => (
                     <div key={r.leg.id} className="flex items-center justify-between text-sm">
                       <div className="flex items-center gap-2">
-                        <span className={`px-1.5 py-0.5 rounded text-xs font-bold ${r.tipo === "green" ? "bg-[#1e3a8a] text-white" : "bg-[#DC2626] text-white"}`}>
+                        <span className={`px-1.5 py-0.5 rounded text-xs font-bold ${r.tipo === "green" ? "bg-green-600 text-white" : "bg-[#DC2626] text-white"}`}>
                           {r.tipo === "green" ? "GREEN" : "RED"}
                         </span>
                         <span className="text-[var(--text-primary)]">{r.leg.profile_bet?.bet?.nome ?? "Casa"}</span>
                       </div>
-                      <span className={`font-bold ${r.valor >= 0 ? "text-[var(--accent-text)]" : "text-[#DC2626]"}`}>
+                      <span className={`font-bold ${r.valor >= 0 ? "text-green-600" : "text-[#DC2626]"}`}>
                         {r.valor >= 0 ? "+" : ""}{formatCurrency(r.valor)}
                       </span>
                     </div>
                   ))}
                   <div className="pt-2 border-t border-[var(--border)] flex items-center justify-between text-sm font-bold">
                     <span className="text-[var(--text-primary)]">Resultado líquido</span>
-                    <span className={resultadoLiquido! >= 0 ? "text-[var(--accent-text)]" : "text-[#DC2626]"}>
+                    <span className={resultadoLiquido! >= 0 ? "text-green-600" : "text-[#DC2626]"}>
                       {resultadoLiquido! >= 0 ? "+" : ""}{formatCurrency(resultadoLiquido!)}
                     </span>
                   </div>

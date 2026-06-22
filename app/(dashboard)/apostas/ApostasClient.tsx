@@ -12,7 +12,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
 import { formatCurrency } from "@/lib/utils"
 import { useToast } from "@/hooks/useToast"
-import { BookOpen, Filter, Trash2, X } from "lucide-react"
+import { BookOpen, Filter, X } from "lucide-react"
 import type { Aposta, ApostaLeg } from "@/lib/types"
 
 interface Props {
@@ -184,19 +184,11 @@ export default function ApostasClient({ apostas: initialApostas, profiles }: Pro
             <Link key={aposta.id} href={`/apostas/${aposta.id}`}>
             <Card className="hover:border-[#1e3a8a]/40 transition-colors cursor-pointer overflow-hidden">
               <CardContent className="p-4">
-                {/* Linha 1: evento + badges + botão deletar */}
-                <div className="flex items-start gap-2 mb-1 min-w-0">
-                  <div className="flex-1 min-w-0 flex items-center gap-2 flex-wrap">
-                    <p className="font-medium text-[var(--text-primary)] truncate">{aposta.evento}</p>
-                    {statusBadge(aposta.status)}
-                    <Badge variant="secondary">{aposta.tipo}</Badge>
-                  </div>
-                  <button
-                    onClick={e => { e.preventDefault(); setDeletarDialog(aposta) }}
-                    className="p-1 rounded text-gray-400 hover:text-[#DC2626] hover:bg-[#DC2626]/10 transition-colors flex-shrink-0"
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </button>
+                {/* Linha 1: evento + badges */}
+                <div className="flex items-center gap-2 flex-wrap mb-1 min-w-0">
+                  <p className="font-medium text-[var(--text-primary)] truncate">{aposta.evento}</p>
+                  {statusBadge(aposta.status)}
+                  <Badge variant="secondary">{aposta.tipo}</Badge>
                 </div>
                 <p className="text-xs text-[var(--text-secondary)] mb-2">
                   Perfil: {aposta.profile ? (aposta.profile.apelido || `${aposta.profile.nome} ${aposta.profile.sobrenome}`) : "—"} · {new Date(aposta.created_at).toLocaleDateString("pt-BR")}
