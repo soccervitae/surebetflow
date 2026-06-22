@@ -7,6 +7,8 @@ import { createClient } from "@/lib/supabase/client"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
 import { formatCurrency } from "@/lib/utils"
 import { useToast } from "@/hooks/useToast"
@@ -70,6 +72,19 @@ export default function ApostaDetailClient({ aposta: initial }: { aposta: Aposta
   const [finalizando, setFinalizando] = useState(false)
   const [cancelando, setCancelando] = useState(false)
   const [deletando, setDeletando] = useState(false)
+  const [editarOpen, setEditarOpen] = useState(false)
+  const [editEvento, setEditEvento] = useState(initial.evento)
+  const [editEsporte, setEditEsporte] = useState(initial.esporte ?? "")
+  const [editTipo, setEditTipo] = useState<"2-way" | "3-way">(initial.tipo)
+  const [editLegs, setEditLegs] = useState(
+    (initial.legs ?? []).map(l => ({
+      id: l.id,
+      resultado_apostado: l.resultado_apostado,
+      odd: String(l.odd),
+      stake: String(l.stake),
+    }))
+  )
+  const [salvandoEdicao, setSalvandoEdicao] = useState(false)
   const { toast } = useToast()
   const router = useRouter()
   const supabase = createClient()
@@ -139,6 +154,64 @@ export default function ApostaDetailClient({ aposta: initial }: { aposta: Aposta
         const other = legs.find(l => l.id !== legId)
         if (other) setGreenLegId(other.id)
       }
+    }
+  }
+
+  function formatOdd(v: string) {
+    return v.replace(/[^0-9.]/g, "").replace(/(\..*)\./g, "$1")
+  }
+
+  function formatStake(raw: string) {
+    const digits = raw.replace(/\D/g, "")
+    if (!digits) return ""
+    const num = parseInt(digits, 10) / 100
+    return num.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+  }
+
+  function parseStake(formatted: string) {
+    return parseFloat(formatted.replace(/\./g, "").replace(",", ".")) || 0
+  }
+
+  async function handleEditar() {
+    if (!editEvento.trim()) {
+      toast({ title: "Informe o nome do evento", variant: "destructive" }); return
+    }
+    const legsValidas = editLegs.every(l => l.resultado_apostado.trim() && parseFloat(l.odd) > 0 && parseStake(l.stake) > 0)
+    if (!legsValidas) {
+      toast({ title: "Preencha resultado, odd e stake de todas as entradas", variant: "destructive" }); return
+    }
+    setSalvandoEdicao(true)
+    try {
+      const stakes = editLegs.map(l => parseStake(l.stake))
+      const odds = editLegs.map(l => parseFloat(l.odd))
+      const investimento_total = stakes.reduce((s, v) => s + v, 0)
+      const retornos = editLegs.map((_, i) => stakes[i] * odds[i])
+      const lucro_garantido = Math.min(...retornos) - investimento_total
+      const roi_percentual = investimento_total > 0 ? (lucro_garantido / investimento_total) * 100 : 0
+
+      const { error: apostaErr } = await supabase
+        .from("apostas")
+        .update({ evento: editEvento.trim(), esporte: editEsporte.trim() || null, tipo: editTipo, investimento_total, lucro_garantido, roi_percentual })
+        .eq("id", aposta.id)
+      if (apostaErr) throw apostaErr
+
+      for (let i = 0; i < editLegs.length; i++) {
+        const { error: legErr } = await supabase
+          .from("aposta_legs")
+          .update({ resultado_apostado: editLegs[i].resultado_apostado.trim(), odd: parseFloat(editLegs[i].odd), stake: stakes[i] })
+          .eq("id", editLegs[i].id)
+        if (legErr) throw legErr
+      }
+
+      setAposta(prev => ({ ...prev, evento: editEvento.trim(), esporte: editEsporte.trim() || null, tipo: editTipo, investimento_total, lucro_garantido, roi_percentual,
+        legs: prev.legs?.map((l, i) => ({ ...l, resultado_apostado: editLegs[i].resultado_apostado.trim(), odd: parseFloat(editLegs[i].odd), stake: stakes[i] }))
+      }))
+      toast({ title: "Aposta atualizada com sucesso!" })
+      setEditarOpen(false)
+    } catch {
+      toast({ title: "Erro ao salvar alterações", variant: "destructive" })
+    } finally {
+      setSalvandoEdicao(false)
     }
   }
 
@@ -372,7 +445,7 @@ export default function ApostaDetailClient({ aposta: initial }: { aposta: Aposta
         <Button
           variant="outline"
           className="flex-1 gap-2"
-          onClick={() => {/* TODO: editar aposta */}}
+          onClick={() => setEditarOpen(true)}
         >
           <Pencil className="w-4 h-4" />
           Editar
@@ -408,6 +481,119 @@ export default function ApostaDetailClient({ aposta: initial }: { aposta: Aposta
           </Button>
         </div>
       )}
+
+      {/* Dialog Editar */}
+      <Dialog open={editarOpen} onOpenChange={setEditarOpen}>
+        <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Editar Aposta</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label>Evento *</Label>
+              <Input value={editEvento} onChange={e => setEditEvento(e.target.value)} placeholder="Ex: Real Madrid vs Barcelona" />
+            </div>
+            <div className="space-y-2">
+              <Label>Esporte</Label>
+              <Input value={editEsporte} onChange={e => setEditEsporte(e.target.value)} placeholder="Ex: Futebol" />
+            </div>
+            <div className="space-y-2">
+              <Label>Tipo</Label>
+              <div className="flex gap-2">
+                {(["2-way", "3-way"] as const).map(t => (
+                  <button
+                    key={t}
+                    type="button"
+                    onClick={() => setEditTipo(t)}
+                    className={`flex-1 h-10 rounded-xl border text-sm font-medium transition-colors ${
+                      editTipo === t
+                        ? "border-[#1e3a8a] bg-[#1e3a8a]/10 text-[#1e3a8a]"
+                        : "border-[var(--border)] text-[var(--text-secondary)] hover:bg-[var(--bg-elevated)]"
+                    }`}
+                  >
+                    {t}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="space-y-3">
+              <Label>Entradas</Label>
+              {editLegs.map((leg, i) => (
+                <div key={leg.id} className="p-3 rounded-xl bg-[var(--bg-elevated)] space-y-2">
+                  <p className="text-xs font-semibold text-[var(--text-secondary)]">
+                    Entrada {i + 1} — {aposta.legs?.[i]?.profile_bet?.bet?.nome ?? `Bet ${i + 1}`}
+                  </p>
+                  <div className="space-y-2">
+                    <div className="space-y-1">
+                      <Label className="text-xs">Resultado apostado</Label>
+                      <Input
+                        value={leg.resultado_apostado}
+                        onChange={e => setEditLegs(prev => prev.map((l, j) => j === i ? { ...l, resultado_apostado: e.target.value } : l))}
+                        placeholder="Ex: Real Madrid vence"
+                      />
+                    </div>
+                    <div className="grid grid-cols-2 gap-2">
+                      <div className="space-y-1">
+                        <Label className="text-xs">Odd</Label>
+                        <Input
+                          type="text"
+                          inputMode="decimal"
+                          value={leg.odd}
+                          onChange={e => setEditLegs(prev => prev.map((l, j) => j === i ? { ...l, odd: formatOdd(e.target.value) } : l))}
+                          placeholder="Ex: 2.10"
+                        />
+                      </div>
+                      <div className="space-y-1">
+                        <Label className="text-xs">Stake (R$)</Label>
+                        <Input
+                          type="text"
+                          inputMode="numeric"
+                          value={leg.stake}
+                          onChange={e => setEditLegs(prev => prev.map((l, j) => j === i ? { ...l, stake: formatStake(e.target.value) } : l))}
+                          placeholder="0,00"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Prévia dos totais */}
+            {editLegs.length > 0 && (() => {
+              const stakes = editLegs.map(l => parseStake(l.stake))
+              const odds = editLegs.map(l => parseFloat(l.odd) || 0)
+              const total = stakes.reduce((s, v) => s + v, 0)
+              const retornos = editLegs.map((_, i) => stakes[i] * odds[i])
+              const lucro = Math.min(...retornos) - total
+              const roi = total > 0 ? (lucro / total) * 100 : 0
+              return (
+                <div className="p-3 rounded-xl bg-[var(--bg-muted)] border border-[var(--border)] space-y-1.5 text-sm">
+                  <div className="flex justify-between">
+                    <span className="text-[var(--text-secondary)]">Investimento total</span>
+                    <span className="font-medium text-[var(--text-primary)]">{formatCurrency(total)}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-[var(--text-secondary)]">Lucro garantido</span>
+                    <span className={`font-bold ${lucro >= 0 ? "text-green-600" : "text-[#DC2626]"}`}>{formatCurrency(lucro)}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-[var(--text-secondary)]">ROI</span>
+                    <span className={`font-bold ${roi >= 0 ? "text-green-600" : "text-[#DC2626]"}`}>{roi.toFixed(2)}%</span>
+                  </div>
+                </div>
+              )
+            })()}
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setEditarOpen(false)}>Cancelar</Button>
+            <Button onClick={handleEditar} disabled={salvandoEdicao} className="bg-[#1e3a8a] hover:bg-[#1e40af] text-white">
+              {salvandoEdicao ? "Salvando..." : "Salvar alterações"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       {/* Dialog Deletar */}
       <Dialog open={deletarOpen} onOpenChange={setDeletarOpen}>
