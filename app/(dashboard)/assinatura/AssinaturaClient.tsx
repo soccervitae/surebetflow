@@ -1,7 +1,7 @@
 "use client"
 
-import { useState } from "react"
 import { useSearchParams } from "next/navigation"
+import Link from "next/link"
 import { CreditCard, CheckCircle, Star, ExternalLink, AlertCircle, Clock } from "lucide-react"
 
 type Subscription = {
@@ -31,7 +31,6 @@ const STATUS_INFO: Record<string, { label: string; color: string; bg: string; ic
 }
 
 export default function AssinaturaClient({ subscription }: { subscription: Subscription }) {
-  const [loading, setLoading] = useState(false)
   const searchParams = useSearchParams()
   const success = searchParams.get("success")
   const canceled = searchParams.get("canceled")
@@ -39,18 +38,6 @@ export default function AssinaturaClient({ subscription }: { subscription: Subsc
   const isActive = subscription?.status === "active" || subscription?.status === "trialing"
   const statusInfo = STATUS_INFO[subscription?.status ?? "inactive"]
   const StatusIcon = statusInfo.icon
-
-  async function handleCheckout() {
-    setLoading(true)
-    const res = await fetch("/api/mp/checkout", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ plan: "pro" }),
-    })
-    const data = await res.json()
-    if (data.url) window.location.href = data.url
-    else setLoading(false)
-  }
 
   return (
     <div className="max-w-lg mx-auto space-y-6">
@@ -125,13 +112,12 @@ export default function AssinaturaClient({ subscription }: { subscription: Subsc
             Cancelar / Gerenciar via Suporte
           </button>
         ) : (
-          <button
-            onClick={handleCheckout}
-            disabled={loading}
-            className="w-full py-3 rounded-xl text-sm font-semibold bg-[#1e3a8a] hover:bg-[#1e40af] text-white transition-colors disabled:opacity-50"
+          <Link
+            href="/assinatura/checkout"
+            className="block w-full py-3 rounded-xl text-sm font-semibold bg-[#1e3a8a] hover:bg-[#1e40af] text-white transition-colors text-center"
           >
-            {loading ? "Redirecionando para pagamento..." : "Assinar agora — R$ 99,00/mês"}
-          </button>
+            Assinar agora — R$ 99,00/mês
+          </Link>
         )}
       </div>
 
