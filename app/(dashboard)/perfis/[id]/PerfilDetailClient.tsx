@@ -40,6 +40,7 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
   const [currentApostas, setCurrentApostas] = useState(apostas)
   const [showCalculadora, setShowCalculadora] = useState(false)
   const [finalizarDialog, setFinalizarDialog] = useState<Aposta | null>(null)
+  const [periodoFiltro, setPeriodoFiltro] = useState<"semana" | "mes" | "ano">("semana")
   const [resultadoReal, setResultadoReal] = useState("")
   const [finalizando, setFinalizando] = useState(false)
   const { toast } = useToast()
@@ -68,6 +69,21 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
       date: new Date(a.finalizada_at!).toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit" }),
       lucro: parseFloat(cumulative.toFixed(2)),
     }
+  })
+
+  // Filtro de período para lista do dashboard
+  const now = new Date()
+  const apostasFiltradasPeriodo = currentApostas.filter(a => {
+    const date = new Date(a.created_at)
+    if (periodoFiltro === "semana") {
+      const semanaAtras = new Date(now)
+      semanaAtras.setDate(now.getDate() - 7)
+      return date >= semanaAtras
+    }
+    if (periodoFiltro === "mes") {
+      return date.getMonth() === now.getMonth() && date.getFullYear() === now.getFullYear()
+    }
+    return date.getFullYear() === now.getFullYear()
   })
 
   async function handleFinalizar() {
@@ -216,16 +232,76 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
               <CardContent>
                 <ResponsiveContainer width="100%" height={200}>
                   <LineChart data={chartData}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#E5E1D8" />
-                    <XAxis dataKey="date" tick={{ fontSize: 11 }} stroke="#9ca3af" />
-                    <YAxis tick={{ fontSize: 11 }} stroke="#9ca3af" tickFormatter={v => `R$${v}`} />
-                    <Tooltip formatter={(v: unknown) => [formatCurrency(v as number), "Lucro"]} />
+                    <CartesianGrid strokeDasharray="3 3" stroke="var(--border-subtle)" />
+                    <XAxis dataKey="date" tick={{ fontSize: 11, fill: "var(--text-muted)" }} axisLine={false} tickLine={false} />
+                    <YAxis tick={{ fontSize: 11, fill: "var(--text-muted)" }} axisLine={false} tickLine={false} tickFormatter={v => `R$${v}`} />
+                    <Tooltip
+                      contentStyle={{ backgroundColor: "var(--bg-elevated)", border: "1px solid var(--border)", borderRadius: "8px", color: "var(--text-primary)" }}
+                      formatter={(v: unknown) => [formatCurrency(v as number), "Lucro"]}
+                    />
                     <Line type="monotone" dataKey="lucro" stroke="#16A34A" strokeWidth={2} dot={false} />
                   </LineChart>
                 </ResponsiveContainer>
               </CardContent>
             </Card>
           )}
+
+          {/* Apostas do período */}
+          <div>
+            <div className="flex items-center justify-between mb-3">
+              <h2 className="text-sm font-semibold text-[var(--text-primary)] uppercase tracking-wide">Apostas</h2>
+              <div className="flex gap-1 bg-[var(--bg-elevated)] rounded-lg p-1">
+                {(["semana", "mes", "ano"] as const).map(p => (
+                  <button
+                    key={p}
+                    onClick={() => setPeriodoFiltro(p)}
+                    className={`px-3 py-1 rounded-md text-xs font-medium transition-colors ${
+                      periodoFiltro === p
+                        ? "bg-[var(--bg-surface)] text-[#16A34A] shadow-sm border border-[var(--border)]"
+                        : "text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
+                    }`}
+                  >
+                    {p === "semana" ? "Semana" : p === "mes" ? "Mês" : "Ano"}
+                  </button>
+                ))}
+              </div>
+            </div>
+            {apostasFiltradasPeriodo.length === 0 ? (
+              <Card>
+                <CardContent className="py-8 text-center text-[var(--text-secondary)] text-sm">
+                  Nenhuma aposta registrada neste período
+                </CardContent>
+              </Card>
+            ) : (
+              <div className="space-y-2">
+                {apostasFiltradasPeriodo.map(aposta => (
+                  <Link key={aposta.id} href={`/apostas/${aposta.id}`}>
+                    <Card className="hover:border-[#16A34A]/40 transition-colors cursor-pointer">
+                      <CardContent className="p-4">
+                        <div className="flex items-center justify-between gap-3">
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2 flex-wrap">
+                              <p className="font-medium text-[var(--text-primary)] text-sm truncate">{aposta.evento}</p>
+                              {statusBadge(aposta.status)}
+                            </div>
+                            <p className="text-xs text-[var(--text-secondary)] mt-0.5">
+                              {new Date(aposta.created_at).toLocaleDateString("pt-BR")} · {aposta.tipo} · ROI {aposta.roi_percentual.toFixed(2)}%
+                            </p>
+                          </div>
+                          <div className="text-right flex-shrink-0">
+                            <p className={`text-sm font-bold ${aposta.status === "finalizada" ? "text-[#16A34A]" : "text-yellow-500"}`}>
+                              {formatCurrency(aposta.status === "finalizada" ? (aposta.resultado_real ?? aposta.lucro_garantido) : aposta.lucro_garantido)}
+                            </p>
+                            <p className="text-xs text-[var(--text-muted)]">{formatCurrency(aposta.investimento_total)} investido</p>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </Link>
+                ))}
+              </div>
+            )}
+          </div>
         </TabsContent>
 
         {/* Casas Tab */}
