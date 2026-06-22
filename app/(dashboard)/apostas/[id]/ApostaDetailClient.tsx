@@ -52,42 +52,56 @@ function statusBadge(status: string) {
 export default function ApostaDetailClient({ aposta: initial }: { aposta: ApostaWithDetails }) {
   const [aposta, setAposta] = useState(initial)
   const [finalizarOpen, setFinalizarOpen] = useState(false)
-  const [resultadoReal, setResultadoReal] = useState("")
+  const [greenLegId, setGreenLegId] = useState<string | null>(null)
   const [finalizando, setFinalizando] = useState(false)
   const [cancelando, setCancelando] = useState(false)
   const { toast } = useToast()
   const router = useRouter()
   const supabase = createClient()
 
-  function formatBRL(raw: string) {
-    const digits = raw.replace(/\D/g, "")
-    if (!digits) return ""
-    const num = parseInt(digits, 10) / 100
-    return num.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })
-  }
-
   function parseBRL(formatted: string) {
     return parseFloat(formatted.replace(/\./g, "").replace(",", ".")) || 0
   }
 
+  // Calculate green/red per leg based on which leg won
+  const legs = aposta.legs ?? []
+  const totalInvestido = aposta.investimento_total
+
+  function calcGreenRed(winnerLegId: string) {
+    return legs.map(leg => {
+      if (leg.id === winnerLegId) {
+        const retorno = leg.stake * leg.odd
+        const lucro = retorno - totalInvestido
+        return { leg, tipo: "green" as const, valor: lucro, retorno }
+      } else {
+        return { leg, tipo: "red" as const, valor: -leg.stake, retorno: 0 }
+      }
+    })
+  }
+
+  const greenRedCalc = greenLegId ? calcGreenRed(greenLegId) : null
+  const resultadoLiquido = greenRedCalc
+    ? greenRedCalc.reduce((s, r) => s + r.valor, 0)
+    : null
+
   async function handleFinalizar() {
-    const valor = parseBRL(resultadoReal)
-    if (!valor || valor <= 0) {
-      toast({ title: "Informe um valor válido", variant: "destructive" })
+    if (!greenLegId || resultadoLiquido === null) {
+      toast({ title: "Selecione qual casa deu green", variant: "destructive" })
       return
     }
     setFinalizando(true)
     const { error } = await supabase
       .from("apostas")
-      .update({ status: "finalizada", resultado_real: valor, finalizada_at: new Date().toISOString() })
+      .update({ status: "finalizada", resultado_real: resultadoLiquido, finalizada_at: new Date().toISOString() })
       .eq("id", aposta.id)
 
     if (error) {
       toast({ title: "Erro ao finalizar aposta", variant: "destructive" })
     } else {
-      setAposta(prev => ({ ...prev, status: "finalizada", resultado_real: valor, finalizada_at: new Date().toISOString() }))
+      setAposta(prev => ({ ...prev, status: "finalizada", resultado_real: resultadoLiquido, finalizada_at: new Date().toISOString() }))
       toast({ title: "Aposta finalizada com sucesso!" })
       setFinalizarOpen(false)
+      setGreenLegId(null)
     }
     setFinalizando(false)
   }
@@ -109,7 +123,6 @@ export default function ApostaDetailClient({ aposta: initial }: { aposta: Aposta
   }
 
   const perfil = aposta.profile
-  const legs = aposta.legs ?? []
   const lucroExibido = aposta.status === "finalizada"
     ? (aposta.resultado_real ?? aposta.lucro_garantido)
     : aposta.lucro_garantido
@@ -263,10 +276,7 @@ export default function ApostaDetailClient({ aposta: initial }: { aposta: Aposta
         <div className="flex gap-3">
           <Button
             className="flex-1 bg-[#16A34A] hover:bg-[#15803D]"
-            onClick={() => {
-              setResultadoReal(formatBRL((aposta.lucro_garantido * 100).toFixed(0)))
-              setFinalizarOpen(true)
-            }}
+            onClick={() => setFinalizarOpen(true)}
           >
             <CheckCircle2 className="w-4 h-4 mr-2" />
             Finalizar Aposta
@@ -284,7 +294,7 @@ export default function ApostaDetailClient({ aposta: initial }: { aposta: Aposta
       )}
 
       {/* Dialog Finalizar */}
-      <Dialog open={finalizarOpen} onOpenChange={setFinalizarOpen}>
+      <Dialog open={finalizarOpen} onOpenChange={open => { setFinalizarOpen(open); if (!open) setGreenLegId(null) }}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Finalizar Aposta</DialogTitle>
@@ -292,23 +302,67 @@ export default function ApostaDetailClient({ aposta: initial }: { aposta: Aposta
           <div className="space-y-4">
             <div className="p-3 rounded-xl bg-[var(--bg-muted)] border border-[var(--border)]">
               <p className="text-sm font-medium text-[var(--text-primary)]">{aposta.evento}</p>
-              <p className="text-xs text-[var(--text-secondary)] mt-1">Lucro esperado: {formatCurrency(aposta.lucro_garantido)}</p>
+              <p className="text-xs text-[var(--text-secondary)] mt-1">Lucro garantido esperado: {formatCurrency(aposta.lucro_garantido)}</p>
             </div>
+
             <div className="space-y-2">
-              <Label>Resultado real obtido (R$)</Label>
-              <Input
-                type="text"
-                inputMode="numeric"
-                value={resultadoReal}
-                onChange={e => setResultadoReal(formatBRL(e.target.value))}
-                placeholder="0,00"
-                autoFocus
-              />
+              <Label className="text-sm font-medium">Qual casa deu green?</Label>
+              <div className="space-y-2">
+                {legs.map(leg => (
+                  <button
+                    key={leg.id}
+                    type="button"
+                    onClick={() => setGreenLegId(leg.id)}
+                    className={`w-full flex items-center justify-between p-3 rounded-xl border text-left transition-all ${
+                      greenLegId === leg.id
+                        ? "border-[#16A34A] bg-[#16A34A]/10"
+                        : "border-[var(--border)] bg-[var(--bg-muted)] hover:border-[#16A34A]/50"
+                    }`}
+                  >
+                    <div>
+                      <p className="text-sm font-medium text-[var(--text-primary)]">
+                        {leg.profile_bet?.bet?.nome ?? "Casa desconhecida"}
+                      </p>
+                      <p className="text-xs text-[var(--text-secondary)]">
+                        {leg.resultado_apostado} · Odd {Number(leg.odd).toFixed(2)} · Stake {formatCurrency(leg.stake)}
+                      </p>
+                    </div>
+                    <div className={`w-5 h-5 rounded-full border-2 flex-shrink-0 ${
+                      greenLegId === leg.id ? "border-[#16A34A] bg-[#16A34A]" : "border-[var(--border)]"
+                    }`} />
+                  </button>
+                ))}
+              </div>
             </div>
+
+            {greenRedCalc && (
+              <div className="space-y-2 p-3 rounded-xl bg-[var(--bg-muted)] border border-[var(--border)]">
+                <p className="text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wide">Resultado por casa</p>
+                {greenRedCalc.map(r => (
+                  <div key={r.leg.id} className="flex items-center justify-between text-sm">
+                    <div className="flex items-center gap-2">
+                      <span className={`px-1.5 py-0.5 rounded text-xs font-bold ${r.tipo === "green" ? "bg-[#16A34A] text-white" : "bg-[#DC2626] text-white"}`}>
+                        {r.tipo === "green" ? "GREEN" : "RED"}
+                      </span>
+                      <span className="text-[var(--text-primary)]">{r.leg.profile_bet?.bet?.nome ?? "Casa"}</span>
+                    </div>
+                    <span className={`font-bold ${r.valor >= 0 ? "text-[#16A34A]" : "text-[#DC2626]"}`}>
+                      {r.valor >= 0 ? "+" : ""}{formatCurrency(r.valor)}
+                    </span>
+                  </div>
+                ))}
+                <div className="pt-2 border-t border-[var(--border)] flex items-center justify-between text-sm font-bold">
+                  <span className="text-[var(--text-primary)]">Resultado líquido</span>
+                  <span className={resultadoLiquido! >= 0 ? "text-[#16A34A]" : "text-[#DC2626]"}>
+                    {resultadoLiquido! >= 0 ? "+" : ""}{formatCurrency(resultadoLiquido!)}
+                  </span>
+                </div>
+              </div>
+            )}
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setFinalizarOpen(false)}>Cancelar</Button>
-            <Button onClick={handleFinalizar} disabled={finalizando} className="bg-[#16A34A] hover:bg-[#15803D]">
+            <Button variant="outline" onClick={() => { setFinalizarOpen(false); setGreenLegId(null) }}>Cancelar</Button>
+            <Button onClick={handleFinalizar} disabled={finalizando || !greenLegId} className="bg-[#16A34A] hover:bg-[#15803D]">
               {finalizando ? "Finalizando..." : "Confirmar"}
             </Button>
           </DialogFooter>
