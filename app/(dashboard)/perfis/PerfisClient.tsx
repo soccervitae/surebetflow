@@ -167,11 +167,6 @@ export default function PerfisClient({ profiles: initialProfiles, userId }: Prop
                         {profile.email && (
                           <p className="text-sm text-[var(--text-secondary)] truncate">{profile.email}</p>
                         )}
-                        <div className="mt-2 flex items-center gap-1.5">
-                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-[#16A34A]/10 text-[#16A34A]">
-                            {count} aposta{count !== 1 ? "s" : ""}
-                          </span>
-                        </div>
                       </div>
                     </div>
                   </CardContent>

@@ -41,6 +41,7 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
   const [confirmAtivoOpen, setConfirmAtivoOpen] = useState(false)
   const [currentApostas, setCurrentApostas] = useState(apostas)
   const [showCalculadora, setShowCalculadora] = useState(false)
+  const [minBetsAlertOpen, setMinBetsAlertOpen] = useState(false)
   const [finalizarDialog, setFinalizarDialog] = useState<Aposta | null>(null)
   const [periodoFiltro, setPeriodoFiltro] = useState<"dia" | "semana" | "mes" | "ano">("semana")
   const [casaFiltro, setCasaFiltro] = useState<string>("todas")
@@ -260,7 +261,20 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
           </div>
         </div>
         <div className="flex items-center gap-2">
-          <Button onClick={() => setShowCalculadora(true)} size="sm">
+          <Button
+            onClick={async () => {
+              const { data } = await createClient()
+                .from("profile_bets")
+                .select("id")
+                .eq("profile_id", currentProfile.id)
+              if (!data || data.length < 2) {
+                setMinBetsAlertOpen(true)
+              } else {
+                setShowCalculadora(true)
+              }
+            }}
+            size="sm"
+          >
             <Calculator className="h-4 w-4 mr-2" />
             Nova Aposta
           </Button>
@@ -668,6 +682,32 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
               }}
             >
               {togglingAtivo ? "Salvando..." : currentProfile.ativo ? "Desativar" : "Ativar"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Alerta mínimo de bets */}
+      <Dialog open={minBetsAlertOpen} onOpenChange={setMinBetsAlertOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Bets insuficientes</DialogTitle>
+          </DialogHeader>
+          <p className="text-sm text-[var(--text-secondary)]">
+            Para registrar uma aposta é necessário ter pelo menos <strong className="text-[var(--text-primary)]">2 casas de apostas</strong> cadastradas neste perfil.
+          </p>
+          <p className="text-sm text-[var(--text-secondary)]">
+            Vá até a aba <strong className="text-[var(--text-primary)]">Bets</strong> e adicione as casas antes de criar uma aposta.
+          </p>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setMinBetsAlertOpen(false)}>Fechar</Button>
+            <Button
+              onClick={() => {
+                setMinBetsAlertOpen(false)
+                document.querySelector<HTMLButtonElement>('[data-value="casas"]')?.click()
+              }}
+            >
+              Ir para Bets
             </Button>
           </DialogFooter>
         </DialogContent>
