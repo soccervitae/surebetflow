@@ -1,27 +1,62 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useState, useRef } from "react"
 import { createClient } from "@/lib/supabase/client"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Settings } from "lucide-react"
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar"
+import { Settings, Camera, Loader2 } from "lucide-react"
 
 export default function ConfiguracoesPage() {
   const [email, setEmail] = useState("")
+  const [userId, setUserId] = useState("")
+  const [avatarUrl, setAvatarUrl] = useState("")
   const [newPassword, setNewPassword] = useState("")
   const [confirmPassword, setConfirmPassword] = useState("")
   const [passwordError, setPasswordError] = useState("")
   const [passwordSuccess, setPasswordSuccess] = useState("")
   const [saving, setSaving] = useState(false)
+  const [uploading, setUploading] = useState(false)
+  const fileInputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
     const supabase = createClient()
     supabase.auth.getUser().then(({ data: { user } }) => {
-      if (user) setEmail(user.email ?? "")
+      if (user) {
+        setEmail(user.email ?? "")
+        setUserId(user.id)
+        setAvatarUrl(user.user_metadata?.avatar_url ?? "")
+      }
     })
   }, [])
+
+  async function handlePhotoUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    if (!file || !userId) return
+    setUploading(true)
+    try {
+      const supabase = createClient()
+      const ext = file.name.split(".").pop()
+      const fileName = `${userId}/avatar.${ext}`
+      const { error: uploadError } = await supabase.storage
+        .from("profile-photos")
+        .upload(fileName, file, { upsert: true })
+      if (uploadError) throw uploadError
+      const { data } = supabase.storage.from("profile-photos").getPublicUrl(fileName)
+      const url = data.publicUrl
+      const { error: updateError } = await supabase.auth.updateUser({
+        data: { avatar_url: url }
+      })
+      if (updateError) throw updateError
+      setAvatarUrl(url)
+    } catch (err) {
+      console.error("Erro ao fazer upload:", err)
+    } finally {
+      setUploading(false)
+    }
+  }
 
   async function handleChangePassword(e: React.FormEvent) {
     e.preventDefault()
@@ -50,6 +85,28 @@ export default function ConfiguracoesPage() {
         </div>
       </div>
 
+      {/* Foto da conta */}
+      <Card className="mb-6">
+        <CardHeader><CardTitle className="text-base">Foto da conta</CardTitle></CardHeader>
+        <CardContent className="flex items-center gap-4">
+          <Avatar className="h-16 w-16">
+            {avatarUrl && <AvatarImage src={avatarUrl} alt="Foto da conta" />}
+            <AvatarFallback className="text-xl">{email.charAt(0).toUpperCase()}</AvatarFallback>
+          </Avatar>
+          <div>
+            <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handlePhotoUpload} />
+            <Button type="button" variant="outline" size="sm" onClick={() => fileInputRef.current?.click()} disabled={uploading}>
+              {uploading
+                ? <><Loader2 className="h-4 w-4 mr-2 animate-spin" />Enviando...</>
+                : <><Camera className="h-4 w-4 mr-2" />Alterar foto</>
+              }
+            </Button>
+            <p className="text-xs text-[var(--text-muted)] mt-1">JPG, PNG ou WebP até 5MB</p>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Email */}
       <Card className="mb-6">
         <CardHeader><CardTitle className="text-base">E-mail da conta</CardTitle></CardHeader>
         <CardContent>
@@ -61,6 +118,7 @@ export default function ConfiguracoesPage() {
         </CardContent>
       </Card>
 
+      {/* Senha */}
       <Card>
         <CardHeader><CardTitle className="text-base">Alterar senha</CardTitle></CardHeader>
         <CardContent>
