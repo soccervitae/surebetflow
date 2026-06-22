@@ -401,7 +401,15 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
               </Card>
             ) : (
               <div className="space-y-2">
-                {apostasFiltradasPeriodo.map(aposta => (
+                {apostasFiltradasPeriodo.map(aposta => {
+                  type LegWithBet = { id: string; resultado_apostado: string; odd: number; stake: number; profile_bet?: { bet?: { nome: string } } }
+                  const legs = (aposta as Aposta & { legs?: LegWithBet[] }).legs ?? []
+                  // Infer green leg from resultado_real
+                  const greenLegId = aposta.status === "finalizada" && aposta.resultado_real != null
+                    ? legs.find(l => Math.abs(l.stake * l.odd - aposta.investimento_total - aposta.resultado_real!) < 0.5)?.id ?? null
+                    : null
+
+                  return (
                   <Link key={aposta.id} href={`/apostas/${aposta.id}`}>
                     <Card className="hover:border-[#16A34A]/40 transition-colors cursor-pointer">
                       <CardContent className="p-4">
@@ -413,41 +421,64 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
                               <Badge variant="secondary">{aposta.tipo}</Badge>
                             </div>
                             <p className="text-xs text-[var(--text-secondary)]">
-                              Investimento: {formatCurrency(aposta.investimento_total)} · ROI: {aposta.roi_percentual.toFixed(2)}% · {new Date(aposta.created_at).toLocaleDateString("pt-BR")}
+                              {new Date(aposta.created_at).toLocaleDateString("pt-BR")}
                             </p>
-                            {(aposta as Aposta & { legs?: { id: string; resultado_apostado: string; odd: number; stake: number; profile_bet?: { bet?: { nome: string } } }[] }).legs?.length ? (
+                            {legs.length > 0 && (
                               <div className="mt-2 space-y-1">
-                                {(aposta as Aposta & { legs?: { id: string; resultado_apostado: string; odd: number; stake: number; profile_bet?: { bet?: { nome: string } } }[] }).legs!.map(leg => (
-                                  <div key={leg.id} className="text-xs text-[var(--text-secondary)] flex items-center gap-2">
-                                    <span className="bg-[var(--bg-elevated)] rounded px-1.5 py-0.5">{leg.profile_bet?.bet?.nome ?? "Casa"}</span>
-                                    <span>{leg.resultado_apostado}</span>
-                                    <span className="font-medium">@{Number(leg.odd).toFixed(2)}</span>
-                                    <span className="text-[#16A34A]">{formatCurrency(leg.stake)}</span>
-                                  </div>
-                                ))}
+                                {legs.map(leg => {
+                                  const isGreen = greenLegId === leg.id
+                                  const isRed = greenLegId !== null && greenLegId !== leg.id
+                                  return (
+                                    <div key={leg.id} className={`text-xs flex items-center gap-2 rounded-lg px-2 py-1 border ${
+                                      isGreen ? "border-[#16A34A]/40 bg-[#16A34A]/5" :
+                                      isRed   ? "border-[#DC2626]/40 bg-[#DC2626]/5" :
+                                               "border-transparent"
+                                    }`}>
+                                      {(isGreen || isRed) && (
+                                        <span className={`px-1.5 py-0.5 rounded text-[10px] font-bold flex-shrink-0 ${
+                                          isGreen ? "bg-[#16A34A] text-white" : "bg-[#DC2626] text-white"
+                                        }`}>
+                                          {isGreen ? "GREEN" : "RED"}
+                                        </span>
+                                      )}
+                                      <span className={`font-medium flex-shrink-0 ${isGreen ? "text-[#16A34A]" : isRed ? "text-[#DC2626]" : "text-[var(--text-secondary)]"}`}>
+                                        {leg.profile_bet?.bet?.nome ?? "Casa"}
+                                      </span>
+                                      <span className="text-[var(--text-secondary)] truncate">{leg.resultado_apostado}</span>
+                                      <span className="text-[var(--text-muted)] flex-shrink-0">@{Number(leg.odd).toFixed(2)}</span>
+                                      <span className="flex-shrink-0 text-[var(--text-secondary)]">{formatCurrency(leg.stake)}</span>
+                                    </div>
+                                  )
+                                })}
                               </div>
-                            ) : null}
+                            )}
                           </div>
-                          <div className="text-right flex-shrink-0">
+                          <div className="text-right flex-shrink-0 min-w-[110px]">
+                            <p className="text-xs text-[var(--text-muted)]">
+                              {formatCurrency(aposta.investimento_total)} · {aposta.roi_percentual.toFixed(2)}%
+                            </p>
                             {aposta.status === "finalizada" ? (
                               <>
-                                <p className="text-xs text-[var(--text-muted)]">Resultado real</p>
-                                <p className="text-base font-bold text-[#16A34A]">{formatCurrency(aposta.resultado_real ?? 0)}</p>
+                                <p className="text-xs text-[var(--text-muted)] mt-1">Lucro</p>
+                                <p className={`text-base font-bold ${(aposta.resultado_real ?? 0) >= 0 ? "text-[#16A34A]" : "text-[#DC2626]"}`}>
+                                  {formatCurrency(aposta.resultado_real ?? 0)}
+                                </p>
                               </>
                             ) : aposta.status === "pendente" ? (
                               <>
-                                <p className="text-xs text-[var(--text-muted)]">Lucro esperado</p>
-                                <p className="text-base font-bold text-yellow-600">{formatCurrency(aposta.lucro_garantido)}</p>
+                                <p className="text-xs text-[var(--text-muted)] mt-1">Lucro esperado</p>
+                                <p className="text-base font-bold text-[#D97706]">{formatCurrency(aposta.lucro_garantido)}</p>
                               </>
                             ) : (
-                              <p className="text-sm text-[var(--text-muted)]">Cancelada</p>
+                              <p className="text-sm text-[var(--text-muted)] mt-1">Cancelada</p>
                             )}
                           </div>
                         </div>
                       </CardContent>
                     </Card>
                   </Link>
-                ))}
+                  )
+                })}
               </div>
             )}
           </div>
