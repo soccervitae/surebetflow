@@ -173,7 +173,7 @@ export default function ApostaDetailClient({ aposta: initial }: { aposta: Aposta
     : aposta.lucro_garantido
 
   return (
-    <div className="max-w-2xl mx-auto space-y-6 p-4 md:p-6">
+    <div className="max-w-2xl md:max-w-4xl mx-auto space-y-6 p-4 md:p-6">
       {/* Cabeçalho */}
       <div className="flex items-center gap-3">
         <Button variant="ghost" size="icon" onClick={() => router.back()}>
@@ -205,61 +205,45 @@ export default function ApostaDetailClient({ aposta: initial }: { aposta: Aposta
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         <Card>
           <CardContent className="p-4">
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-[#2563EB]/10 rounded-lg">
-                <DollarSign className="h-4 w-4 text-[#2563EB]" />
-              </div>
-              <div>
-                <p className="text-xs text-[var(--text-secondary)]">Investimento</p>
-                <p className="text-base font-bold text-[var(--text-primary)]">{formatCurrency(aposta.investimento_total)}</p>
-              </div>
+            <div className="p-2 bg-[#2563EB]/10 rounded-lg w-fit mb-3">
+              <DollarSign className="h-4 w-4 text-[#2563EB]" />
             </div>
+            <p className="text-xs text-[var(--text-secondary)]">Investimento</p>
+            <p className="text-base font-bold text-[var(--text-primary)] mt-0.5">{formatCurrency(aposta.investimento_total)}</p>
           </CardContent>
         </Card>
 
         <Card>
           <CardContent className="p-4">
-            <div className="flex items-center gap-3">
-              <div className={`p-2 rounded-lg ${aposta.status === "finalizada" ? "bg-[#16A34A]/10" : "bg-yellow-50"}`}>
-                <TrendingUp className={`h-4 w-4 ${aposta.status === "finalizada" ? "text-[#16A34A]" : "text-yellow-500"}`} />
-              </div>
-              <div>
-                <p className="text-xs text-[var(--text-secondary)]">
-                  {aposta.status === "finalizada" ? "Lucro Real" : "Lucro Esperado"}
-                </p>
-                <p className={`text-base font-bold ${aposta.status === "finalizada" ? "text-[#16A34A]" : "text-yellow-600"}`}>
-                  {formatCurrency(lucroExibido)}
-                </p>
-              </div>
+            <div className={`p-2 rounded-lg w-fit mb-3 ${aposta.status === "finalizada" ? "bg-[#16A34A]/10" : "bg-[#D97706]/10"}`}>
+              <TrendingUp className={`h-4 w-4 ${aposta.status === "finalizada" ? "text-[#16A34A]" : "text-[#D97706]"}`} />
             </div>
+            <p className="text-xs text-[var(--text-secondary)]">
+              {aposta.status === "finalizada" ? "Lucro Real" : "Lucro Esperado"}
+            </p>
+            <p className={`text-base font-bold mt-0.5 ${aposta.status === "finalizada" ? "text-[#16A34A]" : "text-[#D97706]"}`}>
+              {formatCurrency(lucroExibido)}
+            </p>
           </CardContent>
         </Card>
 
         <Card>
           <CardContent className="p-4">
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-[#7C3AED]/10 rounded-lg">
-                <BarChart2 className="h-4 w-4 text-[#7C3AED]" />
-              </div>
-              <div>
-                <p className="text-xs text-[var(--text-secondary)]">ROI</p>
-                <p className="text-base font-bold text-[#7C3AED]">{aposta.roi_percentual.toFixed(2)}%</p>
-              </div>
+            <div className="p-2 bg-[#7C3AED]/10 rounded-lg w-fit mb-3">
+              <BarChart2 className="h-4 w-4 text-[#7C3AED]" />
             </div>
+            <p className="text-xs text-[var(--text-secondary)]">ROI</p>
+            <p className="text-base font-bold text-[#7C3AED] mt-0.5">{aposta.roi_percentual.toFixed(2)}%</p>
           </CardContent>
         </Card>
 
         <Card>
           <CardContent className="p-4">
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-[var(--bg-elevated)] rounded-lg">
-                <Tag className="h-4 w-4 text-[var(--text-secondary)]" />
-              </div>
-              <div>
-                <p className="text-xs text-[var(--text-secondary)]">Tipo</p>
-                <p className="text-base font-bold text-[var(--text-primary)]">{aposta.tipo}</p>
-              </div>
+            <div className="p-2 bg-[var(--bg-elevated)] rounded-lg w-fit mb-3">
+              <Tag className="h-4 w-4 text-[var(--text-secondary)]" />
             </div>
+            <p className="text-xs text-[var(--text-secondary)]">Tipo</p>
+            <p className="text-base font-bold text-[var(--text-primary)] mt-0.5">{aposta.tipo}</p>
           </CardContent>
         </Card>
       </div>
