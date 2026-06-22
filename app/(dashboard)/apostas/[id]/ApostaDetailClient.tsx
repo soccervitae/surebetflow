@@ -191,14 +191,6 @@ export default function ApostaDetailClient({ aposta: initial }: { aposta: Aposta
         <div className="flex items-center gap-2 flex-shrink-0">
           <StatusIcon status={aposta.status} />
           {statusBadge(aposta.status)}
-          <Button
-            variant="ghost"
-            size="icon"
-            className="hidden md:flex text-[#DC2626] hover:bg-[#DC2626]/10"
-            onClick={() => setDeletarOpen(true)}
-          >
-            <Trash2 className="h-4 w-4" />
-          </Button>
         </div>
       </div>
 
@@ -375,8 +367,8 @@ export default function ApostaDetailClient({ aposta: initial }: { aposta: Aposta
         </CardContent>
       </Card>
 
-      {/* Botões Editar / Deletar — apenas mobile */}
-      <div className="flex md:hidden gap-3">
+      {/* Botões Editar / Deletar */}
+      <div className="flex gap-3">
         <Button
           variant="outline"
           className="flex-1 gap-2"
