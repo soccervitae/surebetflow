@@ -238,29 +238,31 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center gap-4">
-        <Link href="/perfis">
-          <Button variant="ghost" size="icon">
-            <ArrowLeft className="h-5 w-5" />
-          </Button>
-        </Link>
-        <div className="flex items-center gap-3 flex-1 min-w-0">
-          <Avatar className="h-12 w-12">
-            {currentProfile.foto_url && <AvatarImage src={currentProfile.foto_url} />}
-            <AvatarFallback>
-              {currentProfile.nome.charAt(0)}{currentProfile.sobrenome.charAt(0)}
-            </AvatarFallback>
-          </Avatar>
-          <div className="min-w-0">
-            <h1 className="text-xl font-bold text-[var(--text-primary)] truncate">
-              {currentProfile.nome} {currentProfile.sobrenome}
-            </h1>
-            {currentProfile.apelido && (
-              <p className="text-sm text-[var(--text-secondary)]">{currentProfile.apelido}</p>
-            )}
+      <div className="space-y-3">
+        <div className="flex items-center gap-3">
+          <Link href="/perfis">
+            <Button variant="ghost" size="icon" className="flex-shrink-0">
+              <ArrowLeft className="h-5 w-5" />
+            </Button>
+          </Link>
+          <div className="flex items-center gap-3 flex-1 min-w-0">
+            <Avatar className="h-10 w-10 flex-shrink-0">
+              {currentProfile.foto_url && <AvatarImage src={currentProfile.foto_url} />}
+              <AvatarFallback>
+                {currentProfile.nome.charAt(0)}{currentProfile.sobrenome.charAt(0)}
+              </AvatarFallback>
+            </Avatar>
+            <div className="min-w-0">
+              <h1 className="text-lg font-bold text-[var(--text-primary)] truncate">
+                {currentProfile.nome} {currentProfile.sobrenome}
+              </h1>
+              {currentProfile.apelido && (
+                <p className="text-sm text-[var(--text-secondary)] truncate">{currentProfile.apelido}</p>
+              )}
+            </div>
           </div>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-wrap">
           <Button
             onClick={async () => {
               const { data } = await createClient()
@@ -274,6 +276,7 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
               }
             }}
             size="sm"
+            className="flex-1 sm:flex-none"
           >
             <Calculator className="h-4 w-4 mr-2" />
             Nova Aposta
@@ -282,16 +285,16 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
             variant="outline"
             size="sm"
             onClick={() => setConfirmAtivoOpen(true)}
-            className={currentProfile.ativo
+            className={`flex-1 sm:flex-none ${currentProfile.ativo
               ? "text-[#1e3a8a] border-[#1e3a8a]/40 hover:bg-[#1e3a8a]/5"
               : "text-[#DC2626] border-[#DC2626]/40 hover:bg-[#DC2626]/5"
-            }
+            }`}
           >
             <span className={`w-2 h-2 rounded-full mr-2 ${currentProfile.ativo ? "bg-[#1e3a8a]" : "bg-[#DC2626]"}`} />
             {currentProfile.ativo ? "Ativo" : "Inativo"}
           </Button>
-          <Link href={`/perfis/${profile.id}/editar`}>
-            <Button variant="outline" size="sm">
+          <Link href={`/perfis/${profile.id}/editar`} className="flex-1 sm:flex-none">
+            <Button variant="outline" size="sm" className="w-full">
               <Pencil className="h-4 w-4 mr-2" />
               Editar
             </Button>
@@ -365,7 +368,7 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
 
           {/* Apostas do período */}
           <div>
-            <div className="flex flex-wrap items-center justify-between gap-3 mb-3">
+            <div className="flex flex-col gap-2 mb-3">
               <div className="flex items-center gap-2">
                 <h2 className="text-sm font-semibold text-[var(--text-primary)] uppercase tracking-wide">Apostas</h2>
                 <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-[#1e3a8a]/10 text-[#1e3a8a]">
@@ -388,14 +391,14 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
                 <div className="flex gap-1 bg-[var(--bg-elevated)] rounded-lg p-1">
                   {([
                     { value: "dia", label: "Dia" },
-                    { value: "semana", label: "Semana" },
+                    { value: "semana", label: "Sem" },
                     { value: "mes", label: "Mês" },
                     { value: "ano", label: "Ano" },
                   ] as { value: "dia" | "semana" | "mes" | "ano"; label: string }[]).map(({ value, label }) => (
                     <button
                       key={value}
                       onClick={() => setPeriodoFiltro(value)}
-                      className={`px-3 py-1 rounded-md text-xs font-medium transition-colors ${
+                      className={`px-2 py-1 rounded-md text-xs font-medium transition-colors ${
                         periodoFiltro === value
                           ? "bg-[var(--bg-surface)] text-[#1e3a8a] shadow-sm border border-[var(--border)]"
                           : "text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
@@ -466,7 +469,7 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
                               </div>
                             )}
                           </div>
-                          <div className="text-right flex-shrink-0 min-w-[120px]">
+                          <div className="text-right flex-shrink-0">
                             <p className="text-xs text-[var(--text-muted)]">Investimento</p>
                             <p className="text-base font-bold text-[var(--text-primary)]">{formatCurrency(aposta.investimento_total)}</p>
                             <p className="text-xs text-[var(--text-muted)] mt-2">
