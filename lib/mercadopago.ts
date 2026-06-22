@@ -5,16 +5,10 @@ export const mp = new MercadoPagoConfig({
 })
 
 export const PLANS = {
-  starter: {
-    name: "Starter",
-    price: "R$ 79,90",
-    amount: 79.9,
-    planId: process.env.MP_PLAN_STARTER!,
-  },
   pro: {
     name: "Pro",
-    price: "R$ 199,90",
-    amount: 199.9,
+    price: "R$ 99,00",
+    amount: 99.0,
     planId: process.env.MP_PLAN_PRO!,
   },
 } as const

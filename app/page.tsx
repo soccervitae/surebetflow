@@ -20,8 +20,7 @@ export default async function LandingPage() {
     url: "https://www.surebetflow.bet",
     description: "Plataforma completa para apostadores de arbitragem esportiva. Calcule surebets, gerencie perfis e controle finanças com segurança total.",
     offers: [
-      { "@type": "Offer", price: "79.90", priceCurrency: "BRL", name: "Plano Starter" },
-      { "@type": "Offer", price: "199.90", priceCurrency: "BRL", name: "Plano Profissional" },
+      { "@type": "Offer", price: "99.00", priceCurrency: "BRL", name: "Plano Pro" },
     ],
     aggregateRating: {
       "@type": "AggregateRating",
@@ -261,50 +260,21 @@ export default async function LandingPage() {
       {/* Planos */}
       <section className="border-y border-white/5 py-20 bg-[#111]">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 text-center">
-          <h2 className="text-3xl font-bold text-white mb-4">Planos simples. Sem surpresas.</h2>
-          <p className="text-gray-400 mb-12 max-w-xl mx-auto">Escolha o plano ideal para o seu volume de operação.</p>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-3xl mx-auto">
-            {/* Plano Starter */}
-            <div className="bg-[#0a0a0a] border border-white/10 rounded-2xl p-8 text-left">
-              <p className="text-gray-400 text-sm mb-2">Plano Starter</p>
-              <div className="flex items-end gap-1 mb-1">
-                <span className="text-gray-500 text-lg font-medium">R$</span>
-                <span className="text-5xl font-extrabold text-white">79</span>
-                <span className="text-gray-500 text-lg font-medium mb-1">,90/mês</span>
-              </div>
-              <p className="text-xs text-gray-500 mb-6">Ideal para quem está começando</p>
-              <ul className="space-y-3 text-sm mb-8">
-                {[
-                  "Até 3 perfis de apostador",
-                  "Casas de apostas ilimitadas",
-                  "Calculadora 2-way e 3-way",
-                  "Controle financeiro básico",
-                  "Histórico de apostas",
-                  "Senhas criptografadas",
-                ].map(f => (
-                  <li key={f} className="flex items-center gap-2">
-                    <CheckCircle className="w-4 h-4 text-[#1e3a8a] flex-shrink-0" />
-                    <span className="text-gray-300">{f}</span>
-                  </li>
-                ))}
-              </ul>
-              <Link href="/cadastro" className="block w-full border border-white/10 hover:border-white/20 bg-white/5 hover:bg-white/10 text-white font-semibold py-3 rounded-xl transition-colors text-center">
-                Assinar Starter
-              </Link>
-            </div>
-
+          <h2 className="text-3xl font-bold text-white mb-4">Um plano. Acesso completo.</h2>
+          <p className="text-gray-400 mb-12 max-w-xl mx-auto">Sem planos confusos. Tudo incluso por um preço justo.</p>
+          <div className="max-w-sm mx-auto">
             {/* Plano Pro */}
             <div className="bg-[#0a0a0a] border-2 border-[#1e3a8a] rounded-2xl p-8 text-left relative">
               <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-                <span className="bg-[#1e3a8a] text-white text-xs font-bold px-3 py-1 rounded-full">MAIS POPULAR</span>
+                <span className="bg-[#1e3a8a] text-white text-xs font-bold px-3 py-1 rounded-full">PLANO PRO</span>
               </div>
-              <p className="text-gray-400 text-sm mb-2">Plano Profissional</p>
+              <p className="text-gray-400 text-sm mb-2">Acesso completo à plataforma</p>
               <div className="flex items-end gap-1 mb-1">
                 <span className="text-gray-500 text-lg font-medium">R$</span>
-                <span className="text-5xl font-extrabold text-white">199</span>
-                <span className="text-gray-500 text-lg font-medium mb-1">,90/mês</span>
+                <span className="text-5xl font-extrabold text-white">99</span>
+                <span className="text-gray-500 text-lg font-medium mb-1">,00/mês</span>
               </div>
-              <p className="text-xs text-gray-500 mb-6">Para operação profissional completa</p>
+              <p className="text-xs text-gray-500 mb-6">Cancele quando quiser, sem fidelidade</p>
               <ul className="space-y-3 text-sm mb-8">
                 {[
                   "Perfis ilimitados de apostador",
@@ -313,7 +283,7 @@ export default async function LandingPage() {
                   "Dashboard financeiro completo",
                   "Histórico completo de apostas",
                   "Senhas criptografadas AES-256",
-                  "Suporte prioritário",
+                  "Suporte prioritário por ticket",
                 ].map(f => (
                   <li key={f} className="flex items-center gap-2">
                     <CheckCircle className="w-4 h-4 text-[#1e3a8a] flex-shrink-0" />
@@ -322,7 +292,7 @@ export default async function LandingPage() {
                 ))}
               </ul>
               <Link href="/cadastro" className="block w-full bg-[#1e3a8a] hover:bg-[#1e40af] text-white font-semibold py-3 rounded-xl transition-colors text-center">
-                Assinar Pro
+                Começar agora
               </Link>
             </div>
           </div>
