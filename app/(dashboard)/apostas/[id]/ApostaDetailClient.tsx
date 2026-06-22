@@ -250,7 +250,7 @@ export default function ApostaDetailClient({ aposta: initial }: { aposta: Aposta
     : aposta.lucro_garantido
 
   return (
-    <div className="max-w-2xl md:max-w-4xl mx-auto space-y-6 p-4 md:p-6">
+    <div className="max-w-2xl md:max-w-4xl mx-auto space-y-6">
       {/* Cabeçalho */}
       <div className="flex items-start gap-3">
         <div className="flex-1 min-w-0">
