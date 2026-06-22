@@ -12,7 +12,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
 import { formatCurrency } from "@/lib/utils"
 import { useToast } from "@/hooks/useToast"
-import { BookOpen, Filter, Trash2 } from "lucide-react"
+import { BookOpen, Filter, Trash2, X } from "lucide-react"
 import type { Aposta, ApostaLeg } from "@/lib/types"
 
 interface Props {
@@ -34,6 +34,7 @@ export default function ApostasClient({ apostas: initialApostas, profiles }: Pro
   const [filterProfile, setFilterProfile] = useState("todos")
   const [finalizarDialog, setFinalizarDialog] = useState<Aposta | null>(null)
   const [deletarDialog, setDeletarDialog] = useState<Aposta | null>(null)
+  const [showFilter, setShowFilter] = useState(false)
   const [resultadoReal, setResultadoReal] = useState("")
   const [finalizando, setFinalizando] = useState(false)
   const [deletando, setDeletando] = useState(false)
@@ -101,52 +102,67 @@ export default function ApostasClient({ apostas: initialApostas, profiles }: Pro
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-[var(--text-primary)]">Apostas</h1>
-        <p className="text-[var(--text-secondary)] text-sm mt-1">Histórico completo de todas as suas apostas</p>
+      <div className="flex items-center justify-between gap-2">
+        <div>
+          <h1 className="text-2xl font-bold text-[var(--text-primary)]">Apostas</h1>
+          <p className="text-[var(--text-secondary)] text-sm mt-1">Histórico completo de todas as suas apostas</p>
+        </div>
+        <button
+          onClick={() => setShowFilter(v => !v)}
+          className={`md:hidden flex items-center gap-1.5 px-3 py-2 rounded-xl border text-sm font-medium transition-colors ${
+            showFilter
+              ? "bg-[#1e3a8a]/10 border-[#1e3a8a]/30 text-[var(--accent-text)]"
+              : "border-[var(--border)] text-[var(--text-secondary)] hover:bg-[var(--bg-elevated)]"
+          }`}
+        >
+          {showFilter ? <X className="h-4 w-4" /> : <Filter className="h-4 w-4" />}
+          Filtrar
+        </button>
       </div>
 
-      {/* Filters */}
-      <Card>
-        <CardContent className="p-4">
-          <div className="flex items-center gap-2 mb-3">
-            <Filter className="h-4 w-4 text-[var(--text-secondary)]" />
-            <span className="text-sm font-medium text-[var(--text-primary)]">Filtros</span>
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div className="space-y-1.5">
-              <Label className="text-xs">Status</Label>
-              <Select value={filterStatus} onValueChange={setFilterStatus}>
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="todos">Todos</SelectItem>
-                  <SelectItem value="pendente">Pendentes</SelectItem>
-                  <SelectItem value="finalizada">Finalizadas</SelectItem>
-                  <SelectItem value="cancelada">Canceladas</SelectItem>
-                </SelectContent>
-              </Select>
+      {/* Filters — always visible on desktop, toggle on mobile */}
+      <div className={`${showFilter ? "block" : "hidden"} md:block`}>
+        <Card>
+          <CardContent className="p-4">
+            <div className="hidden md:flex items-center gap-2 mb-3">
+              <Filter className="h-4 w-4 text-[var(--text-secondary)]" />
+              <span className="text-sm font-medium text-[var(--text-primary)]">Filtros</span>
             </div>
-            <div className="space-y-1.5">
-              <Label className="text-xs">Perfil</Label>
-              <Select value={filterProfile} onValueChange={setFilterProfile}>
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="todos">Todos os perfis</SelectItem>
-                  {profiles.map(p => (
-                    <SelectItem key={p.id} value={p.id}>
-                      {p.apelido || `${p.nome} ${p.sobrenome}`}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="space-y-1.5">
+                <Label className="text-xs">Status</Label>
+                <Select value={filterStatus} onValueChange={setFilterStatus}>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="todos">Todos</SelectItem>
+                    <SelectItem value="pendente">Pendentes</SelectItem>
+                    <SelectItem value="finalizada">Finalizadas</SelectItem>
+                    <SelectItem value="cancelada">Canceladas</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-1.5">
+                <Label className="text-xs">Perfil</Label>
+                <Select value={filterProfile} onValueChange={setFilterProfile}>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="todos">Todos os perfis</SelectItem>
+                    {profiles.map(p => (
+                      <SelectItem key={p.id} value={p.id}>
+                        {p.apelido || `${p.nome} ${p.sobrenome}`}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
-          </div>
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
+      </div>
 
       {/* List */}
       {filtered.length === 0 ? (

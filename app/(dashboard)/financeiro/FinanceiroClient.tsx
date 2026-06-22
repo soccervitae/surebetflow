@@ -10,7 +10,7 @@ import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { formatCurrency } from "@/lib/utils"
 import { useToast } from "@/hooks/useToast"
-import { ArrowDownLeft, ArrowUpRight, Plus, Filter, DollarSign } from "lucide-react"
+import { ArrowDownLeft, ArrowUpRight, Plus, Filter, DollarSign, X } from "lucide-react"
 import type { MovimentacaoFinanceira } from "@/lib/types"
 
 interface Props {
@@ -27,6 +27,7 @@ export default function FinanceiroClient({ movimentacoes: initial, profiles, pro
   const [filterProfile, setFilterProfile] = useState("todos")
   const [filterTipo, setFilterTipo] = useState("todos")
   const [showForm, setShowForm] = useState(false)
+  const [showFilter, setShowFilter] = useState(false)
 
   // Form state
   const [formProfile, setFormProfile] = useState("")
@@ -120,19 +121,33 @@ export default function FinanceiroClient({ movimentacoes: initial, profiles, pro
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between gap-2">
         <div>
           <h1 className="text-2xl font-bold text-[var(--text-primary)]">Financeiro</h1>
           <p className="text-[var(--text-secondary)] text-sm mt-1">Controle de depósitos e saques</p>
         </div>
-        <Button onClick={() => setShowForm(!showForm)}>
-          <Plus className="h-4 w-4 mr-2" />
-          Nova Movimentação
-        </Button>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => setShowFilter(v => !v)}
+            className={`md:hidden flex items-center gap-1.5 px-3 py-2 rounded-xl border text-sm font-medium transition-colors ${
+              showFilter
+                ? "bg-[#1e3a8a]/10 border-[#1e3a8a]/30 text-[var(--accent-text)]"
+                : "border-[var(--border)] text-[var(--text-secondary)] hover:bg-[var(--bg-elevated)]"
+            }`}
+          >
+            {showFilter ? <X className="h-4 w-4" /> : <Filter className="h-4 w-4" />}
+            Filtrar
+          </button>
+          <Button onClick={() => setShowForm(!showForm)}>
+            <Plus className="h-4 w-4 mr-2" />
+            <span className="hidden sm:inline">Nova Movimentação</span>
+            <span className="sm:hidden">Nova</span>
+          </Button>
+        </div>
       </div>
 
       {/* Summary */}
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
         <Card>
           <CardContent className="p-4">
             <div className="flex items-center gap-2 mb-1">
@@ -243,40 +258,42 @@ export default function FinanceiroClient({ movimentacoes: initial, profiles, pro
         </Card>
       )}
 
-      {/* Filters */}
-      <Card>
-        <CardContent className="p-4">
-          <div className="flex items-center gap-2 mb-3">
-            <Filter className="h-4 w-4 text-[var(--text-secondary)]" />
-            <span className="text-sm font-medium text-[var(--text-primary)]">Filtros</span>
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <Select value={filterProfile} onValueChange={setFilterProfile}>
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="todos">Todos os perfis</SelectItem>
-                {profiles.map(p => (
-                  <SelectItem key={p.id} value={p.id}>
-                    {p.apelido || `${p.nome} ${p.sobrenome}`}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            <Select value={filterTipo} onValueChange={setFilterTipo}>
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="todos">Todos os tipos</SelectItem>
-                <SelectItem value="deposito">Depósitos</SelectItem>
-                <SelectItem value="saque">Saques</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-        </CardContent>
-      </Card>
+      {/* Filters — always visible on desktop, toggle on mobile */}
+      <div className={`${showFilter ? "block" : "hidden"} md:block`}>
+        <Card>
+          <CardContent className="p-4">
+            <div className="hidden md:flex items-center gap-2 mb-3">
+              <Filter className="h-4 w-4 text-[var(--text-secondary)]" />
+              <span className="text-sm font-medium text-[var(--text-primary)]">Filtros</span>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <Select value={filterProfile} onValueChange={setFilterProfile}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="todos">Todos os perfis</SelectItem>
+                  {profiles.map(p => (
+                    <SelectItem key={p.id} value={p.id}>
+                      {p.apelido || `${p.nome} ${p.sobrenome}`}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <Select value={filterTipo} onValueChange={setFilterTipo}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="todos">Todos os tipos</SelectItem>
+                  <SelectItem value="deposito">Depósitos</SelectItem>
+                  <SelectItem value="saque">Saques</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
 
       {/* Table */}
       {filtered.length === 0 ? (
