@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 import Link from "next/link"
+import { useRouter } from "next/navigation"
 import { createClient } from "@/lib/supabase/client"
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
 import { Card, CardContent } from "@/components/ui/card"
@@ -59,6 +60,7 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
   const [finFormDescricao, setFinFormDescricao] = useState("")
   const [finSaving, setFinSaving] = useState(false)
   const { toast } = useToast()
+  const router = useRouter()
 
   function formatBRL(raw: string) {
     const digits = raw.replace(/\D/g, "")
@@ -158,6 +160,7 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
       setFinFormValor("")
       setFinFormDescricao("")
       await loadMovimentacoes()
+      router.refresh()
     }
     setFinSaving(false)
   }

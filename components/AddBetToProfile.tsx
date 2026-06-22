@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect, useCallback, useRef } from "react"
+import { useRouter } from "next/navigation"
 import { createClient } from "@/lib/supabase/client"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -48,6 +49,7 @@ export default function AddBetToProfile({ profileId }: Props) {
   const betSearchRef = useRef<HTMLInputElement>(null)
   const { toast } = useToast()
   const supabase = createClient()
+  const router = useRouter()
 
   const loadData = useCallback(async function loadData() {
     const [betsRes, pbRes] = await Promise.all([
@@ -172,6 +174,7 @@ export default function AddBetToProfile({ profileId }: Props) {
       setMovTipo("deposito")
       setMovValor("")
       setMovDescricao("")
+      router.refresh()
     }
     setMovSaving(false)
   }
