@@ -32,7 +32,7 @@ export async function POST(req: NextRequest) {
   return NextResponse.json({ ok: true })
 }
 
-export async function GET(req: NextRequest) {
+export async function GET() {
   // Public key only — safe to expose
   const adminSupabase = createAdminClient()
   const { data } = await adminSupabase

@@ -95,7 +95,7 @@ export default function CheckoutClient({ publicKey, userEmail }: { publicKey: st
             router.push("/assinatura?success=1")
           }
         },
-        onFetching: (resource: string) => {
+        onFetching: () => {
           // shows loading state while MP fetches card data
           return () => {}
         },

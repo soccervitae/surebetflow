@@ -22,7 +22,6 @@ export async function POST(req: NextRequest) {
     const url = new URL(req.url)
     const dataId = url.searchParams.get("data.id") ?? ""
 
-    const manifest = `id:${dataId};request-id:${xRequestId};ts:${xSignature.split(",").find(p => p.startsWith("ts="))?.split("=")[1] ?? ""};`
     const ts = xSignature.split(",").find(p => p.startsWith("ts="))?.split("=")[1] ?? ""
     const v1 = xSignature.split(",").find(p => p.startsWith("v1="))?.split("=")[1] ?? ""
     const expected = createHmac("sha256", secret)

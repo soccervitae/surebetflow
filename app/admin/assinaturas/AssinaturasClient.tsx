@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { CheckCircle, Clock, XCircle, AlertCircle, TrendingUp, Users, DollarSign, Search, MoreVertical, RefreshCw } from "lucide-react"
+import { CheckCircle, Clock, XCircle, AlertCircle, Users, DollarSign, Search, MoreVertical, RefreshCw } from "lucide-react"
 import { useRouter } from "next/navigation"
 
 type Sub = {

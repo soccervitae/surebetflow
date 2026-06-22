@@ -3,7 +3,7 @@
 import { useState } from "react"
 import Link from "next/link"
 import { createClient } from "@/lib/supabase/client"
-import { Plus, MessageCircle, Clock, CheckCircle, XCircle, AlertCircle } from "lucide-react"
+import { Plus, MessageCircle, Clock, CheckCircle } from "lucide-react"
 import { useRouter } from "next/navigation"
 
 type Ticket = {
@@ -29,7 +29,7 @@ const PRIORIDADE_CONFIG = {
 }
 
 export default function SuporteClient({ tickets: initial, userId }: { tickets: Ticket[]; userId: string }) {
-  const [tickets, setTickets] = useState(initial)
+  const [tickets] = useState(initial)
   const [showNew, setShowNew] = useState(false)
   const [assunto, setAssunto] = useState("")
   const [mensagem, setMensagem] = useState("")
