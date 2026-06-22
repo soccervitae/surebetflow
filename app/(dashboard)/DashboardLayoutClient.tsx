@@ -53,7 +53,7 @@ export default function DashboardLayoutClient({ children }: { children: React.Re
               className={cn(
                 "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors",
                 isActive(item.href)
-                  ? "bg-[#1e3a8a]/10 text-[#1e3a8a]"
+                  ? "bg-[#1e3a8a]/10 text-[var(--accent-text)]"
                   : "text-[var(--text-secondary)] hover:bg-[var(--bg-elevated)] hover:text-[var(--text-primary)]"
               )}
             >
@@ -98,7 +98,7 @@ export default function DashboardLayoutClient({ children }: { children: React.Re
                   className={cn(
                     "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors",
                     isActive(item.href)
-                      ? "bg-[#1e3a8a]/10 text-[#1e3a8a]"
+                      ? "bg-[#1e3a8a]/10 text-[var(--accent-text)]"
                       : "text-[var(--text-secondary)] hover:bg-[var(--bg-elevated)] hover:text-[var(--text-primary)]"
                   )}
                 >
@@ -150,7 +150,7 @@ export default function DashboardLayoutClient({ children }: { children: React.Re
                 href={item.href}
                 className={cn(
                   "flex flex-col items-center gap-1 px-2 py-1.5 rounded-lg transition-colors min-w-0",
-                  isActive(item.href) ? "text-[#1e3a8a]" : "text-[var(--text-secondary)]"
+                  isActive(item.href) ? "text-[var(--accent-text)]" : "text-[var(--text-secondary)]"
                 )}
               >
                 <item.icon className="h-5 w-5 flex-shrink-0" />

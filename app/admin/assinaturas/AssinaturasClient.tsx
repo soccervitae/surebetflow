@@ -78,7 +78,7 @@ export default function AssinaturasClient({ subs, emailMap, stats }: {
           { label: "Ativas",     value: stats.active,     color: "text-green-400",    icon: CheckCircle,suffix: "" },
           { label: "Canceladas", value: stats.canceled,   color: "text-gray-400",     icon: XCircle,    suffix: "" },
           { label: "Pendentes",  value: stats.incomplete, color: "text-yellow-400",   icon: AlertCircle,suffix: "" },
-          { label: "MRR",        value: stats.mrr,        color: "text-[#1e3a8a]",    icon: DollarSign, suffix: "" },
+          { label: "MRR",        value: stats.mrr,        color: "text-[var(--accent-text)]",    icon: DollarSign, suffix: "" },
         ].map(s => {
           const Icon = s.icon
           return (

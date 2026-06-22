@@ -118,7 +118,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                   "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all",
                   collapsed && "justify-center px-0",
                   active
-                    ? "bg-[#1e3a8a]/15 text-[#1e3a8a] border border-[#1e3a8a]/20"
+                    ? "bg-[#1e3a8a]/15 text-[var(--accent-text)] border border-[#1e3a8a]/20"
                     : "text-[var(--text-secondary)] hover:bg-[var(--bg-elevated)] hover:text-[var(--text-primary)]"
                 )}
               >
@@ -145,7 +145,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             {!collapsed && (
               <div className="flex-1 min-w-0">
                 <p className="text-xs font-medium text-[var(--text-primary)] truncate">{userName}</p>
-                <p className="text-[10px] text-[#1e3a8a] font-semibold">APOSTADOR</p>
+                <p className="text-[10px] text-[var(--accent-text)] font-semibold">APOSTADOR</p>
               </div>
             )}
           </div>
@@ -184,12 +184,12 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         {/* Desktop top bar */}
         <header className="hidden md:flex items-center justify-between px-6 py-3 bg-[var(--bg-surface)] border-b border-[var(--border)] sticky top-0 z-10">
           <div className="flex items-center gap-2 text-sm text-[var(--text-secondary)]">
-            <Circle className="w-2 h-2 fill-[#1e3a8a] text-[#1e3a8a]" />
+            <Circle className="w-2 h-2 fill-[var(--accent-text)] text-[var(--accent-text)]" />
             <span>Sessão ativa</span>
             <span className="opacity-30">•</span>
             <span className="text-[var(--text-primary)] font-medium">{userName}</span>
             <span className="opacity-30">•</span>
-            <span className="text-xs font-semibold bg-[#1e3a8a]/20 text-[#1e3a8a] px-2 py-0.5 rounded border border-[#1e3a8a]/30">
+            <span className="text-xs font-semibold bg-[#1e3a8a]/20 text-[var(--accent-text)] px-2 py-0.5 rounded border border-[#1e3a8a]/30">
               APOSTADOR
             </span>
           </div>
@@ -242,7 +242,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               <Link key={href} href={href}
                 className={cn(
                   "flex-1 flex flex-col items-center justify-center py-2.5 gap-1 transition-colors relative",
-                  active ? "text-[#1e3a8a]" : "text-[var(--text-muted)]"
+                  active ? "text-[var(--accent-text)]" : "text-[var(--text-muted)]"
                 )}
               >
                 {active && (
@@ -259,7 +259,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             onClick={() => setDrawerOpen(true)}
             className={cn(
               "flex-1 flex flex-col items-center justify-center py-2.5 gap-1 transition-colors",
-              drawerOpen ? "text-[#1e3a8a]" : "text-[var(--text-muted)]"
+              drawerOpen ? "text-[var(--accent-text)]" : "text-[var(--text-muted)]"
             )}
           >
             <MoreHorizontal className="w-5 h-5" />
@@ -292,7 +292,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 </div>
                 <div>
                   <p className="text-sm font-semibold text-[var(--text-primary)] truncate max-w-[180px]">{userName}</p>
-                  <p className="text-[11px] text-[#1e3a8a] font-semibold">APOSTADOR</p>
+                  <p className="text-[11px] text-[var(--accent-text)] font-semibold">APOSTADOR</p>
                 </div>
               </div>
               <button onClick={() => setDrawerOpen(false)}
@@ -310,7 +310,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                     className={cn(
                       "flex flex-col items-center gap-2 py-4 rounded-2xl text-center transition-colors",
                       active
-                        ? "bg-[#1e3a8a]/15 text-[#1e3a8a] border border-[#1e3a8a]/25"
+                        ? "bg-[#1e3a8a]/15 text-[var(--accent-text)] border border-[#1e3a8a]/25"
                         : "bg-[var(--bg-elevated)] text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
                     )}
                   >

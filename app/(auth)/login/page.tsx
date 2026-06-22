@@ -88,7 +88,7 @@ export default function LoginPage() {
       </form>
       <p className="text-center text-sm text-gray-500 mt-6">
         Não tem uma conta?{" "}
-        <Link href="/cadastro" className="text-[#1e3a8a] font-medium hover:underline">
+        <Link href="/cadastro" className="text-[var(--accent-text)] font-medium hover:underline">
           Cadastre-se
         </Link>
       </p>

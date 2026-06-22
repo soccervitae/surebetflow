@@ -137,7 +137,7 @@ export default function CadastroPage() {
       </form>
       <p className="text-center text-sm text-gray-500 mt-6">
         Já tem uma conta?{" "}
-        <Link href="/login" className="text-[#1e3a8a] font-medium hover:underline">
+        <Link href="/login" className="text-[var(--accent-text)] font-medium hover:underline">
           Fazer login
         </Link>
       </p>

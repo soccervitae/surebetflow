@@ -281,7 +281,7 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
             size="sm"
             onClick={() => setConfirmAtivoOpen(true)}
             className={`flex-1 sm:flex-none ${currentProfile.ativo
-              ? "text-[#1e3a8a] border-[#1e3a8a]/40 hover:bg-[#1e3a8a]/5"
+              ? "text-[var(--accent-text)] border-[#1e3a8a]/40 hover:bg-[#1e3a8a]/5"
               : "text-[#DC2626] border-[#DC2626]/40 hover:bg-[#DC2626]/5"
             }`}
           >
@@ -324,11 +324,11 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
               <CardContent className="p-5">
                 <div className="flex items-center gap-3">
                   <div className="p-2 bg-[#1e3a8a]/10 rounded-lg">
-                    <TrendingUp className="h-5 w-5 text-[#1e3a8a]" />
+                    <TrendingUp className="h-5 w-5 text-[var(--accent-text)]" />
                   </div>
                   <div className="min-w-0">
                     <p className="text-xs text-[var(--text-secondary)]">Lucro Realizado</p>
-                    <p className="text-base font-bold text-[#1e3a8a] truncate">{formatCurrency(dashboard?.lucro_realizado ?? 0)}</p>
+                    <p className="text-base font-bold text-[var(--accent-text)] truncate">{formatCurrency(dashboard?.lucro_realizado ?? 0)}</p>
                   </div>
                 </div>
               </CardContent>
@@ -366,7 +366,7 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
             <div className="flex flex-col gap-2 mb-3">
               <div className="flex items-center gap-2">
                 <h2 className="text-sm font-semibold text-[var(--text-primary)] uppercase tracking-wide">Apostas</h2>
-                <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-[#1e3a8a]/10 text-[#1e3a8a]">
+                <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-[#1e3a8a]/10 text-[var(--accent-text)]">
                   {apostasFiltradasPeriodo.length}
                 </span>
               </div>
@@ -395,7 +395,7 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
                       onClick={() => setPeriodoFiltro(value)}
                       className={`px-2 py-1 rounded-md text-xs font-medium transition-colors ${
                         periodoFiltro === value
-                          ? "bg-[var(--bg-surface)] text-[#1e3a8a] shadow-sm border border-[var(--border)]"
+                          ? "bg-[var(--bg-surface)] text-[var(--accent-text)] shadow-sm border border-[var(--border)]"
                           : "text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
                       }`}
                     >
@@ -452,7 +452,7 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
                                           {isGreen ? "GREEN" : "RED"}
                                         </span>
                                       )}
-                                      <span className={`font-medium flex-shrink-0 ${isGreen ? "text-[#1e3a8a]" : isRed ? "text-[#DC2626]" : "text-[var(--text-secondary)]"}`}>
+                                      <span className={`font-medium flex-shrink-0 ${isGreen ? "text-[var(--accent-text)]" : isRed ? "text-[#DC2626]" : "text-[var(--text-secondary)]"}`}>
                                         {leg.profile_bet?.bet?.nome ?? "Casa"}
                                       </span>
                                       <span className="text-[var(--text-secondary)] truncate">{leg.resultado_apostado}</span>
@@ -471,7 +471,7 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
                               {aposta.status === "finalizada" ? "Lucro" : aposta.status === "pendente" ? "Lucro esperado" : ""}
                             </p>
                             {aposta.status === "finalizada" ? (
-                              <p className={`text-base font-bold ${(aposta.resultado_real ?? 0) >= 0 ? "text-[#1e3a8a]" : "text-[#DC2626]"}`}>
+                              <p className={`text-base font-bold ${(aposta.resultado_real ?? 0) >= 0 ? "text-[var(--accent-text)]" : "text-[#DC2626]"}`}>
                                 {formatCurrency(aposta.resultado_real ?? 0)}
                               </p>
                             ) : aposta.status === "pendente" ? (
@@ -507,7 +507,7 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
             <Card>
               <CardContent className="p-4">
                 <p className="text-xs text-[var(--text-secondary)] mb-1">Depositado</p>
-                <p className="text-lg font-bold text-[#1e3a8a]">{formatCurrency(totalDepositos)}</p>
+                <p className="text-lg font-bold text-[var(--accent-text)]">{formatCurrency(totalDepositos)}</p>
               </CardContent>
             </Card>
             <Card>
@@ -519,7 +519,7 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
             <Card>
               <CardContent className="p-4">
                 <p className="text-xs text-[var(--text-secondary)] mb-1">Saldo Líquido</p>
-                <p className={`text-lg font-bold ${saldoLiquido >= 0 ? "text-[#1e3a8a]" : "text-[#DC2626]"}`}>{formatCurrency(saldoLiquido)}</p>
+                <p className={`text-lg font-bold ${saldoLiquido >= 0 ? "text-[var(--accent-text)]" : "text-[#DC2626]"}`}>{formatCurrency(saldoLiquido)}</p>
               </CardContent>
             </Card>
           </div>
@@ -529,7 +529,7 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
             <div className="flex gap-1 bg-[var(--bg-elevated)] rounded-lg p-1">
               {(["hoje", "semana", "mes", "todos"] as const).map(p => (
                 <button key={p} onClick={() => setFinPeriodo(p)}
-                  className={`px-3 py-1 rounded-md text-xs font-medium transition-colors ${finPeriodo === p ? "bg-[var(--bg-surface)] text-[#1e3a8a] shadow-sm border border-[var(--border)]" : "text-[var(--text-secondary)] hover:text-[var(--text-primary)]"}`}>
+                  className={`px-3 py-1 rounded-md text-xs font-medium transition-colors ${finPeriodo === p ? "bg-[var(--bg-surface)] text-[var(--accent-text)] shadow-sm border border-[var(--border)]" : "text-[var(--text-secondary)] hover:text-[var(--text-primary)]"}`}>
                   {p === "hoje" ? "Hoje" : p === "semana" ? "Semana" : p === "mes" ? "Mês" : "Todos"}
                 </button>
               ))}
@@ -623,7 +623,7 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
                     <div className="flex items-center gap-3">
                       <div className={`p-2 rounded-lg ${m.tipo === "deposito" ? "bg-[#1e3a8a]/10" : "bg-[#DC2626]/10"}`}>
                         {m.tipo === "deposito"
-                          ? <ArrowDownCircle className="h-4 w-4 text-[#1e3a8a]" />
+                          ? <ArrowDownCircle className="h-4 w-4 text-[var(--accent-text)]" />
                           : <ArrowUpCircle className="h-4 w-4 text-[#DC2626]" />}
                       </div>
                       <div className="flex-1 min-w-0">
@@ -638,7 +638,7 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
                         {m.descricao && <p className="text-xs text-[var(--text-muted)] truncate">{m.descricao}</p>}
                         <p className="text-xs text-[var(--text-secondary)]">{new Date(m.created_at).toLocaleDateString("pt-BR")}</p>
                       </div>
-                      <p className={`text-sm font-bold ${m.tipo === "deposito" ? "text-[#1e3a8a]" : "text-[#DC2626]"}`}>
+                      <p className={`text-sm font-bold ${m.tipo === "deposito" ? "text-[var(--accent-text)]" : "text-[#DC2626]"}`}>
                         {m.tipo === "saque" ? "-" : "+"}{formatCurrency(m.valor)}
                       </p>
                     </div>
@@ -711,7 +711,7 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
         <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
-              <Calculator className="h-5 w-5 text-[#1e3a8a]" />
+              <Calculator className="h-5 w-5 text-[var(--accent-text)]" />
               Nova Aposta — {currentProfile.apelido ?? `${currentProfile.nome} ${currentProfile.sobrenome}`}
             </DialogTitle>
           </DialogHeader>

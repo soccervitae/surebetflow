@@ -210,7 +210,7 @@ export default function ConfiguracoesPage() {
         <CardContent className="space-y-3">
           <div className="flex items-center gap-3 p-3 rounded-xl bg-[var(--bg-muted)] border border-[var(--border)]">
             <div className="p-2 rounded-lg bg-[#1e3a8a]/10">
-              <DeviceIcon className="h-5 w-5 text-[#1e3a8a]" />
+              <DeviceIcon className="h-5 w-5 text-[var(--accent-text)]" />
             </div>
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2">
@@ -290,7 +290,7 @@ export default function ConfiguracoesPage() {
               </p>
             )}
             {passwordSuccess && (
-              <p className="text-sm text-[#1e3a8a] bg-[#1e3a8a]/5 border border-[#1e3a8a]/20 rounded-lg px-3 py-2">
+              <p className="text-sm text-[var(--accent-text)] bg-[#1e3a8a]/5 border border-[#1e3a8a]/20 rounded-lg px-3 py-2">
                 {passwordSuccess}
               </p>
             )}

@@ -58,13 +58,13 @@ export default async function LandingPage() {
 
       {/* Hero */}
       <section className="max-w-6xl mx-auto px-4 sm:px-6 pt-24 pb-28 text-center">
-        <div className="inline-flex items-center gap-2 bg-[#1e3a8a]/10 border border-[#1e3a8a]/20 text-[#1e3a8a] text-sm font-medium px-4 py-1.5 rounded-full mb-8">
+        <div className="inline-flex items-center gap-2 bg-[#1e3a8a]/10 border border-[#1e3a8a]/20 text-[var(--accent-text)] text-sm font-medium px-4 py-1.5 rounded-full mb-8">
           <Zap className="w-3.5 h-3.5" />
           Lucro garantido — é matemática pura
         </div>
         <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold leading-tight mb-6">
           Calcular vitórias nunca<br />
-          foi tão <span className="text-[#1e3a8a]">simples</span>
+          foi tão <span className="text-[var(--accent-text)]">simples</span>
         </h1>
         <p className="text-lg text-gray-400 max-w-2xl mx-auto mb-10">
           A plataforma completa para apostadores de arbitragem. Calcule, registre e acompanhe seus lucros garantidos com segurança total e controle profissional.
@@ -96,7 +96,7 @@ export default async function LandingPage() {
                 desc: "Duas ou mais casas oferecem odds altas o suficiente para que a soma das probabilidades implícitas seja menor que 100%."
               },
               {
-                icon: Calculator, color: "bg-[#1e3a8a]/10", iconColor: "text-[#1e3a8a]",
+                icon: Calculator, color: "bg-[#1e3a8a]/10", iconColor: "text-[var(--accent-text)]",
                 title: "2. Calcule as stakes",
                 desc: "Distribua o valor apostado entre todos os resultados possíveis de forma proporcional para garantir lucro em qualquer desfecho."
               },
@@ -126,11 +126,11 @@ export default async function LandingPage() {
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
           {[
-            { icon: Calculator, color: "bg-[#1e3a8a]/10", iconColor: "text-[#1e3a8a]", title: "Calculadora 2-way e 3-way", desc: "Detecta arbitragem em tempo real e calcula automaticamente a distribuição ideal das stakes." },
+            { icon: Calculator, color: "bg-[#1e3a8a]/10", iconColor: "text-[var(--accent-text)]", title: "Calculadora 2-way e 3-way", desc: "Detecta arbitragem em tempo real e calcula automaticamente a distribuição ideal das stakes." },
             { icon: Lock, color: "bg-blue-500/10", iconColor: "text-blue-400", title: "Senhas criptografadas AES-256", desc: "Suas credenciais das casas de apostas ficam protegidas com criptografia de nível militar." },
             { icon: Users, color: "bg-purple-500/10", iconColor: "text-purple-400", title: "Perfis ilimitados", desc: "Crie perfis separados para você, familiares ou sócios. Cada perfil é totalmente isolado." },
             { icon: Wallet, color: "bg-yellow-500/10", iconColor: "text-yellow-400", title: "Controle financeiro", desc: "Registre depósitos e saques por casa de apostas. Visualize saldo, lucro realizado e pendente." },
-            { icon: BarChart3, color: "bg-[#1e3a8a]/10", iconColor: "text-[#1e3a8a]", title: "Dashboard com gráficos", desc: "Acompanhe a evolução do lucro acumulado. Veja ROI, total investido e apostas ativas." },
+            { icon: BarChart3, color: "bg-[#1e3a8a]/10", iconColor: "text-[var(--accent-text)]", title: "Dashboard com gráficos", desc: "Acompanhe a evolução do lucro acumulado. Veja ROI, total investido e apostas ativas." },
             { icon: RefreshCw, color: "bg-blue-500/10", iconColor: "text-blue-400", title: "Histórico completo", desc: "Todas as apostas com legs detalhados, odds, stakes e resultado real. Filtre por perfil e período." },
           ].map((f) => (
             <div key={f.title} className="bg-[#111] border border-white/5 rounded-2xl p-6 hover:border-white/10 transition-colors">
@@ -194,7 +194,7 @@ export default async function LandingPage() {
                     </div>
                     <div className="text-right flex-shrink-0">
                       <p className="text-sm font-bold text-white">{p.saldo}</p>
-                      <p className="text-xs font-medium text-[#1e3a8a]">{p.lucro}</p>
+                      <p className="text-xs font-medium text-[var(--accent-text)]">{p.lucro}</p>
                     </div>
                   </div>
                 ))}
@@ -202,7 +202,7 @@ export default async function LandingPage() {
                   <p className="text-sm font-semibold text-gray-300">Total consolidado</p>
                   <div className="text-right">
                     <p className="text-sm font-bold text-white">R$ 7.500,00</p>
-                    <p className="text-xs font-bold text-[#1e3a8a]">+ R$ 946,25</p>
+                    <p className="text-xs font-bold text-[var(--accent-text)]">+ R$ 946,25</p>
                   </div>
                 </div>
               </div>
@@ -230,7 +230,7 @@ export default async function LandingPage() {
                 { title: "Consistente", desc: "Diferente de apostas normais, o resultado positivo é recorrente e previsível." },
               ].map((item) => (
                 <li key={item.title} className="flex items-start gap-3">
-                  <CheckCircle className="w-5 h-5 text-[#1e3a8a] flex-shrink-0 mt-0.5" />
+                  <CheckCircle className="w-5 h-5 text-[var(--accent-text)] flex-shrink-0 mt-0.5" />
                   <div>
                     <span className="font-semibold text-white">{item.title}: </span>
                     <span className="text-gray-400">{item.desc}</span>
@@ -241,7 +241,7 @@ export default async function LandingPage() {
           </div>
           <div className="space-y-4">
             {[
-              { icon: ShieldCheck, color: "text-[#1e3a8a]", title: "Segurança total dos dados", desc: "Suas credenciais são criptografadas com AES-256-GCM via Edge Function segura. Nunca em texto puro." },
+              { icon: ShieldCheck, color: "text-[var(--accent-text)]", title: "Segurança total dos dados", desc: "Suas credenciais são criptografadas com AES-256-GCM via Edge Function segura. Nunca em texto puro." },
               { icon: BarChart3, color: "text-blue-400", title: "ROI típico de 1% a 5% por operação", desc: "Com volume consistente, apostadores conseguem retornos mensais de 10% a 30% sobre o capital." },
               { icon: Zap, color: "text-yellow-400", title: "Velocidade é essencial", desc: "Oportunidades duram segundos. Com o SureBetFlow, você calcula e registra em poucos cliques." },
             ].map((item) => (
@@ -286,7 +286,7 @@ export default async function LandingPage() {
                   "Suporte prioritário por ticket",
                 ].map(f => (
                   <li key={f} className="flex items-center gap-2">
-                    <CheckCircle className="w-4 h-4 text-[#1e3a8a] flex-shrink-0" />
+                    <CheckCircle className="w-4 h-4 text-[var(--accent-text)] flex-shrink-0" />
                     <span className="text-gray-300">{f}</span>
                   </li>
                 ))}

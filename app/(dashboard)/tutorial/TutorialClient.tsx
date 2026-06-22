@@ -25,7 +25,7 @@ const SECTIONS = [
 function Tip({ text }: { text: string }) {
   return (
     <div className="flex items-start gap-2.5 bg-[#1e3a8a]/10 border border-[#1e3a8a]/20 rounded-xl px-4 py-3">
-      <Zap className="w-4 h-4 text-[#1e3a8a] shrink-0 mt-0.5" />
+      <Zap className="w-4 h-4 text-[var(--accent-text)] shrink-0 mt-0.5" />
       <p className="text-sm text-[var(--text-secondary)]">{text}</p>
     </div>
   )
@@ -35,7 +35,7 @@ function Step({ num, text }: { num: number; text: string }) {
   return (
     <div className="flex items-start gap-3">
       <div className="w-6 h-6 rounded-full bg-[#1e3a8a]/20 border border-[#1e3a8a]/40 flex items-center justify-center shrink-0 mt-0.5">
-        <span className="text-[#1e3a8a] text-xs font-bold">{num}</span>
+        <span className="text-[var(--accent-text)] text-xs font-bold">{num}</span>
       </div>
       <p className="text-sm text-[var(--text-secondary)] leading-relaxed">{text}</p>
     </div>
@@ -79,7 +79,7 @@ function MockShell({ url, children }: { url: string; children: React.ReactNode }
             ].map(({ href, icon: Icon, label }) => {
               const active = url === href || (url.startsWith(href) && href !== "/dashboard") || (url === href)
               return (
-                <div key={href} className={`flex items-center gap-2 px-2 py-1.5 rounded-md text-[9px] font-medium ${active ? "bg-[#1e3a8a]/20 text-[#1e3a8a] border border-[#1e3a8a]/25" : "text-gray-500"}`}>
+                <div key={href} className={`flex items-center gap-2 px-2 py-1.5 rounded-md text-[9px] font-medium ${active ? "bg-[#1e3a8a]/20 text-[var(--accent-text)] border border-[#1e3a8a]/25" : "text-gray-500"}`}>
                   <Icon className="w-3 h-3 shrink-0" />
                   {label}
                 </div>
@@ -91,7 +91,7 @@ function MockShell({ url, children }: { url: string; children: React.ReactNode }
               <div className="w-5 h-5 bg-[#1e3a8a] rounded-full flex items-center justify-center text-white text-[7px] font-bold">JS</div>
               <div>
                 <p className="text-[8px] text-white">João Silva</p>
-                <p className="text-[7px] text-[#1e3a8a] font-semibold">APOSTADOR</p>
+                <p className="text-[7px] text-[var(--accent-text)] font-semibold">APOSTADOR</p>
               </div>
             </div>
           </div>
@@ -101,9 +101,9 @@ function MockShell({ url, children }: { url: string; children: React.ReactNode }
           {/* Top bar */}
           <div className="flex items-center justify-between px-4 py-2 bg-[#111] border-b border-white/5">
             <div className="flex items-center gap-1.5 text-[9px] text-gray-500">
-              <Circle className="w-1.5 h-1.5 fill-[#1e3a8a] text-[#1e3a8a]" />
+              <Circle className="w-1.5 h-1.5 fill-[var(--accent-text)] text-[var(--accent-text)]" />
               Sessão ativa · <span className="text-white">João Silva</span>
-              <span className="text-[8px] bg-[#1e3a8a]/20 text-[#1e3a8a] px-1.5 py-0.5 rounded border border-[#1e3a8a]/30 ml-1">APOSTADOR</span>
+              <span className="text-[8px] bg-[#1e3a8a]/20 text-[var(--accent-text)] px-1.5 py-0.5 rounded border border-[#1e3a8a]/30 ml-1">APOSTADOR</span>
             </div>
             <div className="flex items-center gap-1.5">
               <Sun className="w-3 h-3 text-gray-500" />
@@ -128,7 +128,7 @@ export default function TutorialClient() {
     <div className="max-w-5xl mx-auto">
       <div className="flex items-center gap-3 mb-8">
         <div className="w-9 h-9 bg-[#1e3a8a]/10 rounded-xl flex items-center justify-center">
-          <BookOpen className="w-5 h-5 text-[#1e3a8a]" />
+          <BookOpen className="w-5 h-5 text-[var(--accent-text)]" />
         </div>
         <div>
           <h1 className="text-2xl font-bold text-[var(--text-primary)]">Tutorial</h1>
@@ -149,7 +149,7 @@ export default function TutorialClient() {
                   <button
                     onClick={() => setActive(id)}
                     className={`w-full flex items-center gap-2.5 px-3 py-2 text-sm rounded-lg mx-1.5 transition-colors text-left
-                      ${active === id ? "bg-[#1e3a8a]/15 text-[#1e3a8a] font-medium" : "text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-white/5"}`}
+                      ${active === id ? "bg-[#1e3a8a]/15 text-[var(--accent-text)] font-medium" : "text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-white/5"}`}
                     style={{ width: "calc(100% - 12px)" }}
                   >
                     <Icon className="w-3.5 h-3.5 shrink-0" />
@@ -179,7 +179,7 @@ export default function TutorialClient() {
                 <div className="grid grid-cols-4 gap-2 mb-3">
                   {[
                     { l: "Saldo Total", v: "R$ 2.000,00", c: "text-blue-400", bg: "bg-blue-500/10 border-blue-500/20" },
-                    { l: "Lucro Realizado", v: "R$ 120,00", c: "text-[#1e3a8a]", bg: "bg-[#1e3a8a]/10 border-[#1e3a8a]/20" },
+                    { l: "Lucro Realizado", v: "R$ 120,00", c: "text-[var(--accent-text)]", bg: "bg-[#1e3a8a]/10 border-[#1e3a8a]/20" },
                     { l: "Lucro Pendente", v: "R$ 0,00", c: "text-yellow-500", bg: "bg-yellow-500/10 border-yellow-500/20" },
                     { l: "ROI", v: "5.00%", c: "text-purple-400", bg: "bg-purple-500/10 border-purple-500/20" },
                   ].map(({ l, v, c, bg }) => (
@@ -206,7 +206,7 @@ export default function TutorialClient() {
                     <p className="text-[8px] font-semibold text-gray-300 uppercase tracking-wide mb-2">Resumo Financeiro</p>
                     {[
                       { l: "Total Investido", v: "R$ 2.400,00", c: "text-white" },
-                      { l: "Lucro Realizado", v: "R$ 120,00", c: "text-[#1e3a8a]" },
+                      { l: "Lucro Realizado", v: "R$ 120,00", c: "text-[var(--accent-text)]" },
                       { l: "Lucro Pendente", v: "R$ 0,00", c: "text-yellow-500" },
                       { l: "Total Apostas", v: "1", c: "text-white" },
                     ].map(({ l, v, c }) => (
@@ -230,7 +230,7 @@ export default function TutorialClient() {
                   ].map(({ icon: Icon, label, desc }) => (
                     <div key={label} className="bg-[var(--bg-surface)] border border-[var(--border)] rounded-xl p-4">
                       <div className="flex items-center gap-2 mb-1.5">
-                        <Icon className="w-4 h-4 text-[#1e3a8a]" />
+                        <Icon className="w-4 h-4 text-[var(--accent-text)]" />
                         <span className="text-sm font-medium text-[var(--text-primary)]">{label}</span>
                       </div>
                       <p className="text-xs text-[var(--text-muted)]">{desc}</p>
@@ -327,7 +327,7 @@ export default function TutorialClient() {
                         </div>
                         <div className="bg-black/40 border border-white/10 rounded-lg px-2 py-1">
                           <p className="text-[7px] text-gray-500">Stake sugerida</p>
-                          <p className="text-[9px] text-[#1e3a8a] font-mono font-bold">{["R$ 95,24", "R$ 90,91"][i]}</p>
+                          <p className="text-[9px] text-[var(--accent-text)] font-mono font-bold">{["R$ 95,24", "R$ 90,91"][i]}</p>
                         </div>
                       </div>
                     </div>
@@ -448,7 +448,7 @@ export default function TutorialClient() {
                 <div className="grid grid-cols-4 gap-1.5 mb-3">
                   {[
                     { l: "Total Investido", v: "R$ 2.400", c: "text-white" },
-                    { l: "Lucro Realizado", v: "R$ 120,00", c: "text-[#1e3a8a]" },
+                    { l: "Lucro Realizado", v: "R$ 120,00", c: "text-[var(--accent-text)]" },
                     { l: "Lucro Pendente", v: "R$ 0,00", c: "text-yellow-500" },
                     { l: "ROI Médio", v: "5.00%", c: "text-green-400" },
                   ].map(({ l, v, c }) => (
@@ -485,7 +485,7 @@ export default function TutorialClient() {
                   ].map(({ icon: Icon, label, desc }) => (
                     <div key={label} className="flex items-start gap-3 bg-[var(--bg-surface)] border border-[var(--border)] rounded-xl p-4">
                       <div className="w-8 h-8 bg-[#1e3a8a]/10 rounded-lg flex items-center justify-center shrink-0">
-                        <Icon className="w-4 h-4 text-[#1e3a8a]" />
+                        <Icon className="w-4 h-4 text-[var(--accent-text)]" />
                       </div>
                       <div>
                         <p className="text-sm font-medium text-[var(--text-primary)] mb-0.5">{label}</p>
@@ -510,7 +510,7 @@ export default function TutorialClient() {
               <MockShell url="/assinatura">
                 <div className="flex items-center gap-2 mb-3">
                   <div className="w-6 h-6 bg-[#1e3a8a]/10 rounded-lg flex items-center justify-center">
-                    <CreditCard className="w-3 h-3 text-[#1e3a8a]" />
+                    <CreditCard className="w-3 h-3 text-[var(--accent-text)]" />
                   </div>
                   <div>
                     <p className="text-[10px] font-bold text-white">Assinatura</p>
@@ -520,10 +520,10 @@ export default function TutorialClient() {
                 {/* Plan card */}
                 <div className="bg-white/5 border border-[#1e3a8a]/30 rounded-xl p-2.5 mb-2 relative">
                   <div className="absolute top-2 right-2">
-                    <span className="text-[6px] bg-[#1e3a8a]/20 text-[#1e3a8a] px-1.5 py-0.5 rounded-full">Plano único</span>
+                    <span className="text-[6px] bg-[#1e3a8a]/20 text-[var(--accent-text)] px-1.5 py-0.5 rounded-full">Plano único</span>
                   </div>
                   <div className="flex items-center gap-1.5 mb-1">
-                    <Star className="w-3 h-3 text-[#1e3a8a]" />
+                    <Star className="w-3 h-3 text-[var(--accent-text)]" />
                     <span className="text-[9px] font-bold text-white">Pro</span>
                     <span className="text-[7px] bg-green-500/20 text-green-400 px-1.5 rounded-full border border-green-500/20 ml-1">Ativa</span>
                   </div>
@@ -612,7 +612,7 @@ export default function TutorialClient() {
                       <p className="text-[6px] text-gray-500 uppercase tracking-wider mb-1">Incluído</p>
                       {["Perfis ilimitados", "Calculadora", "Dashboard", "Suporte"].map(f => (
                         <div key={f} className="flex items-center gap-1 mb-0.5">
-                          <CheckCircle className="w-2 h-2 text-[#1e3a8a]" />
+                          <CheckCircle className="w-2 h-2 text-[var(--accent-text)]" />
                           <span className="text-[6px] text-gray-400">{f}</span>
                         </div>
                       ))}
@@ -662,7 +662,7 @@ export default function TutorialClient() {
                     { label: "Notificações",  desc: "Escolha quais alertas deseja receber por e-mail." },
                   ].map(({ label, desc }) => (
                     <div key={label} className="flex items-start gap-3 bg-[var(--bg-surface)] border border-[var(--border)] rounded-xl p-4">
-                      <CheckCircle className="w-4 h-4 text-[#1e3a8a] shrink-0 mt-0.5" />
+                      <CheckCircle className="w-4 h-4 text-[var(--accent-text)] shrink-0 mt-0.5" />
                       <div>
                         <p className="text-sm font-medium text-[var(--text-primary)] mb-0.5">{label}</p>
                         <p className="text-xs text-[var(--text-muted)]">{desc}</p>
@@ -790,7 +790,7 @@ export default function TutorialClient() {
                 if (idx < SECTIONS.length - 1) setActive(SECTIONS[idx + 1].id)
               }}
               disabled={SECTIONS[SECTIONS.length - 1].id === active}
-              className="flex items-center gap-2 text-sm text-[#1e3a8a] hover:text-[#1e40af] disabled:opacity-30 transition-colors font-medium"
+              className="flex items-center gap-2 text-sm text-[var(--accent-text)] hover:text-[#1e40af] disabled:opacity-30 transition-colors font-medium"
             >
               Próximo
               <ChevronRight className="w-4 h-4" />

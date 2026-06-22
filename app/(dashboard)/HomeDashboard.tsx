@@ -25,7 +25,7 @@ function statusBadge(status: string) {
 
 const quickActions = [
   { href: "/perfis", icon: Users, label: "Perfis", sub: "Gerenciar", color: "text-[#a855f7]", bg: "bg-[#a855f7]/10 border-[#a855f7]/20" },
-  { href: "/apostas", icon: ClipboardList, label: "Apostas", sub: "Registrar", color: "text-[#1e3a8a]", bg: "bg-[#1e3a8a]/10 border-[#1e3a8a]/20" },
+  { href: "/apostas", icon: ClipboardList, label: "Apostas", sub: "Registrar", color: "text-[var(--accent-text)]", bg: "bg-[#1e3a8a]/10 border-[#1e3a8a]/20" },
   { href: "/financeiro", icon: Wallet, label: "Financeiro", sub: "Movimentar", color: "text-[#f97316]", bg: "bg-[#f97316]/10 border-[#f97316]/20" },
 ]
 
@@ -43,7 +43,7 @@ export default function HomeDashboard({ dashboard, profiles, recentApostas, apos
 
   const stats = [
     { label: "Saldo Total", value: formatCurrency(dashboard?.saldo_total ?? 0), icon: DollarSign, color: "text-[#3b82f6]", ring: "border-[#3b82f6]/20", bg: "bg-[#3b82f6]/10" },
-    { label: "Lucro Realizado", value: formatCurrency(dashboard?.lucro_realizado ?? 0), icon: TrendingUp, color: "text-[#1e3a8a]", ring: "border-[#1e3a8a]/20", bg: "bg-[#1e3a8a]/10" },
+    { label: "Lucro Realizado", value: formatCurrency(dashboard?.lucro_realizado ?? 0), icon: TrendingUp, color: "text-[var(--accent-text)]", ring: "border-[#1e3a8a]/20", bg: "bg-[#1e3a8a]/10" },
     { label: "Lucro Pendente", value: formatCurrency(dashboard?.lucro_pendente ?? 0), icon: Clock, color: "text-yellow-500", ring: "border-yellow-500/20", bg: "bg-yellow-500/10" },
     { label: "ROI", value: `${(dashboard?.roi_percentual ?? 0).toFixed(2)}%`, icon: ArrowUpRight, color: "text-[#a855f7]", ring: "border-[#a855f7]/20", bg: "bg-[#a855f7]/10" },
   ]
@@ -108,7 +108,7 @@ export default function HomeDashboard({ dashboard, profiles, recentApostas, apos
           <div className="flex-1 space-y-3">
             {[
               { label: "Total Investido", value: formatCurrency(dashboard?.total_investido ?? 0), cls: "text-[var(--text-primary)]" },
-              { label: "Lucro Realizado", value: formatCurrency(dashboard?.lucro_realizado ?? 0), cls: "text-[#1e3a8a]" },
+              { label: "Lucro Realizado", value: formatCurrency(dashboard?.lucro_realizado ?? 0), cls: "text-[var(--accent-text)]" },
               { label: "Lucro Pendente", value: formatCurrency(dashboard?.lucro_pendente ?? 0), cls: "text-yellow-500" },
               { label: "Total Apostas", value: String(dashboard?.total_apostas ?? 0), cls: "text-[var(--text-primary)]" },
             ].map(({ label, value, cls }) => (
@@ -120,7 +120,7 @@ export default function HomeDashboard({ dashboard, profiles, recentApostas, apos
           </div>
           <Link
             href="/financeiro"
-            className="mt-4 flex items-center justify-center gap-2 w-full py-2.5 rounded-lg border border-[#1e3a8a]/40 text-[#1e3a8a] text-sm font-medium hover:bg-[#1e3a8a]/10 transition-colors"
+            className="mt-4 flex items-center justify-center gap-2 w-full py-2.5 rounded-lg border border-[#1e3a8a]/40 text-[var(--accent-text)] text-sm font-medium hover:bg-[#1e3a8a]/10 transition-colors"
           >
             <Wallet className="w-4 h-4" />
             Ver Financeiro
@@ -155,7 +155,7 @@ export default function HomeDashboard({ dashboard, profiles, recentApostas, apos
         <div className="lg:col-span-2 rounded-xl border border-[var(--border)] bg-[var(--bg-surface)] p-5">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-sm font-semibold text-[var(--text-primary)] uppercase tracking-wide">Atividades Recentes</h2>
-            <Link href="/apostas" className="text-xs text-[#1e3a8a] hover:underline flex items-center gap-1">
+            <Link href="/apostas" className="text-xs text-[var(--accent-text)] hover:underline flex items-center gap-1">
               Ver todas <ChevronRight className="w-3 h-3" />
             </Link>
           </div>
@@ -172,7 +172,7 @@ export default function HomeDashboard({ dashboard, profiles, recentApostas, apos
               {recentApostas.slice(0, 6).map(a => (
                 <Link key={a.id} href={`/apostas/${a.id}`} className="flex items-center gap-3 p-3 rounded-lg hover:bg-[var(--bg-elevated)] transition-colors group">
                   <div className="w-8 h-8 rounded-full bg-[var(--bg-elevated)] flex items-center justify-center flex-shrink-0 group-hover:bg-[#1e3a8a]/20">
-                    <ClipboardList className="w-4 h-4 text-[var(--text-secondary)] group-hover:text-[#1e3a8a]" />
+                    <ClipboardList className="w-4 h-4 text-[var(--text-secondary)] group-hover:text-[var(--accent-text)]" />
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-medium text-[var(--text-primary)] truncate">{a.evento}</p>
@@ -182,7 +182,7 @@ export default function HomeDashboard({ dashboard, profiles, recentApostas, apos
                   </div>
                   <div className="flex items-center gap-2 flex-shrink-0">
                     {statusBadge(a.status)}
-                    <span className="text-xs font-semibold text-[#1e3a8a]">{formatCurrency(a.lucro_garantido)}</span>
+                    <span className="text-xs font-semibold text-[var(--accent-text)]">{formatCurrency(a.lucro_garantido)}</span>
                   </div>
                 </Link>
               ))}
@@ -196,7 +196,7 @@ export default function HomeDashboard({ dashboard, profiles, recentApostas, apos
         <div className="rounded-xl border border-[var(--border)] bg-[var(--bg-surface)] p-5">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-sm font-semibold text-[var(--text-primary)] uppercase tracking-wide">Perfis</h2>
-            <Link href="/perfis" className="text-xs text-[#1e3a8a] hover:underline flex items-center gap-1">
+            <Link href="/perfis" className="text-xs text-[var(--accent-text)] hover:underline flex items-center gap-1">
               Ver todos <ChevronRight className="w-3 h-3" />
             </Link>
           </div>
@@ -208,13 +208,13 @@ export default function HomeDashboard({ dashboard, profiles, recentApostas, apos
                 className="flex items-center gap-3 p-3 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-muted)] hover:border-[#1e3a8a]/40 hover:bg-[#1e3a8a]/5 transition-all"
               >
                 <Avatar className="h-9 w-9 flex-shrink-0">
-                  <AvatarFallback className="bg-[#1e3a8a]/20 text-[#1e3a8a] text-sm font-bold">
+                  <AvatarFallback className="bg-[#1e3a8a]/20 text-[var(--accent-text)] text-sm font-bold">
                     {p.nome.charAt(0)}{p.sobrenome.charAt(0)}
                   </AvatarFallback>
                 </Avatar>
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-medium text-[var(--text-primary)] truncate">{p.apelido ?? `${p.nome} ${p.sobrenome}`}</p>
-                  <p className="text-xs text-[#1e3a8a] font-semibold">{formatCurrency(p.saldo_total)}</p>
+                  <p className="text-xs text-[var(--accent-text)] font-semibold">{formatCurrency(p.saldo_total)}</p>
                 </div>
               </Link>
             ))}

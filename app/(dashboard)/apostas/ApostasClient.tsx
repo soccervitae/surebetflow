@@ -189,7 +189,7 @@ export default function ApostasClient({ apostas: initialApostas, profiles }: Pro
                             </span>
                             <span>{leg.resultado_apostado}</span>
                             <span className="font-medium">@{leg.odd}</span>
-                            <span className="text-[#1e3a8a]">{formatCurrency(leg.stake)}</span>
+                            <span className="text-[var(--accent-text)]">{formatCurrency(leg.stake)}</span>
                           </div>
                         ))}
                       </div>
@@ -206,7 +206,7 @@ export default function ApostasClient({ apostas: initialApostas, profiles }: Pro
                     {aposta.status === "finalizada" ? (
                       <>
                         <p className="text-xs text-[var(--text-muted)]">Resultado real</p>
-                        <p className="text-base font-bold text-[#1e3a8a]">{formatCurrency(aposta.resultado_real ?? 0)}</p>
+                        <p className="text-base font-bold text-[var(--accent-text)]">{formatCurrency(aposta.resultado_real ?? 0)}</p>
                         {aposta.finalizada_at && (
                           <p className="text-xs text-[var(--text-muted)]">{new Date(aposta.finalizada_at).toLocaleDateString("pt-BR")}</p>
                         )}

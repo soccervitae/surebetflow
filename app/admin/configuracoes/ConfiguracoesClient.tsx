@@ -72,7 +72,7 @@ export default function ConfiguracoesClient({ settings: initial }: { settings: R
 
       <div className="bg-gray-900 border border-gray-800 rounded-xl p-6">
         <div className="flex items-center gap-2 mb-6">
-          <Settings className="w-5 h-5 text-[#1e3a8a]" />
+          <Settings className="w-5 h-5 text-[var(--accent-text)]" />
           <h2 className="font-semibold text-white">MercadoPago</h2>
           <span className="ml-auto text-xs text-gray-500 bg-gray-800 px-2 py-0.5 rounded-full">Checkout Transparente</span>
         </div>

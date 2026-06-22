@@ -88,7 +88,7 @@ function VerificarEmailContent() {
       <div className="flex items-center justify-center w-14 h-14 bg-[#1e3a8a]/20 rounded-2xl mx-auto mb-5">
         {success
           ? <CheckCircle className="w-7 h-7 text-green-400" />
-          : <Mail className="w-7 h-7 text-[#1e3a8a]" />
+          : <Mail className="w-7 h-7 text-[var(--accent-text)]" />
         }
       </div>
 
@@ -143,7 +143,7 @@ function VerificarEmailContent() {
               <button
                 onClick={handleResend}
                 disabled={resending}
-                className="text-sm text-[#1e3a8a] hover:underline font-medium flex items-center gap-1.5 mx-auto disabled:opacity-50"
+                className="text-sm text-[var(--accent-text)] hover:underline font-medium flex items-center gap-1.5 mx-auto disabled:opacity-50"
               >
                 <RefreshCw className={`w-3.5 h-3.5 ${resending ? "animate-spin" : ""}`} />
                 {resending ? "Enviando..." : "Reenviar código"}
