@@ -30,6 +30,7 @@ export default function FinanceiroPage() {
   const [profileBets, setProfileBets] = useState<(ProfileBet & { bet: Bet })[]>([])
   const [movimentacoes, setMovimentacoes] = useState<Movimentacao[]>([])
   const [showForm, setShowForm] = useState(false)
+  const [showFilter, setShowFilter] = useState(false)
 
   // Filters
   const [filterPeriodo, setFilterPeriodo] = useState<Periodo>("mes")
@@ -190,9 +191,9 @@ export default function FinanceiroPage() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between gap-2">
         <div className="flex items-center gap-3">
-          <div className="w-9 h-9 bg-[#2563EB]/10 rounded-xl flex items-center justify-center">
+          <div className="w-9 h-9 bg-[#2563EB]/10 rounded-xl flex items-center justify-center flex-shrink-0">
             <Wallet className="w-5 h-5 text-[#2563EB]" />
           </div>
           <div>
@@ -200,9 +201,24 @@ export default function FinanceiroPage() {
             <p className="text-sm text-[var(--text-secondary)]">Depósitos e saques por perfil</p>
           </div>
         </div>
-        <Button onClick={() => setShowForm(!showForm)} className="bg-[#1e3a8a] hover:bg-[#1e40af] text-white gap-2">
-          <Plus className="w-4 h-4" /> Nova Movimentação
-        </Button>
+        <div className="flex items-center gap-2 flex-shrink-0">
+          <button
+            onClick={() => setShowFilter(v => !v)}
+            className={`md:hidden flex items-center gap-1.5 px-3 py-2 rounded-xl border text-sm font-medium transition-colors ${
+              showFilter
+                ? "bg-[#1e3a8a]/10 border-[#1e3a8a]/30 text-[var(--accent-text)]"
+                : "border-[var(--border)] text-[var(--text-secondary)] hover:bg-[var(--bg-elevated)]"
+            }`}
+          >
+            {showFilter ? <X className="w-4 h-4" /> : <SlidersHorizontal className="w-4 h-4" />}
+            <span className="hidden sm:inline">Filtrar</span>
+          </button>
+          <Button onClick={() => setShowForm(!showForm)} className="bg-[#1e3a8a] hover:bg-[#1e40af] text-white gap-2">
+            <Plus className="w-4 h-4" />
+            <span className="hidden sm:inline">Nova Movimentação</span>
+            <span className="sm:hidden">Nova</span>
+          </Button>
+        </div>
       </div>
 
       {/* Form */}
@@ -268,7 +284,8 @@ export default function FinanceiroPage() {
         </Card>
       )}
 
-      {/* Filtros */}
+      {/* Filtros — sempre visível no desktop, toggle no mobile */}
+      <div className={`${showFilter ? "block" : "hidden"} md:block`}>
       <Card>
         <CardContent className="p-4 space-y-4">
           <div className="flex items-center justify-between">
@@ -371,9 +388,10 @@ export default function FinanceiroPage() {
           </div>
         </CardContent>
       </Card>
+      </div>
 
       {/* Resumo */}
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
         <Card>
           <CardContent className="p-4">
             <div className="flex items-center gap-2 mb-1">
