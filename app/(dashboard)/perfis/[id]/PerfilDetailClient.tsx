@@ -235,6 +235,8 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
     setFinalizando(false)
   }
 
+  const [activeTab, setActiveTab] = useState("dashboard")
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -297,11 +299,34 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
         </div>
       </div>
 
-      <Tabs defaultValue="dashboard">
-        <TabsList className="w-full sm:w-auto">
+      <Tabs value={activeTab} onValueChange={v => { setActiveTab(v); if (v === "financeiro" && !movLoaded) loadMovimentacoes() }}>
+        {/* Mobile: scrollable underline tabs */}
+        <div className="-mx-4 md:hidden">
+          <div className="flex overflow-x-auto scrollbar-hide px-4 border-b border-[var(--border)]">
+            {[
+              { value: "dashboard", label: "Dashboard" },
+              { value: "casas", label: "Bets" },
+              { value: "financeiro", label: "Financeiro" },
+            ].map(tab => (
+              <button
+                key={tab.value}
+                onClick={() => { setActiveTab(tab.value); if (tab.value === "financeiro" && !movLoaded) loadMovimentacoes() }}
+                className={`whitespace-nowrap flex-shrink-0 px-4 py-3 text-sm font-medium border-b-2 -mb-px transition-colors ${
+                  activeTab === tab.value
+                    ? "border-[#1e3a8a] text-[var(--accent-text)]"
+                    : "border-transparent text-[var(--text-secondary)]"
+                }`}
+              >
+                {tab.label}
+              </button>
+            ))}
+          </div>
+        </div>
+        {/* Desktop: pill tabs */}
+        <TabsList className="hidden md:flex w-auto">
           <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
           <TabsTrigger value="casas">Bets</TabsTrigger>
-          <TabsTrigger value="financeiro" onClick={() => { if (!movLoaded) loadMovimentacoes() }}>Financeiro</TabsTrigger>
+          <TabsTrigger value="financeiro">Financeiro</TabsTrigger>
         </TabsList>
 
         {/* Dashboard Tab */}
@@ -503,18 +528,14 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
         </TabsContent>
 
         {/* Casas Tab */}
-        <TabsContent value="casas">
-          <Card>
-            <CardContent className="p-6">
-              <AddBetToProfile profileId={profile.id} userToken={userToken} />
-            </CardContent>
-          </Card>
+        <TabsContent value="casas" className="overflow-hidden">
+          <AddBetToProfile profileId={profile.id} userToken={userToken} />
         </TabsContent>
 
         {/* Financeiro Tab */}
         <TabsContent value="financeiro" className="space-y-4">
           {/* Summary cards */}
-          <div className="grid grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <Card>
               <CardContent className="p-4">
                 <p className="text-xs text-[var(--text-secondary)] mb-1">Depositado</p>
