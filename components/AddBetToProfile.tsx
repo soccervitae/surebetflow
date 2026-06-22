@@ -104,7 +104,7 @@ export default function AddBetToProfile({ profileId }: Props) {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <h3 className="font-medium text-gray-900">Casas de Apostas</h3>
+        <h3 className="font-medium text-[var(--text-primary)]">Casas de Apostas</h3>
         <Button size="sm" onClick={() => { setShowForm(v => !v); setSelectedBet(""); setEmail(""); setSenha(""); setSaldo("") }}>
           <Plus className="h-4 w-4 mr-1" />
           Adicionar
@@ -146,7 +146,7 @@ export default function AddBetToProfile({ profileId }: Props) {
                   <button
                     type="button"
                     onClick={() => setShowSenha(v => !v)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors"
                     tabIndex={-1}
                   >
                     {showSenha ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
@@ -177,7 +177,7 @@ export default function AddBetToProfile({ profileId }: Props) {
       )}
 
       {profileBets.length === 0 ? (
-        <p className="text-sm text-gray-500 text-center py-6">Nenhuma casa de apostas adicionada</p>
+        <p className="text-sm text-[var(--text-secondary)] text-center py-6">Nenhuma casa de apostas adicionada</p>
       ) : (
         <div className="space-y-3">
           {profileBets.map(pb => (
@@ -186,12 +186,12 @@ export default function AddBetToProfile({ profileId }: Props) {
                 <div className="flex items-center justify-between gap-3">
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 flex-wrap">
-                      <p className="font-medium text-gray-900">{pb.bet?.nome ?? "Casa"}</p>
+                      <p className="font-medium text-[var(--text-primary)]">{pb.bet?.nome ?? "Casa"}</p>
                       <Badge variant="blue">{formatCurrency(pb.saldo)}</Badge>
                     </div>
-                    <p className="text-sm text-gray-500 truncate mt-0.5">{pb.email}</p>
+                    <p className="text-sm text-[var(--text-secondary)] truncate mt-0.5">{pb.email}</p>
                     {revealedPasswords[pb.id] && (
-                      <p className="text-sm font-mono bg-gray-100 rounded px-2 py-1 mt-2 text-gray-700 break-all">
+                      <p className="text-sm font-mono bg-[var(--bg-elevated)] rounded px-2 py-1 mt-2 text-[var(--text-primary)] break-all">
                         {pb.senha_encrypted}
                       </p>
                     )}
