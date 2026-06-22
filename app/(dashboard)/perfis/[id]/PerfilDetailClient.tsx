@@ -307,54 +307,54 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
         {/* Dashboard Tab */}
         <TabsContent value="dashboard" className="space-y-6">
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-            <Card>
-              <CardContent className="p-5">
-                <div className="flex items-center gap-3">
-                  <div className="p-2 bg-[#2563EB]/10 rounded-lg">
-                    <DollarSign className="h-5 w-5 text-[#2563EB]" />
+            <Card className="overflow-hidden">
+              <CardContent className="p-4">
+                <div className="flex items-center gap-2 min-w-0">
+                  <div className="p-2 bg-[#2563EB]/10 rounded-lg flex-shrink-0">
+                    <DollarSign className="h-4 w-4 text-[#2563EB]" />
                   </div>
-                  <div className="min-w-0">
-                    <p className="text-xs text-[var(--text-secondary)]">Saldo Total</p>
-                    <p className="text-base font-bold text-[var(--text-primary)] truncate">{formatCurrency(dashboard?.saldo_total ?? 0)}</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardContent className="p-5">
-                <div className="flex items-center gap-3">
-                  <div className="p-2 bg-[#1e3a8a]/10 rounded-lg">
-                    <TrendingUp className="h-5 w-5 text-[var(--accent-text)]" />
-                  </div>
-                  <div className="min-w-0">
-                    <p className="text-xs text-[var(--text-secondary)]">Lucro Realizado</p>
-                    <p className="text-base font-bold text-[var(--accent-text)] truncate">{formatCurrency(dashboard?.lucro_realizado ?? 0)}</p>
+                  <div className="min-w-0 flex-1">
+                    <p className="text-xs text-[var(--text-secondary)] truncate">Saldo Total</p>
+                    <p className="text-sm font-bold text-[var(--text-primary)] truncate">{formatCurrency(dashboard?.saldo_total ?? 0)}</p>
                   </div>
                 </div>
               </CardContent>
             </Card>
-            <Card>
-              <CardContent className="p-5">
-                <div className="flex items-center gap-3">
-                  <div className="p-2 bg-[#D97706]/10 rounded-lg">
-                    <Clock className="h-5 w-5 text-[#D97706]" />
+            <Card className="overflow-hidden">
+              <CardContent className="p-4">
+                <div className="flex items-center gap-2 min-w-0">
+                  <div className="p-2 bg-[#1e3a8a]/10 rounded-lg flex-shrink-0">
+                    <TrendingUp className="h-4 w-4 text-[var(--accent-text)]" />
                   </div>
-                  <div className="min-w-0">
-                    <p className="text-xs text-[var(--text-secondary)]">Lucro Pendente</p>
-                    <p className="text-base font-bold text-[#D97706] truncate">{formatCurrency(dashboard?.lucro_pendente ?? 0)}</p>
+                  <div className="min-w-0 flex-1">
+                    <p className="text-xs text-[var(--text-secondary)] truncate">Lucro Realizado</p>
+                    <p className="text-sm font-bold text-[var(--accent-text)] truncate">{formatCurrency(dashboard?.lucro_realizado ?? 0)}</p>
                   </div>
                 </div>
               </CardContent>
             </Card>
-            <Card>
-              <CardContent className="p-5">
-                <div className="flex items-center gap-3">
-                  <div className="p-2 bg-[#7C3AED]/10 rounded-lg">
-                    <ArrowUpRight className="h-5 w-5 text-[#7C3AED]" />
+            <Card className="overflow-hidden">
+              <CardContent className="p-4">
+                <div className="flex items-center gap-2 min-w-0">
+                  <div className="p-2 bg-[#D97706]/10 rounded-lg flex-shrink-0">
+                    <Clock className="h-4 w-4 text-[#D97706]" />
                   </div>
-                  <div className="min-w-0">
-                    <p className="text-xs text-[var(--text-secondary)]">ROI</p>
-                    <p className="text-base font-bold text-[#7C3AED] truncate">{(dashboard?.roi_percentual ?? 0).toFixed(2)}%</p>
+                  <div className="min-w-0 flex-1">
+                    <p className="text-xs text-[var(--text-secondary)] truncate">Lucro Pendente</p>
+                    <p className="text-sm font-bold text-[#D97706] truncate">{formatCurrency(dashboard?.lucro_pendente ?? 0)}</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+            <Card className="overflow-hidden">
+              <CardContent className="p-4">
+                <div className="flex items-center gap-2 min-w-0">
+                  <div className="p-2 bg-[#7C3AED]/10 rounded-lg flex-shrink-0">
+                    <ArrowUpRight className="h-4 w-4 text-[#7C3AED]" />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="text-xs text-[var(--text-secondary)] truncate">ROI</p>
+                    <p className="text-sm font-bold text-[#7C3AED] truncate">{(dashboard?.roi_percentual ?? 0).toFixed(2)}%</p>
                   </div>
                 </div>
               </CardContent>
