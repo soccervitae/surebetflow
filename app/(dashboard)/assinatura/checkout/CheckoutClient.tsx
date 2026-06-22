@@ -4,7 +4,6 @@ import { useEffect, useRef, useState } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { ArrowLeft, ShieldCheck, Lock, CheckCircle, Loader2, QrCode, CreditCard, Copy } from "lucide-react"
-import Image from "next/image"
 
 const PRO_FEATURES = [
   "Perfis ilimitados de apostador",
@@ -279,9 +278,8 @@ export default function CheckoutClient({ publicKey, userEmail }: { publicKey: st
 
                   {pixQrImg ? (
                     <div className="flex justify-center mb-4">
-                      <div className="bg-white p-3 rounded-2xl inline-block">
-                        <Image src={pixQrImg} alt="QR Code PIX" width={200} height={200} />
-                      </div>
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img src={pixQrImg} alt="QR Code PIX" className="bg-white p-3 rounded-2xl w-52 h-52" />
                     </div>
                   ) : (
                     <div className="bg-white/5 border border-[var(--border)] rounded-2xl p-6 mb-4 flex items-center justify-center">
