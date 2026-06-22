@@ -79,13 +79,14 @@ export default function ApostaDetailClient({ aposta: initial }: { aposta: Aposta
   const totalInvestido = aposta.investimento_total
 
   function calcGreenRed(winnerLegId: string) {
+    // GREEN: lucro nessa casa = retorno - stake (o que você ganhou lá)
+    // RED: perda nessa casa = -stake (o que você perdeu lá)
+    // Soma de todos = stake_green * odd_green - Σstakes = stake_green * odd_green - totalInvestido ✓
     return legs.map(leg => {
       if (leg.id === winnerLegId) {
-        const retorno = leg.stake * leg.odd
-        const lucro = retorno - totalInvestido
-        return { leg, tipo: "green" as const, valor: lucro, retorno }
+        return { leg, tipo: "green" as const, valor: leg.stake * (leg.odd - 1) }
       } else {
-        return { leg, tipo: "red" as const, valor: -leg.stake, retorno: 0 }
+        return { leg, tipo: "red" as const, valor: -leg.stake }
       }
     })
   }
