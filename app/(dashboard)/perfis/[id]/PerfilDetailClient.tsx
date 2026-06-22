@@ -16,7 +16,7 @@ import AddBetToProfile from "@/components/AddBetToProfile"
 import { formatCurrency } from "@/lib/utils"
 import { useToast } from "@/hooks/useToast"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { ArrowLeft, DollarSign, TrendingUp, Clock, ArrowUpRight, Pencil, Calculator, ArrowDownCircle, ArrowUpCircle } from "lucide-react"
+import { DollarSign, TrendingUp, Clock, ArrowUpRight, Pencil, Calculator, ArrowDownCircle, ArrowUpCircle } from "lucide-react"
 import SurebetCalculator from "@/components/SurebetCalculator"
 import type { Profile, ProfileDashboard, Aposta, MovimentacaoFinanceira, ProfileBet } from "@/lib/types"
 
@@ -240,11 +240,6 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
       {/* Header */}
       <div className="space-y-3">
         <div className="flex items-center gap-3">
-          <Link href="/perfis">
-            <Button variant="ghost" size="icon" className="flex-shrink-0">
-              <ArrowLeft className="h-5 w-5" />
-            </Button>
-          </Link>
           <div className="flex items-center gap-3 flex-1 min-w-0">
             <Avatar className="h-10 w-10 flex-shrink-0">
               {currentProfile.foto_url && <AvatarImage src={currentProfile.foto_url} />}
