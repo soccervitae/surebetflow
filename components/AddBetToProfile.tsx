@@ -18,9 +18,11 @@ interface Props {
   userToken?: string
 }
 
+type ProfileBetWithBet = ProfileBet & { bet?: { nome: string }; ativo: boolean }
+
 export default function AddBetToProfile({ profileId }: Props) {
   const [bets, setBets] = useState<Bet[]>([])
-  const [profileBets, setProfileBets] = useState<(ProfileBet & { bet?: { nome: string } })[]>([])
+  const [profileBets, setProfileBets] = useState<ProfileBetWithBet[]>([])
   const [showForm, setShowForm] = useState(false)
   const [selectedBet, setSelectedBet] = useState("")
   const [email, setEmail] = useState("")
@@ -30,6 +32,10 @@ export default function AddBetToProfile({ profileId }: Props) {
   const [revealedPasswords, setRevealedPasswords] = useState<Record<string, boolean>>({})
   const [betSearch, setBetSearch] = useState("")
   const [betDropdownOpen, setBetDropdownOpen] = useState(false)
+  const [deletarDialog, setDeletarDialog] = useState<ProfileBetWithBet | null>(null)
+  const [deletando, setDeletando] = useState(false)
+  const [ativoDialog, setAtivoDialog] = useState<ProfileBetWithBet | null>(null)
+  const [togglingAtivo, setTogglingAtivo] = useState(false)
   const betSearchRef = useRef<HTMLInputElement>(null)
   const { toast } = useToast()
   const supabase = createClient()
@@ -40,7 +46,7 @@ export default function AddBetToProfile({ profileId }: Props) {
       supabase.from("profile_bets").select("*, bet:bets(nome)").eq("profile_id", profileId),
     ])
     if (betsRes.data) setBets(betsRes.data)
-    if (pbRes.data) setProfileBets(pbRes.data as (ProfileBet & { bet?: { nome: string } })[])
+    if (pbRes.data) setProfileBets(pbRes.data as ProfileBetWithBet[])
   }, [profileId, supabase])
 
   useEffect(() => {
@@ -81,14 +87,36 @@ export default function AddBetToProfile({ profileId }: Props) {
     }
   }
 
-  async function handleDelete(id: string) {
-    const { error } = await supabase.from("profile_bets").delete().eq("id", id)
+  async function handleDelete() {
+    if (!deletarDialog) return
+    setDeletando(true)
+    const { error } = await supabase.from("profile_bets").delete().eq("id", deletarDialog.id)
     if (error) {
       toast({ title: "Erro ao remover", variant: "destructive" })
     } else {
-      setProfileBets(prev => prev.filter(pb => pb.id !== id))
+      setProfileBets(prev => prev.filter(pb => pb.id !== deletarDialog.id))
       toast({ title: "Casa de apostas removida" })
+      setDeletarDialog(null)
     }
+    setDeletando(false)
+  }
+
+  async function handleToggleAtivo() {
+    if (!ativoDialog) return
+    setTogglingAtivo(true)
+    const novoAtivo = !ativoDialog.ativo
+    const { error } = await supabase
+      .from("profile_bets")
+      .update({ ativo: novoAtivo })
+      .eq("id", ativoDialog.id)
+    if (error) {
+      toast({ title: "Erro ao atualizar status", variant: "destructive" })
+    } else {
+      setProfileBets(prev => prev.map(pb => pb.id === ativoDialog.id ? { ...pb, ativo: novoAtivo } : pb))
+      toast({ title: novoAtivo ? "Casa ativada" : "Casa desativada" })
+      setAtivoDialog(null)
+    }
+    setTogglingAtivo(false)
   }
 
   return (
@@ -101,6 +129,7 @@ export default function AddBetToProfile({ profileId }: Props) {
         </Button>
       </div>
 
+      {/* Dialog Adicionar */}
       <Dialog open={showForm} onOpenChange={open => { if (!open) { setShowForm(false); setSelectedBet(""); setEmail(""); setSenha(""); setBetSearch(""); setBetDropdownOpen(false) } }}>
         <DialogContent>
           <DialogHeader>
@@ -110,7 +139,6 @@ export default function AddBetToProfile({ profileId }: Props) {
             <div className="space-y-2">
               <Label>Casa de Apostas *</Label>
               <div className="relative">
-                {/* Selected display / search input */}
                 {selectedBet && !betDropdownOpen ? (
                   <div className="flex items-center justify-between h-10 px-3 rounded-md border border-[var(--border)] bg-[var(--bg-surface)]">
                     <span className="text-sm text-[var(--text-primary)]">
@@ -139,7 +167,6 @@ export default function AddBetToProfile({ profileId }: Props) {
                   </div>
                 )}
 
-                {/* Dropdown list */}
                 {betDropdownOpen && (
                   <div className="absolute z-50 mt-1 w-full max-h-52 overflow-y-auto rounded-md border border-[var(--border)] bg-[var(--bg-surface)] shadow-lg">
                     {bets.filter(b => b.nome.toLowerCase().includes(betSearch.toLowerCase())).length === 0 ? (
@@ -197,18 +224,63 @@ export default function AddBetToProfile({ profileId }: Props) {
         </DialogContent>
       </Dialog>
 
+      {/* Dialog Deletar */}
+      <Dialog open={!!deletarDialog} onOpenChange={open => !open && setDeletarDialog(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Remover Casa de Apostas</DialogTitle>
+          </DialogHeader>
+          <p className="text-sm text-[var(--text-secondary)]">
+            Tem certeza que deseja remover <strong className="text-[var(--text-primary)]">{deletarDialog?.bet?.nome}</strong>? Esta ação não pode ser desfeita.
+          </p>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setDeletarDialog(null)}>Cancelar</Button>
+            <Button variant="destructive" onClick={handleDelete} disabled={deletando}>
+              {deletando ? "Removendo..." : "Remover"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Dialog Ativo/Inativo */}
+      <Dialog open={!!ativoDialog} onOpenChange={open => !open && setAtivoDialog(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{ativoDialog?.ativo ? "Desativar" : "Ativar"} Casa de Apostas</DialogTitle>
+          </DialogHeader>
+          <p className="text-sm text-[var(--text-secondary)]">
+            Tem certeza que deseja {ativoDialog?.ativo ? "desativar" : "ativar"} a casa{" "}
+            <strong className="text-[var(--text-primary)]">{ativoDialog?.bet?.nome}</strong>?
+          </p>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setAtivoDialog(null)}>Cancelar</Button>
+            <Button
+              onClick={handleToggleAtivo}
+              disabled={togglingAtivo}
+              className={ativoDialog?.ativo ? "bg-[#DC2626] hover:bg-[#B91C1C] text-white" : "bg-[#16A34A] hover:bg-[#15803D] text-white"}
+            >
+              {togglingAtivo ? "Salvando..." : ativoDialog?.ativo ? "Desativar" : "Ativar"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
       {profileBets.length === 0 ? (
         <p className="text-sm text-[var(--text-secondary)] text-center py-6">Nenhuma casa de apostas adicionada</p>
       ) : (
         <div className="space-y-3">
           {profileBets.map(pb => (
-            <Card key={pb.id}>
+            <Card key={pb.id} className={!pb.ativo ? "opacity-60" : ""}>
               <CardContent className="p-4">
                 <div className="flex items-center justify-between gap-3">
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 flex-wrap">
                       <p className="font-medium text-[var(--text-primary)]">{pb.bet?.nome ?? "Casa"}</p>
                       <Badge variant="blue">{formatCurrency(pb.saldo)}</Badge>
+                      <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium ${pb.ativo ? "bg-green-500/10 text-green-600" : "bg-red-500/10 text-red-500"}`}>
+                        <span className={`w-1.5 h-1.5 rounded-full ${pb.ativo ? "bg-green-500" : "bg-red-500"}`} />
+                        {pb.ativo ? "Ativa" : "Inativa"}
+                      </span>
                     </div>
                     <p className="text-sm text-[var(--text-secondary)] truncate mt-0.5">{pb.email}</p>
                     {revealedPasswords[pb.id] && (
@@ -233,8 +305,16 @@ export default function AddBetToProfile({ profileId }: Props) {
                     <Button
                       variant="outline"
                       size="sm"
-                      onClick={() => handleDelete(pb.id)}
-                      className="text-red-500 hover:text-red-600"
+                      onClick={() => setAtivoDialog(pb)}
+                      className={pb.ativo ? "text-orange-500 hover:text-orange-600 hover:bg-orange-50" : "text-green-600 hover:text-green-700 hover:bg-green-50"}
+                    >
+                      {pb.ativo ? "Desativar" : "Ativar"}
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setDeletarDialog(pb)}
+                      className="text-red-500 hover:text-red-600 hover:bg-red-50"
                     >
                       <Trash2 className="h-4 w-4" />
                     </Button>
