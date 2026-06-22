@@ -35,6 +35,7 @@ export default function AddBetToProfile({ profileId }: Props) {
   const [betDropdownOpen, setBetDropdownOpen] = useState(false)
   const [deletarDialog, setDeletarDialog] = useState<ProfileBetWithBet | null>(null)
   const [deletando, setDeletando] = useState(false)
+  const [saldoNaoZeradoDialog, setSaldoNaoZeradoDialog] = useState<ProfileBetWithBet | null>(null)
   const [ativoDialog, setAtivoDialog] = useState<ProfileBetWithBet | null>(null)
   const [togglingAtivo, setTogglingAtivo] = useState(false)
   // Movimentação
@@ -104,6 +105,11 @@ export default function AddBetToProfile({ profileId }: Props) {
 
   async function handleDelete() {
     if (!deletarDialog) return
+    if (deletarDialog.saldo !== 0) {
+      setDeletarDialog(null)
+      setSaldoNaoZeradoDialog(deletarDialog)
+      return
+    }
     setDeletando(true)
     const { error } = await supabase.from("profile_bets").delete().eq("id", deletarDialog.id)
     if (error) {
@@ -311,6 +317,23 @@ export default function AddBetToProfile({ profileId }: Props) {
             <Button variant="destructive" onClick={handleDelete} disabled={deletando}>
               {deletando ? "Removendo..." : "Remover"}
             </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Dialog Saldo não zerado */}
+      <Dialog open={!!saldoNaoZeradoDialog} onOpenChange={open => !open && setSaldoNaoZeradoDialog(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Não é possível remover</DialogTitle>
+          </DialogHeader>
+          <p className="text-sm text-[var(--text-secondary)]">
+            A casa <strong className="text-[var(--text-primary)]">{saldoNaoZeradoDialog?.bet?.nome}</strong> ainda possui saldo de{" "}
+            <strong className="text-[var(--text-primary)]">{formatCurrency(saldoNaoZeradoDialog?.saldo ?? 0)}</strong>.
+            Realize um saque para zerar o saldo antes de remover a casa de apostas.
+          </p>
+          <DialogFooter>
+            <Button onClick={() => setSaldoNaoZeradoDialog(null)}>Entendido</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
