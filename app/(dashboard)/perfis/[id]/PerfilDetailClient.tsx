@@ -37,6 +37,7 @@ function statusBadge(status: string) {
 export default function PerfilDetailClient({ profile, dashboard, apostas, userToken }: Props) {
   const [currentProfile, setCurrentProfile] = useState(profile)
   const [togglingAtivo, setTogglingAtivo] = useState(false)
+  const [confirmAtivoOpen, setConfirmAtivoOpen] = useState(false)
   const [currentApostas, setCurrentApostas] = useState(apostas)
   const [showCalculadora, setShowCalculadora] = useState(false)
   const [finalizarDialog, setFinalizarDialog] = useState<Aposta | null>(null)
@@ -251,15 +252,14 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
           <Button
             variant="outline"
             size="sm"
-            onClick={handleToggleAtivo}
-            disabled={togglingAtivo}
+            onClick={() => setConfirmAtivoOpen(true)}
             className={currentProfile.ativo
               ? "text-[#16A34A] border-[#16A34A]/40 hover:bg-[#16A34A]/5"
               : "text-[#DC2626] border-[#DC2626]/40 hover:bg-[#DC2626]/5"
             }
           >
             <span className={`w-2 h-2 rounded-full mr-2 ${currentProfile.ativo ? "bg-[#16A34A]" : "bg-[#DC2626]"}`} />
-            {togglingAtivo ? "..." : currentProfile.ativo ? "Ativo" : "Inativo"}
+            {currentProfile.ativo ? "Ativo" : "Inativo"}
           </Button>
           <Link href={`/perfis/${profile.id}/editar`}>
             <Button variant="outline" size="sm">
@@ -569,6 +569,35 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
         </TabsContent>
 
       </Tabs>
+
+      {/* Confirmar Ativo/Inativo Dialog */}
+      <Dialog open={confirmAtivoOpen} onOpenChange={setConfirmAtivoOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>
+              {currentProfile.ativo ? "Desativar perfil?" : "Ativar perfil?"}
+            </DialogTitle>
+          </DialogHeader>
+          <p className="text-sm text-[var(--text-secondary)]">
+            {currentProfile.ativo
+              ? `O perfil "${currentProfile.apelido ?? `${currentProfile.nome} ${currentProfile.sobrenome}`}" será marcado como inativo. Ele não será excluído e pode ser reativado a qualquer momento.`
+              : `O perfil "${currentProfile.apelido ?? `${currentProfile.nome} ${currentProfile.sobrenome}`}" será marcado como ativo novamente.`}
+          </p>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setConfirmAtivoOpen(false)}>Cancelar</Button>
+            <Button
+              disabled={togglingAtivo}
+              className={currentProfile.ativo ? "bg-[#DC2626] hover:bg-red-700" : "bg-[#16A34A] hover:bg-[#15803D]"}
+              onClick={async () => {
+                await handleToggleAtivo()
+                setConfirmAtivoOpen(false)
+              }}
+            >
+              {togglingAtivo ? "Salvando..." : currentProfile.ativo ? "Desativar" : "Ativar"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       {/* Calculadora Dialog */}
       <Dialog open={showCalculadora} onOpenChange={setShowCalculadora}>
