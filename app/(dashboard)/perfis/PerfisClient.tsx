@@ -140,7 +140,6 @@ export default function PerfisClient({ profiles: initialProfiles, userId }: Prop
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
           {profiles.map(profile => {
-            const count = apostaCounts[profile.id] ?? 0
             return (
               <Link key={profile.id} href={`/perfis/${profile.id}`}>
                 <Card className="hover:border-[#16A34A]/40 hover:bg-[#16A34A]/5 transition-all cursor-pointer">
