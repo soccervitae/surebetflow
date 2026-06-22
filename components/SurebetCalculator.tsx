@@ -114,7 +114,7 @@ export default function SurebetCalculator({ profiles, defaultProfileId, onSaved 
   const [tipo, setTipo] = useState<"2-way" | "3-way">("2-way")
   const [evento, setEvento] = useState("")
   const [esporte, setEsporte] = useState("")
-  const [investimentoTotal, setInvestimentoTotal] = useState("100")
+  const [investimentoTotal, setInvestimentoTotal] = useState("100,00")
   const [profileBets, setProfileBets] = useState<Record<string, ProfileBet[]>>({})
   const [saving, setSaving] = useState(false)
   const [legs, setLegs] = useState<Leg[]>([
@@ -160,6 +160,17 @@ export default function SurebetCalculator({ profiles, defaultProfileId, onSaved 
   useEffect(() => {
     loadProfileBets()
   }, [loadProfileBets])
+
+  function formatBRL(raw: string) {
+    const digits = raw.replace(/\D/g, "")
+    if (!digits) return ""
+    const num = parseInt(digits, 10) / 100
+    return num.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+  }
+
+  function parseBRL(v: string) {
+    return parseFloat(v.replace(/\./g, "").replace(",", ".")) || 0
+  }
 
   function updateLeg(index: number, field: keyof Leg, value: string) {
     setLegs(prev => prev.map((leg, i) => i === index ? { ...leg, [field]: value } : leg))
@@ -222,7 +233,7 @@ export default function SurebetCalculator({ profiles, defaultProfileId, onSaved 
   const impliedProbs = odds.map(o => o > 0 ? 1 / o : 0)
   const sumProbs = impliedProbs.reduce((a, b) => a + b, 0)
   const isArbitrage = sumProbs > 0 && sumProbs < 1
-  const investment = parseFloat(investimentoTotal) || 0
+  const investment = parseBRL(investimentoTotal)
 
   const stakes = isArbitrage && investment > 0
     ? impliedProbs.map(p => parseFloat(((p / sumProbs) * investment).toFixed(2)))
@@ -393,12 +404,10 @@ export default function SurebetCalculator({ profiles, defaultProfileId, onSaved 
             <div className="space-y-2">
               <Label>Investimento Total (R$)</Label>
               <Input
-                type="number"
-                min="1"
-                step="0.01"
+                inputMode="numeric"
                 value={investimentoTotal}
-                onChange={e => setInvestimentoTotal(e.target.value)}
-                placeholder="100"
+                onChange={e => setInvestimentoTotal(formatBRL(e.target.value))}
+                placeholder="0,00"
               />
             </div>
           </div>
@@ -455,16 +464,15 @@ export default function SurebetCalculator({ profiles, defaultProfileId, onSaved 
                 <div className="space-y-2">
                   <Label>Stake (R$)</Label>
                   <Input
-                    type="number"
-                    min="0.01"
-                    step="0.01"
-                    value={stakes[i] > 0 ? stakes[i].toFixed(2) : ""}
-                    placeholder="0.00"
+                    inputMode="numeric"
+                    value={stakes[i] > 0 ? stakes[i].toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : ""}
+                    placeholder="0,00"
                     onChange={e => {
-                      const newStake = parseFloat(e.target.value)
-                      if (!isNaN(newStake) && newStake > 0 && impliedProbs[i] > 0 && sumProbs > 0) {
+                      const formatted = formatBRL(e.target.value)
+                      const newStake = parseBRL(formatted)
+                      if (newStake > 0 && impliedProbs[i] > 0 && sumProbs > 0) {
                         const newInvestment = (newStake * sumProbs) / impliedProbs[i]
-                        setInvestimentoTotal(newInvestment.toFixed(2))
+                        setInvestimentoTotal(newInvestment.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 }))
                       }
                     }}
                   />
