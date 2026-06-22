@@ -51,6 +51,7 @@ export interface Aposta {
   id: string
   profile_id: string
   evento: string
+  esporte?: string | null
   tipo: ApostaTipo
   investimento_total: number
   lucro_garantido: number

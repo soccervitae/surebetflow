@@ -34,7 +34,7 @@ interface ParsedLeg {
   odd: string
 }
 
-function parseSurebetText(text: string): { event: string; legs: ParsedLeg[] } {
+function parseSurebetText(text: string): { event: string; sport: string; legs: ParsedLeg[] } {
   const lines = text.split("\n").map(l => l.trim())
 
   // Find odd lines: standalone decimal number > 1.01
@@ -47,6 +47,7 @@ function parseSurebetText(text: string): { event: string; legs: ParsedLeg[] } {
   }
 
   let event = ""
+  let sport = ""
   const parsedLegs: ParsedLeg[] = []
 
   for (const oddIdx of oddIndices) {
@@ -54,6 +55,7 @@ function parseSurebetText(text: string): { event: string; legs: ParsedLeg[] } {
     let bookmaker = ""
     let market = ""
     let foundEvent = ""
+    let foundSport = ""
 
     // Scan backwards from the odd line
     for (let k = lookback.length - 1; k >= 0; k--) {
@@ -68,11 +70,15 @@ function parseSurebetText(text: string): { event: string; legs: ParsedLeg[] } {
         }
       }
 
-      // Event line: time\tTeams
+      // Sport+date line: "Futebol\t23/06" — first part is sport, no time pattern
       if (line.includes("\t")) {
         const parts = line.split("\t").map(p => p.trim())
         if (parts[0].match(/^\d{1,2}:\d{2}/) && parts[1]) {
+          // Event line: time\tTeams
           foundEvent = parts[1].replace(/[–—]/g, "x").replace(/\s+/g, " ").trim()
+        } else if (!parts[0].match(/^\d/) && parts[1]?.match(/^\d{1,2}\/\d{1,2}/)) {
+          // Sport\tDate pattern
+          foundSport = parts[0]
         }
       }
 
@@ -91,6 +97,7 @@ function parseSurebetText(text: string): { event: string; legs: ParsedLeg[] } {
     }
 
     if (!event && foundEvent) event = foundEvent
+    if (!sport && foundSport) sport = foundSport
 
     parsedLegs.push({
       bookmakerName: bookmaker,
@@ -99,13 +106,14 @@ function parseSurebetText(text: string): { event: string; legs: ParsedLeg[] } {
     })
   }
 
-  return { event, legs: parsedLegs }
+  return { event, sport, legs: parsedLegs }
 }
 
 export default function SurebetCalculator({ profiles, defaultProfileId, onSaved }: Props) {
   const filteredProfiles = defaultProfileId ? profiles.filter(p => p.id === defaultProfileId) : profiles
   const [tipo, setTipo] = useState<"2-way" | "3-way">("2-way")
   const [evento, setEvento] = useState("")
+  const [esporte, setEsporte] = useState("")
   const [investimentoTotal, setInvestimentoTotal] = useState("100")
   const [profileBets, setProfileBets] = useState<Record<string, ProfileBet[]>>({})
   const [saving, setSaving] = useState(false)
@@ -160,15 +168,15 @@ export default function SurebetCalculator({ profiles, defaultProfileId, onSaved 
   function handleParsePaste() {
     if (!pasteText.trim()) return
 
-    const { event, legs: parsedLegs } = parseSurebetText(pasteText)
+    const { event, sport, legs: parsedLegs } = parseSurebetText(pasteText)
 
     if (parsedLegs.length < 2) {
       toast({ title: "Não foi possível identificar as apostas no texto colado", variant: "destructive" })
       return
     }
 
-    // Set event name
     if (event) setEvento(event)
+    if (sport) setEsporte(sport)
 
     // Set tipo based on number of legs
     const newTipo: "2-way" | "3-way" = parsedLegs.length >= 3 ? "3-way" : "2-way"
@@ -260,6 +268,7 @@ export default function SurebetCalculator({ profiles, defaultProfileId, onSaved 
         .insert({
           profile_id: profileId,
           evento: evento.trim(),
+          esporte: esporte.trim() || null,
           tipo,
           investimento_total: investment,
           lucro_garantido: parseFloat(lucroGarantido.toFixed(2)),
@@ -284,6 +293,7 @@ export default function SurebetCalculator({ profiles, defaultProfileId, onSaved 
 
       toast({ title: "Aposta salva com sucesso!" })
       setEvento("")
+      setEsporte("")
       setLegs(Array(numLegs).fill({ profileBetId: "", resultadoApostado: "", odd: "" }))
       onSaved?.()
     } catch (err: unknown) {
@@ -348,9 +358,26 @@ export default function SurebetCalculator({ profiles, defaultProfileId, onSaved 
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="space-y-2">
-            <Label>Evento</Label>
-            <Input value={evento} onChange={e => setEvento(e.target.value)} placeholder="Ex: Flamengo x Corinthians" />
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label>Esporte</Label>
+              <select
+                value={esporte}
+                onChange={e => setEsporte(e.target.value)}
+                className="w-full h-10 px-3 rounded-lg border border-[var(--border)] bg-[var(--bg-surface)] text-[var(--text-primary)] text-sm"
+              >
+                <option value="">Selecionar...</option>
+                {[
+                  "Futebol", "Tênis", "Basquete", "Vôlei", "Futebol Americano",
+                  "Hockey no Gelo", "Beisebol", "Handebol", "Rugby", "MMA/UFC",
+                  "Boxe", "Ciclismo", "Fórmula 1", "Outros",
+                ].map(s => <option key={s} value={s}>{s}</option>)}
+              </select>
+            </div>
+            <div className="space-y-2">
+              <Label>Evento</Label>
+              <Input value={evento} onChange={e => setEvento(e.target.value)} placeholder="Ex: Flamengo x Corinthians" />
+            </div>
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
