@@ -25,7 +25,7 @@ type PaymentMethod = "pix" | "card"
 export default function CheckoutClient({ publicKey, userEmail }: { publicKey: string; userEmail: string }) {
   const router = useRouter()
   const formRef = useRef<HTMLFormElement>(null)
-  const [method, setMethod] = useState<PaymentMethod>("card")
+  const [method, setMethod] = useState<PaymentMethod>("pix")
   const [mpReady, setMpReady] = useState(false)
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState("")
@@ -133,8 +133,8 @@ export default function CheckoutClient({ publicKey, userEmail }: { publicKey: st
   }
 
   const tabs: { id: PaymentMethod; label: string; icon: React.ElementType }[] = [
-    { id: "card", label: "Cartão", icon: CreditCard },
     { id: "pix",  label: "PIX",    icon: QrCode },
+    { id: "card", label: "Cartão", icon: CreditCard },
   ]
 
   return (
