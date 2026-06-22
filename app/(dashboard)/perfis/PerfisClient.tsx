@@ -7,7 +7,6 @@ import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { ProfileForm } from "@/components/ProfileForm"
-import { maskCPF, formatPhone } from "@/lib/utils"
 import { useToast } from "@/hooks/useToast"
 import { Plus, User } from "lucide-react"
 import type { Profile } from "@/lib/types"
@@ -67,14 +66,10 @@ export default function PerfisClient({ profiles: initialProfiles, userId }: Prop
                     </Avatar>
                     <div className="flex-1 min-w-0">
                       <h3 className="font-semibold text-[var(--text-primary)] truncate">
-                        {profile.nome} {profile.sobrenome}
+                        {profile.apelido || `${profile.nome} ${profile.sobrenome}`}
                       </h3>
-                      {profile.apelido && (
-                        <p className="text-sm text-[var(--text-secondary)] truncate">{profile.apelido}</p>
-                      )}
-                      <p className="text-xs text-[var(--text-muted)] mt-1">CPF: {maskCPF(profile.cpf)}</p>
-                      {profile.telefone && (
-                        <p className="text-xs text-[var(--text-muted)]">Tel: {formatPhone(profile.telefone)}</p>
+                      {profile.email && (
+                        <p className="text-sm text-[var(--text-secondary)] truncate">{profile.email}</p>
                       )}
                     </div>
                   </div>

@@ -7,6 +7,7 @@ export interface Profile {
   cpf: string
   telefone?: string | null
   whatsapp?: string | null
+  email?: string | null
   foto_url?: string | null
   created_at: string
   updated_at: string

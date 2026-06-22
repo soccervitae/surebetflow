@@ -20,6 +20,7 @@ export function ProfileForm({ profile, onSuccess, userId }: ProfileFormProps) {
   const [nome, setNome] = useState(profile?.nome ?? "")
   const [sobrenome, setSobrenome] = useState(profile?.sobrenome ?? "")
   const [apelido, setApelido] = useState(profile?.apelido ?? "")
+  const [email, setEmail] = useState(profile?.email ?? "")
   const [cpf, setCpf] = useState(profile?.cpf ? formatCPF(profile.cpf) : "")
   const [telefone, setTelefone] = useState(profile?.telefone ? formatPhone(profile.telefone) : "")
   const [whatsapp, setWhatsapp] = useState(profile?.whatsapp ? formatPhone(profile.whatsapp) : "")
@@ -109,6 +110,7 @@ export function ProfileForm({ profile, onSuccess, userId }: ProfileFormProps) {
             nome: nome.trim(),
             sobrenome: sobrenome.trim(),
             apelido: apelido.trim() || null,
+            email: email.trim() || null,
             cpf: cpfDigits,
             telefone: telefoneDigits,
             whatsapp: whatsappDigits,
@@ -128,6 +130,7 @@ export function ProfileForm({ profile, onSuccess, userId }: ProfileFormProps) {
             nome: nome.trim(),
             sobrenome: sobrenome.trim(),
             apelido: apelido.trim() || null,
+            email: email.trim() || null,
             cpf: cpfDigits,
             telefone: telefoneDigits,
             whatsapp: whatsappDigits,
@@ -176,6 +179,11 @@ export function ProfileForm({ profile, onSuccess, userId }: ProfileFormProps) {
       <div className="space-y-2">
         <Label htmlFor="apelido">Apelido (opcional)</Label>
         <Input id="apelido" value={apelido} onChange={e => setApelido(e.target.value)} placeholder="Ex: Perfil Principal" />
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="email">E-mail (opcional)</Label>
+        <Input id="email" type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="email@exemplo.com" autoComplete="off" />
       </div>
 
       <div className="space-y-2">
