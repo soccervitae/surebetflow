@@ -242,28 +242,6 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
             </Card>
           </div>
 
-          {chartData.length > 0 && (
-            <Card>
-              <CardHeader>
-                <CardTitle>Lucro Acumulado</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <ResponsiveContainer width="100%" height={200}>
-                  <LineChart data={chartData}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="var(--border-subtle)" />
-                    <XAxis dataKey="date" tick={{ fontSize: 11, fill: "var(--text-muted)" }} axisLine={false} tickLine={false} />
-                    <YAxis tick={{ fontSize: 11, fill: "var(--text-muted)" }} axisLine={false} tickLine={false} tickFormatter={v => `R$${v}`} />
-                    <Tooltip
-                      contentStyle={{ backgroundColor: "var(--bg-elevated)", border: "1px solid var(--border)", borderRadius: "8px", color: "var(--text-primary)" }}
-                      formatter={(v: unknown) => [formatCurrency(v as number), "Lucro"]}
-                    />
-                    <Line type="monotone" dataKey="lucro" stroke="#16A34A" strokeWidth={2} dot={false} />
-                  </LineChart>
-                </ResponsiveContainer>
-              </CardContent>
-            </Card>
-          )}
-
           {/* Apostas do período */}
           <div>
             <div className="flex flex-wrap items-center justify-between gap-3 mb-3">
