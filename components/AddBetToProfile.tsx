@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, useCallback, useRef } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { useRouter } from "next/navigation"
 import { createClient } from "@/lib/supabase/client"
 import { Button } from "@/components/ui/button"
@@ -11,7 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { formatCurrency } from "@/lib/utils"
 import { useToast } from "@/hooks/useToast"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
-import { Plus, Eye, EyeOff, Loader2, Trash2, Search, X, PlusCircle, MoreVertical } from "lucide-react"
+import { Plus, Eye, EyeOff, Loader2, Trash2, Search, Check, PlusCircle, MoreVertical } from "lucide-react"
 import type { Bet, ProfileBet } from "@/lib/types"
 
 interface Props {
@@ -32,7 +32,6 @@ export default function AddBetToProfile({ profileId }: Props) {
   const [loading, setLoading] = useState(false)
   const [revealedPasswords, setRevealedPasswords] = useState<Record<string, boolean>>({})
   const [betSearch, setBetSearch] = useState("")
-  const [betDropdownOpen, setBetDropdownOpen] = useState(false)
   const [deletarDialog, setDeletarDialog] = useState<ProfileBetWithBet | null>(null)
   const [deletando, setDeletando] = useState(false)
   const [saldoNaoZeradoDialog, setSaldoNaoZeradoDialog] = useState<ProfileBetWithBet | null>(null)
@@ -46,7 +45,6 @@ export default function AddBetToProfile({ profileId }: Props) {
   const [movDescricao, setMovDescricao] = useState("")
   const [movSaving, setMovSaving] = useState(false)
 
-  const betSearchRef = useRef<HTMLInputElement>(null)
   const { toast } = useToast()
   const supabase = createClient()
   const router = useRouter()
@@ -190,93 +188,113 @@ export default function AddBetToProfile({ profileId }: Props) {
       </div>
 
       {/* Dialog Adicionar */}
-      <Dialog open={showForm} onOpenChange={open => { if (!open) { setShowForm(false); setSelectedBet(""); setEmail(""); setSenha(""); setBetSearch(""); setBetDropdownOpen(false) } }}>
-        <DialogContent>
-          <DialogHeader>
+      <Dialog open={showForm} onOpenChange={open => { if (!open) { setShowForm(false); setSelectedBet(""); setEmail(""); setSenha(""); setBetSearch("") } }}>
+        <DialogContent className="max-w-2xl p-0 gap-0 flex flex-col max-h-[90vh]">
+          <DialogHeader className="px-5 pt-5 pb-3 border-b border-[var(--border)] flex-shrink-0">
             <DialogTitle>Adicionar Casa de Apostas</DialogTitle>
           </DialogHeader>
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="space-y-2">
-              <Label>Casa de Apostas *</Label>
-              <div className="relative">
-                {selectedBet && !betDropdownOpen ? (
-                  <div className="flex items-center justify-between h-10 px-3 rounded-md border border-[var(--border)] bg-[var(--bg-surface)]">
-                    <span className="text-sm text-[var(--text-primary)]">
-                      {bets.find(b => b.id === selectedBet)?.nome}
-                    </span>
-                    <button
-                      type="button"
-                      onClick={() => { setSelectedBet(""); setBetSearch(""); setBetDropdownOpen(true); setTimeout(() => betSearchRef.current?.focus(), 50) }}
-                      className="text-[var(--text-muted)] hover:text-[var(--text-primary)]"
-                    >
-                      <X className="w-4 h-4" />
-                    </button>
-                  </div>
-                ) : (
-                  <div className="relative">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--text-muted)]" />
-                    <Input
-                      ref={betSearchRef}
-                      className="pl-9"
-                      placeholder="Buscar casa de apostas..."
-                      value={betSearch}
-                      onChange={e => { setBetSearch(e.target.value); setBetDropdownOpen(true) }}
-                      onFocus={() => setBetDropdownOpen(true)}
-                      autoComplete="off"
-                    />
-                  </div>
-                )}
-                {betDropdownOpen && (
-                  <div className="absolute z-50 mt-1 w-full max-h-52 overflow-y-auto rounded-md border border-[var(--border)] bg-[var(--bg-surface)] shadow-lg">
-                    {bets.filter(b => b.nome.toLowerCase().includes(betSearch.toLowerCase())).length === 0 ? (
-                      <p className="text-sm text-[var(--text-muted)] text-center py-4">Nenhuma casa encontrada</p>
-                    ) : (
-                      bets.filter(b => b.nome.toLowerCase().includes(betSearch.toLowerCase())).map(b => (
-                        <button
-                          key={b.id}
-                          type="button"
-                          className="w-full text-left px-3 py-2.5 text-sm text-[var(--text-primary)] hover:bg-[var(--bg-elevated)] transition-colors"
-                          onClick={() => { setSelectedBet(b.id); setBetSearch(""); setBetDropdownOpen(false) }}
-                        >
-                          {b.nome}
-                        </button>
-                      ))
-                    )}
-                  </div>
-                )}
+
+          {/* Busca */}
+          <div className="px-5 pt-3 pb-2 flex-shrink-0">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--text-muted)]" />
+              <Input
+                className="pl-9"
+                placeholder="Buscar casa de apostas..."
+                value={betSearch}
+                onChange={e => setBetSearch(e.target.value)}
+                autoComplete="off"
+              />
+            </div>
+          </div>
+
+          {/* Grid de bets — scrollável */}
+          <div className="overflow-y-auto flex-1 px-5 pb-2">
+            {(() => {
+              const alreadyAdded = new Set(profileBets.map(pb => pb.bet_id))
+              const filtered = bets.filter(b => b.nome.toLowerCase().includes(betSearch.toLowerCase()))
+              if (filtered.length === 0) return (
+                <p className="text-sm text-[var(--text-muted)] text-center py-8">Nenhuma casa encontrada</p>
+              )
+              return (
+                <div className="grid grid-cols-3 sm:grid-cols-4 gap-2 py-1">
+                  {filtered.map(b => {
+                    const added = alreadyAdded.has(b.id)
+                    const selected = selectedBet === b.id
+                    return (
+                      <button
+                        key={b.id}
+                        type="button"
+                        disabled={added}
+                        onClick={() => setSelectedBet(selected ? "" : b.id)}
+                        className={`relative flex flex-col items-center gap-1.5 p-2.5 rounded-xl border transition-all text-center
+                          ${added ? "opacity-40 cursor-not-allowed border-[var(--border)] bg-[var(--bg-muted)]" : selected
+                            ? "border-[#16A34A] bg-[#16A34A]/5 shadow-sm"
+                            : "border-[var(--border)] bg-[var(--bg-surface)] hover:border-[#16A34A]/40 hover:bg-[#16A34A]/5"
+                          }`}
+                      >
+                        {selected && (
+                          <span className="absolute top-1.5 right-1.5 w-4 h-4 rounded-full bg-[#16A34A] flex items-center justify-center">
+                            <Check className="w-2.5 h-2.5 text-white" />
+                          </span>
+                        )}
+                        <div className="w-9 h-9 rounded-lg border border-[var(--border)] bg-white flex items-center justify-center overflow-hidden p-0.5 flex-shrink-0">
+                          {b.logo_url ? (
+                            <img src={b.logo_url} alt={b.nome} className="w-full h-full object-contain" onError={e => { (e.target as HTMLImageElement).style.display = "none" }} />
+                          ) : (
+                            <span className="text-xs font-bold text-[var(--text-secondary)]">{b.nome.charAt(0)}</span>
+                          )}
+                        </div>
+                        <span className="text-[10px] leading-tight text-[var(--text-primary)] font-medium line-clamp-2">{b.nome}</span>
+                        {added && <span className="text-[9px] text-[var(--text-muted)]">Adicionada</span>}
+                      </button>
+                    )
+                  })}
+                </div>
+              )
+            })()}
+          </div>
+
+          {/* Footer fixo — email + senha + botões */}
+          <form onSubmit={handleSubmit} className="border-t border-[var(--border)] px-5 py-4 flex-shrink-0 space-y-3 bg-[var(--bg-surface)]">
+            {selectedBet && (
+              <p className="text-xs text-[var(--text-secondary)]">
+                Casa selecionada: <strong className="text-[var(--text-primary)]">{bets.find(b => b.id === selectedBet)?.nome}</strong>
+              </p>
+            )}
+            <div className="flex gap-3">
+              <div className="flex-1 space-y-1.5">
+                <Label className="text-xs">E-mail *</Label>
+                <Input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="email@casa.com" autoComplete="off" />
+              </div>
+              <div className="flex-1 space-y-1.5">
+                <Label className="text-xs">Senha *</Label>
+                <div className="relative">
+                  <Input
+                    type={showSenha ? "text" : "password"}
+                    value={senha}
+                    onChange={e => setSenha(e.target.value)}
+                    placeholder="Senha da conta"
+                    className="pr-10"
+                    autoComplete="new-password"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowSenha(v => !v)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors"
+                    tabIndex={-1}
+                  >
+                    {showSenha ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  </button>
+                </div>
               </div>
             </div>
-            <div className="space-y-2">
-              <Label>E-mail da conta *</Label>
-              <Input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="email@casa.com" autoComplete="off" />
-            </div>
-            <div className="space-y-2">
-              <Label>Senha *</Label>
-              <div className="relative">
-                <Input
-                  type={showSenha ? "text" : "password"}
-                  value={senha}
-                  onChange={e => setSenha(e.target.value)}
-                  placeholder="Senha da conta"
-                  className="pr-10"
-                  autoComplete="new-password"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowSenha(v => !v)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors"
-                  tabIndex={-1}
-                >
-                  {showSenha ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                </button>
-              </div>
-            </div>
-            <DialogFooter>
+            <div className="flex gap-2 justify-end">
               <Button type="button" variant="outline" onClick={() => setShowForm(false)}>Cancelar</Button>
-              <Button type="submit" disabled={loading}>
+              <Button type="submit" disabled={loading || !selectedBet}>
                 {loading ? <><Loader2 className="h-4 w-4 mr-2 animate-spin" />Salvando...</> : "Salvar"}
               </Button>
-            </DialogFooter>
+            </div>
           </form>
         </DialogContent>
       </Dialog>
