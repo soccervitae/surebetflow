@@ -42,7 +42,7 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
   const [currentApostas, setCurrentApostas] = useState(apostas)
   const [showCalculadora, setShowCalculadora] = useState(false)
   const [finalizarDialog, setFinalizarDialog] = useState<Aposta | null>(null)
-  const [periodoFiltro, setPeriodoFiltro] = useState<"semana" | "mes" | "ano">("semana")
+  const [periodoFiltro, setPeriodoFiltro] = useState<"dia" | "semana" | "mes" | "ano">("semana")
   const [casaFiltro, setCasaFiltro] = useState<string>("todas")
   const [resultadoReal, setResultadoReal] = useState("")
   const [finalizando, setFinalizando] = useState(false)
@@ -181,6 +181,9 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
   const apostasFiltradasPeriodo = currentApostas.filter(a => {
     const date = new Date(a.created_at)
     const passaPeriodo = (() => {
+      if (periodoFiltro === "dia") {
+        return date.toDateString() === now.toDateString()
+      }
       if (periodoFiltro === "semana") {
         const semanaAtras = new Date(now)
         semanaAtras.setDate(now.getDate() - 7)
@@ -349,7 +352,12 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
           {/* Apostas do período */}
           <div>
             <div className="flex flex-wrap items-center justify-between gap-3 mb-3">
-              <h2 className="text-sm font-semibold text-[var(--text-primary)] uppercase tracking-wide">Apostas</h2>
+              <div className="flex items-center gap-2">
+                <h2 className="text-sm font-semibold text-[var(--text-primary)] uppercase tracking-wide">Apostas</h2>
+                <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-[#16A34A]/10 text-[#16A34A]">
+                  {apostasFiltradasPeriodo.length}
+                </span>
+              </div>
               <div className="flex flex-wrap items-center gap-2">
                 {casasUnicas.length > 0 && (
                   <select
@@ -364,17 +372,22 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
                   </select>
                 )}
                 <div className="flex gap-1 bg-[var(--bg-elevated)] rounded-lg p-1">
-                  {(["semana", "mes", "ano"] as const).map(p => (
+                  {([
+                    { value: "dia", label: "Dia" },
+                    { value: "semana", label: "Semana" },
+                    { value: "mes", label: "Mês" },
+                    { value: "ano", label: "Ano" },
+                  ] as { value: "dia" | "semana" | "mes" | "ano"; label: string }[]).map(({ value, label }) => (
                     <button
-                      key={p}
-                      onClick={() => setPeriodoFiltro(p)}
+                      key={value}
+                      onClick={() => setPeriodoFiltro(value)}
                       className={`px-3 py-1 rounded-md text-xs font-medium transition-colors ${
-                        periodoFiltro === p
+                        periodoFiltro === value
                           ? "bg-[var(--bg-surface)] text-[#16A34A] shadow-sm border border-[var(--border)]"
                           : "text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
                       }`}
                     >
-                      {p === "semana" ? "Semana" : p === "mes" ? "Mês" : "Ano"}
+                      {label}
                     </button>
                   ))}
                 </div>
