@@ -6,13 +6,12 @@ import { usePathname, useRouter } from "next/navigation"
 import { createClient } from "@/lib/supabase/client"
 import { cn } from "@/lib/utils"
 import {
-  Home, Users, Calculator, BookOpen, DollarSign,
+  Home, Users, BookOpen, DollarSign,
   CreditCard, Settings, LogOut, Menu, X, TrendingUp, HelpCircle
 } from "lucide-react"
 const navItems = [
   { href: "/dashboard", label: "Início", icon: Home },
   { href: "/perfis", label: "Perfis", icon: Users },
-  { href: "/calculadora", label: "Calculadora", icon: Calculator },
   { href: "/apostas", label: "Apostas", icon: BookOpen },
   { href: "/financeiro", label: "Financeiro", icon: DollarSign },
   { href: "/assinatura", label: "Assinatura", icon: CreditCard },
