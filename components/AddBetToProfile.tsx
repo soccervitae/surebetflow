@@ -159,16 +159,14 @@ export default function AddBetToProfile({ profileId }: Props) {
     if (error) {
       toast({ title: "Erro ao registrar movimentação", variant: "destructive" })
     } else {
-      // Atualiza saldo local: deposito soma, saque subtrai
-      const delta = movTipo === "deposito" ? valor : -valor
-      setProfileBets(prev => prev.map(pb =>
-        pb.id === movDialog.id ? { ...pb, saldo: pb.saldo + delta } : pb
-      ))
-      // Persiste saldo no DB
-      await supabase
-        .from("profile_bets")
-        .update({ saldo: movDialog.saldo + delta })
-        .eq("id", movDialog.id)
+      // Busca saldo real calculado do banco
+      const { data: movs } = await supabase
+        .from("movimentacoes_financeiras")
+        .select("tipo, valor")
+        .eq("profile_bet_id", movDialog.id)
+      const saldoReal = (movs ?? []).reduce((acc, m) => acc + (m.tipo === "deposito" ? m.valor : -m.valor), 0)
+      await supabase.from("profile_bets").update({ saldo: saldoReal }).eq("id", movDialog.id)
+      setProfileBets(prev => prev.map(pb => pb.id === movDialog.id ? { ...pb, saldo: saldoReal } : pb))
       toast({ title: "Movimentação registrada!" })
       setMovDialog(null)
       setMovTipo("deposito")

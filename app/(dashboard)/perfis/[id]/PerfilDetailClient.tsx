@@ -142,6 +142,15 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
     if (error) {
       toast({ title: "Erro ao registrar movimentação", variant: "destructive" })
     } else {
+      // Atualiza saldo do profile_bet vinculado
+      if (finFormBet) {
+        const { data: movs } = await supabase
+          .from("movimentacoes_financeiras")
+          .select("tipo, valor")
+          .eq("profile_bet_id", finFormBet)
+        const saldoReal = (movs ?? []).reduce((acc, m) => acc + (m.tipo === "deposito" ? m.valor : -m.valor), 0)
+        await supabase.from("profile_bets").update({ saldo: saldoReal }).eq("id", finFormBet)
+      }
       toast({ title: "Movimentação registrada!" })
       setFinShowForm(false)
       setFinFormBet("")
