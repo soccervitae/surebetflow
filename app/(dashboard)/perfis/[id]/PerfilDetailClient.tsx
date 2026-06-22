@@ -11,7 +11,6 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
-import { ProfileForm } from "@/components/ProfileForm"
 import AddBetToProfile from "@/components/AddBetToProfile"
 import { formatCurrency } from "@/lib/utils"
 import { useToast } from "@/hooks/useToast"
@@ -35,7 +34,7 @@ function statusBadge(status: string) {
 }
 
 export default function PerfilDetailClient({ profile, dashboard, apostas, userToken }: Props) {
-  const [currentProfile, setCurrentProfile] = useState(profile)
+  const [currentProfile] = useState(profile)
   const [currentApostas, setCurrentApostas] = useState(apostas)
   const [showCalculadora, setShowCalculadora] = useState(false)
   const [finalizarDialog, setFinalizarDialog] = useState<Aposta | null>(null)
@@ -165,9 +164,7 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
       <Tabs defaultValue="dashboard">
         <TabsList className="w-full sm:w-auto">
           <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
-          <TabsTrigger value="casas">Casas de Apostas</TabsTrigger>
-          <TabsTrigger value="apostas">Apostas</TabsTrigger>
-          <TabsTrigger value="editar">Editar</TabsTrigger>
+          <TabsTrigger value="casas">Bets</TabsTrigger>
         </TabsList>
 
         {/* Dashboard Tab */}
@@ -308,72 +305,6 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
           </Card>
         </TabsContent>
 
-        {/* Apostas Tab */}
-        <TabsContent value="apostas" className="space-y-3">
-          {currentApostas.length === 0 ? (
-            <Card>
-              <CardContent className="py-12 text-center text-[var(--text-secondary)]">
-                Nenhuma aposta registrada para este perfil
-              </CardContent>
-            </Card>
-          ) : (
-            currentApostas.map(aposta => (
-              <Link key={aposta.id} href={`/apostas/${aposta.id}`}>
-              <Card className="hover:border-[#16A34A]/40 transition-colors cursor-pointer">
-                <CardContent className="p-4">
-                  <div className="flex items-start justify-between gap-3">
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 flex-wrap">
-                        <p className="font-medium text-[var(--text-primary)] truncate">{aposta.evento}</p>
-                        {statusBadge(aposta.status)}
-                        <Badge variant="secondary">{aposta.tipo}</Badge>
-                      </div>
-                      <p className="text-xs text-[var(--text-secondary)] mt-1">
-                        {new Date(aposta.created_at).toLocaleDateString("pt-BR")} ·
-                        Investimento: {formatCurrency(aposta.investimento_total)} ·
-                        ROI: {aposta.roi_percentual.toFixed(2)}%
-                      </p>
-                    </div>
-                    <div className="text-right flex-shrink-0">
-                      {aposta.status === "finalizada" ? (
-                        <p className="text-sm font-bold text-[#16A34A]">{formatCurrency(aposta.resultado_real ?? aposta.lucro_garantido)}</p>
-                      ) : (
-                        <p className="text-sm font-bold text-yellow-600">{formatCurrency(aposta.lucro_garantido)}</p>
-                      )}
-                      {aposta.status === "pendente" && (
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          className="mt-2"
-                          onClick={e => { e.preventDefault(); setFinalizarDialog(aposta); setResultadoReal(formatBRL((aposta.lucro_garantido * 100).toFixed(0))) }}
-                        >
-                          Finalizar
-                        </Button>
-                      )}
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-              </Link>
-            ))
-          )}
-        </TabsContent>
-
-        {/* Editar Tab */}
-        <TabsContent value="editar">
-          <Card>
-            <CardContent className="p-6">
-              <ProfileForm
-                profile={currentProfile}
-                userId={currentProfile.user_id}
-                onSuccess={(updated) => {
-                  setCurrentProfile(updated)
-                  toast({ title: "Perfil atualizado com sucesso!" })
-                }}
-              />
-            </CardContent>
-          </Card>
-        </TabsContent>
       </Tabs>
 
       {/* Calculadora Dialog */}
