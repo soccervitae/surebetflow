@@ -41,7 +41,7 @@ export default async function LandingPage() {
       <nav className="sticky top-0 z-50 bg-[#0a0a0a]/90 backdrop-blur border-b border-white/5">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
           <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 bg-[#16A34A] rounded-lg flex items-center justify-center">
+            <div className="w-8 h-8 bg-[#1e3a8a] rounded-lg flex items-center justify-center">
               <TrendingUp className="w-4 h-4 text-white" />
             </div>
             <span className="font-bold text-white text-lg">SureBetFlow</span>
@@ -50,7 +50,7 @@ export default async function LandingPage() {
             <Link href="/login" className="text-sm font-medium text-gray-400 hover:text-white transition-colors">
               Entrar
             </Link>
-            <Link href="/cadastro" className="bg-[#16A34A] text-white text-sm font-medium px-4 py-2 rounded-lg hover:bg-[#15803D] transition-colors">
+            <Link href="/cadastro" className="bg-[#1e3a8a] text-white text-sm font-medium px-4 py-2 rounded-lg hover:bg-[#1e40af] transition-colors">
               Começar agora
             </Link>
           </div>
@@ -59,19 +59,19 @@ export default async function LandingPage() {
 
       {/* Hero */}
       <section className="max-w-6xl mx-auto px-4 sm:px-6 pt-24 pb-28 text-center">
-        <div className="inline-flex items-center gap-2 bg-[#16A34A]/10 border border-[#16A34A]/20 text-[#16A34A] text-sm font-medium px-4 py-1.5 rounded-full mb-8">
+        <div className="inline-flex items-center gap-2 bg-[#1e3a8a]/10 border border-[#1e3a8a]/20 text-[#1e3a8a] text-sm font-medium px-4 py-1.5 rounded-full mb-8">
           <Zap className="w-3.5 h-3.5" />
           Lucro garantido — é matemática pura
         </div>
         <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold leading-tight mb-6">
           Calcular vitórias nunca<br />
-          foi tão <span className="text-[#16A34A]">simples</span>
+          foi tão <span className="text-[#1e3a8a]">simples</span>
         </h1>
         <p className="text-lg text-gray-400 max-w-2xl mx-auto mb-10">
           A plataforma completa para apostadores de arbitragem. Calcule, registre e acompanhe seus lucros garantidos com segurança total e controle profissional.
         </p>
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
-          <Link href="/cadastro" className="inline-flex items-center justify-center gap-2 bg-[#16A34A] hover:bg-[#15803D] text-white font-semibold px-8 py-3.5 rounded-xl text-base transition-colors">
+          <Link href="/cadastro" className="inline-flex items-center justify-center gap-2 bg-[#1e3a8a] hover:bg-[#1e40af] text-white font-semibold px-8 py-3.5 rounded-xl text-base transition-colors">
             Começar agora <ArrowRight className="w-4 h-4" />
           </Link>
           <Link href="/login" className="inline-flex items-center justify-center gap-2 border border-white/10 bg-white/5 hover:bg-white/10 text-gray-300 font-semibold px-8 py-3.5 rounded-xl text-base transition-colors">
@@ -97,7 +97,7 @@ export default async function LandingPage() {
                 desc: "Duas ou mais casas oferecem odds altas o suficiente para que a soma das probabilidades implícitas seja menor que 100%."
               },
               {
-                icon: Calculator, color: "bg-[#16A34A]/10", iconColor: "text-[#16A34A]",
+                icon: Calculator, color: "bg-[#1e3a8a]/10", iconColor: "text-[#1e3a8a]",
                 title: "2. Calcule as stakes",
                 desc: "Distribua o valor apostado entre todos os resultados possíveis de forma proporcional para garantir lucro em qualquer desfecho."
               },
@@ -127,11 +127,11 @@ export default async function LandingPage() {
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
           {[
-            { icon: Calculator, color: "bg-[#16A34A]/10", iconColor: "text-[#16A34A]", title: "Calculadora 2-way e 3-way", desc: "Detecta arbitragem em tempo real e calcula automaticamente a distribuição ideal das stakes." },
+            { icon: Calculator, color: "bg-[#1e3a8a]/10", iconColor: "text-[#1e3a8a]", title: "Calculadora 2-way e 3-way", desc: "Detecta arbitragem em tempo real e calcula automaticamente a distribuição ideal das stakes." },
             { icon: Lock, color: "bg-blue-500/10", iconColor: "text-blue-400", title: "Senhas criptografadas AES-256", desc: "Suas credenciais das casas de apostas ficam protegidas com criptografia de nível militar." },
             { icon: Users, color: "bg-purple-500/10", iconColor: "text-purple-400", title: "Perfis ilimitados", desc: "Crie perfis separados para você, familiares ou sócios. Cada perfil é totalmente isolado." },
             { icon: Wallet, color: "bg-yellow-500/10", iconColor: "text-yellow-400", title: "Controle financeiro", desc: "Registre depósitos e saques por casa de apostas. Visualize saldo, lucro realizado e pendente." },
-            { icon: BarChart3, color: "bg-[#16A34A]/10", iconColor: "text-[#16A34A]", title: "Dashboard com gráficos", desc: "Acompanhe a evolução do lucro acumulado. Veja ROI, total investido e apostas ativas." },
+            { icon: BarChart3, color: "bg-[#1e3a8a]/10", iconColor: "text-[#1e3a8a]", title: "Dashboard com gráficos", desc: "Acompanhe a evolução do lucro acumulado. Veja ROI, total investido e apostas ativas." },
             { icon: RefreshCw, color: "bg-blue-500/10", iconColor: "text-blue-400", title: "Histórico completo", desc: "Todas as apostas com legs detalhados, odds, stakes e resultado real. Filtre por perfil e período." },
           ].map((f) => (
             <div key={f.title} className="bg-[#111] border border-white/5 rounded-2xl p-6 hover:border-white/10 transition-colors">
@@ -181,7 +181,7 @@ export default async function LandingPage() {
               <p className="text-xs text-gray-500 uppercase tracking-wide font-medium mb-4">Exemplo de uso</p>
               <div className="space-y-3">
                 {[
-                  { nome: "João Silva", apelido: "Conta Principal", casas: 5, saldo: "R$ 3.200,00", lucro: "+ R$ 420,50", cor: "bg-[#16A34A]" },
+                  { nome: "João Silva", apelido: "Conta Principal", casas: 5, saldo: "R$ 3.200,00", lucro: "+ R$ 420,50", cor: "bg-[#1e3a8a]" },
                   { nome: "Maria Silva", apelido: "Esposa", casas: 3, saldo: "R$ 1.800,00", lucro: "+ R$ 210,00", cor: "bg-blue-600" },
                   { nome: "Carlos Silva", apelido: "Irmão", casas: 4, saldo: "R$ 2.500,00", lucro: "+ R$ 315,75", cor: "bg-purple-600" },
                 ].map((p) => (
@@ -195,15 +195,15 @@ export default async function LandingPage() {
                     </div>
                     <div className="text-right flex-shrink-0">
                       <p className="text-sm font-bold text-white">{p.saldo}</p>
-                      <p className="text-xs font-medium text-[#16A34A]">{p.lucro}</p>
+                      <p className="text-xs font-medium text-[#1e3a8a]">{p.lucro}</p>
                     </div>
                   </div>
                 ))}
-                <div className="bg-[#16A34A]/5 border border-[#16A34A]/20 rounded-xl p-4 flex items-center justify-between">
+                <div className="bg-[#1e3a8a]/5 border border-[#1e3a8a]/20 rounded-xl p-4 flex items-center justify-between">
                   <p className="text-sm font-semibold text-gray-300">Total consolidado</p>
                   <div className="text-right">
                     <p className="text-sm font-bold text-white">R$ 7.500,00</p>
-                    <p className="text-xs font-bold text-[#16A34A]">+ R$ 946,25</p>
+                    <p className="text-xs font-bold text-[#1e3a8a]">+ R$ 946,25</p>
                   </div>
                 </div>
               </div>
@@ -231,7 +231,7 @@ export default async function LandingPage() {
                 { title: "Consistente", desc: "Diferente de apostas normais, o resultado positivo é recorrente e previsível." },
               ].map((item) => (
                 <li key={item.title} className="flex items-start gap-3">
-                  <CheckCircle className="w-5 h-5 text-[#16A34A] flex-shrink-0 mt-0.5" />
+                  <CheckCircle className="w-5 h-5 text-[#1e3a8a] flex-shrink-0 mt-0.5" />
                   <div>
                     <span className="font-semibold text-white">{item.title}: </span>
                     <span className="text-gray-400">{item.desc}</span>
@@ -242,7 +242,7 @@ export default async function LandingPage() {
           </div>
           <div className="space-y-4">
             {[
-              { icon: ShieldCheck, color: "text-[#16A34A]", title: "Segurança total dos dados", desc: "Suas credenciais são criptografadas com AES-256-GCM via Edge Function segura. Nunca em texto puro." },
+              { icon: ShieldCheck, color: "text-[#1e3a8a]", title: "Segurança total dos dados", desc: "Suas credenciais são criptografadas com AES-256-GCM via Edge Function segura. Nunca em texto puro." },
               { icon: BarChart3, color: "text-blue-400", title: "ROI típico de 1% a 5% por operação", desc: "Com volume consistente, apostadores conseguem retornos mensais de 10% a 30% sobre o capital." },
               { icon: Zap, color: "text-yellow-400", title: "Velocidade é essencial", desc: "Oportunidades duram segundos. Com o SureBetFlow, você calcula e registra em poucos cliques." },
             ].map((item) => (
@@ -283,7 +283,7 @@ export default async function LandingPage() {
                   "Senhas criptografadas",
                 ].map(f => (
                   <li key={f} className="flex items-center gap-2">
-                    <CheckCircle className="w-4 h-4 text-[#16A34A] flex-shrink-0" />
+                    <CheckCircle className="w-4 h-4 text-[#1e3a8a] flex-shrink-0" />
                     <span className="text-gray-300">{f}</span>
                   </li>
                 ))}
@@ -294,9 +294,9 @@ export default async function LandingPage() {
             </div>
 
             {/* Plano Pro */}
-            <div className="bg-[#0a0a0a] border-2 border-[#16A34A] rounded-2xl p-8 text-left relative">
+            <div className="bg-[#0a0a0a] border-2 border-[#1e3a8a] rounded-2xl p-8 text-left relative">
               <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-                <span className="bg-[#16A34A] text-white text-xs font-bold px-3 py-1 rounded-full">MAIS POPULAR</span>
+                <span className="bg-[#1e3a8a] text-white text-xs font-bold px-3 py-1 rounded-full">MAIS POPULAR</span>
               </div>
               <p className="text-gray-400 text-sm mb-2">Plano Profissional</p>
               <div className="flex items-end gap-1 mb-1">
@@ -316,12 +316,12 @@ export default async function LandingPage() {
                   "Suporte prioritário",
                 ].map(f => (
                   <li key={f} className="flex items-center gap-2">
-                    <CheckCircle className="w-4 h-4 text-[#16A34A] flex-shrink-0" />
+                    <CheckCircle className="w-4 h-4 text-[#1e3a8a] flex-shrink-0" />
                     <span className="text-gray-300">{f}</span>
                   </li>
                 ))}
               </ul>
-              <Link href="/cadastro" className="block w-full bg-[#16A34A] hover:bg-[#15803D] text-white font-semibold py-3 rounded-xl transition-colors text-center">
+              <Link href="/cadastro" className="block w-full bg-[#1e3a8a] hover:bg-[#1e40af] text-white font-semibold py-3 rounded-xl transition-colors text-center">
                 Assinar Pro
               </Link>
             </div>
@@ -358,7 +358,7 @@ export default async function LandingPage() {
           <p className="text-gray-400 text-lg mb-8">
             Junte-se a apostadores que já profissionalizaram sua operação com o SureBetFlow.
           </p>
-          <Link href="/cadastro" className="inline-flex items-center gap-2 bg-[#16A34A] hover:bg-[#15803D] text-white font-bold px-8 py-3.5 rounded-xl transition-colors text-base">
+          <Link href="/cadastro" className="inline-flex items-center gap-2 bg-[#1e3a8a] hover:bg-[#1e40af] text-white font-bold px-8 py-3.5 rounded-xl transition-colors text-base">
             Começar agora <ArrowRight className="w-4 h-4" />
           </Link>
         </div>
@@ -368,7 +368,7 @@ export default async function LandingPage() {
       <footer className="border-t border-white/5 py-8 bg-[#0a0a0a]">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-2">
-            <div className="w-6 h-6 bg-[#16A34A] rounded-md flex items-center justify-center">
+            <div className="w-6 h-6 bg-[#1e3a8a] rounded-md flex items-center justify-center">
               <TrendingUp className="w-3 h-3 text-white" />
             </div>
             <span className="font-bold text-white text-sm">SureBetFlow</span>

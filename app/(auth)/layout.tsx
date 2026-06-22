@@ -7,7 +7,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
           <Link href="/" className="inline-flex flex-col items-center gap-3">
-            <div className="w-12 h-12 bg-[#16A34A] rounded-xl flex items-center justify-center">
+            <div className="w-12 h-12 bg-[#1e3a8a] rounded-xl flex items-center justify-center">
               <TrendingUp className="w-6 h-6 text-white" />
             </div>
             <span className="font-bold text-white text-xl">SureBetFlow</span>

@@ -283,11 +283,11 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
             size="sm"
             onClick={() => setConfirmAtivoOpen(true)}
             className={currentProfile.ativo
-              ? "text-[#16A34A] border-[#16A34A]/40 hover:bg-[#16A34A]/5"
+              ? "text-[#1e3a8a] border-[#1e3a8a]/40 hover:bg-[#1e3a8a]/5"
               : "text-[#DC2626] border-[#DC2626]/40 hover:bg-[#DC2626]/5"
             }
           >
-            <span className={`w-2 h-2 rounded-full mr-2 ${currentProfile.ativo ? "bg-[#16A34A]" : "bg-[#DC2626]"}`} />
+            <span className={`w-2 h-2 rounded-full mr-2 ${currentProfile.ativo ? "bg-[#1e3a8a]" : "bg-[#DC2626]"}`} />
             {currentProfile.ativo ? "Ativo" : "Inativo"}
           </Button>
           <Link href={`/perfis/${profile.id}/editar`}>
@@ -325,12 +325,12 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
             <Card>
               <CardContent className="p-5">
                 <div className="flex items-center gap-3">
-                  <div className="p-2 bg-[#16A34A]/10 rounded-lg">
-                    <TrendingUp className="h-5 w-5 text-[#16A34A]" />
+                  <div className="p-2 bg-[#1e3a8a]/10 rounded-lg">
+                    <TrendingUp className="h-5 w-5 text-[#1e3a8a]" />
                   </div>
                   <div className="min-w-0">
                     <p className="text-xs text-[var(--text-secondary)]">Lucro Realizado</p>
-                    <p className="text-base font-bold text-[#16A34A] truncate">{formatCurrency(dashboard?.lucro_realizado ?? 0)}</p>
+                    <p className="text-base font-bold text-[#1e3a8a] truncate">{formatCurrency(dashboard?.lucro_realizado ?? 0)}</p>
                   </div>
                 </div>
               </CardContent>
@@ -368,7 +368,7 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
             <div className="flex flex-wrap items-center justify-between gap-3 mb-3">
               <div className="flex items-center gap-2">
                 <h2 className="text-sm font-semibold text-[var(--text-primary)] uppercase tracking-wide">Apostas</h2>
-                <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-[#16A34A]/10 text-[#16A34A]">
+                <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-[#1e3a8a]/10 text-[#1e3a8a]">
                   {apostasFiltradasPeriodo.length}
                 </span>
               </div>
@@ -397,7 +397,7 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
                       onClick={() => setPeriodoFiltro(value)}
                       className={`px-3 py-1 rounded-md text-xs font-medium transition-colors ${
                         periodoFiltro === value
-                          ? "bg-[var(--bg-surface)] text-[#16A34A] shadow-sm border border-[var(--border)]"
+                          ? "bg-[var(--bg-surface)] text-[#1e3a8a] shadow-sm border border-[var(--border)]"
                           : "text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
                       }`}
                     >
@@ -425,7 +425,7 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
 
                   return (
                   <Link key={aposta.id} href={`/apostas/${aposta.id}`}>
-                    <Card className="hover:border-[#16A34A]/40 transition-colors cursor-pointer">
+                    <Card className="hover:border-[#1e3a8a]/40 transition-colors cursor-pointer">
                       <CardContent className="p-4">
                         <div className="flex items-start justify-between gap-4">
                           <div className="flex-1 min-w-0">
@@ -444,17 +444,17 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
                                   const isRed = greenLegId !== null && greenLegId !== leg.id
                                   return (
                                     <div key={leg.id} className={`text-xs flex items-center gap-2 rounded-lg px-2 py-1 ${
-                                      isGreen ? "bg-[#16A34A]/5" :
+                                      isGreen ? "bg-[#1e3a8a]/5" :
                                       isRed   ? "bg-[#DC2626]/5" : ""
                                     }`}>
                                       {(isGreen || isRed) && (
                                         <span className={`px-1.5 py-0.5 rounded text-[10px] font-bold flex-shrink-0 ${
-                                          isGreen ? "bg-[#16A34A] text-white" : "bg-[#DC2626] text-white"
+                                          isGreen ? "bg-[#1e3a8a] text-white" : "bg-[#DC2626] text-white"
                                         }`}>
                                           {isGreen ? "GREEN" : "RED"}
                                         </span>
                                       )}
-                                      <span className={`font-medium flex-shrink-0 ${isGreen ? "text-[#16A34A]" : isRed ? "text-[#DC2626]" : "text-[var(--text-secondary)]"}`}>
+                                      <span className={`font-medium flex-shrink-0 ${isGreen ? "text-[#1e3a8a]" : isRed ? "text-[#DC2626]" : "text-[var(--text-secondary)]"}`}>
                                         {leg.profile_bet?.bet?.nome ?? "Casa"}
                                       </span>
                                       <span className="text-[var(--text-secondary)] truncate">{leg.resultado_apostado}</span>
@@ -473,7 +473,7 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
                               {aposta.status === "finalizada" ? "Lucro" : aposta.status === "pendente" ? "Lucro esperado" : ""}
                             </p>
                             {aposta.status === "finalizada" ? (
-                              <p className={`text-base font-bold ${(aposta.resultado_real ?? 0) >= 0 ? "text-[#16A34A]" : "text-[#DC2626]"}`}>
+                              <p className={`text-base font-bold ${(aposta.resultado_real ?? 0) >= 0 ? "text-[#1e3a8a]" : "text-[#DC2626]"}`}>
                                 {formatCurrency(aposta.resultado_real ?? 0)}
                               </p>
                             ) : aposta.status === "pendente" ? (
@@ -509,7 +509,7 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
             <Card>
               <CardContent className="p-4">
                 <p className="text-xs text-[var(--text-secondary)] mb-1">Depositado</p>
-                <p className="text-lg font-bold text-[#16A34A]">{formatCurrency(totalDepositos)}</p>
+                <p className="text-lg font-bold text-[#1e3a8a]">{formatCurrency(totalDepositos)}</p>
               </CardContent>
             </Card>
             <Card>
@@ -521,7 +521,7 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
             <Card>
               <CardContent className="p-4">
                 <p className="text-xs text-[var(--text-secondary)] mb-1">Saldo Líquido</p>
-                <p className={`text-lg font-bold ${saldoLiquido >= 0 ? "text-[#16A34A]" : "text-[#DC2626]"}`}>{formatCurrency(saldoLiquido)}</p>
+                <p className={`text-lg font-bold ${saldoLiquido >= 0 ? "text-[#1e3a8a]" : "text-[#DC2626]"}`}>{formatCurrency(saldoLiquido)}</p>
               </CardContent>
             </Card>
           </div>
@@ -531,7 +531,7 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
             <div className="flex gap-1 bg-[var(--bg-elevated)] rounded-lg p-1">
               {(["hoje", "semana", "mes", "todos"] as const).map(p => (
                 <button key={p} onClick={() => setFinPeriodo(p)}
-                  className={`px-3 py-1 rounded-md text-xs font-medium transition-colors ${finPeriodo === p ? "bg-[var(--bg-surface)] text-[#16A34A] shadow-sm border border-[var(--border)]" : "text-[var(--text-secondary)] hover:text-[var(--text-primary)]"}`}>
+                  className={`px-3 py-1 rounded-md text-xs font-medium transition-colors ${finPeriodo === p ? "bg-[var(--bg-surface)] text-[#1e3a8a] shadow-sm border border-[var(--border)]" : "text-[var(--text-secondary)] hover:text-[var(--text-primary)]"}`}>
                   {p === "hoje" ? "Hoje" : p === "semana" ? "Semana" : p === "mes" ? "Mês" : "Todos"}
                 </button>
               ))}
@@ -540,7 +540,7 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
               {(["todos", "deposito", "saque"] as const).map(t => (
                 <button key={t} onClick={() => setFinTipo(t)}
                   className={`px-3 py-1 rounded-lg text-xs font-medium border transition-colors ${finTipo === t
-                    ? t === "deposito" ? "bg-[#16A34A] text-white border-[#16A34A]"
+                    ? t === "deposito" ? "bg-[#1e3a8a] text-white border-[#1e3a8a]"
                       : t === "saque" ? "bg-[#DC2626] text-white border-[#DC2626]"
                       : "bg-[var(--bg-surface)] text-[var(--text-primary)] border-[var(--border)]"
                     : "bg-transparent text-[var(--text-secondary)] border-[var(--border)] hover:text-[var(--text-primary)]"}`}>
@@ -623,9 +623,9 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
                 <Card key={m.id}>
                   <CardContent className="p-4">
                     <div className="flex items-center gap-3">
-                      <div className={`p-2 rounded-lg ${m.tipo === "deposito" ? "bg-[#16A34A]/10" : "bg-[#DC2626]/10"}`}>
+                      <div className={`p-2 rounded-lg ${m.tipo === "deposito" ? "bg-[#1e3a8a]/10" : "bg-[#DC2626]/10"}`}>
                         {m.tipo === "deposito"
-                          ? <ArrowDownCircle className="h-4 w-4 text-[#16A34A]" />
+                          ? <ArrowDownCircle className="h-4 w-4 text-[#1e3a8a]" />
                           : <ArrowUpCircle className="h-4 w-4 text-[#DC2626]" />}
                       </div>
                       <div className="flex-1 min-w-0">
@@ -640,7 +640,7 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
                         {m.descricao && <p className="text-xs text-[var(--text-muted)] truncate">{m.descricao}</p>}
                         <p className="text-xs text-[var(--text-secondary)]">{new Date(m.created_at).toLocaleDateString("pt-BR")}</p>
                       </div>
-                      <p className={`text-sm font-bold ${m.tipo === "deposito" ? "text-[#16A34A]" : "text-[#DC2626]"}`}>
+                      <p className={`text-sm font-bold ${m.tipo === "deposito" ? "text-[#1e3a8a]" : "text-[#DC2626]"}`}>
                         {m.tipo === "saque" ? "-" : "+"}{formatCurrency(m.valor)}
                       </p>
                     </div>
@@ -670,7 +670,7 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
             <Button variant="outline" onClick={() => setConfirmAtivoOpen(false)}>Cancelar</Button>
             <Button
               disabled={togglingAtivo}
-              className={currentProfile.ativo ? "bg-[#DC2626] hover:bg-red-700" : "bg-[#16A34A] hover:bg-[#15803D]"}
+              className={currentProfile.ativo ? "bg-[#DC2626] hover:bg-red-700" : "bg-[#1e3a8a] hover:bg-[#1e40af]"}
               onClick={async () => {
                 await handleToggleAtivo()
                 setConfirmAtivoOpen(false)
@@ -713,7 +713,7 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
         <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
-              <Calculator className="h-5 w-5 text-[#16A34A]" />
+              <Calculator className="h-5 w-5 text-[#1e3a8a]" />
               Nova Aposta — {currentProfile.apelido ?? `${currentProfile.nome} ${currentProfile.sobrenome}`}
             </DialogTitle>
           </DialogHeader>

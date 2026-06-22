@@ -47,7 +47,7 @@ export default function LoginPage() {
             onChange={e => setEmail(e.target.value)}
             required
             autoComplete="email"
-            className="w-full bg-[#0a0a0a] border border-white/10 rounded-xl px-4 py-3 text-white placeholder-gray-600 text-sm focus:outline-none focus:border-[#16A34A]/50 transition-colors"
+            className="w-full bg-[#0a0a0a] border border-white/10 rounded-xl px-4 py-3 text-white placeholder-gray-600 text-sm focus:outline-none focus:border-[#1e3a8a]/50 transition-colors"
           />
         </div>
         <div className="space-y-1.5">
@@ -61,7 +61,7 @@ export default function LoginPage() {
               onChange={e => setPassword(e.target.value)}
               required
               autoComplete="current-password"
-              className="w-full bg-[#0a0a0a] border border-white/10 rounded-xl px-4 py-3 pr-10 text-white placeholder-gray-600 text-sm focus:outline-none focus:border-[#16A34A]/50 transition-colors"
+              className="w-full bg-[#0a0a0a] border border-white/10 rounded-xl px-4 py-3 pr-10 text-white placeholder-gray-600 text-sm focus:outline-none focus:border-[#1e3a8a]/50 transition-colors"
             />
             <button
               type="button"
@@ -81,14 +81,14 @@ export default function LoginPage() {
         <button
           type="submit"
           disabled={loading}
-          className="w-full bg-[#16A34A] hover:bg-[#15803D] disabled:opacity-60 text-white font-semibold py-3 rounded-xl transition-colors text-sm"
+          className="w-full bg-[#1e3a8a] hover:bg-[#1e40af] disabled:opacity-60 text-white font-semibold py-3 rounded-xl transition-colors text-sm"
         >
           {loading ? "Entrando..." : "Entrar"}
         </button>
       </form>
       <p className="text-center text-sm text-gray-500 mt-6">
         Não tem uma conta?{" "}
-        <Link href="/cadastro" className="text-[#16A34A] font-medium hover:underline">
+        <Link href="/cadastro" className="text-[#1e3a8a] font-medium hover:underline">
           Cadastre-se
         </Link>
       </p>

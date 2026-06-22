@@ -9,8 +9,8 @@ export default function AssinaturaPage() {
   return (
     <div className="p-6 max-w-2xl mx-auto">
       <div className="flex items-center gap-3 mb-6">
-        <div className="w-9 h-9 bg-[#16A34A]/10 rounded-xl flex items-center justify-center">
-          <CreditCard className="w-5 h-5 text-[#16A34A]" />
+        <div className="w-9 h-9 bg-[#1e3a8a]/10 rounded-xl flex items-center justify-center">
+          <CreditCard className="w-5 h-5 text-[#1e3a8a]" />
         </div>
         <div>
           <h1 className="text-2xl font-bold text-[var(--text-primary)]">Assinatura</h1>
@@ -25,10 +25,10 @@ export default function AssinaturaPage() {
               <p className="font-semibold text-[var(--text-primary)] text-lg">Plano Profissional</p>
               <p className="text-[var(--text-secondary)] text-sm">R$ 49,90/mês</p>
             </div>
-            <Badge className="bg-[#16A34A]/10 text-[#16A34A] border-0 text-sm px-3 py-1">Ativa</Badge>
+            <Badge className="bg-[#1e3a8a]/10 text-[#1e3a8a] border-0 text-sm px-3 py-1">Ativa</Badge>
           </div>
           <div className="flex items-center gap-2 text-sm text-[var(--text-secondary)]">
-            <CheckCircle className="w-4 h-4 text-[#16A34A]" />
+            <CheckCircle className="w-4 h-4 text-[#1e3a8a]" />
             <span>Próxima cobrança em <strong className="text-[var(--text-primary)]">21/07/2026</strong></span>
           </div>
         </CardContent>
@@ -74,7 +74,7 @@ export default function AssinaturaPage() {
               "Suporte por e-mail",
             ].map(f => (
               <li key={f} className="flex items-center gap-2">
-                <CheckCircle className="w-4 h-4 text-[#16A34A] flex-shrink-0" />
+                <CheckCircle className="w-4 h-4 text-[#1e3a8a] flex-shrink-0" />
                 {f}
               </li>
             ))}

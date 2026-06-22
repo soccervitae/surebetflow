@@ -84,7 +84,7 @@ export default function OGImage() {
               style={{
                 width: "64px",
                 height: "64px",
-                background: "#16A34A",
+                background: "#1e3a8a",
                 borderRadius: "16px",
                 display: "flex",
                 alignItems: "center",
@@ -114,7 +114,7 @@ export default function OGImage() {
               marginBottom: "28px",
             }}
           >
-            <span style={{ fontSize: "18px", color: "#16A34A", fontWeight: 600 }}>
+            <span style={{ fontSize: "18px", color: "#1e3a8a", fontWeight: 600 }}>
               ⚡ Lucro garantido — é matemática pura
             </span>
           </div>
@@ -130,7 +130,7 @@ export default function OGImage() {
             }}
           >
             Calcular vitórias nunca{" "}
-            <span style={{ color: "#16A34A" }}>foi tão simples</span>
+            <span style={{ color: "#1e3a8a" }}>foi tão simples</span>
           </h1>
 
           {/* Subtitle */}
@@ -155,7 +155,7 @@ export default function OGImage() {
             left: 0,
             right: 0,
             height: "4px",
-            background: "linear-gradient(90deg, transparent, #16A34A, transparent)",
+            background: "linear-gradient(90deg, transparent, #1e3a8a, transparent)",
           }}
         />
       </div>

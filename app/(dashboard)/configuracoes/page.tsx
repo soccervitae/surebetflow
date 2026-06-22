@@ -178,7 +178,7 @@ export default function ConfiguracoesPage() {
               <button
                 onClick={() => fileInputRef.current?.click()}
                 disabled={uploading}
-                className="absolute -bottom-1 -right-1 w-6 h-6 rounded-full bg-[#16A34A] text-white flex items-center justify-center hover:bg-[#15803D] transition-colors disabled:opacity-50"
+                className="absolute -bottom-1 -right-1 w-6 h-6 rounded-full bg-[#1e3a8a] text-white flex items-center justify-center hover:bg-[#1e40af] transition-colors disabled:opacity-50"
               >
                 {uploading ? <Loader2 className="w-3 h-3 animate-spin" /> : <Camera className="w-3 h-3" />}
               </button>
@@ -209,8 +209,8 @@ export default function ConfiguracoesPage() {
         </CardHeader>
         <CardContent className="space-y-3">
           <div className="flex items-center gap-3 p-3 rounded-xl bg-[var(--bg-muted)] border border-[var(--border)]">
-            <div className="p-2 rounded-lg bg-[#16A34A]/10">
-              <DeviceIcon className="h-5 w-5 text-[#16A34A]" />
+            <div className="p-2 rounded-lg bg-[#1e3a8a]/10">
+              <DeviceIcon className="h-5 w-5 text-[#1e3a8a]" />
             </div>
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2">
@@ -290,11 +290,11 @@ export default function ConfiguracoesPage() {
               </p>
             )}
             {passwordSuccess && (
-              <p className="text-sm text-[#16A34A] bg-[#16A34A]/5 border border-[#16A34A]/20 rounded-lg px-3 py-2">
+              <p className="text-sm text-[#1e3a8a] bg-[#1e3a8a]/5 border border-[#1e3a8a]/20 rounded-lg px-3 py-2">
                 {passwordSuccess}
               </p>
             )}
-            <Button type="submit" className="bg-[#16A34A] hover:bg-[#15803D] text-white" disabled={savingPassword}>
+            <Button type="submit" className="bg-[#1e3a8a] hover:bg-[#1e40af] text-white" disabled={savingPassword}>
               <Shield className="h-4 w-4 mr-2" />
               {savingPassword ? "Salvando..." : "Alterar senha"}
             </Button>

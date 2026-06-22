@@ -56,7 +56,7 @@ export default function PerfisClient({ profiles: initialProfiles, userId }: Prop
           {profiles.map(profile => {
             return (
               <Link key={profile.id} href={`/perfis/${profile.id}`}>
-                <Card className="hover:border-[#16A34A]/40 hover:bg-[#16A34A]/5 transition-all cursor-pointer">
+                <Card className="hover:border-[#1e3a8a]/40 hover:bg-[#1e3a8a]/5 transition-all cursor-pointer">
                   <CardContent className="p-5">
                     <div className="flex items-start gap-4">
                       <Avatar className="h-12 w-12 flex-shrink-0">

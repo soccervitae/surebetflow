@@ -32,7 +32,7 @@ export default function OnboardingPerfilPage() {
     <div className="min-h-screen bg-[#FAFAF8] flex items-center justify-center p-4">
       <div className="w-full max-w-2xl">
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-12 h-12 bg-[#16A34A] rounded-xl mb-4">
+          <div className="inline-flex items-center justify-center w-12 h-12 bg-[#1e3a8a] rounded-xl mb-4">
             <span className="text-white font-bold text-xl">S</span>
           </div>
           <h1 className="text-2xl font-bold text-gray-900">Bem-vindo ao SureBetFlow!</h1>

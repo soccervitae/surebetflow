@@ -47,7 +47,7 @@ export default function CadastroPage() {
     router.refresh()
   }
 
-  const inputClass = "w-full bg-[#0a0a0a] border border-white/10 rounded-xl px-4 py-3 text-white placeholder-gray-600 text-sm focus:outline-none focus:border-[#16A34A]/50 transition-colors"
+  const inputClass = "w-full bg-[#0a0a0a] border border-white/10 rounded-xl px-4 py-3 text-white placeholder-gray-600 text-sm focus:outline-none focus:border-[#1e3a8a]/50 transition-colors"
 
   return (
     <>
@@ -124,14 +124,14 @@ export default function CadastroPage() {
         <button
           type="submit"
           disabled={loading}
-          className="w-full bg-[#16A34A] hover:bg-[#15803D] disabled:opacity-60 text-white font-semibold py-3 rounded-xl transition-colors text-sm"
+          className="w-full bg-[#1e3a8a] hover:bg-[#1e40af] disabled:opacity-60 text-white font-semibold py-3 rounded-xl transition-colors text-sm"
         >
           {loading ? "Criando conta..." : "Criar conta"}
         </button>
       </form>
       <p className="text-center text-sm text-gray-500 mt-6">
         Já tem uma conta?{" "}
-        <Link href="/login" className="text-[#16A34A] font-medium hover:underline">
+        <Link href="/login" className="text-[#1e3a8a] font-medium hover:underline">
           Fazer login
         </Link>
       </p>

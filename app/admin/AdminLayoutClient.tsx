@@ -40,7 +40,7 @@ export default function AdminLayoutClient({ children }: { children: React.ReactN
                 href={href}
                 className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
                   active
-                    ? "bg-[#16A34A] text-white"
+                    ? "bg-[#1e3a8a] text-white"
                     : "text-gray-400 hover:text-white hover:bg-gray-800"
                 }`}
               >

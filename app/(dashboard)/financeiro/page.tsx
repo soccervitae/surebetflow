@@ -200,7 +200,7 @@ export default function FinanceiroPage() {
             <p className="text-sm text-[var(--text-secondary)]">Depósitos e saques por perfil</p>
           </div>
         </div>
-        <Button onClick={() => setShowForm(!showForm)} className="bg-[#16A34A] hover:bg-[#15803D] text-white gap-2">
+        <Button onClick={() => setShowForm(!showForm)} className="bg-[#1e3a8a] hover:bg-[#1e40af] text-white gap-2">
           <Plus className="w-4 h-4" /> Nova Movimentação
         </Button>
       </div>
@@ -241,7 +241,7 @@ export default function FinanceiroPage() {
                   <div className="flex gap-2">
                     {(["deposito", "saque"] as const).map(t => (
                       <button key={t} type="button" onClick={() => setFormTipo(t)}
-                        className={`flex-1 h-10 rounded-xl border text-sm font-medium transition-colors ${formTipo === t ? "border-[#16A34A] bg-[#16A34A]/10 text-[#16A34A]" : "border-[var(--border)] text-[var(--text-secondary)]"}`}>
+                        className={`flex-1 h-10 rounded-xl border text-sm font-medium transition-colors ${formTipo === t ? "border-[#1e3a8a] bg-[#1e3a8a]/10 text-[#1e3a8a]" : "border-[var(--border)] text-[var(--text-secondary)]"}`}>
                         {t === "deposito" ? "Depósito" : "Saque"}
                       </button>
                     ))}
@@ -258,7 +258,7 @@ export default function FinanceiroPage() {
               </div>
               {formError && <p className="text-sm text-[#DC2626] bg-[#DC2626]/5 border border-[#DC2626]/20 rounded-lg px-3 py-2">{formError}</p>}
               <div className="flex gap-2">
-                <Button type="submit" className="bg-[#16A34A] hover:bg-[#15803D] text-white" disabled={saving}>
+                <Button type="submit" className="bg-[#1e3a8a] hover:bg-[#1e40af] text-white" disabled={saving}>
                   {saving ? "Salvando..." : "Registrar"}
                 </Button>
                 <Button type="button" variant="outline" onClick={() => setShowForm(false)}>Cancelar</Button>
@@ -298,7 +298,7 @@ export default function FinanceiroPage() {
                   onClick={() => setFilterPeriodo(value)}
                   className={`px-4 py-1.5 rounded-md text-xs font-medium transition-colors ${
                     filterPeriodo === value
-                      ? "bg-[var(--bg-surface)] text-[#16A34A] border border-[var(--border)] shadow-sm"
+                      ? "bg-[var(--bg-surface)] text-[#1e3a8a] border border-[var(--border)] shadow-sm"
                       : "text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
                   }`}
                 >
@@ -325,7 +325,7 @@ export default function FinanceiroPage() {
                     className={`flex-1 py-1.5 rounded-lg border text-xs font-medium transition-colors ${
                       filterTipo === value
                         ? value === "deposito"
-                          ? "border-[#16A34A] bg-[#16A34A]/10 text-[#16A34A]"
+                          ? "border-[#1e3a8a] bg-[#1e3a8a]/10 text-[#1e3a8a]"
                           : value === "saque"
                           ? "border-[#DC2626] bg-[#DC2626]/10 text-[#DC2626]"
                           : "border-[#2563EB] bg-[#2563EB]/10 text-[#2563EB]"
@@ -377,10 +377,10 @@ export default function FinanceiroPage() {
         <Card>
           <CardContent className="p-4">
             <div className="flex items-center gap-2 mb-1">
-              <ArrowDownLeft className="h-4 w-4 text-[#16A34A]" />
+              <ArrowDownLeft className="h-4 w-4 text-[#1e3a8a]" />
               <span className="text-xs text-[var(--text-secondary)]">Total Depositado</span>
             </div>
-            <p className="text-lg font-bold text-[#16A34A]">{formatCurrency(totalDepositos)}</p>
+            <p className="text-lg font-bold text-[#1e3a8a]">{formatCurrency(totalDepositos)}</p>
           </CardContent>
         </Card>
         <Card>
@@ -412,9 +412,9 @@ export default function FinanceiroPage() {
             <div className="space-y-2">
               {filtered.map(m => (
                 <div key={m.id} className="flex items-center gap-4 p-3 rounded-xl border border-[var(--border)]">
-                  <div className={`p-2 rounded-lg flex-shrink-0 ${m.tipo === "deposito" ? "bg-[#16A34A]/10" : "bg-[#DC2626]/10"}`}>
+                  <div className={`p-2 rounded-lg flex-shrink-0 ${m.tipo === "deposito" ? "bg-[#1e3a8a]/10" : "bg-[#DC2626]/10"}`}>
                     {m.tipo === "deposito"
-                      ? <ArrowDownLeft className="h-4 w-4 text-[#16A34A]" />
+                      ? <ArrowDownLeft className="h-4 w-4 text-[#1e3a8a]" />
                       : <ArrowUpRight className="h-4 w-4 text-[#DC2626]" />
                     }
                   </div>
@@ -431,7 +431,7 @@ export default function FinanceiroPage() {
                     </p>
                   </div>
                   <div className="text-right flex-shrink-0">
-                    <p className={`text-base font-bold ${m.tipo === "deposito" ? "text-[#16A34A]" : "text-[#DC2626]"}`}>
+                    <p className={`text-base font-bold ${m.tipo === "deposito" ? "text-[#1e3a8a]" : "text-[#DC2626]"}`}>
                       {m.tipo === "deposito" ? "+" : "-"}{formatCurrency(Number(m.valor))}
                     </p>
                     <p className="text-xs text-[var(--text-muted)]">{m.tipo === "deposito" ? "Depósito" : "Saque"}</p>

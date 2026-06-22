@@ -64,7 +64,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     return (
       <div className="min-h-screen bg-[var(--bg-base)] flex items-center justify-center">
         <div className="flex items-center gap-3">
-          <div className="w-2 h-2 bg-[#16A34A] rounded-full animate-pulse" />
+          <div className="w-2 h-2 bg-[#1e3a8a] rounded-full animate-pulse" />
           <p className="text-[var(--text-secondary)] text-sm">Carregando...</p>
         </div>
       </div>
@@ -87,7 +87,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           "flex items-center gap-3 px-4 py-5 border-b border-[var(--border)]",
           collapsed && "justify-center px-0"
         )}>
-          <div className="w-8 h-8 bg-[#16A34A] rounded-lg flex items-center justify-center flex-shrink-0">
+          <div className="w-8 h-8 bg-[#1e3a8a] rounded-lg flex items-center justify-center flex-shrink-0">
             <TrendingUp className="w-4 h-4 text-white" />
           </div>
           {!collapsed && <span className="font-bold text-[var(--text-primary)] text-sm">SureBetFlow</span>}
@@ -111,7 +111,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                   "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all",
                   collapsed && "justify-center px-0",
                   active
-                    ? "bg-[#16A34A]/15 text-[#16A34A] border border-[#16A34A]/20"
+                    ? "bg-[#1e3a8a]/15 text-[#1e3a8a] border border-[#1e3a8a]/20"
                     : "text-[var(--text-secondary)] hover:bg-[var(--bg-elevated)] hover:text-[var(--text-primary)]"
                 )}
               >
@@ -133,13 +133,13 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             "flex items-center gap-3 px-3 py-2 rounded-lg bg-[var(--bg-elevated)]",
             collapsed && "justify-center px-0"
           )}>
-            <div className="w-7 h-7 bg-[#16A34A] rounded-full flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
+            <div className="w-7 h-7 bg-[#1e3a8a] rounded-full flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
               {userInitials}
             </div>
             {!collapsed && (
               <div className="flex-1 min-w-0">
                 <p className="text-xs font-medium text-[var(--text-primary)] truncate">{userName}</p>
-                <p className="text-[10px] text-[#16A34A] font-semibold">APOSTADOR</p>
+                <p className="text-[10px] text-[#1e3a8a] font-semibold">APOSTADOR</p>
               </div>
             )}
           </div>
@@ -177,12 +177,12 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         {/* Top bar */}
         <header className="hidden md:flex items-center justify-between px-6 py-3 bg-[var(--bg-surface)] border-b border-[var(--border)] sticky top-0 z-10">
           <div className="flex items-center gap-2 text-sm text-[var(--text-secondary)]">
-            <Circle className="w-2 h-2 fill-[#16A34A] text-[#16A34A]" />
+            <Circle className="w-2 h-2 fill-[#1e3a8a] text-[#1e3a8a]" />
             <span>Sessão ativa</span>
             <span className="opacity-30">•</span>
             <span className="text-[var(--text-primary)] font-medium">{userName}</span>
             <span className="opacity-30">•</span>
-            <span className="text-xs font-semibold bg-[#16A34A]/20 text-[#16A34A] px-2 py-0.5 rounded border border-[#16A34A]/30">
+            <span className="text-xs font-semibold bg-[#1e3a8a]/20 text-[#1e3a8a] px-2 py-0.5 rounded border border-[#1e3a8a]/30">
               APOSTADOR
             </span>
           </div>
@@ -198,7 +198,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             <button className="w-8 h-8 flex items-center justify-center rounded-lg text-[var(--text-secondary)] hover:bg-[var(--bg-elevated)] hover:text-[var(--text-primary)] transition-colors">
               <Bell className="w-4 h-4" />
             </button>
-            <div className="w-8 h-8 bg-[#16A34A] rounded-full flex items-center justify-center text-white text-xs font-bold">
+            <div className="w-8 h-8 bg-[#1e3a8a] rounded-full flex items-center justify-center text-white text-xs font-bold">
               {userInitials}
             </div>
           </div>
@@ -220,7 +220,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               href={href}
               className={cn(
                 "flex-1 flex flex-col items-center py-2 text-xs gap-1",
-                active ? "text-[#16A34A]" : "text-[var(--text-secondary)]"
+                active ? "text-[#1e3a8a]" : "text-[var(--text-secondary)]"
               )}
             >
               <Icon className="w-5 h-5" />

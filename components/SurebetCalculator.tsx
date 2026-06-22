@@ -326,13 +326,13 @@ export default function SurebetCalculator({ profiles, defaultProfileId, onSaved 
     <div className="space-y-4">
 
       {/* Paste block */}
-      <Card className="border-dashed border-[#16A34A]/40 bg-[#16A34A]/5">
+      <Card className="border-dashed border-[#1e3a8a]/40 bg-[#1e3a8a]/5">
         <CardContent className="p-4">
           {!showPaste ? (
             <button
               type="button"
               onClick={() => setShowPaste(true)}
-              className="w-full flex items-center justify-center gap-3 py-2 text-sm text-[#16A34A] font-medium hover:opacity-80 transition-opacity"
+              className="w-full flex items-center justify-center gap-3 py-2 text-sm text-[#1e3a8a] font-medium hover:opacity-80 transition-opacity"
             >
               <ClipboardPaste className="h-4 w-4" />
               Colar dados da surebet para preenchimento automático
@@ -340,21 +340,21 @@ export default function SurebetCalculator({ profiles, defaultProfileId, onSaved 
           ) : (
             <div className="space-y-3">
               <div className="flex items-center gap-2">
-                <Sparkles className="h-4 w-4 text-[#16A34A]" />
+                <Sparkles className="h-4 w-4 text-[#1e3a8a]" />
                 <p className="text-sm font-medium text-[var(--text-primary)]">Cole o texto do localizador de surebets</p>
               </div>
               <textarea
                 value={pasteText}
                 onChange={e => setPasteText(e.target.value)}
                 placeholder={`Cole aqui. Exemplo:\n6,07%\n1 dia\n\nBetano (BR)\nFutebol\t23/06\n14:00\tPortugal – Uzbequistão\n...\t Acima 33.5 - tackles\n5.40`}
-                className="w-full h-44 p-3 text-sm rounded-lg border border-[var(--border)] bg-[var(--bg-surface)] text-[var(--text-primary)] placeholder:text-[var(--text-muted)] resize-none focus:outline-none focus:ring-1 focus:ring-[#16A34A] font-mono"
+                className="w-full h-44 p-3 text-sm rounded-lg border border-[var(--border)] bg-[var(--bg-surface)] text-[var(--text-primary)] placeholder:text-[var(--text-muted)] resize-none focus:outline-none focus:ring-1 focus:ring-[#1e3a8a] font-mono"
               />
               <div className="flex gap-2">
                 <Button
                   type="button"
                   onClick={handleParsePaste}
                   disabled={!pasteText.trim()}
-                  className="flex-1 bg-[#16A34A] hover:bg-[#15803D] text-white"
+                  className="flex-1 bg-[#1e3a8a] hover:bg-[#1e40af] text-white"
                 >
                   <Sparkles className="h-4 w-4 mr-2" />
                   Analisar e preencher automaticamente
@@ -372,7 +372,7 @@ export default function SurebetCalculator({ profiles, defaultProfileId, onSaved 
       <Card>
         <CardHeader className="pb-3">
           <CardTitle className="flex items-center gap-2">
-            <Calculator className="h-5 w-5 text-[#16A34A]" />
+            <Calculator className="h-5 w-5 text-[#1e3a8a]" />
             Configuração da Aposta
           </CardTitle>
         </CardHeader>
@@ -513,15 +513,15 @@ export default function SurebetCalculator({ profiles, defaultProfileId, onSaved 
       </div>
 
       {/* Result */}
-      <Card className={isArbitrage ? "border-[#16A34A]/30" : "border-[#DC2626]/30"}>
+      <Card className={isArbitrage ? "border-[#1e3a8a]/30" : "border-[#DC2626]/30"}>
         <CardContent className="p-5">
           <div className="flex items-center gap-3 mb-4">
             {isArbitrage ? (
               <div className="flex items-center gap-2">
-                <div className="p-1.5 bg-[#16A34A]/10 rounded-full">
-                  <Check className="h-4 w-4 text-[#16A34A]" />
+                <div className="p-1.5 bg-[#1e3a8a]/10 rounded-full">
+                  <Check className="h-4 w-4 text-[#1e3a8a]" />
                 </div>
-                <span className="font-semibold text-[#16A34A]">Arbitragem encontrada!</span>
+                <span className="font-semibold text-[#1e3a8a]">Arbitragem encontrada!</span>
               </div>
             ) : sumProbs > 0 ? (
               <div className="flex items-center gap-2">
@@ -543,11 +543,11 @@ export default function SurebetCalculator({ profiles, defaultProfileId, onSaved 
               </div>
               <div>
                 <p className="text-xs text-[var(--text-secondary)] mb-1">Lucro Garantido</p>
-                <p className="text-lg font-bold text-[#16A34A]">{formatCurrency(lucroGarantido)}</p>
+                <p className="text-lg font-bold text-[#1e3a8a]">{formatCurrency(lucroGarantido)}</p>
               </div>
               <div>
                 <p className="text-xs text-[var(--text-secondary)] mb-1">ROI</p>
-                <p className="text-lg font-bold text-[#16A34A]">{roi.toFixed(2)}%</p>
+                <p className="text-lg font-bold text-[#1e3a8a]">{roi.toFixed(2)}%</p>
               </div>
             </div>
           )}

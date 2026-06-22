@@ -51,7 +51,7 @@ export default function AdminCasasClient({ bets: initial }: { bets: Bet[] }) {
           <h1 className="text-2xl font-bold text-white">Casas de Apostas</h1>
           <p className="text-gray-400 text-sm mt-1">{bets.length} casas cadastradas</p>
         </div>
-        <button onClick={openNew} className="flex items-center gap-2 px-4 py-2 bg-[#16A34A] hover:bg-[#15803D] text-white text-sm font-medium rounded-lg transition-colors">
+        <button onClick={openNew} className="flex items-center gap-2 px-4 py-2 bg-[#1e3a8a] hover:bg-[#1e40af] text-white text-sm font-medium rounded-lg transition-colors">
           <Plus className="h-4 w-4" /> Nova Casa
         </button>
       </div>
@@ -63,7 +63,7 @@ export default function AdminCasasClient({ bets: initial }: { bets: Bet[] }) {
             <div className="space-y-1.5">
               <label className="text-xs text-gray-400">Nome *</label>
               <input
-                className="w-full h-10 px-3 rounded-lg bg-gray-800 border border-gray-700 text-white text-sm focus:outline-none focus:border-[#16A34A]"
+                className="w-full h-10 px-3 rounded-lg bg-gray-800 border border-gray-700 text-white text-sm focus:outline-none focus:border-[#1e3a8a]"
                 placeholder="Ex: Betano"
                 value={nome}
                 onChange={e => setNome(e.target.value)}
@@ -72,7 +72,7 @@ export default function AdminCasasClient({ bets: initial }: { bets: Bet[] }) {
             <div className="space-y-1.5">
               <label className="text-xs text-gray-400">URL do Logo (opcional)</label>
               <input
-                className="w-full h-10 px-3 rounded-lg bg-gray-800 border border-gray-700 text-white text-sm focus:outline-none focus:border-[#16A34A]"
+                className="w-full h-10 px-3 rounded-lg bg-gray-800 border border-gray-700 text-white text-sm focus:outline-none focus:border-[#1e3a8a]"
                 placeholder="https://..."
                 value={logoUrl}
                 onChange={e => setLogoUrl(e.target.value)}
@@ -80,7 +80,7 @@ export default function AdminCasasClient({ bets: initial }: { bets: Bet[] }) {
             </div>
           </div>
           <div className="flex gap-2">
-            <button onClick={handleSave} disabled={saving} className="flex items-center gap-2 px-4 py-2 bg-[#16A34A] hover:bg-[#15803D] text-white text-sm font-medium rounded-lg transition-colors disabled:opacity-50">
+            <button onClick={handleSave} disabled={saving} className="flex items-center gap-2 px-4 py-2 bg-[#1e3a8a] hover:bg-[#1e40af] text-white text-sm font-medium rounded-lg transition-colors disabled:opacity-50">
               <Check className="h-4 w-4" /> {saving ? "Salvando..." : "Salvar"}
             </button>
             <button onClick={cancel} className="flex items-center gap-2 px-4 py-2 bg-gray-800 hover:bg-gray-700 text-gray-300 text-sm font-medium rounded-lg transition-colors">
