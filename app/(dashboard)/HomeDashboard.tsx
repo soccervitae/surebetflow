@@ -52,9 +52,7 @@ export default function HomeDashboard({ dashboard, profiles, recentApostas, apos
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-bold text-[var(--text-primary)]">
-          Painel Geral <span>📊</span>
-        </h1>
+        <h1 className="text-2xl font-bold text-[var(--text-primary)]">Painel Geral</h1>
         <p className="text-[var(--text-secondary)] text-sm mt-1">Visão consolidada de todos os seus perfis</p>
       </div>
 
