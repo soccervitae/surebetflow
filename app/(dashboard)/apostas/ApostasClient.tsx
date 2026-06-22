@@ -86,16 +86,16 @@ export default function ApostasClient({ apostas: initialApostas, profiles }: Pro
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">Apostas</h1>
-        <p className="text-gray-500 text-sm mt-1">Histórico completo de todas as suas apostas</p>
+        <h1 className="text-2xl font-bold text-[var(--text-primary)]">Apostas</h1>
+        <p className="text-[var(--text-secondary)] text-sm mt-1">Histórico completo de todas as suas apostas</p>
       </div>
 
       {/* Filters */}
       <Card>
         <CardContent className="p-4">
           <div className="flex items-center gap-2 mb-3">
-            <Filter className="h-4 w-4 text-gray-500" />
-            <span className="text-sm font-medium text-gray-700">Filtros</span>
+            <Filter className="h-4 w-4 text-[var(--text-secondary)]" />
+            <span className="text-sm font-medium text-[var(--text-primary)]">Filtros</span>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="space-y-1.5">
@@ -137,7 +137,7 @@ export default function ApostasClient({ apostas: initialApostas, profiles }: Pro
         <Card>
           <CardContent className="flex flex-col items-center justify-center py-16">
             <BookOpen className="h-12 w-12 text-gray-300 mb-4" />
-            <p className="text-gray-500">Nenhuma aposta encontrada</p>
+            <p className="text-[var(--text-secondary)]">Nenhuma aposta encontrada</p>
           </CardContent>
         </Card>
       ) : (
@@ -149,11 +149,11 @@ export default function ApostasClient({ apostas: initialApostas, profiles }: Pro
                 <div className="flex items-start justify-between gap-4">
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 flex-wrap mb-1">
-                      <p className="font-medium text-gray-900 truncate">{aposta.evento}</p>
+                      <p className="font-medium text-[var(--text-primary)] truncate">{aposta.evento}</p>
                       {statusBadge(aposta.status)}
                       <Badge variant="secondary">{aposta.tipo}</Badge>
                     </div>
-                    <div className="text-xs text-gray-500 space-y-0.5">
+                    <div className="text-xs text-[var(--text-secondary)] space-y-0.5">
                       <p>
                         Perfil: {aposta.profile ? (aposta.profile.apelido || `${aposta.profile.nome} ${aposta.profile.sobrenome}`) : "—"}
                       </p>
@@ -167,8 +167,8 @@ export default function ApostasClient({ apostas: initialApostas, profiles }: Pro
                     {(aposta as Aposta & { legs?: ApostaLeg[] }).legs && (aposta as Aposta & { legs?: ApostaLeg[] }).legs!.length > 0 && (
                       <div className="mt-2 space-y-1">
                         {(aposta as Aposta & { legs?: ApostaLeg[] }).legs!.map((leg) => (
-                          <div key={leg.id} className="text-xs text-gray-500 flex items-center gap-2">
-                            <span className="bg-gray-100 rounded px-1.5 py-0.5">
+                          <div key={leg.id} className="text-xs text-[var(--text-secondary)] flex items-center gap-2">
+                            <span className="bg-[var(--bg-elevated)] rounded px-1.5 py-0.5">
                               {leg.profile_bet?.bet?.nome ?? "Casa"}
                             </span>
                             <span>{leg.resultado_apostado}</span>
@@ -182,15 +182,15 @@ export default function ApostasClient({ apostas: initialApostas, profiles }: Pro
                   <div className="text-right flex-shrink-0">
                     {aposta.status === "finalizada" ? (
                       <>
-                        <p className="text-xs text-gray-400">Resultado real</p>
+                        <p className="text-xs text-[var(--text-muted)]">Resultado real</p>
                         <p className="text-base font-bold text-[#16A34A]">{formatCurrency(aposta.resultado_real ?? 0)}</p>
                         {aposta.finalizada_at && (
-                          <p className="text-xs text-gray-400">{new Date(aposta.finalizada_at).toLocaleDateString("pt-BR")}</p>
+                          <p className="text-xs text-[var(--text-muted)]">{new Date(aposta.finalizada_at).toLocaleDateString("pt-BR")}</p>
                         )}
                       </>
                     ) : aposta.status === "pendente" ? (
                       <>
-                        <p className="text-xs text-gray-400">Lucro esperado</p>
+                        <p className="text-xs text-[var(--text-muted)]">Lucro esperado</p>
                         <p className="text-base font-bold text-yellow-600">{formatCurrency(aposta.lucro_garantido)}</p>
                         <Button
                           size="sm"
@@ -206,7 +206,7 @@ export default function ApostasClient({ apostas: initialApostas, profiles }: Pro
                         </Button>
                       </>
                     ) : (
-                      <p className="text-sm text-gray-400">Cancelada</p>
+                      <p className="text-sm text-[var(--text-muted)]">Cancelada</p>
                     )}
                   </div>
                 </div>
@@ -223,7 +223,7 @@ export default function ApostasClient({ apostas: initialApostas, profiles }: Pro
             <DialogTitle>Finalizar Aposta</DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
-            <p className="text-sm text-gray-600">
+            <p className="text-sm text-[var(--text-secondary)]">
               Evento: <strong>{finalizarDialog?.evento}</strong><br />
               Lucro esperado: <strong>{formatCurrency(finalizarDialog?.lucro_garantido ?? 0)}</strong>
             </p>

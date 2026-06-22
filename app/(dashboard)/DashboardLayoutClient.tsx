@@ -38,12 +38,12 @@ export default function DashboardLayoutClient({ children }: { children: React.Re
   return (
     <div className="flex h-screen bg-[#FAFAF8] overflow-hidden">
       {/* Desktop Sidebar */}
-      <aside className="hidden lg:flex lg:flex-col w-64 bg-white border-r border-[#E5E1D8] flex-shrink-0">
-        <div className="flex items-center gap-3 p-6 border-b border-[#E5E1D8]">
+      <aside className="hidden lg:flex lg:flex-col w-64 bg-[var(--bg-surface)] border-r border-[var(--border)] flex-shrink-0">
+        <div className="flex items-center gap-3 p-6 border-b border-[var(--border)]">
           <div className="flex items-center justify-center w-9 h-9 bg-[#16A34A] rounded-lg">
             <TrendingUp className="h-5 w-5 text-white" />
           </div>
-          <span className="font-bold text-gray-900">SureBetFlow</span>
+          <span className="font-bold text-[var(--text-primary)]">SureBetFlow</span>
         </div>
         <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
           {navItems.map(item => (
@@ -54,7 +54,7 @@ export default function DashboardLayoutClient({ children }: { children: React.Re
                 "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors",
                 isActive(item.href)
                   ? "bg-[#16A34A]/10 text-[#16A34A]"
-                  : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
+                  : "text-[var(--text-secondary)] hover:bg-[var(--bg-elevated)] hover:text-[var(--text-primary)]"
               )}
             >
               <item.icon className="h-5 w-5 flex-shrink-0" />
@@ -62,10 +62,10 @@ export default function DashboardLayoutClient({ children }: { children: React.Re
             </Link>
           ))}
         </nav>
-        <div className="p-4 border-t border-[#E5E1D8]">
+        <div className="p-4 border-t border-[var(--border)]">
           <button
             onClick={handleLogout}
-            className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100 hover:text-gray-900 transition-colors w-full"
+            className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-[var(--text-secondary)] hover:bg-[var(--bg-elevated)] hover:text-[var(--text-primary)] transition-colors w-full"
           >
             <LogOut className="h-5 w-5" />
             Sair
@@ -77,16 +77,16 @@ export default function DashboardLayoutClient({ children }: { children: React.Re
       {sidebarOpen && (
         <div className="fixed inset-0 z-40 lg:hidden">
           <div className="absolute inset-0 bg-black/50" onClick={() => setSidebarOpen(false)} />
-          <aside className="absolute left-0 top-0 bottom-0 w-72 bg-white flex flex-col shadow-xl">
-            <div className="flex items-center justify-between p-6 border-b border-[#E5E1D8]">
+          <aside className="absolute left-0 top-0 bottom-0 w-72 bg-[var(--bg-surface)] flex flex-col shadow-xl">
+            <div className="flex items-center justify-between p-6 border-b border-[var(--border)]">
               <div className="flex items-center gap-3">
                 <div className="flex items-center justify-center w-9 h-9 bg-[#16A34A] rounded-lg">
                   <TrendingUp className="h-5 w-5 text-white" />
                 </div>
-                <span className="font-bold text-gray-900">SureBetFlow</span>
+                <span className="font-bold text-[var(--text-primary)]">SureBetFlow</span>
               </div>
-              <button onClick={() => setSidebarOpen(false)} className="p-1 rounded-lg hover:bg-gray-100">
-                <X className="h-5 w-5 text-gray-500" />
+              <button onClick={() => setSidebarOpen(false)} className="p-1 rounded-lg hover:bg-[var(--bg-elevated)]">
+                <X className="h-5 w-5 text-[var(--text-secondary)]" />
               </button>
             </div>
             <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
@@ -99,7 +99,7 @@ export default function DashboardLayoutClient({ children }: { children: React.Re
                     "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors",
                     isActive(item.href)
                       ? "bg-[#16A34A]/10 text-[#16A34A]"
-                      : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
+                      : "text-[var(--text-secondary)] hover:bg-[var(--bg-elevated)] hover:text-[var(--text-primary)]"
                   )}
                 >
                   <item.icon className="h-5 w-5 flex-shrink-0" />
@@ -107,10 +107,10 @@ export default function DashboardLayoutClient({ children }: { children: React.Re
                 </Link>
               ))}
             </nav>
-            <div className="p-4 border-t border-[#E5E1D8]">
+            <div className="p-4 border-t border-[var(--border)]">
               <button
                 onClick={handleLogout}
-                className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100 w-full"
+                className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-[var(--text-secondary)] hover:bg-[var(--bg-elevated)] w-full"
               >
                 <LogOut className="h-5 w-5" />
                 Sair
@@ -123,15 +123,15 @@ export default function DashboardLayoutClient({ children }: { children: React.Re
       {/* Main content */}
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
         {/* Mobile top bar */}
-        <header className="lg:hidden flex items-center justify-between p-4 bg-white border-b border-[#E5E1D8]">
-          <button onClick={() => setSidebarOpen(true)} className="p-2 rounded-lg hover:bg-gray-100">
-            <Menu className="h-5 w-5 text-gray-600" />
+        <header className="lg:hidden flex items-center justify-between p-4 bg-[var(--bg-surface)] border-b border-[var(--border)]">
+          <button onClick={() => setSidebarOpen(true)} className="p-2 rounded-lg hover:bg-[var(--bg-elevated)]">
+            <Menu className="h-5 w-5 text-[var(--text-secondary)]" />
           </button>
           <div className="flex items-center gap-2">
             <div className="flex items-center justify-center w-7 h-7 bg-[#16A34A] rounded-lg">
               <TrendingUp className="h-4 w-4 text-white" />
             </div>
-            <span className="font-bold text-gray-900 text-sm">SureBetFlow</span>
+            <span className="font-bold text-[var(--text-primary)] text-sm">SureBetFlow</span>
           </div>
           <div className="w-9" />
         </header>
@@ -142,7 +142,7 @@ export default function DashboardLayoutClient({ children }: { children: React.Re
         </main>
 
         {/* Mobile bottom nav */}
-        <nav className="lg:hidden bg-white border-t border-[#E5E1D8] px-2 py-2 safe-area-bottom">
+        <nav className="lg:hidden bg-[var(--bg-surface)] border-t border-[var(--border)] px-2 py-2 safe-area-bottom">
           <div className="flex items-center justify-around">
             {navItems.slice(0, 5).map(item => (
               <Link
@@ -150,7 +150,7 @@ export default function DashboardLayoutClient({ children }: { children: React.Re
                 href={item.href}
                 className={cn(
                   "flex flex-col items-center gap-1 px-2 py-1.5 rounded-lg transition-colors min-w-0",
-                  isActive(item.href) ? "text-[#16A34A]" : "text-gray-500"
+                  isActive(item.href) ? "text-[#16A34A]" : "text-[var(--text-secondary)]"
                 )}
               >
                 <item.icon className="h-5 w-5 flex-shrink-0" />

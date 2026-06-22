@@ -122,9 +122,9 @@ export default function ApostaDetailClient({ aposta: initial }: { aposta: Aposta
           <ArrowLeft className="h-5 w-5" />
         </Button>
         <div className="flex-1 min-w-0">
-          <h1 className="text-xl font-bold text-gray-900 truncate">{aposta.evento}</h1>
+          <h1 className="text-xl font-bold text-[var(--text-primary)] truncate">{aposta.evento}</h1>
           {perfil && (
-            <Link href={`/perfis/${perfil.id}`} className="text-sm text-gray-500 hover:text-[#16A34A] transition-colors">
+            <Link href={`/perfis/${perfil.id}`} className="text-sm text-[var(--text-secondary)] hover:text-[#16A34A] transition-colors">
               {perfil.apelido ?? `${perfil.nome} ${perfil.sobrenome}`}
             </Link>
           )}
@@ -144,8 +144,8 @@ export default function ApostaDetailClient({ aposta: initial }: { aposta: Aposta
                 <DollarSign className="h-4 w-4 text-[#2563EB]" />
               </div>
               <div>
-                <p className="text-xs text-gray-500">Investimento</p>
-                <p className="text-base font-bold text-gray-900">{formatCurrency(aposta.investimento_total)}</p>
+                <p className="text-xs text-[var(--text-secondary)]">Investimento</p>
+                <p className="text-base font-bold text-[var(--text-primary)]">{formatCurrency(aposta.investimento_total)}</p>
               </div>
             </div>
           </CardContent>
@@ -158,7 +158,7 @@ export default function ApostaDetailClient({ aposta: initial }: { aposta: Aposta
                 <TrendingUp className={`h-4 w-4 ${aposta.status === "finalizada" ? "text-[#16A34A]" : "text-yellow-500"}`} />
               </div>
               <div>
-                <p className="text-xs text-gray-500">
+                <p className="text-xs text-[var(--text-secondary)]">
                   {aposta.status === "finalizada" ? "Lucro Real" : "Lucro Esperado"}
                 </p>
                 <p className={`text-base font-bold ${aposta.status === "finalizada" ? "text-[#16A34A]" : "text-yellow-600"}`}>
@@ -176,7 +176,7 @@ export default function ApostaDetailClient({ aposta: initial }: { aposta: Aposta
                 <BarChart2 className="h-4 w-4 text-purple-600" />
               </div>
               <div>
-                <p className="text-xs text-gray-500">ROI</p>
+                <p className="text-xs text-[var(--text-secondary)]">ROI</p>
                 <p className="text-base font-bold text-purple-600">{aposta.roi_percentual.toFixed(2)}%</p>
               </div>
             </div>
@@ -186,12 +186,12 @@ export default function ApostaDetailClient({ aposta: initial }: { aposta: Aposta
         <Card>
           <CardContent className="p-4">
             <div className="flex items-center gap-3">
-              <div className="p-2 bg-gray-100 rounded-lg">
-                <Tag className="h-4 w-4 text-gray-500" />
+              <div className="p-2 bg-[var(--bg-elevated)] rounded-lg">
+                <Tag className="h-4 w-4 text-[var(--text-secondary)]" />
               </div>
               <div>
-                <p className="text-xs text-gray-500">Tipo</p>
-                <p className="text-base font-bold text-gray-900">{aposta.tipo}</p>
+                <p className="text-xs text-[var(--text-secondary)]">Tipo</p>
+                <p className="text-base font-bold text-[var(--text-primary)]">{aposta.tipo}</p>
               </div>
             </div>
           </CardContent>
@@ -205,26 +205,26 @@ export default function ApostaDetailClient({ aposta: initial }: { aposta: Aposta
         </CardHeader>
         <CardContent className="space-y-3">
           {legs.length === 0 ? (
-            <p className="text-sm text-gray-400 text-center py-4">Nenhuma entrada registrada</p>
+            <p className="text-sm text-[var(--text-muted)] text-center py-4">Nenhuma entrada registrada</p>
           ) : (
             legs.map((leg, i) => (
-              <div key={leg.id} className="flex items-center justify-between p-3 rounded-xl bg-gray-50 border border-[#E5E1D8]">
+              <div key={leg.id} className="flex items-center justify-between p-3 rounded-xl bg-[var(--bg-muted)] border border-[var(--border)]">
                 <div className="flex items-center gap-3">
                   <div className="w-7 h-7 rounded-full bg-[#16A34A]/10 flex items-center justify-center text-xs font-bold text-[#16A34A]">
                     {i + 1}
                   </div>
                   <div>
-                    <p className="font-medium text-sm text-gray-900">
+                    <p className="font-medium text-sm text-[var(--text-primary)]">
                       {leg.profile_bet?.bet?.nome ?? "Casa desconhecida"}
                     </p>
-                    <p className="text-xs text-gray-500 mt-0.5">
-                      Resultado: <span className="font-medium text-gray-700">{leg.resultado_apostado}</span>
+                    <p className="text-xs text-[var(--text-secondary)] mt-0.5">
+                      Resultado: <span className="font-medium text-[var(--text-primary)]">{leg.resultado_apostado}</span>
                     </p>
                   </div>
                 </div>
                 <div className="text-right">
-                  <p className="text-sm font-bold text-gray-900">Odd {Number(leg.odd).toFixed(2)}</p>
-                  <p className="text-xs text-gray-500">{formatCurrency(leg.stake)}</p>
+                  <p className="text-sm font-bold text-[var(--text-primary)]">Odd {Number(leg.odd).toFixed(2)}</p>
+                  <p className="text-xs text-[var(--text-secondary)]">{formatCurrency(leg.stake)}</p>
                 </div>
               </div>
             ))
@@ -236,21 +236,21 @@ export default function ApostaDetailClient({ aposta: initial }: { aposta: Aposta
       <Card>
         <CardContent className="p-4 space-y-2">
           <div className="flex items-center justify-between text-sm">
-            <div className="flex items-center gap-2 text-gray-500">
+            <div className="flex items-center gap-2 text-[var(--text-secondary)]">
               <CalendarDays className="w-4 h-4" />
               <span>Registrada em</span>
             </div>
-            <span className="font-medium text-gray-900">
+            <span className="font-medium text-[var(--text-primary)]">
               {new Date(aposta.created_at).toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit", year: "numeric" })}
             </span>
           </div>
           {aposta.finalizada_at && (
             <div className="flex items-center justify-between text-sm">
-              <div className="flex items-center gap-2 text-gray-500">
+              <div className="flex items-center gap-2 text-[var(--text-secondary)]">
                 <Clock className="w-4 h-4" />
                 <span>Finalizada em</span>
               </div>
-              <span className="font-medium text-gray-900">
+              <span className="font-medium text-[var(--text-primary)]">
                 {new Date(aposta.finalizada_at).toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit", year: "numeric" })}
               </span>
             </div>
@@ -290,9 +290,9 @@ export default function ApostaDetailClient({ aposta: initial }: { aposta: Aposta
             <DialogTitle>Finalizar Aposta</DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
-            <div className="p-3 rounded-xl bg-gray-50 border border-[#E5E1D8]">
-              <p className="text-sm font-medium text-gray-900">{aposta.evento}</p>
-              <p className="text-xs text-gray-500 mt-1">Lucro esperado: {formatCurrency(aposta.lucro_garantido)}</p>
+            <div className="p-3 rounded-xl bg-[var(--bg-muted)] border border-[var(--border)]">
+              <p className="text-sm font-medium text-[var(--text-primary)]">{aposta.evento}</p>
+              <p className="text-xs text-[var(--text-secondary)] mt-1">Lucro esperado: {formatCurrency(aposta.lucro_garantido)}</p>
             </div>
             <div className="space-y-2">
               <Label>Resultado real obtido (R$)</Label>

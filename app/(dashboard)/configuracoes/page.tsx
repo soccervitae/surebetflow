@@ -41,12 +41,12 @@ export default function ConfiguracoesPage() {
   return (
     <div className="p-6 max-w-2xl mx-auto">
       <div className="flex items-center gap-3 mb-6">
-        <div className="w-9 h-9 bg-gray-100 rounded-xl flex items-center justify-center">
-          <Settings className="w-5 h-5 text-gray-600" />
+        <div className="w-9 h-9 bg-[var(--bg-elevated)] rounded-xl flex items-center justify-center">
+          <Settings className="w-5 h-5 text-[var(--text-secondary)]" />
         </div>
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Configurações</h1>
-          <p className="text-sm text-gray-500">Dados da sua conta</p>
+          <h1 className="text-2xl font-bold text-[var(--text-primary)]">Configurações</h1>
+          <p className="text-sm text-[var(--text-secondary)]">Dados da sua conta</p>
         </div>
       </div>
 
@@ -55,9 +55,9 @@ export default function ConfiguracoesPage() {
         <CardContent>
           <div className="space-y-2">
             <Label>E-mail</Label>
-            <Input value={email} disabled className="bg-gray-50 text-gray-500" />
+            <Input value={email} disabled className="bg-[var(--bg-muted)] text-[var(--text-secondary)]" />
           </div>
-          <p className="text-xs text-gray-400 mt-2">Para alterar o e-mail, entre em contato com o suporte.</p>
+          <p className="text-xs text-[var(--text-muted)] mt-2">Para alterar o e-mail, entre em contato com o suporte.</p>
         </CardContent>
       </Card>
 

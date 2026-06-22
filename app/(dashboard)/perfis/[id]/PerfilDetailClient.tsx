@@ -119,11 +119,11 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
             </AvatarFallback>
           </Avatar>
           <div className="min-w-0">
-            <h1 className="text-xl font-bold text-gray-900 truncate">
+            <h1 className="text-xl font-bold text-[var(--text-primary)] truncate">
               {currentProfile.nome} {currentProfile.sobrenome}
             </h1>
             {currentProfile.apelido && (
-              <p className="text-sm text-gray-500">{currentProfile.apelido}</p>
+              <p className="text-sm text-[var(--text-secondary)]">{currentProfile.apelido}</p>
             )}
           </div>
         </div>
@@ -153,8 +153,8 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
                     <DollarSign className="h-5 w-5 text-[#2563EB]" />
                   </div>
                   <div className="min-w-0">
-                    <p className="text-xs text-gray-500">Saldo Total</p>
-                    <p className="text-base font-bold text-gray-900 truncate">{formatCurrency(dashboard?.saldo_total ?? 0)}</p>
+                    <p className="text-xs text-[var(--text-secondary)]">Saldo Total</p>
+                    <p className="text-base font-bold text-[var(--text-primary)] truncate">{formatCurrency(dashboard?.saldo_total ?? 0)}</p>
                   </div>
                 </div>
               </CardContent>
@@ -166,7 +166,7 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
                     <TrendingUp className="h-5 w-5 text-[#16A34A]" />
                   </div>
                   <div className="min-w-0">
-                    <p className="text-xs text-gray-500">Lucro Realizado</p>
+                    <p className="text-xs text-[var(--text-secondary)]">Lucro Realizado</p>
                     <p className="text-base font-bold text-[#16A34A] truncate">{formatCurrency(dashboard?.lucro_realizado ?? 0)}</p>
                   </div>
                 </div>
@@ -179,7 +179,7 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
                     <Clock className="h-5 w-5 text-yellow-600" />
                   </div>
                   <div className="min-w-0">
-                    <p className="text-xs text-gray-500">Lucro Pendente</p>
+                    <p className="text-xs text-[var(--text-secondary)]">Lucro Pendente</p>
                     <p className="text-base font-bold text-yellow-600 truncate">{formatCurrency(dashboard?.lucro_pendente ?? 0)}</p>
                   </div>
                 </div>
@@ -192,7 +192,7 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
                     <ArrowUpRight className="h-5 w-5 text-purple-600" />
                   </div>
                   <div className="min-w-0">
-                    <p className="text-xs text-gray-500">ROI</p>
+                    <p className="text-xs text-[var(--text-secondary)]">ROI</p>
                     <p className="text-base font-bold text-purple-600 truncate">{(dashboard?.roi_percentual ?? 0).toFixed(2)}%</p>
                   </div>
                 </div>
@@ -233,7 +233,7 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
         <TabsContent value="apostas" className="space-y-3">
           {currentApostas.length === 0 ? (
             <Card>
-              <CardContent className="py-12 text-center text-gray-500">
+              <CardContent className="py-12 text-center text-[var(--text-secondary)]">
                 Nenhuma aposta registrada para este perfil
               </CardContent>
             </Card>
@@ -245,11 +245,11 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
                   <div className="flex items-start justify-between gap-3">
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 flex-wrap">
-                        <p className="font-medium text-gray-900 truncate">{aposta.evento}</p>
+                        <p className="font-medium text-[var(--text-primary)] truncate">{aposta.evento}</p>
                         {statusBadge(aposta.status)}
                         <Badge variant="secondary">{aposta.tipo}</Badge>
                       </div>
-                      <p className="text-xs text-gray-500 mt-1">
+                      <p className="text-xs text-[var(--text-secondary)] mt-1">
                         {new Date(aposta.created_at).toLocaleDateString("pt-BR")} ·
                         Investimento: {formatCurrency(aposta.investimento_total)} ·
                         ROI: {aposta.roi_percentual.toFixed(2)}%
@@ -304,7 +304,7 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
             <DialogTitle>Finalizar Aposta</DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
-            <p className="text-sm text-gray-600">
+            <p className="text-sm text-[var(--text-secondary)]">
               Informe o resultado real obtido para a aposta <strong>{finalizarDialog?.evento}</strong>.
             </p>
             <div className="space-y-2">

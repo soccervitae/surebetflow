@@ -27,8 +27,8 @@ export default function EditarPerfilClient({ profile }: { profile: Profile }) {
           </Button>
         </Link>
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Editar Perfil</h1>
-          <p className="text-gray-500 text-sm">{profile.nome} {profile.sobrenome}</p>
+          <h1 className="text-2xl font-bold text-[var(--text-primary)]">Editar Perfil</h1>
+          <p className="text-[var(--text-secondary)] text-sm">{profile.nome} {profile.sobrenome}</p>
         </div>
       </div>
 

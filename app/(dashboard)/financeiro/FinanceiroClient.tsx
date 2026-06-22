@@ -122,8 +122,8 @@ export default function FinanceiroClient({ movimentacoes: initial, profiles, pro
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Financeiro</h1>
-          <p className="text-gray-500 text-sm mt-1">Controle de depósitos e saques</p>
+          <h1 className="text-2xl font-bold text-[var(--text-primary)]">Financeiro</h1>
+          <p className="text-[var(--text-secondary)] text-sm mt-1">Controle de depósitos e saques</p>
         </div>
         <Button onClick={() => setShowForm(!showForm)}>
           <Plus className="h-4 w-4 mr-2" />
@@ -137,7 +137,7 @@ export default function FinanceiroClient({ movimentacoes: initial, profiles, pro
           <CardContent className="p-4">
             <div className="flex items-center gap-2 mb-1">
               <ArrowDownLeft className="h-4 w-4 text-[#16A34A]" />
-              <span className="text-xs text-gray-500">Total Depositado</span>
+              <span className="text-xs text-[var(--text-secondary)]">Total Depositado</span>
             </div>
             <p className="text-lg font-bold text-[#16A34A]">{formatCurrency(totalDepositos)}</p>
           </CardContent>
@@ -146,7 +146,7 @@ export default function FinanceiroClient({ movimentacoes: initial, profiles, pro
           <CardContent className="p-4">
             <div className="flex items-center gap-2 mb-1">
               <ArrowUpRight className="h-4 w-4 text-[#DC2626]" />
-              <span className="text-xs text-gray-500">Total Sacado</span>
+              <span className="text-xs text-[var(--text-secondary)]">Total Sacado</span>
             </div>
             <p className="text-lg font-bold text-[#DC2626]">{formatCurrency(totalSaques)}</p>
           </CardContent>
@@ -155,7 +155,7 @@ export default function FinanceiroClient({ movimentacoes: initial, profiles, pro
           <CardContent className="p-4">
             <div className="flex items-center gap-2 mb-1">
               <DollarSign className="h-4 w-4 text-[#2563EB]" />
-              <span className="text-xs text-gray-500">Saldo Líquido</span>
+              <span className="text-xs text-[var(--text-secondary)]">Saldo Líquido</span>
             </div>
             <p className="text-lg font-bold text-[#2563EB]">{formatCurrency(totalDepositos - totalSaques)}</p>
           </CardContent>
@@ -247,8 +247,8 @@ export default function FinanceiroClient({ movimentacoes: initial, profiles, pro
       <Card>
         <CardContent className="p-4">
           <div className="flex items-center gap-2 mb-3">
-            <Filter className="h-4 w-4 text-gray-500" />
-            <span className="text-sm font-medium text-gray-700">Filtros</span>
+            <Filter className="h-4 w-4 text-[var(--text-secondary)]" />
+            <span className="text-sm font-medium text-[var(--text-primary)]">Filtros</span>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <Select value={filterProfile} onValueChange={setFilterProfile}>
@@ -281,7 +281,7 @@ export default function FinanceiroClient({ movimentacoes: initial, profiles, pro
       {/* Table */}
       {filtered.length === 0 ? (
         <Card>
-          <CardContent className="py-12 text-center text-gray-500">
+          <CardContent className="py-12 text-center text-[var(--text-secondary)]">
             Nenhuma movimentação encontrada
           </CardContent>
         </Card>
@@ -299,14 +299,14 @@ export default function FinanceiroClient({ movimentacoes: initial, profiles, pro
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">
-                      <p className="font-medium text-gray-900 text-sm">
+                      <p className="font-medium text-[var(--text-primary)] text-sm">
                         {mov.tipo === "deposito" ? "Depósito" : "Saque"}
                       </p>
                       {mov.profile_bet?.bet && (
                         <Badge variant="secondary">{mov.profile_bet.bet.nome}</Badge>
                       )}
                     </div>
-                    <p className="text-xs text-gray-500">
+                    <p className="text-xs text-[var(--text-secondary)]">
                       {mov.profile ? (mov.profile.apelido || `${mov.profile.nome} ${mov.profile.sobrenome}`) : "—"}
                       {mov.descricao && ` · ${mov.descricao}`}
                       {" · "}{new Date(mov.created_at).toLocaleDateString("pt-BR")}

@@ -110,8 +110,8 @@ export default function FinanceiroPage() {
             <Wallet className="w-5 h-5 text-[#2563EB]" />
           </div>
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">Financeiro</h1>
-            <p className="text-sm text-gray-500">Depósitos e saques por perfil</p>
+            <h1 className="text-2xl font-bold text-[var(--text-primary)]">Financeiro</h1>
+            <p className="text-sm text-[var(--text-secondary)]">Depósitos e saques por perfil</p>
           </div>
         </div>
         <Button onClick={() => setShowForm(!showForm)} className="bg-[#16A34A] hover:bg-[#15803D] text-white gap-2">
@@ -127,14 +127,14 @@ export default function FinanceiroPage() {
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label>Perfil *</Label>
-                  <select className="w-full h-10 px-3 rounded-xl border border-[#E5E1D8] text-sm" value={formProfile} onChange={e => setFormProfile(e.target.value)} required>
+                  <select className="w-full h-10 px-3 rounded-xl border border-[var(--border)] text-sm" value={formProfile} onChange={e => setFormProfile(e.target.value)} required>
                     <option value="">Selecione</option>
                     {profiles.map(p => <option key={p.id} value={p.id}>{p.nome} {p.sobrenome}</option>)}
                   </select>
                 </div>
                 <div className="space-y-2">
                   <Label>Casa de Apostas (opcional)</Label>
-                  <select className="w-full h-10 px-3 rounded-xl border border-[#E5E1D8] text-sm" value={formBet} onChange={e => setFormBet(e.target.value)}>
+                  <select className="w-full h-10 px-3 rounded-xl border border-[var(--border)] text-sm" value={formBet} onChange={e => setFormBet(e.target.value)}>
                     <option value="">Nenhuma</option>
                     {profileBets.map(pb => <option key={pb.id} value={pb.id}>{pb.bet?.nome}</option>)}
                   </select>
@@ -146,7 +146,7 @@ export default function FinanceiroPage() {
                   <div className="flex gap-2">
                     {(["deposito", "saque"] as const).map(t => (
                       <button key={t} type="button" onClick={() => setFormTipo(t)}
-                        className={`flex-1 h-10 rounded-xl border text-sm font-medium transition-colors capitalize ${formTipo === t ? "border-[#16A34A] bg-[#16A34A]/10 text-[#16A34A]" : "border-[#E5E1D8] text-gray-600"}`}>
+                        className={`flex-1 h-10 rounded-xl border text-sm font-medium transition-colors capitalize ${formTipo === t ? "border-[#16A34A] bg-[#16A34A]/10 text-[#16A34A]" : "border-[var(--border)] text-[var(--text-secondary)]"}`}>
                         {t === "deposito" ? "Depósito" : "Saque"}
                       </button>
                     ))}
@@ -173,7 +173,7 @@ export default function FinanceiroPage() {
 
       {/* Filters */}
       <div className="flex gap-3 mb-4">
-        <select className="h-9 px-3 rounded-xl border border-[#E5E1D8] text-sm" value={filterProfile} onChange={e => setFilterProfile(e.target.value)}>
+        <select className="h-9 px-3 rounded-xl border border-[var(--border)] text-sm" value={filterProfile} onChange={e => setFilterProfile(e.target.value)}>
           <option value="">Todos os perfis</option>
           {profiles.map(p => <option key={p.id} value={p.id}>{p.nome}</option>)}
         </select>
@@ -182,18 +182,18 @@ export default function FinanceiroPage() {
       <Card>
         <CardContent className="pt-4">
           {filtered.length === 0
-            ? <p className="text-center text-gray-400 py-8 text-sm">Nenhuma movimentação encontrada.</p>
+            ? <p className="text-center text-[var(--text-muted)] py-8 text-sm">Nenhuma movimentação encontrada.</p>
             : (
               <div className="space-y-2">
                 {filtered.map(m => (
-                  <div key={m.id} className="flex items-center justify-between p-3 rounded-xl border border-[#E5E1D8]">
+                  <div key={m.id} className="flex items-center justify-between p-3 rounded-xl border border-[var(--border)]">
                     <div>
-                      <p className="text-sm font-medium text-gray-900">
+                      <p className="text-sm font-medium text-[var(--text-primary)]">
                         {m.profile?.nome} {m.profile?.sobrenome}
-                        {m.profile_bet?.bet?.nome && <span className="text-gray-500"> · {m.profile_bet.bet.nome}</span>}
+                        {m.profile_bet?.bet?.nome && <span className="text-[var(--text-secondary)]"> · {m.profile_bet.bet.nome}</span>}
                       </p>
-                      {m.descricao && <p className="text-xs text-gray-400">{m.descricao}</p>}
-                      <p className="text-xs text-gray-400">{new Date(m.created_at).toLocaleDateString("pt-BR")}</p>
+                      {m.descricao && <p className="text-xs text-[var(--text-muted)]">{m.descricao}</p>}
+                      <p className="text-xs text-[var(--text-muted)]">{new Date(m.created_at).toLocaleDateString("pt-BR")}</p>
                     </div>
                     <div className="flex items-center gap-3">
                       <span className={`text-base font-bold ${m.tipo === "deposito" ? "text-[#16A34A]" : "text-[#DC2626]"}`}>

@@ -45,8 +45,8 @@ export default function PerfisClient({ profiles: initialProfiles, userId }: Prop
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Perfis</h1>
-          <p className="text-gray-500 text-sm mt-1">Gerencie seus perfis de apostador</p>
+          <h1 className="text-2xl font-bold text-[var(--text-primary)]">Perfis</h1>
+          <p className="text-[var(--text-secondary)] text-sm mt-1">Gerencie seus perfis de apostador</p>
         </div>
         <Button onClick={() => setShowCreate(true)}>
           <Plus className="h-4 w-4 mr-2" />
@@ -58,7 +58,7 @@ export default function PerfisClient({ profiles: initialProfiles, userId }: Prop
         <Card>
           <CardContent className="flex flex-col items-center justify-center py-16 text-center">
             <User className="h-12 w-12 text-gray-300 mb-4" />
-            <p className="text-gray-500">Nenhum perfil cadastrado</p>
+            <p className="text-[var(--text-secondary)]">Nenhum perfil cadastrado</p>
             <Button className="mt-4" onClick={() => setShowCreate(true)}>
               <Plus className="h-4 w-4 mr-2" />
               Criar primeiro perfil
@@ -79,20 +79,20 @@ export default function PerfisClient({ profiles: initialProfiles, userId }: Prop
                   </Avatar>
                   <div className="flex-1 min-w-0">
                     <Link href={`/perfis/${profile.id}`} className="hover:underline">
-                      <h3 className="font-semibold text-gray-900 truncate">
+                      <h3 className="font-semibold text-[var(--text-primary)] truncate">
                         {profile.nome} {profile.sobrenome}
                       </h3>
                     </Link>
                     {profile.apelido && (
-                      <p className="text-sm text-gray-500 truncate">{profile.apelido}</p>
+                      <p className="text-sm text-[var(--text-secondary)] truncate">{profile.apelido}</p>
                     )}
-                    <p className="text-xs text-gray-400 mt-1">CPF: {maskCPF(profile.cpf)}</p>
+                    <p className="text-xs text-[var(--text-muted)] mt-1">CPF: {maskCPF(profile.cpf)}</p>
                     {profile.telefone && (
-                      <p className="text-xs text-gray-400">Tel: {formatPhone(profile.telefone)}</p>
+                      <p className="text-xs text-[var(--text-muted)]">Tel: {formatPhone(profile.telefone)}</p>
                     )}
                   </div>
                 </div>
-                <div className="flex items-center gap-2 mt-4 pt-4 border-t border-[#E5E1D8]">
+                <div className="flex items-center gap-2 mt-4 pt-4 border-t border-[var(--border)]">
                   <Link href={`/perfis/${profile.id}`} className="flex-1">
                     <Button variant="outline" size="sm" className="w-full">
                       Ver detalhes
