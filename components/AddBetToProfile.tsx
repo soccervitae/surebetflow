@@ -19,7 +19,7 @@ interface Props {
   userToken?: string
 }
 
-type ProfileBetWithBet = ProfileBet & { bet?: { nome: string }; ativo: boolean }
+type ProfileBetWithBet = ProfileBet & { bet?: { nome: string; logo_url?: string | null }; ativo: boolean }
 
 export default function AddBetToProfile({ profileId }: Props) {
   const [bets, setBets] = useState<Bet[]>([])
@@ -54,7 +54,7 @@ export default function AddBetToProfile({ profileId }: Props) {
   const loadData = useCallback(async function loadData() {
     const [betsRes, pbRes] = await Promise.all([
       supabase.from("bets").select("*").order("nome"),
-      supabase.from("profile_bets").select("*, bet:bets(nome)").eq("profile_id", profileId),
+      supabase.from("profile_bets").select("*, bet:bets(nome, logo_url)").eq("profile_id", profileId),
     ])
     if (betsRes.data) setBets(betsRes.data)
     if (pbRes.data) setProfileBets(pbRes.data as ProfileBetWithBet[])
@@ -384,6 +384,16 @@ export default function AddBetToProfile({ profileId }: Props) {
             <Card key={pb.id} className={!pb.ativo ? "opacity-60" : ""}>
               <CardContent className="p-4">
                 <div className="flex items-start gap-3">
+                  {/* Logo */}
+                  {pb.bet?.logo_url ? (
+                    <div className="w-9 h-9 rounded-lg border border-[var(--border)] bg-white flex items-center justify-center flex-shrink-0 overflow-hidden p-0.5">
+                      <img src={pb.bet.logo_url} alt={pb.bet.nome} className="w-full h-full object-contain" onError={e => { (e.target as HTMLImageElement).style.display = 'none' }} />
+                    </div>
+                  ) : (
+                    <div className="w-9 h-9 rounded-lg border border-[var(--border)] bg-[var(--bg-elevated)] flex items-center justify-center flex-shrink-0 text-xs font-bold text-[var(--text-secondary)]">
+                      {(pb.bet?.nome ?? "?").charAt(0)}
+                    </div>
+                  )}
                   {/* Info */}
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 flex-wrap">
