@@ -58,7 +58,7 @@ export default function CadastroPage() {
       return
     }
 
-    router.push("/onboarding/perfil")
+    router.push("/dashboard")
     router.refresh()
   }
 
