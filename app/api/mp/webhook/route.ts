@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from "next/server"
 import { createAdminClient } from "@/lib/supabase/admin"
-import { getMpClient } from "@/lib/settings"
+import { getMpClient, getMpWebhookSecret } from "@/lib/settings"
 import { PreApproval } from "mercadopago"
+import { createHmac } from "crypto"
 
 const STATUS_MAP: Record<string, string> = {
   authorized: "active",
@@ -11,9 +12,31 @@ const STATUS_MAP: Record<string, string> = {
 }
 
 export async function POST(req: NextRequest) {
-  const body = await req.json()
-  const type = body.type ?? body.topic
-  const id = body.data?.id ?? body.id
+  const body = await req.text()
+
+  // Validate MP signature
+  const secret = await getMpWebhookSecret()
+  if (secret) {
+    const xSignature = req.headers.get("x-signature") ?? ""
+    const xRequestId = req.headers.get("x-request-id") ?? ""
+    const url = new URL(req.url)
+    const dataId = url.searchParams.get("data.id") ?? ""
+
+    const manifest = `id:${dataId};request-id:${xRequestId};ts:${xSignature.split(",").find(p => p.startsWith("ts="))?.split("=")[1] ?? ""};`
+    const ts = xSignature.split(",").find(p => p.startsWith("ts="))?.split("=")[1] ?? ""
+    const v1 = xSignature.split(",").find(p => p.startsWith("v1="))?.split("=")[1] ?? ""
+    const expected = createHmac("sha256", secret)
+      .update(`id:${dataId};request-id:${xRequestId};ts:${ts};`)
+      .digest("hex")
+
+    if (v1 && expected !== v1) {
+      return NextResponse.json({ error: "Invalid signature" }, { status: 401 })
+    }
+  }
+
+  const payload = JSON.parse(body)
+  const type = payload.type ?? payload.topic
+  const id = payload.data?.id ?? payload.id
 
   if (type !== "preapproval" || !id) return NextResponse.json({ received: true })
 

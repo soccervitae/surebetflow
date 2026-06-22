@@ -34,3 +34,8 @@ export async function getMpPublicKey(): Promise<string> {
   const settings = await getSettings()
   return settings["mp_public_key"] ?? process.env.NEXT_PUBLIC_MP_PUBLIC_KEY ?? ""
 }
+
+export async function getMpWebhookSecret(): Promise<string> {
+  const settings = await getSettings()
+  return settings["mp_webhook_secret"] ?? ""
+}

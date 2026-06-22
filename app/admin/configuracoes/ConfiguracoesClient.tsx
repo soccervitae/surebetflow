@@ -21,9 +21,16 @@ const FIELDS = [
   {
     key: "mp_plan_pro",
     label: "ID do Plano Pro",
-    description: "MercadoPago → Assinaturas → ID do plano criado (começa com 2c9...)",
-    placeholder: "2c93808...",
+    description: "MercadoPago → Assinaturas → ID do plano criado",
+    placeholder: "f202a0dd...",
     secret: false,
+  },
+  {
+    key: "mp_webhook_secret",
+    label: "Assinatura Secreta do Webhook",
+    description: "MercadoPago → Webhooks → Assinatura secreta (gerada automaticamente)",
+    placeholder: "599f3ac3...",
+    secret: true,
   },
 ]
 
