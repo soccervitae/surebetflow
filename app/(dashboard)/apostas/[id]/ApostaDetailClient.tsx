@@ -346,37 +346,33 @@ export default function ApostaDetailClient({ aposta: initial }: { aposta: Aposta
                 return (
                   <div
                     key={leg.id}
-                    className={`text-xs rounded-lg px-2 py-2 flex items-center gap-2 ${
+                    className={`rounded-xl px-3 py-3 flex items-start gap-3 ${
                       isGreen ? "bg-green-500/10" :
                       isRed ? "bg-[#DC2626]/5" :
                       "bg-[var(--bg-elevated)]"
                     }`}
                   >
-                    {/* Info: bet name + resultado + odd/stake */}
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-1.5 flex-wrap min-w-0">
-                        <span className={`font-medium flex-shrink-0 ${isGreen ? "text-green-600" : isRed ? "text-[#DC2626]" : "text-[var(--text-secondary)]"}`}>
-                          {leg.profile_bet?.bet?.nome ?? "Bet"}
-                        </span>
-                        <span className="text-[var(--text-secondary)] truncate">{leg.resultado_apostado}</span>
-                      </div>
-                      <div className="flex items-center gap-2 mt-0.5 flex-wrap">
-                        <p className="text-[var(--text-muted)]">@{Number(leg.odd).toFixed(2)} · {formatCurrency(leg.stake)}</p>
-                        {calc && (
-                          <p className={`font-bold ${calc.valor >= 0 ? "text-green-600" : "text-[#DC2626]"}`}>
-                            {calc.tipo === "green"
-                              ? `Retorno: ${formatCurrency(calc.valor)}`
-                              : `Perda: ${formatCurrency(calc.valor)}`}
-                          </p>
-                        )}
-                      </div>
+                    {/* Info: stacked vertically */}
+                    <div className="flex-1 min-w-0 space-y-1">
+                      <p className={`text-base font-bold leading-tight ${isGreen ? "text-green-600" : isRed ? "text-[#DC2626]" : "text-[var(--text-primary)]"}`}>
+                        {leg.profile_bet?.bet?.nome ?? "Bet"}
+                      </p>
+                      <p className="text-sm text-[var(--text-secondary)] leading-snug">{leg.resultado_apostado}</p>
+                      <p className="text-sm text-[var(--text-muted)]">@{Number(leg.odd).toFixed(2)} · {formatCurrency(leg.stake)}</p>
+                      {calc && (
+                        <p className={`text-sm font-bold ${calc.valor >= 0 ? "text-green-600" : "text-[#DC2626]"}`}>
+                          {calc.tipo === "green"
+                            ? `Retorno: ${formatCurrency(calc.valor)}`
+                            : `Perda: ${formatCurrency(calc.valor)}`}
+                        </p>
+                      )}
                     </div>
                     {/* GREEN/RED toggle badges */}
-                    <div className="flex flex-col gap-1 flex-shrink-0">
+                    <div className="flex flex-col gap-1.5 flex-shrink-0 pt-0.5">
                       <button
                         type="button"
                         onClick={() => handleLegClick(leg.id, "green")}
-                        className={`px-2 py-0.5 rounded text-[10px] font-bold border transition-all ${
+                        className={`px-2.5 py-1 rounded text-xs font-bold border transition-all ${
                           isGreen
                             ? "bg-green-600 text-white border-green-600"
                             : "bg-transparent text-green-600 border-green-600/40 hover:bg-green-500/10"
@@ -387,7 +383,7 @@ export default function ApostaDetailClient({ aposta: initial }: { aposta: Aposta
                       <button
                         type="button"
                         onClick={() => handleLegClick(leg.id, "red")}
-                        className={`px-2 py-0.5 rounded text-[10px] font-bold border transition-all ${
+                        className={`px-2.5 py-1 rounded text-xs font-bold border transition-all ${
                           isRed
                             ? "bg-[#DC2626] text-white border-[#DC2626]"
                             : "bg-transparent text-[#DC2626] border-[#DC2626]/40 hover:bg-[#DC2626]/10"
