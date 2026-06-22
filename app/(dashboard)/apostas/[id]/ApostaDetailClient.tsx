@@ -79,22 +79,25 @@ export default function ApostaDetailClient({ aposta: initial }: { aposta: Aposta
   const totalInvestido = aposta.investimento_total
 
   function calcGreenRed(winnerLegId: string) {
-    // GREEN: lucro nessa casa = retorno - stake (o que você ganhou lá)
-    // RED: perda nessa casa = -stake (o que você perdeu lá)
-    // Soma de todos = stake_green * odd_green - Σstakes = stake_green * odd_green - totalInvestido ✓
+    // GREEN: mostra retorno total recebido (stake × odd)
+    // RED: mostra perda (−stake)
     return legs.map(leg => {
       if (leg.id === winnerLegId) {
-        return { leg, tipo: "green" as const, valor: leg.stake * (leg.odd - 1) }
+        return { leg, tipo: "green" as const, valor: leg.stake * leg.odd }
       } else {
         return { leg, tipo: "red" as const, valor: -leg.stake }
       }
     })
   }
 
+  function calcResultadoLiquido(winnerLegId: string) {
+    const greenLeg = legs.find(l => l.id === winnerLegId)
+    if (!greenLeg) return 0
+    return greenLeg.stake * greenLeg.odd - totalInvestido
+  }
+
   const greenRedCalc = greenLegId ? calcGreenRed(greenLegId) : null
-  const resultadoLiquido = greenRedCalc
-    ? greenRedCalc.reduce((s, r) => s + r.valor, 0)
-    : null
+  const resultadoLiquido = greenLegId ? calcResultadoLiquido(greenLegId) : null
 
   async function handleFinalizar(overrideGreenId?: string) {
     const effectiveGreenId = overrideGreenId ?? greenLegId
@@ -102,7 +105,7 @@ export default function ApostaDetailClient({ aposta: initial }: { aposta: Aposta
       toast({ title: "Selecione qual casa deu green", variant: "destructive" })
       return
     }
-    const resultado = calcGreenRed(effectiveGreenId).reduce((s, r) => s + r.valor, 0)
+    const resultado = calcResultadoLiquido(effectiveGreenId)
     setFinalizando(true)
     const { error } = await supabase
       .from("apostas")
@@ -298,13 +301,15 @@ export default function ApostaDetailClient({ aposta: initial }: { aposta: Aposta
                       </p>
                     </div>
 
-                    {/* Odd + Stake + valor calc */}
+                    {/* Odd + Stake + retorno/perda */}
                     <div className="text-right mr-3">
                       <p className="text-sm font-bold text-[var(--text-primary)]">Odd {Number(leg.odd).toFixed(2)}</p>
-                      <p className="text-xs text-[var(--text-secondary)]">{formatCurrency(leg.stake)}</p>
+                      <p className="text-xs text-[var(--text-secondary)]">Stake: {formatCurrency(leg.stake)}</p>
                       {calc && (
-                        <p className={`text-xs font-bold mt-0.5 ${calc.valor >= 0 ? "text-[#16A34A]" : "text-[#DC2626]"}`}>
-                          {calc.valor >= 0 ? "+" : ""}{formatCurrency(calc.valor)}
+                        <p className={`text-sm font-bold mt-0.5 ${calc.valor >= 0 ? "text-[#16A34A]" : "text-[#DC2626]"}`}>
+                          {calc.tipo === "green"
+                            ? `Retorno: ${formatCurrency(calc.valor)}`
+                            : `Perda: ${formatCurrency(calc.valor)}`}
                         </p>
                       )}
                     </div>
@@ -434,7 +439,7 @@ export default function ApostaDetailClient({ aposta: initial }: { aposta: Aposta
             </p>
             {pendingGreenLegId && (() => {
               const newCalc = calcGreenRed(pendingGreenLegId)
-              const newResultado = newCalc.reduce((s, r) => s + r.valor, 0)
+              const newResultado = calcResultadoLiquido(pendingGreenLegId)
               return (
                 <div className="space-y-2 p-3 rounded-xl bg-[var(--bg-muted)] border border-[var(--border)]">
                   {newCalc.map(r => (
