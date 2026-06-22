@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import Link from "next/link"
 import { createClient } from "@/lib/supabase/client"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -142,7 +143,8 @@ export default function ApostasClient({ apostas: initialApostas, profiles }: Pro
       ) : (
         <div className="space-y-3">
           {filtered.map(aposta => (
-            <Card key={aposta.id}>
+            <Link key={aposta.id} href={`/apostas/${aposta.id}`}>
+            <Card className="hover:border-[#16A34A]/40 transition-colors cursor-pointer">
               <CardContent className="p-4">
                 <div className="flex items-start justify-between gap-4">
                   <div className="flex-1 min-w-0">
@@ -194,7 +196,8 @@ export default function ApostasClient({ apostas: initialApostas, profiles }: Pro
                           size="sm"
                           variant="outline"
                           className="mt-2"
-                          onClick={() => {
+                          onClick={e => {
+                            e.preventDefault()
                             setFinalizarDialog(aposta)
                             setResultadoReal(formatBRL((aposta.lucro_garantido * 100).toFixed(0)))
                           }}
@@ -209,6 +212,7 @@ export default function ApostasClient({ apostas: initialApostas, profiles }: Pro
                 </div>
               </CardContent>
             </Card>
+            </Link>
           ))}
         </div>
       )}

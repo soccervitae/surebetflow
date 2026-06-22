@@ -239,7 +239,8 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
             </Card>
           ) : (
             currentApostas.map(aposta => (
-              <Card key={aposta.id}>
+              <Link key={aposta.id} href={`/apostas/${aposta.id}`}>
+              <Card className="hover:border-[#16A34A]/40 transition-colors cursor-pointer">
                 <CardContent className="p-4">
                   <div className="flex items-start justify-between gap-3">
                     <div className="flex-1 min-w-0">
@@ -265,7 +266,7 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
                           size="sm"
                           variant="outline"
                           className="mt-2"
-                          onClick={() => { setFinalizarDialog(aposta); setResultadoReal(formatBRL((aposta.lucro_garantido * 100).toFixed(0))) }}
+                          onClick={e => { e.preventDefault(); setFinalizarDialog(aposta); setResultadoReal(formatBRL((aposta.lucro_garantido * 100).toFixed(0))) }}
                         >
                           Finalizar
                         </Button>
@@ -274,6 +275,7 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
                   </div>
                 </CardContent>
               </Card>
+              </Link>
             ))
           )}
         </TabsContent>
