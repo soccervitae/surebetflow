@@ -36,6 +36,7 @@ export default function FinanceiroPage() {
   const [filterTipo, setFilterTipo] = useState<"todos" | "deposito" | "saque">("todos")
   const [filterProfile, setFilterProfile] = useState("")
   const [filterBet, setFilterBet] = useState("")
+  const [filterProfileBets, setFilterProfileBets] = useState<{ id: string; nome: string }[]>([])
 
   // Form
   const [formProfile, setFormProfile] = useState("")
@@ -69,6 +70,26 @@ export default function FinanceiroPage() {
       setProfileBets((data ?? []) as (ProfileBet & { bet: Bet })[])
     })
   }, [formProfile])
+
+  useEffect(() => {
+    setFilterBet("")
+    if (!filterProfile) { setFilterProfileBets([]); return }
+    const supabase = createClient()
+    supabase
+      .from("profile_bets")
+      .select("id, bet:bets(id, nome)")
+      .eq("profile_id", filterProfile)
+      .then(({ data }) => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        setFilterProfileBets(
+          (data ?? [])
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            .filter((pb: any) => pb.bet?.nome)
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            .map((pb: any) => ({ id: pb.id, nome: pb.bet.nome }))
+        )
+      })
+  }, [filterProfile])
 
   function formatBRL(raw: string) {
     const digits = raw.replace(/\D/g, "")
@@ -140,7 +161,14 @@ export default function FinanceiroPage() {
 
       if (filterTipo !== "todos" && m.tipo !== filterTipo) return false
       if (filterProfile && m.profile_id !== filterProfile) return false
-      if (filterBet && m.profile_bet?.bet?.id !== filterBet) return false
+      if (filterBet) {
+        // quando perfil selecionado, filterBet é profile_bet_id; senão, é bet_id
+        if (filterProfile) {
+          if (m.profile_bet_id !== filterBet) return false
+        } else {
+          if (m.profile_bet?.bet?.id !== filterBet) return false
+        }
+      }
 
       return true
     })
@@ -155,6 +183,7 @@ export default function FinanceiroPage() {
     setFilterTipo("todos")
     setFilterProfile("")
     setFilterBet("")
+    setFilterProfileBets([])
     setFilterPeriodo("mes")
   }
 
@@ -331,9 +360,10 @@ export default function FinanceiroPage() {
                 value={filterBet}
                 onChange={e => setFilterBet(e.target.value)}
                 className="w-full h-9 px-3 rounded-lg border border-[var(--border)] bg-[var(--bg-surface)] text-[var(--text-primary)] text-sm"
+                disabled={filterProfile !== "" && filterProfileBets.length === 0}
               >
                 <option value="">Todas as casas</option>
-                {allBets.map(b => (
+                {(filterProfile ? filterProfileBets : allBets).map(b => (
                   <option key={b.id} value={b.id}>{b.nome}</option>
                 ))}
               </select>
