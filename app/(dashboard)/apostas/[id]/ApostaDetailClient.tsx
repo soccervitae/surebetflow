@@ -216,7 +216,7 @@ export default function ApostaDetailClient({ aposta: initial }: { aposta: Aposta
         <CardHeader className="pb-3">
           <div className="flex items-center justify-between">
             <CardTitle className="text-base">Entradas por Casa de Apostas</CardTitle>
-            {aposta.status === "pendente" && legs.length > 0 && (
+            {legs.length > 0 && (
               <p className="text-xs text-[var(--text-secondary)]">Selecione qual deu green</p>
             )}
           </div>
@@ -269,9 +269,8 @@ export default function ApostaDetailClient({ aposta: initial }: { aposta: Aposta
                       )}
                     </div>
 
-                    {/* Green/Red toggle — only for pending */}
-                    {aposta.status === "pendente" && (
-                      <div className="flex flex-col gap-1 flex-shrink-0">
+                    {/* Green/Red toggle */}
+                    <div className="flex flex-col gap-1 flex-shrink-0">
                         <button
                           type="button"
                           onClick={() => setGreenLegId(isGreen ? null : leg.id)}
@@ -301,15 +300,6 @@ export default function ApostaDetailClient({ aposta: initial }: { aposta: Aposta
                           RED
                         </button>
                       </div>
-                    )}
-
-                    {/* Show final badge when already finalized */}
-                    {aposta.status === "finalizada" && (
-                      <div className="flex-shrink-0 ml-1">
-                        {isGreen && <span className="px-2 py-0.5 rounded text-xs font-bold bg-[#16A34A] text-white">GREEN</span>}
-                        {isRed && <span className="px-2 py-0.5 rounded text-xs font-bold bg-[#DC2626] text-white">RED</span>}
-                      </div>
-                    )}
                   </div>
                 )
               })}
