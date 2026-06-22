@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { createClient } from "@/lib/supabase/client"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -44,18 +44,18 @@ export default function AddBetToProfile({ profileId }: Props) {
     return parseFloat(formatted.replace(/\./g, "").replace(",", ".")) || 0
   }
 
-  useEffect(() => {
-    loadData()
-  }, [profileId])
-
-  async function loadData() {
+  const loadData = useCallback(async function loadData() {
     const [betsRes, pbRes] = await Promise.all([
       supabase.from("bets").select("*").order("nome"),
       supabase.from("profile_bets").select("*, bet:bets(nome)").eq("profile_id", profileId),
     ])
     if (betsRes.data) setBets(betsRes.data)
     if (pbRes.data) setProfileBets(pbRes.data as (ProfileBet & { bet?: { nome: string } })[])
-  }
+  }, [profileId, supabase])
+
+  useEffect(() => {
+    loadData()
+  }, [loadData])
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()

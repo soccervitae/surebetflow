@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { createClient } from "@/lib/supabase/client"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -142,11 +142,7 @@ export default function SurebetCalculator({ profiles, defaultProfileId, onSaved 
     }
   }, [tipo])
 
-  useEffect(() => {
-    loadProfileBets()
-  }, [filteredProfiles])
-
-  async function loadProfileBets() {
+  const loadProfileBets = useCallback(async () => {
     const { data } = await supabase
       .from("profile_bets")
       .select("*, bet:bets(*)")
@@ -159,7 +155,11 @@ export default function SurebetCalculator({ profiles, defaultProfileId, onSaved 
       })
       setProfileBets(grouped)
     }
-  }
+  }, [filteredProfiles, supabase])
+
+  useEffect(() => {
+    loadProfileBets()
+  }, [loadProfileBets])
 
   function updateLeg(index: number, field: keyof Leg, value: string) {
     setLegs(prev => prev.map((leg, i) => i === index ? { ...leg, [field]: value } : leg))
