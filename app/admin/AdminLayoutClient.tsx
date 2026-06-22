@@ -2,6 +2,7 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
+import { useState } from "react"
 import { LayoutDashboard, Users, Building2, ClipboardList, LogOut } from "lucide-react"
 import { createClient } from "@/lib/supabase/client"
 import { useRouter } from "next/navigation"
@@ -17,6 +18,7 @@ export default function AdminLayoutClient({ children }: { children: React.ReactN
   const pathname = usePathname()
   const router = useRouter()
   const supabase = createClient()
+  const [confirmOpen, setConfirmOpen] = useState(false)
 
   async function handleLogout() {
     await supabase.auth.signOut()
@@ -51,7 +53,7 @@ export default function AdminLayoutClient({ children }: { children: React.ReactN
         </nav>
         <div className="p-3 border-t border-gray-800">
           <button
-            onClick={handleLogout}
+            onClick={() => setConfirmOpen(true)}
             className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-gray-400 hover:text-white hover:bg-gray-800 transition-colors w-full"
           >
             <LogOut className="h-4 w-4" />
@@ -66,6 +68,35 @@ export default function AdminLayoutClient({ children }: { children: React.ReactN
           {children}
         </div>
       </main>
+
+      {/* Logout confirmation dialog */}
+      {confirmOpen && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-gray-900 border border-gray-800 rounded-2xl p-6 w-full max-w-sm shadow-xl">
+            <div className="flex items-center justify-center w-12 h-12 bg-red-500/10 rounded-full mx-auto mb-4">
+              <LogOut className="w-6 h-6 text-red-400" />
+            </div>
+            <h2 className="text-lg font-semibold text-white text-center mb-1">Sair da conta?</h2>
+            <p className="text-gray-400 text-sm text-center mb-6">
+              Você será desconectado do painel administrativo.
+            </p>
+            <div className="flex gap-3">
+              <button
+                onClick={() => setConfirmOpen(false)}
+                className="flex-1 px-4 py-2.5 rounded-xl border border-gray-700 text-gray-300 hover:bg-gray-800 text-sm font-medium transition-colors"
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={handleLogout}
+                className="flex-1 px-4 py-2.5 rounded-xl bg-red-600 hover:bg-red-700 text-white text-sm font-semibold transition-colors"
+              >
+                Sair
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

@@ -28,6 +28,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const [collapsed, setCollapsed] = useState(false)
   const [userName, setUserName] = useState("")
   const [userInitials, setUserInitials] = useState("")
+  const [confirmLogout, setConfirmLogout] = useState(false)
 
   useEffect(() => {
     const supabase = createClient()
@@ -144,7 +145,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             )}
           </div>
           <button
-            onClick={handleLogout}
+            onClick={() => setConfirmLogout(true)}
             title={collapsed ? "Sair" : undefined}
             className={cn(
               "flex items-center gap-3 px-3 py-2 w-full rounded-lg text-sm font-medium text-[var(--text-secondary)] hover:bg-[var(--bg-elevated)] hover:text-[var(--text-primary)] transition-colors",
@@ -229,6 +230,35 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           )
         })}
       </nav>
+
+      {/* Logout confirmation dialog */}
+      {confirmLogout && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-[var(--bg-surface)] border border-[var(--border)] rounded-2xl p-6 w-full max-w-sm shadow-xl">
+            <div className="flex items-center justify-center w-12 h-12 bg-red-500/10 rounded-full mx-auto mb-4">
+              <LogOut className="w-6 h-6 text-red-500" />
+            </div>
+            <h2 className="text-lg font-semibold text-[var(--text-primary)] text-center mb-1">Sair da conta?</h2>
+            <p className="text-[var(--text-secondary)] text-sm text-center mb-6">
+              Você será desconectado e precisará fazer login novamente.
+            </p>
+            <div className="flex gap-3">
+              <button
+                onClick={() => setConfirmLogout(false)}
+                className="flex-1 px-4 py-2.5 rounded-xl border border-[var(--border)] text-[var(--text-secondary)] hover:bg-[var(--bg-elevated)] text-sm font-medium transition-colors"
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={handleLogout}
+                className="flex-1 px-4 py-2.5 rounded-xl bg-red-600 hover:bg-red-700 text-white text-sm font-semibold transition-colors"
+              >
+                Sair
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
