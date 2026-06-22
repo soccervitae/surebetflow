@@ -443,12 +443,12 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
                               const isRed = greenLegId !== null && greenLegId !== leg.id
                               return (
                                 <div key={leg.id} className={`text-xs rounded-lg px-2 py-2 flex items-center gap-2 ${
-                                  isGreen ? "bg-[#1e3a8a]/5" : isRed ? "bg-[#DC2626]/5" : "bg-[var(--bg-elevated)]"
+                                  isGreen ? "bg-green-500/10" : isRed ? "bg-[#DC2626]/5" : "bg-[var(--bg-elevated)]"
                                 }`}>
                                   {/* Info: casa + evento + odd/stake */}
                                   <div className="flex-1 min-w-0">
                                     <div className="flex items-center gap-1.5 flex-wrap min-w-0">
-                                      <span className={`font-medium flex-shrink-0 ${isGreen ? "text-[var(--accent-text)]" : isRed ? "text-[#DC2626]" : "text-[var(--text-secondary)]"}`}>
+                                      <span className={`font-medium flex-shrink-0 ${isGreen ? "text-green-600" : isRed ? "text-[#DC2626]" : "text-[var(--text-secondary)]"}`}>
                                         {leg.profile_bet?.bet?.nome ?? "Casa"}
                                       </span>
                                       <span className="text-[var(--text-secondary)] truncate">{leg.resultado_apostado}</span>
@@ -460,7 +460,7 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
                                   {/* GREEN / RED badge no canto direito */}
                                   {(isGreen || isRed) && (
                                     <span className={`px-2 py-1 rounded-lg text-[10px] font-bold flex-shrink-0 ${
-                                      isGreen ? "bg-[#1e3a8a] text-white" : "bg-[#DC2626] text-white"
+                                      isGreen ? "bg-green-600 text-white" : "bg-[#DC2626] text-white"
                                     }`}>
                                       {isGreen ? "GREEN" : "RED"}
                                     </span>
