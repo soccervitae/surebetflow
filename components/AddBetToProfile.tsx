@@ -62,6 +62,18 @@ export default function AddBetToProfile({ profileId }: Props) {
     loadData()
   }, [loadData])
 
+  function handleLogoError(e: React.SyntheticEvent<HTMLImageElement>) {
+    const img = e.target as HTMLImageElement
+    const src = img.src
+    if (src.includes('logo.clearbit.com')) {
+      const domain = src.replace('https://logo.clearbit.com/', '')
+      img.onerror = () => { img.style.display = 'none' }
+      img.src = `https://www.google.com/s2/favicons?domain=${domain}&sz=128`
+    } else {
+      img.style.display = 'none'
+    }
+  }
+
   function formatBRL(raw: string) {
     const digits = raw.replace(/\D/g, "")
     if (!digits) return ""
@@ -240,7 +252,7 @@ export default function AddBetToProfile({ profileId }: Props) {
                         )}
                         <div className="w-9 h-9 rounded-lg border border-[var(--border)] bg-white flex items-center justify-center overflow-hidden p-0.5 flex-shrink-0">
                           {b.logo_url ? (
-                            <img src={b.logo_url} alt={b.nome} className="w-full h-full object-contain" onError={e => { (e.target as HTMLImageElement).style.display = "none" }} />
+                            <img src={b.logo_url} alt={b.nome} className="w-full h-full object-contain" onError={handleLogoError} />
                           ) : (
                             <span className="text-xs font-bold text-[var(--text-secondary)]">{b.nome.charAt(0)}</span>
                           )}
@@ -405,7 +417,7 @@ export default function AddBetToProfile({ profileId }: Props) {
                   {/* Logo */}
                   {pb.bet?.logo_url ? (
                     <div className="w-9 h-9 rounded-lg border border-[var(--border)] bg-white flex items-center justify-center flex-shrink-0 overflow-hidden p-0.5">
-                      <img src={pb.bet.logo_url} alt={pb.bet.nome} className="w-full h-full object-contain" onError={e => { (e.target as HTMLImageElement).style.display = 'none' }} />
+                      <img src={pb.bet.logo_url} alt={pb.bet.nome} className="w-full h-full object-contain" onError={handleLogoError} />
                     </div>
                   ) : (
                     <div className="w-9 h-9 rounded-lg border border-[var(--border)] bg-[var(--bg-elevated)] flex items-center justify-center flex-shrink-0 text-xs font-bold text-[var(--text-secondary)]">
