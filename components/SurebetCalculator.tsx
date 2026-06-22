@@ -304,7 +304,7 @@ export default function SurebetCalculator({ profiles, defaultProfileId, onSaved 
   }
 
   return (
-    <div className="space-y-4 max-w-2xl">
+    <div className="space-y-4">
 
       {/* Paste block */}
       <Card className="border-dashed border-[#16A34A]/40 bg-[#16A34A]/5">
@@ -351,14 +351,14 @@ export default function SurebetCalculator({ profiles, defaultProfileId, onSaved 
 
       {/* Config */}
       <Card>
-        <CardHeader>
+        <CardHeader className="pb-3">
           <CardTitle className="flex items-center gap-2">
             <Calculator className="h-5 w-5 text-[#16A34A]" />
             Configuração da Aposta
           </CardTitle>
         </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="grid grid-cols-2 gap-4">
+        <CardContent>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <div className="space-y-2">
               <Label>Esporte</Label>
               <select
@@ -378,8 +378,6 @@ export default function SurebetCalculator({ profiles, defaultProfileId, onSaved 
               <Label>Evento</Label>
               <Input value={evento} onChange={e => setEvento(e.target.value)} placeholder="Ex: Flamengo x Corinthians" />
             </div>
-          </div>
-          <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label>Tipo</Label>
               <Select value={tipo} onValueChange={(v: "2-way" | "3-way") => setTipo(v)}>
@@ -408,32 +406,32 @@ export default function SurebetCalculator({ profiles, defaultProfileId, onSaved 
       </Card>
 
       {/* Legs */}
-      {legs.slice(0, numLegs).map((leg, i) => (
-        <Card key={i}>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-base">Aposta {i + 1}</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="space-y-2">
-              <Label>Casa de Apostas</Label>
-              <Select value={leg.profileBetId} onValueChange={v => updateLeg(i, "profileBetId", v)}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Selecionar conta..." />
-                </SelectTrigger>
-                <SelectContent>
-                  {filteredProfiles.map(profile => {
-                    const bets = profileBets[profile.id] ?? []
-                    if (bets.length === 0) return null
-                    return bets.map(pb => (
-                      <SelectItem key={pb.id} value={pb.id}>
-                        {profile.apelido || `${profile.nome} ${profile.sobrenome}`} — {(pb as ProfileBet & { bet?: { nome: string } }).bet?.nome ?? "Casa"}
-                      </SelectItem>
-                    ))
-                  })}
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="grid grid-cols-2 gap-4">
+      <div className={`grid gap-4 ${numLegs === 3 ? "md:grid-cols-3" : "md:grid-cols-2"}`}>
+        {legs.slice(0, numLegs).map((leg, i) => (
+          <Card key={i}>
+            <CardHeader className="pb-3">
+              <CardTitle className="text-base">Aposta {i + 1}</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <div className="space-y-2">
+                <Label>Casa de Apostas</Label>
+                <Select value={leg.profileBetId} onValueChange={v => updateLeg(i, "profileBetId", v)}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Selecionar conta..." />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {filteredProfiles.map(profile => {
+                      const bets = profileBets[profile.id] ?? []
+                      if (bets.length === 0) return null
+                      return bets.map(pb => (
+                        <SelectItem key={pb.id} value={pb.id}>
+                          {profile.apelido || `${profile.nome} ${profile.sobrenome}`} — {(pb as ProfileBet & { bet?: { nome: string } }).bet?.nome ?? "Casa"}
+                        </SelectItem>
+                      ))
+                    })}
+                  </SelectContent>
+                </Select>
+              </div>
               <div className="space-y-2">
                 <Label>Resultado Apostado</Label>
                 <Input
@@ -442,33 +440,46 @@ export default function SurebetCalculator({ profiles, defaultProfileId, onSaved 
                   placeholder={tipo === "2-way" ? (i === 0 ? "Casa" : "Visitante") : ["Casa", "Empate", "Visitante"][i]}
                 />
               </div>
-              <div className="space-y-2">
-                <Label>Odd</Label>
-                <Input
-                  type="number"
-                  min="1.01"
-                  step="0.01"
-                  value={leg.odd}
-                  onChange={e => updateLeg(i, "odd", e.target.value)}
-                  placeholder="2.10"
-                />
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-2">
+                  <Label>Odd</Label>
+                  <Input
+                    type="number"
+                    min="1.01"
+                    step="0.01"
+                    value={leg.odd}
+                    onChange={e => updateLeg(i, "odd", e.target.value)}
+                    placeholder="2.10"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label>Stake (R$)</Label>
+                  <Input
+                    type="number"
+                    min="0.01"
+                    step="0.01"
+                    value={stakes[i] > 0 ? stakes[i].toFixed(2) : ""}
+                    placeholder="0.00"
+                    onChange={e => {
+                      const newStake = parseFloat(e.target.value)
+                      if (!isNaN(newStake) && newStake > 0 && impliedProbs[i] > 0 && sumProbs > 0) {
+                        const newInvestment = (newStake * sumProbs) / impliedProbs[i]
+                        setInvestimentoTotal(newInvestment.toFixed(2))
+                      }
+                    }}
+                  />
+                </div>
               </div>
-            </div>
-            {leg.odd && parseFloat(leg.odd) > 1 && (
-              <div className="flex items-center justify-between text-sm bg-[var(--bg-elevated)] rounded-lg p-3">
-                <span className="text-[var(--text-secondary)]">Probabilidade implícita:</span>
-                <span className="font-medium text-[var(--text-primary)]">{((1 / parseFloat(leg.odd)) * 100).toFixed(1)}%</span>
-              </div>
-            )}
-            {stakes[i] > 0 && (
-              <div className="flex items-center justify-between text-sm bg-[#16A34A]/5 rounded-lg p-3">
-                <span className="text-[var(--text-secondary)]">Stake recomendada:</span>
-                <span className="font-bold text-[#16A34A]">{formatCurrency(stakes[i])}</span>
-              </div>
-            )}
-          </CardContent>
-        </Card>
-      ))}
+              {leg.odd && parseFloat(leg.odd) > 1 && (
+                <div className="flex items-center justify-between text-xs bg-[var(--bg-elevated)] rounded-lg px-3 py-2">
+                  <span className="text-[var(--text-secondary)]">Prob. implícita:</span>
+                  <span className="font-medium text-[var(--text-primary)]">{((1 / parseFloat(leg.odd)) * 100).toFixed(1)}%</span>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        ))}
+      </div>
 
       {/* Result */}
       <Card className={isArbitrage ? "border-[#16A34A]/30" : "border-[#DC2626]/30"}>
