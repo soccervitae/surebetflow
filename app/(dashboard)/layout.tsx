@@ -8,7 +8,7 @@ import { useTheme } from "@/components/ThemeProvider"
 import {
   Home, Users, Wallet, CreditCard, BookOpen,
   Settings, LogOut, TrendingUp, Bell, ChevronLeft, ChevronRight,
-  Circle, Sun, Moon, MessageCircle, HelpCircle, Menu, X, MoreHorizontal
+  Circle, Sun, Moon, MessageCircle, HelpCircle
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 
@@ -23,9 +23,13 @@ const navItems = [
   { href: "/configuracoes", icon: Settings,      label: "Configurações" },
 ]
 
-// First 4 in bottom bar, rest in drawer
-const bottomItems = navItems.slice(0, 4)
-const drawerItems = navItems.slice(4)
+const bottomItems = [
+  { href: "/dashboard",  icon: Home,       label: "Dashboard" },
+  { href: "/perfis",     icon: Users,      label: "Perfis" },
+  { href: "/apostas",    icon: BookOpen,   label: "Apostas" },
+  { href: "/tutorial",   icon: HelpCircle, label: "Tutorial" },
+  { href: "/financeiro", icon: Wallet,     label: "Financeiro" },
+]
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter()
@@ -36,7 +40,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const [userName, setUserName] = useState("")
   const [userInitials, setUserInitials] = useState("")
   const [confirmLogout, setConfirmLogout] = useState(false)
-  const [drawerOpen, setDrawerOpen] = useState(false)
+  const [avatarMenuOpen, setAvatarMenuOpen] = useState(false)
 
   useEffect(() => {
     const supabase = createClient()
@@ -59,8 +63,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     })
   }, [router, pathname])
 
-  // Close drawer on route change
-  useEffect(() => { setDrawerOpen(false) }, [pathname])
+  useEffect(() => { setAvatarMenuOpen(false) }, [pathname])
 
   async function handleLogout() {
     const supabase = createClient()
@@ -220,11 +223,41 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               className="w-8 h-8 flex items-center justify-center rounded-xl text-[var(--text-secondary)] hover:bg-[var(--bg-elevated)] transition-colors">
               {isDark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
             </button>
-            <div className="w-8 h-8 bg-[#1e3a8a] rounded-full flex items-center justify-center text-white text-xs font-bold">
+            <button
+              onClick={() => setAvatarMenuOpen(v => !v)}
+              className="w-8 h-8 bg-[#1e3a8a] rounded-full flex items-center justify-center text-white text-xs font-bold"
+            >
               {userInitials}
-            </div>
+            </button>
           </div>
         </header>
+
+        {/* Mobile avatar dropdown */}
+        {avatarMenuOpen && (
+          <>
+            <div className="md:hidden fixed inset-0 z-30" onClick={() => setAvatarMenuOpen(false)} />
+            <div className="md:hidden fixed top-14 right-4 z-40 w-56 bg-[var(--bg-surface)] border border-[var(--border)] rounded-2xl shadow-2xl overflow-hidden">
+              <div className="px-4 py-3 border-b border-[var(--border)]">
+                <p className="text-sm font-semibold text-[var(--text-primary)] truncate">{userName}</p>
+                <p className="text-[11px] text-[var(--accent-text)] font-semibold">APOSTADOR</p>
+              </div>
+              <div className="p-2 space-y-1">
+                <Link href="/configuracoes"
+                  className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-[var(--text-secondary)] hover:bg-[var(--bg-elevated)] hover:text-[var(--text-primary)] transition-colors">
+                  <Settings className="w-4 h-4" />
+                  Configurações
+                </Link>
+                <button
+                  onClick={() => { setAvatarMenuOpen(false); setConfirmLogout(true) }}
+                  className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-red-400 hover:bg-red-500/10 transition-colors w-full"
+                >
+                  <LogOut className="w-4 h-4" />
+                  Sair
+                </button>
+              </div>
+            </div>
+          </>
+        )}
 
         {/* Main content */}
         <main className="flex-1 p-4 md:p-6 pb-24 md:pb-6">
@@ -254,86 +287,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             )
           })}
 
-          {/* More button */}
-          <button
-            onClick={() => setDrawerOpen(true)}
-            className={cn(
-              "flex-1 flex flex-col items-center justify-center py-2.5 gap-1 transition-colors",
-              drawerOpen ? "text-[var(--accent-text)]" : "text-[var(--text-muted)]"
-            )}
-          >
-            <MoreHorizontal className="w-5 h-5" />
-            <span className="text-[10px] font-medium">Mais</span>
-          </button>
         </div>
       </nav>
-
-      {/* ── MOBILE DRAWER ── */}
-      {drawerOpen && (
-        <>
-          {/* Backdrop */}
-          <div
-            className="md:hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-30"
-            onClick={() => setDrawerOpen(false)}
-          />
-          {/* Drawer */}
-          <div className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-[var(--bg-surface)] rounded-t-3xl border-t border-[var(--border)] shadow-2xl"
-            style={{ paddingBottom: "env(safe-area-inset-bottom)" }}>
-            {/* Handle */}
-            <div className="flex justify-center pt-3 pb-1">
-              <div className="w-10 h-1 bg-[var(--border)] rounded-full" />
-            </div>
-
-            {/* Header */}
-            <div className="flex items-center justify-between px-5 py-3 border-b border-[var(--border)]">
-              <div className="flex items-center gap-3">
-                <div className="w-9 h-9 bg-[#1e3a8a] rounded-full flex items-center justify-center text-white text-sm font-bold">
-                  {userInitials}
-                </div>
-                <div>
-                  <p className="text-sm font-semibold text-[var(--text-primary)] truncate max-w-[180px]">{userName}</p>
-                  <p className="text-[11px] text-[var(--accent-text)] font-semibold">APOSTADOR</p>
-                </div>
-              </div>
-              <button onClick={() => setDrawerOpen(false)}
-                className="w-8 h-8 flex items-center justify-center rounded-xl bg-[var(--bg-elevated)] text-[var(--text-secondary)]">
-                <X className="w-4 h-4" />
-              </button>
-            </div>
-
-            {/* Nav items */}
-            <div className="px-4 py-3 grid grid-cols-3 gap-2">
-              {drawerItems.map(({ href, icon: Icon, label }) => {
-                const active = pathname === href || (href !== "/" && pathname.startsWith(href))
-                return (
-                  <Link key={href} href={href}
-                    className={cn(
-                      "flex flex-col items-center gap-2 py-4 rounded-2xl text-center transition-colors",
-                      active
-                        ? "bg-[#1e3a8a]/15 text-[var(--accent-text)] border border-[#1e3a8a]/25"
-                        : "bg-[var(--bg-elevated)] text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
-                    )}
-                  >
-                    <Icon className="w-5 h-5" />
-                    <span className="text-[11px] font-medium">{label}</span>
-                  </Link>
-                )
-              })}
-            </div>
-
-            {/* Logout */}
-            <div className="px-4 pb-4">
-              <button
-                onClick={() => { setDrawerOpen(false); setConfirmLogout(true) }}
-                className="w-full flex items-center justify-center gap-2 py-3 rounded-2xl bg-red-500/10 border border-red-500/20 text-red-400 text-sm font-medium transition-colors hover:bg-red-500/20"
-              >
-                <LogOut className="w-4 h-4" />
-                Sair da conta
-              </button>
-            </div>
-          </div>
-        </>
-      )}
 
       {/* ── LOGOUT DIALOG ── */}
       {confirmLogout && (

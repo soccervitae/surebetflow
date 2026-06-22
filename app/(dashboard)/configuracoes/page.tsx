@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useRef } from "react"
 import { useRouter } from "next/navigation"
+import Link from "next/link"
 import { createClient } from "@/lib/supabase/client"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -11,7 +12,7 @@ import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
 import {
   Settings, Camera, Loader2, Shield, Monitor, Smartphone,
-  MapPin, Clock, LogOut, Key, User, AlertTriangle
+  MapPin, Clock, LogOut, Key, User, AlertTriangle, CreditCard, MessageCircle, ExternalLink
 } from "lucide-react"
 
 interface GeoInfo {
@@ -46,6 +47,7 @@ function parseBrowser(ua: string): string {
 
 export default function ConfiguracoesPage() {
   const router = useRouter()
+  const [tab, setTab] = useState<"conta" | "assinatura" | "suporte">("conta")
   const [email, setEmail] = useState("")
   const [userId, setUserId] = useState("")
   const [avatarUrl, setAvatarUrl] = useState("")
@@ -149,6 +151,12 @@ export default function ConfiguracoesPage() {
 
   const DeviceIcon = device?.icone === "smartphone" ? Smartphone : Monitor
 
+  const tabs = [
+    { key: "conta" as const,      label: "Conta",      icon: User },
+    { key: "assinatura" as const, label: "Assinatura", icon: CreditCard },
+    { key: "suporte" as const,    label: "Suporte",    icon: MessageCircle },
+  ]
+
   return (
     <div className="max-w-2xl mx-auto space-y-6 p-4 md:p-6">
       <div className="flex items-center gap-3">
@@ -161,6 +169,81 @@ export default function ConfiguracoesPage() {
         </div>
       </div>
 
+      {/* Tabs */}
+      <div className="flex gap-1 bg-[var(--bg-elevated)] p-1 rounded-xl">
+        {tabs.map(({ key, label, icon: Icon }) => (
+          <button
+            key={key}
+            onClick={() => setTab(key)}
+            className={`flex-1 flex items-center justify-center gap-2 py-2 px-3 rounded-lg text-sm font-medium transition-colors ${
+              tab === key
+                ? "bg-[var(--bg-surface)] text-[var(--text-primary)] shadow-sm"
+                : "text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
+            }`}
+          >
+            <Icon className="w-4 h-4 flex-shrink-0" />
+            <span>{label}</span>
+          </button>
+        ))}
+      </div>
+
+      {tab === "assinatura" && (
+        <Card>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-base flex items-center gap-2">
+              <CreditCard className="h-4 w-4" /> Assinatura
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <p className="text-sm text-[var(--text-secondary)]">
+              Gerencie seu plano e informações de cobrança na página de assinatura.
+            </p>
+            <Link href="/assinatura"
+              className="flex items-center justify-between p-4 rounded-xl bg-[var(--bg-muted)] border border-[var(--border)] hover:bg-[var(--bg-elevated)] transition-colors">
+              <div className="flex items-center gap-3">
+                <div className="w-9 h-9 bg-[#1e3a8a]/10 rounded-lg flex items-center justify-center">
+                  <CreditCard className="w-5 h-5 text-[var(--accent-text)]" />
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-[var(--text-primary)]">Plano atual</p>
+                  <p className="text-xs text-[var(--text-secondary)]">Ver detalhes e gerenciar assinatura</p>
+                </div>
+              </div>
+              <ExternalLink className="w-4 h-4 text-[var(--text-muted)]" />
+            </Link>
+          </CardContent>
+        </Card>
+      )}
+
+      {tab === "suporte" && (
+        <Card>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-base flex items-center gap-2">
+              <MessageCircle className="h-4 w-4" /> Suporte
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <p className="text-sm text-[var(--text-secondary)]">
+              Precisa de ajuda? Acesse nossa central de suporte ou entre em contato diretamente.
+            </p>
+            <Link href="/suporte"
+              className="flex items-center justify-between p-4 rounded-xl bg-[var(--bg-muted)] border border-[var(--border)] hover:bg-[var(--bg-elevated)] transition-colors">
+              <div className="flex items-center gap-3">
+                <div className="w-9 h-9 bg-[#1e3a8a]/10 rounded-lg flex items-center justify-center">
+                  <MessageCircle className="w-5 h-5 text-[var(--accent-text)]" />
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-[var(--text-primary)]">Central de suporte</p>
+                  <p className="text-xs text-[var(--text-secondary)]">Tire suas dúvidas e fale conosco</p>
+                </div>
+              </div>
+              <ExternalLink className="w-4 h-4 text-[var(--text-muted)]" />
+            </Link>
+          </CardContent>
+        </Card>
+      )}
+
+      {tab === "conta" && <>
       {/* Conta */}
       <Card>
         <CardHeader className="pb-3">
@@ -301,6 +384,8 @@ export default function ConfiguracoesPage() {
           </form>
         </CardContent>
       </Card>
+
+      </>}
 
       {/* Dialog confirmar logout global */}
       <Dialog open={logoutAllOpen} onOpenChange={setLogoutAllOpen}>
