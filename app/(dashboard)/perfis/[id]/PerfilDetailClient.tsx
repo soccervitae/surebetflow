@@ -41,6 +41,7 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
   const [showCalculadora, setShowCalculadora] = useState(false)
   const [finalizarDialog, setFinalizarDialog] = useState<Aposta | null>(null)
   const [periodoFiltro, setPeriodoFiltro] = useState<"semana" | "mes" | "ano">("semana")
+  const [casaFiltro, setCasaFiltro] = useState<string>("todas")
   const [resultadoReal, setResultadoReal] = useState("")
   const [finalizando, setFinalizando] = useState(false)
   const { toast } = useToast()
@@ -71,19 +72,36 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
     }
   })
 
-  // Filtro de período para lista do dashboard
+  // Casas únicas extraídas das legs de todas as apostas
+  const casasUnicas = Array.from(
+    new Map(
+      currentApostas.flatMap(a =>
+        (a as Aposta & { legs?: { profile_bet?: { id: string; bet?: { id: string; nome: string } } }[] }).legs ?? []
+      )
+        .filter(l => l.profile_bet?.bet)
+        .map(l => [l.profile_bet!.bet!.id, { id: l.profile_bet!.bet!.id, nome: l.profile_bet!.bet!.nome }])
+    ).values()
+  )
+
+  // Filtro de período + casa
   const now = new Date()
   const apostasFiltradasPeriodo = currentApostas.filter(a => {
     const date = new Date(a.created_at)
-    if (periodoFiltro === "semana") {
-      const semanaAtras = new Date(now)
-      semanaAtras.setDate(now.getDate() - 7)
-      return date >= semanaAtras
-    }
-    if (periodoFiltro === "mes") {
-      return date.getMonth() === now.getMonth() && date.getFullYear() === now.getFullYear()
-    }
-    return date.getFullYear() === now.getFullYear()
+    const passaPeriodo = (() => {
+      if (periodoFiltro === "semana") {
+        const semanaAtras = new Date(now)
+        semanaAtras.setDate(now.getDate() - 7)
+        return date >= semanaAtras
+      }
+      if (periodoFiltro === "mes") {
+        return date.getMonth() === now.getMonth() && date.getFullYear() === now.getFullYear()
+      }
+      return date.getFullYear() === now.getFullYear()
+    })()
+    if (!passaPeriodo) return false
+    if (casaFiltro === "todas") return true
+    const legs = (a as Aposta & { legs?: { profile_bet?: { bet?: { id: string } } }[] }).legs ?? []
+    return legs.some(l => l.profile_bet?.bet?.id === casaFiltro)
   })
 
   async function handleFinalizar() {
@@ -248,22 +266,36 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
 
           {/* Apostas do período */}
           <div>
-            <div className="flex items-center justify-between mb-3">
+            <div className="flex flex-wrap items-center justify-between gap-3 mb-3">
               <h2 className="text-sm font-semibold text-[var(--text-primary)] uppercase tracking-wide">Apostas</h2>
-              <div className="flex gap-1 bg-[var(--bg-elevated)] rounded-lg p-1">
-                {(["semana", "mes", "ano"] as const).map(p => (
-                  <button
-                    key={p}
-                    onClick={() => setPeriodoFiltro(p)}
-                    className={`px-3 py-1 rounded-md text-xs font-medium transition-colors ${
-                      periodoFiltro === p
-                        ? "bg-[var(--bg-surface)] text-[#16A34A] shadow-sm border border-[var(--border)]"
-                        : "text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
-                    }`}
+              <div className="flex flex-wrap items-center gap-2">
+                {casasUnicas.length > 0 && (
+                  <select
+                    value={casaFiltro}
+                    onChange={e => setCasaFiltro(e.target.value)}
+                    className="h-8 px-2 rounded-lg border border-[var(--border)] bg-[var(--bg-surface)] text-[var(--text-primary)] text-xs"
                   >
-                    {p === "semana" ? "Semana" : p === "mes" ? "Mês" : "Ano"}
-                  </button>
-                ))}
+                    <option value="todas">Todas as casas</option>
+                    {casasUnicas.map(c => (
+                      <option key={c.id} value={c.id}>{c.nome}</option>
+                    ))}
+                  </select>
+                )}
+                <div className="flex gap-1 bg-[var(--bg-elevated)] rounded-lg p-1">
+                  {(["semana", "mes", "ano"] as const).map(p => (
+                    <button
+                      key={p}
+                      onClick={() => setPeriodoFiltro(p)}
+                      className={`px-3 py-1 rounded-md text-xs font-medium transition-colors ${
+                        periodoFiltro === p
+                          ? "bg-[var(--bg-surface)] text-[#16A34A] shadow-sm border border-[var(--border)]"
+                          : "text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
+                      }`}
+                    >
+                      {p === "semana" ? "Semana" : p === "mes" ? "Mês" : "Ano"}
+                    </button>
+                  ))}
+                </div>
               </div>
             </div>
             {apostasFiltradasPeriodo.length === 0 ? (
