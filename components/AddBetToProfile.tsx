@@ -47,6 +47,12 @@ export default function AddBetToProfile({ profileId }: Props) {
   const [movDescricao, setMovDescricao] = useState("")
   const [movSaving, setMovSaving] = useState(false)
 
+  const [editDialog, setEditDialog] = useState<ProfileBetWithBet | null>(null)
+  const [editEmail, setEditEmail] = useState("")
+  const [editSenha, setEditSenha] = useState("")
+  const [editShowSenha, setEditShowSenha] = useState(false)
+  const [editSaving, setEditSaving] = useState(false)
+
   const { toast } = useToast()
   const supabase = createClient()
   const router = useRouter()
@@ -139,6 +145,32 @@ export default function AddBetToProfile({ profileId }: Props) {
       setDeletarDialog(null)
     }
     setDeletando(false)
+  }
+
+  async function handleEdit() {
+    if (!editDialog) return
+    if (!editEmail.trim()) {
+      toast({ title: "Informe o email", variant: "destructive" })
+      return
+    }
+    setEditSaving(true)
+    const updates: Record<string, string> = { email: editEmail.trim() }
+    if (editSenha.trim()) {
+      updates.senha_encrypted = editSenha.trim()
+      updates.senha_nonce = ""
+    }
+    const { error } = await supabase.from("profile_bets").update(updates).eq("id", editDialog.id)
+    if (error) {
+      toast({ title: "Erro ao salvar", variant: "destructive" })
+    } else {
+      setProfileBets(prev => prev.map(pb => pb.id === editDialog.id
+        ? { ...pb, email: editEmail.trim(), senha_encrypted: editSenha.trim() ? editSenha.trim() as unknown as Uint8Array : pb.senha_encrypted }
+        : pb
+      ))
+      toast({ title: "Dados atualizados!" })
+      setEditDialog(null)
+    }
+    setEditSaving(false)
   }
 
   async function handleToggleAtivo() {
@@ -385,6 +417,51 @@ export default function AddBetToProfile({ profileId }: Props) {
       )}
 
       {/* Dialog Deletar */}
+      {/* Edit Dialog */}
+      <Dialog open={!!editDialog} onOpenChange={open => !open && setEditDialog(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Editar — {editDialog?.bet?.nome}</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="space-y-1.5">
+              <Label>Email</Label>
+              <Input
+                type="email"
+                value={editEmail}
+                onChange={e => setEditEmail(e.target.value)}
+                placeholder="email@exemplo.com"
+              />
+            </div>
+            <div className="space-y-1.5">
+              <Label>Nova senha <span className="text-[var(--text-muted)] font-normal">(deixe em branco para não alterar)</span></Label>
+              <div className="relative">
+                <Input
+                  type={editShowSenha ? "text" : "password"}
+                  value={editSenha}
+                  onChange={e => setEditSenha(e.target.value)}
+                  placeholder="••••••••"
+                  className="pr-10"
+                />
+                <button
+                  type="button"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)] hover:text-[var(--text-primary)]"
+                  onClick={() => setEditShowSenha(v => !v)}
+                >
+                  {editShowSenha ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                </button>
+              </div>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setEditDialog(null)}>Cancelar</Button>
+            <Button onClick={handleEdit} disabled={editSaving}>
+              {editSaving ? "Salvando..." : "Salvar"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
       <Dialog open={!!deletarDialog} onOpenChange={open => !open && setDeletarDialog(null)}>
         <DialogContent>
           <DialogHeader>
@@ -528,7 +605,19 @@ export default function AddBetToProfile({ profileId }: Props) {
                     </div>
 
                     {/* Actions */}
-                    <div className="flex items-center gap-2 pt-1">
+                    <div className="flex items-center gap-2 pt-1 flex-wrap">
+                      <button
+                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium bg-[#1e3a8a]/10 text-[var(--accent-text)] hover:bg-[#1e3a8a]/20 transition-colors"
+                        onClick={() => {
+                          setEditEmail(pb.email ?? "")
+                          setEditSenha("")
+                          setEditShowSenha(false)
+                          setEditDialog(pb)
+                          setMenuOpenId(null)
+                        }}
+                      >
+                        Editar
+                      </button>
                       <button
                         className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${pb.ativo ? "bg-orange-500/10 text-orange-500 hover:bg-orange-500/20" : "bg-green-500/10 text-green-600 hover:bg-green-500/20"}`}
                         onClick={() => { setAtivoDialog(pb); setMenuOpenId(null) }}
