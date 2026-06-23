@@ -3,6 +3,8 @@
 import Image from "next/image"
 import { useTheme } from "@/components/ThemeProvider"
 
+const LOGO_DARK = "https://gkkuttabavwxjuibmrnr.supabase.co/storage/v1/object/public/logos/surebetflow-horizontal-vazada-branca.png"
+
 interface LogoProps {
   size?: "sm" | "md" | "lg"
   showText?: boolean
@@ -37,7 +39,7 @@ export default function Logo({ size = "md", showText = true }: LogoProps) {
     return (
       <div className="select-none flex items-center">
         <Image
-          src="/logo-dark.svg"
+          src={LOGO_DARK}
           alt="SurebetFlow"
           width={logoW}
           height={logoH}
