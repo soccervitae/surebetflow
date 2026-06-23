@@ -30,14 +30,14 @@ export default async function LandingPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#0c1428] text-white">
+    <div className="min-h-screen bg-[#0B1220] text-white">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
 
       {/* Navbar */}
-      <nav className="sticky top-0 z-50 bg-[#0c1428]/90 backdrop-blur border-b border-white/5">
+      <nav className="sticky top-0 z-50 bg-[#0B1220]/90 backdrop-blur border-b border-white/5">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
           <div className="flex items-center gap-2.5">
             <div className="w-8 h-8 bg-[#1e3a8a] rounded-lg flex items-center justify-center">
@@ -62,7 +62,7 @@ export default async function LandingPage() {
           <Zap className="w-3.5 h-3.5" />
           Lucro garantido — é matemática pura
         </div>
-        <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold leading-tight mb-6">
+        <h1 className="font-display text-4xl sm:text-5xl lg:text-6xl font-extrabold leading-tight mb-6 tracking-tight">
           Calcular vitórias nunca<br />
           foi tão <span className="text-[#60a5fa]">simples</span>
         </h1>
@@ -80,10 +80,10 @@ export default async function LandingPage() {
       </section>
 
       {/* O que é Surebet */}
-      <section className="border-y border-white/5 py-20 bg-[#0f1d3a]">
+      <section className="border-y border-white/5 py-20 bg-[#111A2E]">
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
           <div className="text-center mb-14">
-            <h2 className="text-3xl font-bold text-white mb-4">O que é uma Surebet?</h2>
+            <h2 className="font-display text-3xl font-bold text-white mb-4 tracking-tight">O que é uma Surebet?</h2>
             <p className="text-gray-400 max-w-2xl mx-auto text-lg">
               Uma surebet acontece quando as odds de diferentes casas criam uma oportunidade de lucro garantido, independente do resultado do evento.
             </p>
@@ -106,7 +106,7 @@ export default async function LandingPage() {
                 desc: "Independente do resultado do jogo, você recebe mais do que investiu. É matemática, não sorte."
               },
             ].map((f) => (
-              <div key={f.title} className="bg-[#0c1428] border border-white/5 rounded-2xl p-6 text-center">
+              <div key={f.title} className="bg-[#0B1220] border border-white/5 rounded-2xl p-6 text-center">
                 <div className={`w-12 h-12 ${f.color} rounded-xl flex items-center justify-center mx-auto mb-4`}>
                   <f.icon className={`w-6 h-6 ${f.iconColor}`} />
                 </div>
@@ -121,7 +121,7 @@ export default async function LandingPage() {
       {/* Funcionalidades */}
       <section className="max-w-6xl mx-auto px-4 sm:px-6 py-20">
         <div className="text-center mb-14">
-          <h2 className="text-3xl font-bold text-white mb-4">Tudo que você precisa em um lugar</h2>
+          <h2 className="font-display text-3xl font-bold text-white mb-4 tracking-tight">Tudo que você precisa em um lugar</h2>
           <p className="text-gray-400 max-w-xl mx-auto">Do cálculo da arbitragem ao controle financeiro completo — tudo para profissionalizar sua operação.</p>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
@@ -133,7 +133,7 @@ export default async function LandingPage() {
             { icon: BarChart3, color: "bg-[#1e3a8a]/10", iconColor: "text-[#60a5fa]", title: "Dashboard com gráficos", desc: "Acompanhe a evolução do lucro acumulado. Veja ROI, total investido e apostas ativas." },
             { icon: RefreshCw, color: "bg-blue-500/10", iconColor: "text-blue-400", title: "Histórico completo", desc: "Todas as apostas com legs detalhados, odds, stakes e resultado real. Filtre por perfil e período." },
           ].map((f) => (
-            <div key={f.title} className="bg-[#0f1d3a] border border-white/5 rounded-2xl p-6 hover:border-[#1e3a8a]/50 transition-colors">
+            <div key={f.title} className="bg-[#111A2E] border border-white/5 rounded-2xl p-6 hover:border-[#1e3a8a]/50 transition-colors">
               <div className={`w-10 h-10 ${f.color} rounded-xl flex items-center justify-center mb-4`}>
                 <f.icon className={`w-5 h-5 ${f.iconColor}`} />
               </div>
@@ -145,14 +145,14 @@ export default async function LandingPage() {
       </section>
 
       {/* Múltiplos Perfis */}
-      <section className="border-y border-white/5 py-20 bg-[#0f1d3a]">
+      <section className="border-y border-white/5 py-20 bg-[#111A2E]">
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
           <div className="text-center mb-12">
             <div className="inline-flex items-center gap-2 bg-purple-500/10 border border-purple-500/20 text-purple-400 text-sm font-medium px-4 py-1.5 rounded-full mb-4">
               <Users className="w-3.5 h-3.5" />
               Gestão por perfis
             </div>
-            <h2 className="text-3xl font-bold text-white mb-4">
+            <h2 className="font-display text-3xl font-bold text-white mb-4 tracking-tight">
               Gerencie vários perfis separados<br className="hidden sm:block" /> na mesma conta
             </h2>
             <p className="text-gray-400 max-w-2xl mx-auto text-lg">
@@ -167,7 +167,7 @@ export default async function LandingPage() {
                 { title: "Saldo e lucro por perfil", desc: "Acompanhe quanto cada perfil tem em cada casa, lucro realizado, pendente e ROI individual." },
                 { title: "Visão consolidada no dashboard", desc: "O painel geral soma o desempenho de todos os perfis para você enxergar o resultado total." },
               ].map((item) => (
-                <div key={item.title} className="flex items-start gap-3 p-4 rounded-xl bg-[#0c1428] border border-white/5">
+                <div key={item.title} className="flex items-start gap-3 p-4 rounded-xl bg-[#0B1220] border border-white/5">
                   <CheckCircle className="w-5 h-5 text-purple-400 flex-shrink-0 mt-0.5" />
                   <div>
                     <p className="font-semibold text-white text-sm">{item.title}</p>
@@ -176,7 +176,7 @@ export default async function LandingPage() {
                 </div>
               ))}
             </div>
-            <div className="bg-[#0c1428] border border-white/5 rounded-2xl p-6">
+            <div className="bg-[#0B1220] border border-white/5 rounded-2xl p-6">
               <p className="text-xs text-gray-500 uppercase tracking-wide font-medium mb-4">Exemplo de uso</p>
               <div className="space-y-3">
                 {[
@@ -184,7 +184,7 @@ export default async function LandingPage() {
                   { nome: "Maria Silva", apelido: "Esposa", casas: 3, saldo: "R$ 1.800,00", lucro: "+ R$ 210,00", cor: "bg-blue-600" },
                   { nome: "Carlos Silva", apelido: "Irmão", casas: 4, saldo: "R$ 2.500,00", lucro: "+ R$ 315,75", cor: "bg-purple-600" },
                 ].map((p) => (
-                  <div key={p.nome} className="bg-[#0c1428] border border-white/5 rounded-xl p-4 flex items-center gap-4">
+                  <div key={p.nome} className="bg-[#0B1220] border border-white/5 rounded-xl p-4 flex items-center gap-4">
                     <div className={`w-10 h-10 ${p.cor} rounded-full flex items-center justify-center text-white font-bold text-sm flex-shrink-0`}>
                       {p.nome.charAt(0)}
                     </div>
@@ -220,7 +220,7 @@ export default async function LandingPage() {
       <section className="max-w-6xl mx-auto px-4 sm:px-6 py-20">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
           <div>
-            <h2 className="text-3xl font-bold text-white mb-4">Por que surebet é diferente das apostas comuns?</h2>
+            <h2 className="font-display text-3xl font-bold text-white mb-4 tracking-tight">Por que surebet é diferente das apostas comuns?</h2>
             <p className="text-gray-400 mb-8">Nas apostas tradicionais, você depende da sorte. Na arbitragem, você explora ineficiências do mercado — é puramente matemático.</p>
             <ul className="space-y-4">
               {[
@@ -245,7 +245,7 @@ export default async function LandingPage() {
               { icon: BarChart3, color: "text-blue-400", title: "ROI típico de 1% a 5% por operação", desc: "Com volume consistente, apostadores conseguem retornos mensais de 10% a 30% sobre o capital." },
               { icon: Zap, color: "text-yellow-400", title: "Velocidade é essencial", desc: "Oportunidades duram segundos. Com o SureBetFlow, você calcula e registra em poucos cliques." },
             ].map((item) => (
-              <div key={item.title} className="bg-[#0f1d3a] border border-white/5 rounded-2xl p-6">
+              <div key={item.title} className="bg-[#111A2E] border border-white/5 rounded-2xl p-6">
                 <div className="flex items-center gap-3 mb-3">
                   <item.icon className={`w-6 h-6 ${item.color}`} />
                   <span className="font-bold text-white">{item.title}</span>
@@ -258,13 +258,13 @@ export default async function LandingPage() {
       </section>
 
       {/* Planos */}
-      <section className="border-y border-white/5 py-20 bg-[#0f1d3a]">
+      <section className="border-y border-white/5 py-20 bg-[#111A2E]">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 text-center">
-          <h2 className="text-3xl font-bold text-white mb-4">Um plano. Acesso completo.</h2>
+          <h2 className="font-display text-3xl font-bold text-white mb-4 tracking-tight">Um plano. Acesso completo.</h2>
           <p className="text-gray-400 mb-12 max-w-xl mx-auto">Sem planos confusos. Tudo incluso por um preço justo.</p>
           <div className="max-w-sm mx-auto">
             {/* Plano Pro */}
-            <div className="bg-[#0f1d3a] border-2 border-[#1e3a8a] rounded-2xl p-8 text-left relative">
+            <div className="bg-[#111A2E] border-2 border-[#1e3a8a] rounded-2xl p-8 text-left relative">
               <div className="absolute -top-3 left-1/2 -translate-x-1/2">
                 <span className="bg-[#1e3a8a] text-white text-xs font-bold px-3 py-1 rounded-full">PLANO PRO</span>
               </div>
@@ -310,7 +310,7 @@ export default async function LandingPage() {
             { q: "Minhas senhas ficam seguras?", a: "Sim. Todas as senhas das casas de apostas são criptografadas com AES-256-GCM via Edge Function segura. Nem o banco de dados guarda sua senha em texto puro." },
             { q: "Posso cancelar a qualquer momento?", a: "Sim, você pode cancelar sua assinatura a qualquer momento sem multa ou fidelidade. O acesso continua até o fim do período pago." },
           ].map((item) => (
-            <details key={item.q} className="group bg-[#0f1d3a] border border-white/5 rounded-xl overflow-hidden">
+            <details key={item.q} className="group bg-[#111A2E] border border-white/5 rounded-xl overflow-hidden">
               <summary className="flex items-center justify-between p-5 cursor-pointer list-none">
                 <span className="font-semibold text-white">{item.q}</span>
                 <ChevronDown className="w-5 h-5 text-gray-400 group-open:rotate-180 transition-transform flex-shrink-0" />
@@ -322,9 +322,9 @@ export default async function LandingPage() {
       </section>
 
       {/* CTA Final */}
-      <section className="border-t border-white/5 py-20 bg-[#0f1d3a]">
+      <section className="border-t border-white/5 py-20 bg-[#111A2E]">
         <div className="max-w-3xl mx-auto px-4 sm:px-6 text-center">
-          <h2 className="text-3xl font-bold text-white mb-4">Pronto para lucrar com matemática?</h2>
+          <h2 className="font-display text-3xl font-bold text-white mb-4 tracking-tight">Pronto para lucrar com matemática?</h2>
           <p className="text-gray-400 text-lg mb-8">
             Junte-se a apostadores que já profissionalizaram sua operação com o SureBetFlow.
           </p>
@@ -335,7 +335,7 @@ export default async function LandingPage() {
       </section>
 
       {/* Footer */}
-      <footer className="border-t border-white/5 py-8 bg-[#0c1428]">
+      <footer className="border-t border-white/5 py-8 bg-[#0B1220]">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-2">
             <div className="w-6 h-6 bg-[#1e3a8a] rounded-md flex items-center justify-center">

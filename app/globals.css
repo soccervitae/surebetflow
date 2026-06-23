@@ -3,44 +3,48 @@
 @tailwind utilities;
 
 :root {
-  /* Light mode */
-  --bg-base: #FAFAF8;
+  /* Light mode — brand book */
+  --bg-base: #F5F7FA;
   --bg-surface: #ffffff;
-  --bg-elevated: #f3f4f6;
+  --bg-elevated: #EEF2F8;
   --bg-muted: #f9fafb;
-  --border: #E5E1D8;
-  --border-subtle: #e5e7eb;
-  --text-primary: #111827;
-  --text-secondary: #6b7280;
-  --text-muted: #9ca3af;
+  --border: #E2E8F0;
+  --border-subtle: #E2E8F0;
+  --text-primary: #0B1220;
+  --text-secondary: #475569;
+  --text-muted: #64748B;
   --primary: #1e3a8a;
   --primary-foreground: #ffffff;
   --destructive: #DC2626;
   --blue: #2563EB;
-  --background: #FAFAF8;
-  --foreground: #1a1a1a;
+  --background: #F5F7FA;
+  --foreground: #0B1220;
   --radius: 12px;
   --accent-text: #1e3a8a;
+  --confirm: #10B981;
+  --navy-300: #5b7ec9;
 }
 
 .dark {
-  /* Dark mode */
-  --bg-base: #0d1117;
-  --bg-surface: #161b22;
-  --bg-elevated: #21262d;
-  --bg-muted: #161b22;
-  --border: #30363d;
-  --border-subtle: #21262d;
-  --text-primary: #e6edf3;
-  --text-secondary: #8b949e;
-  --text-muted: #6e7681;
+  /* Dark mode — brand book terminal */
+  --bg-base: #0B1220;
+  --bg-surface: #111A2E;
+  --bg-elevated: #18233D;
+  --bg-muted: #111A2E;
+  --border: #1F2C49;
+  --border-subtle: #1F2C49;
+  --text-primary: #E8EDF4;
+  --text-secondary: #94A3B8;
+  --text-muted: #64748B;
   --primary: #1e3a8a;
   --primary-foreground: #ffffff;
-  --destructive: #f85149;
-  --blue: #58a6ff;
-  --background: #0d1117;
-  --foreground: #e6edf3;
-  --accent-text: #60a5fa;
+  --destructive: #DC2626;
+  --blue: #5b7ec9;
+  --background: #0B1220;
+  --foreground: #E8EDF4;
+  --accent-text: #5b7ec9;
+  --confirm: #10B981;
+  --navy-300: #5b7ec9;
 }
 
 body {
