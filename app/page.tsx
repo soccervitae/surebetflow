@@ -2,9 +2,10 @@ import { redirect } from "next/navigation"
 import { createClient } from "@/lib/supabase/server"
 import Link from "next/link"
 import {
-  TrendingUp, ShieldCheck, Calculator, Wallet, Lock, BarChart3,
+  ShieldCheck, Calculator, Wallet, Lock, BarChart3, TrendingUp,
   CheckCircle, ArrowRight, Zap, Users, Target, RefreshCw, ChevronDown
 } from "lucide-react"
+import { LogoIcon } from "@/components/Logo"
 
 export default async function LandingPage() {
   const supabase = await createClient()
@@ -40,10 +41,8 @@ export default async function LandingPage() {
       <nav className="sticky top-0 z-50 bg-[#0a0a0a]/90 backdrop-blur border-b border-white/5">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
           <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 bg-[#1e3a8a] rounded-lg flex items-center justify-center">
-              <TrendingUp className="w-4 h-4 text-white" />
-            </div>
-            <span className="font-bold text-white text-lg">SureBetFlow</span>
+            <LogoIcon size="sm" />
+            <span className="font-bold text-white text-lg">SurebetFlow</span>
           </div>
           <div className="flex items-center gap-3">
             <Link href="/login" className="text-sm font-medium text-gray-400 hover:text-white transition-colors">
@@ -338,10 +337,8 @@ export default async function LandingPage() {
       <footer className="border-t border-white/5 py-8 bg-[#0a0a0a]">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-2">
-            <div className="w-6 h-6 bg-[#1e3a8a] rounded-md flex items-center justify-center">
-              <TrendingUp className="w-3 h-3 text-white" />
-            </div>
-            <span className="font-bold text-white text-sm">SureBetFlow</span>
+            <LogoIcon size="sm" />
+            <span className="font-bold text-white text-sm">SurebetFlow</span>
           </div>
           <p className="text-xs text-gray-600">© 2026 SureBetFlow. Todos os direitos reservados.</p>
           <div className="flex gap-4">

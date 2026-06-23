@@ -7,8 +7,9 @@ import { createClient } from "@/lib/supabase/client"
 import { cn } from "@/lib/utils"
 import {
   Home, Users, Calculator, BookOpen, DollarSign,
-  CreditCard, Settings, LogOut, Menu, X, TrendingUp
+  CreditCard, Settings, LogOut, Menu, X
 } from "lucide-react"
+import Logo from "@/components/Logo"
 const navItems = [
   { href: "/dashboard", label: "Início", icon: Home },
   { href: "/perfis", label: "Perfis", icon: Users },
@@ -39,11 +40,8 @@ export default function DashboardLayoutClient({ children }: { children: React.Re
     <div className="flex h-screen bg-[#FAFAF8] overflow-hidden">
       {/* Desktop Sidebar */}
       <aside className="hidden lg:flex lg:flex-col w-64 bg-[var(--bg-surface)] border-r border-[var(--border)] flex-shrink-0">
-        <div className="flex items-center gap-3 p-6 border-b border-[var(--border)]">
-          <div className="flex items-center justify-center w-9 h-9 bg-[#1e3a8a] rounded-lg">
-            <TrendingUp className="h-5 w-5 text-white" />
-          </div>
-          <span className="font-bold text-[var(--text-primary)]">SureBetFlow</span>
+        <div className="flex items-center p-6 border-b border-[var(--border)]">
+          <Logo size="md" />
         </div>
         <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
           {navItems.map(item => (
@@ -79,12 +77,7 @@ export default function DashboardLayoutClient({ children }: { children: React.Re
           <div className="absolute inset-0 bg-black/50" onClick={() => setSidebarOpen(false)} />
           <aside className="absolute left-0 top-0 bottom-0 w-72 bg-[var(--bg-surface)] flex flex-col shadow-xl">
             <div className="flex items-center justify-between p-6 border-b border-[var(--border)]">
-              <div className="flex items-center gap-3">
-                <div className="flex items-center justify-center w-9 h-9 bg-[#1e3a8a] rounded-lg">
-                  <TrendingUp className="h-5 w-5 text-white" />
-                </div>
-                <span className="font-bold text-[var(--text-primary)]">SureBetFlow</span>
-              </div>
+              <Logo size="md" />
               <button onClick={() => setSidebarOpen(false)} className="p-1 rounded-lg hover:bg-[var(--bg-elevated)]">
                 <X className="h-5 w-5 text-[var(--text-secondary)]" />
               </button>
@@ -127,12 +120,7 @@ export default function DashboardLayoutClient({ children }: { children: React.Re
           <button onClick={() => setSidebarOpen(true)} className="p-2 rounded-lg hover:bg-[var(--bg-elevated)]">
             <Menu className="h-5 w-5 text-[var(--text-secondary)]" />
           </button>
-          <div className="flex items-center gap-2">
-            <div className="flex items-center justify-center w-7 h-7 bg-[#1e3a8a] rounded-lg">
-              <TrendingUp className="h-4 w-4 text-white" />
-            </div>
-            <span className="font-bold text-[var(--text-primary)] text-sm">SureBetFlow</span>
-          </div>
+          <Logo size="sm" />
           <div className="w-9" />
         </header>
 
