@@ -413,18 +413,19 @@ export default function AddBetToProfile({ profileId }: Props) {
           {profileBets.map(pb => (
             <Card key={pb.id} className={!pb.ativo ? "opacity-60" : ""}>
               <CardContent className="p-4">
-                <div className="flex items-start gap-3">
-                  {/* Logo */}
+                <div className="flex items-center gap-3">
+                  {/* Logo — hidden on mobile */}
                   {pb.bet?.logo_url ? (
-                    <div className="w-9 h-9 rounded-lg border border-[var(--border)] bg-white flex items-center justify-center flex-shrink-0 overflow-hidden p-0.5">
+                    <div className="hidden sm:flex w-9 h-9 rounded-lg border border-[var(--border)] bg-white items-center justify-center flex-shrink-0 overflow-hidden p-0.5">
                       <img src={pb.bet.logo_url} alt={pb.bet.nome} className="w-full h-full object-contain" onError={handleLogoError} />
                     </div>
                   ) : (
-                    <div className="w-9 h-9 rounded-lg border border-[var(--border)] bg-[var(--bg-elevated)] flex items-center justify-center flex-shrink-0 text-xs font-bold text-[var(--text-secondary)]">
+                    <div className="hidden sm:flex w-9 h-9 rounded-lg border border-[var(--border)] bg-[var(--bg-elevated)] items-center justify-center flex-shrink-0 text-xs font-bold text-[var(--text-secondary)]">
                       {(pb.bet?.nome ?? "?").charAt(0)}
                     </div>
                   )}
-                  {/* Info */}
+
+                  {/* Info — left column */}
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 flex-wrap">
                       <p className="font-semibold text-[var(--text-primary)]">{pb.bet?.nome ?? "Casa"}</p>
@@ -433,7 +434,9 @@ export default function AddBetToProfile({ profileId }: Props) {
                         {pb.ativo ? "Ativa" : "Inativa"}
                       </span>
                     </div>
-                    <p className="text-xs text-[var(--text-secondary)] truncate mt-0.5">{pb.email}</p>
+                    <p className={`text-sm font-bold mt-0.5 ${pb.saldo > 0 ? "text-[var(--accent-text)]" : pb.saldo < 0 ? "text-[#DC2626]" : "text-[var(--text-secondary)]"}`}>
+                      {formatCurrency(pb.saldo)}
+                    </p>
                     {revealedPasswords[pb.id] && (
                       <p className="text-sm font-mono bg-[var(--bg-elevated)] rounded px-2 py-1 mt-2 text-[var(--text-primary)] break-all">
                         {pb.senha_encrypted}
@@ -441,22 +444,13 @@ export default function AddBetToProfile({ profileId }: Props) {
                     )}
                   </div>
 
-                  {/* Saldo + botão movimentação */}
-                  <div className="flex flex-col items-end gap-1.5 flex-shrink-0">
-                    <div className="text-right">
-                      <p className="text-xs text-[var(--text-muted)]">Saldo</p>
-                      <p className={`text-base font-bold ${pb.saldo > 0 ? "text-[#1e3a8a]" : pb.saldo < 0 ? "text-[#DC2626]" : "text-[var(--text-secondary)]"}`}>
-                        {formatCurrency(pb.saldo)}
-                      </p>
-                    </div>
-                    <button
-                      className="flex items-center gap-1 text-xs text-[#1e3a8a] hover:text-[#1e40af] transition-colors"
-                      onClick={() => { setMovDialog(pb); setMovTipo("deposito"); setMovValor(""); setMovDescricao("") }}
-                    >
-                      <PlusCircle className="h-3.5 w-3.5" />
-                      Movimentação
-                    </button>
-                  </div>
+                  {/* Right: + circle button */}
+                  <button
+                    className="w-9 h-9 rounded-full border-2 border-[#1e3a8a]/40 flex items-center justify-center text-[var(--accent-text)] hover:bg-[#1e3a8a]/10 transition-colors flex-shrink-0"
+                    onClick={() => { setMovDialog(pb); setMovTipo("deposito"); setMovValor(""); setMovDescricao("") }}
+                  >
+                    <Plus className="h-4 w-4" />
+                  </button>
 
                   {/* Menu 3 pontos */}
                   <div className="relative flex-shrink-0">
