@@ -653,13 +653,13 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
                           : <ArrowUpCircle className="h-4 w-4 text-[#DC2626]" />}
                       </div>
                       <div className="flex-1 min-w-0">
+                        {(m.profile_bet as MovimentacaoFinanceira["profile_bet"])?.bet?.nome && (
+                          <p className="text-xs font-semibold text-[var(--accent-text)] mb-0.5">
+                            {(m.profile_bet as MovimentacaoFinanceira["profile_bet"])?.bet?.nome}
+                          </p>
+                        )}
                         <p className="text-sm font-medium text-[var(--text-primary)]">
                           {m.tipo === "deposito" ? "Depósito" : "Saque"}
-                          {(m.profile_bet as MovimentacaoFinanceira["profile_bet"])?.bet?.nome && (
-                            <span className="ml-2 text-xs px-1.5 py-0.5 rounded bg-[var(--bg-elevated)] text-[var(--text-secondary)]">
-                              {(m.profile_bet as MovimentacaoFinanceira["profile_bet"])?.bet?.nome}
-                            </span>
-                          )}
                         </p>
                         {m.descricao && <p className="text-xs text-[var(--text-muted)] truncate">{m.descricao}</p>}
                         <p className="text-xs text-[var(--text-secondary)]">{new Date(m.created_at).toLocaleDateString("pt-BR")}</p>
