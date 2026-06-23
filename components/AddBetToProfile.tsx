@@ -522,11 +522,13 @@ export default function AddBetToProfile({ profileId }: Props) {
                           </button>
                           <div className="border-t border-[var(--border)]" />
                           <button
-                            className="w-full flex items-center gap-2 px-3 py-2.5 text-sm text-red-500 hover:bg-red-50 transition-colors"
-                            onClick={() => { setDeletarDialog(pb); setMenuOpenId(null) }}
+                            className={`w-full flex items-center gap-2 px-3 py-2.5 text-sm transition-colors ${pb.saldo !== 0 ? "text-red-300 cursor-not-allowed" : "text-red-500 hover:bg-red-50"}`}
+                            onClick={() => { if (pb.saldo !== 0) return; setDeletarDialog(pb); setMenuOpenId(null) }}
+                            title={pb.saldo !== 0 ? "Zere o saldo antes de remover" : undefined}
                           >
                             <Trash2 className="h-4 w-4" />
                             Remover
+                            {pb.saldo !== 0 && <span className="ml-auto text-xs text-red-300">saldo ≠ 0</span>}
                           </button>
                         </div>
                       </>
