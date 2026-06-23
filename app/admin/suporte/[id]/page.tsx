@@ -1,4 +1,5 @@
 import { createAdminClient } from "@/lib/supabase/admin"
+import { createClient } from "@/lib/supabase/server"
 import { notFound } from "next/navigation"
 import AdminTicketClient from "./AdminTicketClient"
 
@@ -28,5 +29,10 @@ export default async function AdminTicketPage({ params }: { params: { id: string
   const { data: { user } } = await supabase.auth.admin.getUserById(ticket.user_id)
   const userEmail = user?.email ?? ticket.user_id
 
-  return <AdminTicketClient ticket={ticket} mensagens={mensagens ?? []} userEmail={userEmail} />
+  // Get the logged-in admin's own user ID
+  const clientSupabase = await createClient()
+  const { data: { user: adminUser } } = await clientSupabase.auth.getUser()
+  const adminId = adminUser?.id ?? ""
+
+  return <AdminTicketClient ticket={ticket} mensagens={mensagens ?? []} userEmail={userEmail} adminId={adminId} />
 }

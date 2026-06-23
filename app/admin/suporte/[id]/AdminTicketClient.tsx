@@ -14,10 +14,11 @@ const STATUS_LABEL: Record<string, { label: string; color: string; bg: string }>
   fechado:    { label: "Fechado",    color: "text-gray-400",   bg: "bg-gray-500/10" },
 }
 
-export default function AdminTicketClient({ ticket: initial, mensagens: initialMsgs, userEmail }: {
+export default function AdminTicketClient({ ticket: initial, mensagens: initialMsgs, userEmail, adminId }: {
   ticket: Ticket
   mensagens: Mensagem[]
   userEmail: string
+  adminId: string
 }) {
   const [ticket, setTicket] = useState(initial)
   const [mensagens, setMensagens] = useState(initialMsgs)
@@ -61,7 +62,7 @@ export default function AdminTicketClient({ ticket: initial, mensagens: initialM
 
     await supabase.from("ticket_mensagens").insert({
       ticket_id: ticket.id,
-      sender_id: ticket.user_id,
+      sender_id: adminId,
       is_admin: true,
       conteudo: texto.trim(),
     })
