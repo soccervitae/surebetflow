@@ -11,7 +11,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { formatCurrency } from "@/lib/utils"
 import { useToast } from "@/hooks/useToast"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetFooter } from "@/components/ui/sheet"
 import { Plus, Eye, EyeOff, Loader2, Trash2, Search, Check, PlusCircle, MoreVertical } from "lucide-react"
+import { useMediaQuery } from "@/hooks/useMediaQuery"
 import type { Bet, ProfileBet } from "@/lib/types"
 
 interface Props {
@@ -48,6 +50,7 @@ export default function AddBetToProfile({ profileId }: Props) {
   const { toast } = useToast()
   const supabase = createClient()
   const router = useRouter()
+  const isMobile = !useMediaQuery("(min-width: 768px)")
 
   const loadData = useCallback(async function loadData() {
     const [betsRes, pbRes] = await Promise.all([
@@ -306,42 +309,80 @@ export default function AddBetToProfile({ profileId }: Props) {
         </DialogContent>
       </Dialog>
 
-      {/* Dialog Nova Movimentação */}
-      <Dialog open={!!movDialog} onOpenChange={open => { if (!open) { setMovDialog(null); setMovTipo("deposito"); setMovValor(""); setMovDescricao("") } }}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Nova Movimentação — {movDialog?.bet?.nome}</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-4">
-            <div className="grid grid-cols-2 gap-3">
-              <div className="space-y-1.5">
-                <Label>Tipo</Label>
-                <Select value={movTipo} onValueChange={v => setMovTipo(v as "deposito" | "saque")}>
-                  <SelectTrigger><SelectValue /></SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="deposito">Depósito</SelectItem>
-                    <SelectItem value="saque">Saque</SelectItem>
-                  </SelectContent>
-                </Select>
+      {/* Movimentação — Sheet no mobile, Dialog no desktop */}
+      {isMobile ? (
+        <Sheet open={!!movDialog} onOpenChange={open => { if (!open) { setMovDialog(null); setMovTipo("deposito"); setMovValor(""); setMovDescricao("") } }}>
+          <SheetContent side="bottom">
+            <SheetHeader>
+              <SheetTitle>Nova Movimentação — {movDialog?.bet?.nome}</SheetTitle>
+            </SheetHeader>
+            <div className="px-4 space-y-4 py-2">
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-1.5">
+                  <Label>Tipo</Label>
+                  <Select value={movTipo} onValueChange={v => setMovTipo(v as "deposito" | "saque")}>
+                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="deposito">Depósito</SelectItem>
+                      <SelectItem value="saque">Saque</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-1.5">
+                  <Label>Valor (R$)</Label>
+                  <Input placeholder="0,00" value={movValor} onChange={e => setMovValor(formatBRL(e.target.value))} inputMode="numeric" />
+                </div>
               </div>
               <div className="space-y-1.5">
-                <Label>Valor (R$)</Label>
-                <Input placeholder="0,00" value={movValor} onChange={e => setMovValor(formatBRL(e.target.value))} />
+                <Label>Descrição (opcional)</Label>
+                <Input placeholder="Ex: Depósito inicial" value={movDescricao} onChange={e => setMovDescricao(e.target.value)} />
               </div>
             </div>
-            <div className="space-y-1.5">
-              <Label>Descrição (opcional)</Label>
-              <Input placeholder="Ex: Depósito inicial" value={movDescricao} onChange={e => setMovDescricao(e.target.value)} />
+            <SheetFooter>
+              <Button variant="outline" onClick={() => setMovDialog(null)}>Cancelar</Button>
+              <Button onClick={handleMovSave} disabled={movSaving} className="bg-[#1e3a8a] hover:bg-[#1e40af] text-white">
+                {movSaving ? "Salvando..." : "Salvar"}
+              </Button>
+            </SheetFooter>
+          </SheetContent>
+        </Sheet>
+      ) : (
+        <Dialog open={!!movDialog} onOpenChange={open => { if (!open) { setMovDialog(null); setMovTipo("deposito"); setMovValor(""); setMovDescricao("") } }}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Nova Movimentação — {movDialog?.bet?.nome}</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4">
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-1.5">
+                  <Label>Tipo</Label>
+                  <Select value={movTipo} onValueChange={v => setMovTipo(v as "deposito" | "saque")}>
+                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="deposito">Depósito</SelectItem>
+                      <SelectItem value="saque">Saque</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-1.5">
+                  <Label>Valor (R$)</Label>
+                  <Input placeholder="0,00" value={movValor} onChange={e => setMovValor(formatBRL(e.target.value))} />
+                </div>
+              </div>
+              <div className="space-y-1.5">
+                <Label>Descrição (opcional)</Label>
+                <Input placeholder="Ex: Depósito inicial" value={movDescricao} onChange={e => setMovDescricao(e.target.value)} />
+              </div>
             </div>
-          </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setMovDialog(null)}>Cancelar</Button>
-            <Button onClick={handleMovSave} disabled={movSaving}>
-              {movSaving ? "Salvando..." : "Salvar"}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setMovDialog(null)}>Cancelar</Button>
+              <Button onClick={handleMovSave} disabled={movSaving}>
+                {movSaving ? "Salvando..." : "Salvar"}
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      )}
 
       {/* Dialog Deletar */}
       <Dialog open={!!deletarDialog} onOpenChange={open => !open && setDeletarDialog(null)}>
