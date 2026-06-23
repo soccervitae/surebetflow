@@ -12,7 +12,7 @@ import { formatCurrency } from "@/lib/utils"
 import { useToast } from "@/hooks/useToast"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetFooter } from "@/components/ui/sheet"
-import { Plus, Eye, EyeOff, Loader2, Trash2, Search, Check, PlusCircle, MoreVertical } from "lucide-react"
+import { Plus, Eye, EyeOff, Loader2, Trash2, Search, Check, PlusCircle, ChevronDown } from "lucide-react"
 import { useMediaQuery } from "@/hooks/useMediaQuery"
 import type { Bet, ProfileBet } from "@/lib/types"
 
@@ -473,11 +473,6 @@ export default function AddBetToProfile({ profileId }: Props) {
                     <p className={`text-sm font-bold mt-0.5 ${pb.saldo > 0 ? "text-[var(--accent-text)]" : pb.saldo < 0 ? "text-[#DC2626]" : "text-[var(--text-secondary)]"}`}>
                       {formatCurrency(pb.saldo)}
                     </p>
-                    {revealedPasswords[pb.id] && (
-                      <p className="text-sm font-mono bg-[var(--bg-elevated)] rounded px-2 py-1 mt-2 text-[var(--text-primary)] break-all">
-                        {pb.senha_encrypted}
-                      </p>
-                    )}
                   </div>
 
                   {/* Right: + circle button */}
@@ -488,53 +483,63 @@ export default function AddBetToProfile({ profileId }: Props) {
                     <Plus className="h-4 w-4" />
                   </button>
 
-                  {/* Menu 3 pontos */}
-                  <div className="relative flex-shrink-0">
-                    <button
-                      className="p-1 rounded-lg text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-elevated)] transition-colors"
-                      onClick={() => setMenuOpenId(menuOpenId === pb.id ? null : pb.id)}
-                    >
-                      <MoreVertical className="h-4 w-4" />
-                    </button>
-                    {menuOpenId === pb.id && (
-                      <>
-                        {/* Overlay para fechar */}
-                        <div className="fixed inset-0 z-10" onClick={() => setMenuOpenId(null)} />
-                        <div className="absolute right-0 top-7 z-20 w-44 rounded-xl border border-[var(--border)] bg-[var(--bg-surface)] shadow-lg overflow-hidden">
-                          <button
-                            className="w-full flex items-center gap-2 px-3 py-2.5 text-sm text-[var(--text-primary)] hover:bg-[var(--bg-elevated)] transition-colors"
-                            onClick={() => {
-                              setRevealedPasswords(prev =>
-                                prev[pb.id] ? Object.fromEntries(Object.entries(prev).filter(([k]) => k !== pb.id)) : { ...prev, [pb.id]: true }
-                              )
-                              setMenuOpenId(null)
-                            }}
-                          >
-                            {revealedPasswords[pb.id] ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                            {revealedPasswords[pb.id] ? "Ocultar senha" : "Ver senha"}
-                          </button>
-                          <button
-                            className={`w-full flex items-center gap-2 px-3 py-2.5 text-sm hover:bg-[var(--bg-elevated)] transition-colors ${pb.ativo ? "text-orange-500" : "text-green-600"}`}
-                            onClick={() => { setAtivoDialog(pb); setMenuOpenId(null) }}
-                          >
-                            <span className={`w-2 h-2 rounded-full ${pb.ativo ? "bg-orange-400" : "bg-green-500"}`} />
-                            {pb.ativo ? "Desativar" : "Ativar"}
-                          </button>
-                          <div className="border-t border-[var(--border)]" />
-                          <button
-                            className={`w-full flex items-center gap-2 px-3 py-2.5 text-sm transition-colors ${pb.saldo !== 0 ? "text-red-300 cursor-not-allowed" : "text-red-500 hover:bg-red-50"}`}
-                            onClick={() => { if (pb.saldo !== 0) return; setDeletarDialog(pb); setMenuOpenId(null) }}
-                            title={pb.saldo !== 0 ? "Zere o saldo antes de remover" : undefined}
-                          >
-                            <Trash2 className="h-4 w-4" />
-                            Remover
-                            {pb.saldo !== 0 && <span className="ml-auto text-xs text-red-300">saldo ≠ 0</span>}
-                          </button>
-                        </div>
-                      </>
-                    )}
-                  </div>
+                  {/* Chevron expand */}
+                  <button
+                    className="p-1 rounded-lg text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-elevated)] transition-colors flex-shrink-0"
+                    onClick={() => setMenuOpenId(menuOpenId === pb.id ? null : pb.id)}
+                  >
+                    <ChevronDown className={`h-4 w-4 transition-transform duration-200 ${menuOpenId === pb.id ? "rotate-180" : ""}`} />
+                  </button>
                 </div>
+
+                {/* Expanded section */}
+                {menuOpenId === pb.id && (
+                  <div className="mt-3 pt-3 border-t border-[var(--border)] space-y-3">
+                    {/* Email */}
+                    <div className="space-y-0.5">
+                      <p className="text-xs text-[var(--text-muted)] font-medium uppercase tracking-wide">Email</p>
+                      <p className="text-sm text-[var(--text-primary)] break-all">{pb.email || "—"}</p>
+                    </div>
+
+                    {/* Senha */}
+                    <div className="space-y-1">
+                      <p className="text-xs text-[var(--text-muted)] font-medium uppercase tracking-wide">Senha</p>
+                      <div className="flex items-center gap-2">
+                        <p className="text-sm text-[var(--text-primary)] font-mono flex-1">
+                          {revealedPasswords[pb.id] ? (pb.senha_encrypted as unknown as string || "—") : "••••••••"}
+                        </p>
+                        <button
+                          className="p-1 rounded text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors"
+                          onClick={() => setRevealedPasswords(prev =>
+                            prev[pb.id] ? Object.fromEntries(Object.entries(prev).filter(([k]) => k !== pb.id)) : { ...prev, [pb.id]: true }
+                          )}
+                        >
+                          {revealedPasswords[pb.id] ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Actions */}
+                    <div className="flex items-center gap-2 pt-1">
+                      <button
+                        className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${pb.ativo ? "bg-orange-500/10 text-orange-500 hover:bg-orange-500/20" : "bg-green-500/10 text-green-600 hover:bg-green-500/20"}`}
+                        onClick={() => { setAtivoDialog(pb); setMenuOpenId(null) }}
+                      >
+                        <span className={`w-1.5 h-1.5 rounded-full ${pb.ativo ? "bg-orange-400" : "bg-green-500"}`} />
+                        {pb.ativo ? "Desativar" : "Ativar"}
+                      </button>
+                      <button
+                        className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${pb.saldo !== 0 ? "text-red-300 cursor-not-allowed bg-red-50/50" : "text-red-500 hover:bg-red-50"}`}
+                        onClick={() => { if (pb.saldo !== 0) return; setDeletarDialog(pb); setMenuOpenId(null) }}
+                        title={pb.saldo !== 0 ? "Zere o saldo antes de remover" : undefined}
+                      >
+                        <Trash2 className="h-3.5 w-3.5" />
+                        Remover
+                        {pb.saldo !== 0 && <span className="text-xs text-red-300">(saldo ≠ 0)</span>}
+                      </button>
+                    </div>
+                  </div>
+                )}
               </CardContent>
             </Card>
           ))}
