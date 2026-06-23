@@ -79,7 +79,7 @@ export default function AssinaturaClient({ subscription }: { subscription: Subsc
         </div>
         <div>
           <h1 className="text-2xl font-bold text-[var(--text-primary)]">Assinatura</h1>
-          <p className="text-sm text-[var(--text-secondary)]">Gerencie seu plano do SureBetFlow</p>
+          <p className="text-sm text-[var(--text-secondary)]">Gerencie seu plano do SurebetFlow</p>
         </div>
       </div>
 

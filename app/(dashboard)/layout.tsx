@@ -88,7 +88,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           <div className="w-8 h-8 bg-[#1e3a8a] rounded-lg flex items-center justify-center flex-shrink-0">
             <TrendingUp className="w-4 h-4 text-white" />
           </div>
-          {!collapsed && <span className="font-bold text-[var(--text-primary)] text-sm">SureBetFlow</span>}
+          {!collapsed && <span className="font-bold text-[var(--text-primary)] text-sm">SurebetFlow</span>}
         </div>
 
         {/* Nav */}

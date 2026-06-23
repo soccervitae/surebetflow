@@ -9,9 +9,9 @@ export async function sendVerificationEmail(email: string, nome: string, code: s
   const apiKey = await getResendApiKey()
   const resend = new Resend(apiKey)
   return resend.emails.send({
-    from: "SureBetFlow <naoresponda@surebetflow.bet>",
+    from: "SurebetFlow <naoresponda@surebetflow.bet>",
     to: email,
-    subject: `${code} é seu código de verificação — SureBetFlow`,
+    subject: `${code} é seu código de verificação — SurebetFlow`,
     html: `
       <!DOCTYPE html>
       <html>
@@ -22,7 +22,7 @@ export async function sendVerificationEmail(email: string, nome: string, code: s
                 <table width="480" cellpadding="0" cellspacing="0" style="background:#111;border:1px solid #222;border-radius:16px;overflow:hidden;">
                   <tr>
                     <td style="background:#1e3a8a;padding:24px 32px;">
-                      <p style="margin:0;color:#fff;font-size:20px;font-weight:700;">SureBetFlow</p>
+                      <p style="margin:0;color:#fff;font-size:20px;font-weight:700;">SurebetFlow</p>
                     </td>
                   </tr>
                   <tr>
@@ -36,12 +36,12 @@ export async function sendVerificationEmail(email: string, nome: string, code: s
                         <p style="margin:0;color:#fff;font-size:40px;font-weight:800;letter-spacing:12px;">${code}</p>
                       </div>
                       <p style="margin:0 0 8px;color:#666;font-size:12px;">⏱ Este código expira em <strong style="color:#aaa;">15 minutos</strong>.</p>
-                      <p style="margin:0;color:#666;font-size:12px;">Se você não criou uma conta no SureBetFlow, ignore este e-mail.</p>
+                      <p style="margin:0;color:#666;font-size:12px;">Se você não criou uma conta no SurebetFlow, ignore este e-mail.</p>
                     </td>
                   </tr>
                   <tr>
                     <td style="padding:16px 32px;border-top:1px solid #222;">
-                      <p style="margin:0;color:#555;font-size:11px;text-align:center;">© ${new Date().getFullYear()} SureBetFlow · surebetflow.bet</p>
+                      <p style="margin:0;color:#555;font-size:11px;text-align:center;">© ${new Date().getFullYear()} SurebetFlow · surebetflow.bet</p>
                     </td>
                   </tr>
                 </table>
