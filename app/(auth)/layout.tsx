@@ -7,7 +7,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
           <Link href="/" className="inline-flex flex-col items-center gap-3">
-            <Image src="https://gkkuttabavwxjuibmrnr.supabase.co/storage/v1/object/public/logos/surebetflow-horizontal-vazada-branca.png" alt="SurebetFlow" width={220} height={57} priority />
+            <Image src="https://gkkuttabavwxjuibmrnr.supabase.co/storage/v1/object/public/logos/surebetflow-horizontal-vazada-branca.png" alt="SurebetFlow" width={280} height={72} priority />
           </Link>
           <p className="text-gray-500 text-sm mt-2">Gerenciador de Apostas Seguras</p>
         </div>
