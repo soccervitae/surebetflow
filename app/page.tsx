@@ -3,7 +3,7 @@ import { createClient } from "@/lib/supabase/server"
 import Link from "next/link"
 import {
   ShieldCheck, Calculator, Wallet, Lock, BarChart3, TrendingUp,
-  CheckCircle, ArrowRight, Zap, Users, Target, RefreshCw, ChevronDown
+  CheckCircle, ArrowRight, Zap, Users, Target, RefreshCw, ChevronDown, Gift
 } from "lucide-react"
 import Image from "next/image"
 
@@ -123,9 +123,9 @@ export default async function LandingPage() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
           {[
             { icon: Calculator, color: "bg-[#1e3a8a]/10", iconColor: "text-[#1e3a8a]", title: "Calculadora 2-way e 3-way", desc: "Detecta arbitragem em tempo real e calcula automaticamente a distribuição ideal das stakes." },
-            { icon: Lock, color: "bg-blue-500/10", iconColor: "text-blue-400", title: "Senhas criptografadas AES-256", desc: "Suas credenciais das casas de apostas ficam protegidas com criptografia de nível militar." },
-            { icon: Users, color: "bg-purple-500/10", iconColor: "text-purple-400", title: "Perfis ilimitados", desc: "Crie perfis separados para você, familiares ou sócios. Cada perfil é totalmente isolado." },
-            { icon: Wallet, color: "bg-yellow-500/10", iconColor: "text-yellow-400", title: "Controle financeiro", desc: "Registre depósitos e saques por casa de apostas. Visualize saldo, lucro realizado e pendente." },
+            { icon: Gift, color: "bg-purple-500/10", iconColor: "text-purple-400", title: "Controle de bônus das bets", desc: "Registre os bônus em dinheiro que as casas concedem. O saldo de bônus fica separado do saldo real de cada bet." },
+            { icon: Users, color: "bg-blue-500/10", iconColor: "text-blue-400", title: "Perfis ilimitados", desc: "Crie perfis separados para você, familiares ou sócios. Cada perfil é totalmente isolado." },
+            { icon: Wallet, color: "bg-yellow-500/10", iconColor: "text-yellow-400", title: "Controle financeiro", desc: "Registre depósitos, saques e bônus por casa de apostas. Visualize saldo, lucro realizado e pendente." },
             { icon: BarChart3, color: "bg-[#1e3a8a]/10", iconColor: "text-[#1e3a8a]", title: "Dashboard com gráficos", desc: "Acompanhe a evolução do lucro acumulado. Veja ROI, total investido e apostas ativas." },
             { icon: RefreshCw, color: "bg-blue-500/10", iconColor: "text-blue-400", title: "Histórico completo", desc: "Todas as apostas com legs detalhados, odds, stakes e resultado real. Filtre por perfil e período." },
           ].map((f) => (
@@ -276,9 +276,9 @@ export default async function LandingPage() {
                   "Perfis ilimitados de apostador",
                   "Casas de apostas ilimitadas",
                   "Calculadora 2-way e 3-way",
+                  "Controle de bônus por casa de apostas",
                   "Dashboard financeiro completo",
                   "Histórico completo de apostas",
-                  "Senhas criptografadas AES-256",
                   "Suporte prioritário por ticket",
                 ].map(f => (
                   <li key={f} className="flex items-center gap-2">
