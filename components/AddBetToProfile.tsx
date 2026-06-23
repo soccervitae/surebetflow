@@ -229,7 +229,7 @@ export default function AddBetToProfile({ profileId }: Props) {
                 <p className="text-sm text-[var(--text-muted)] text-center py-8">Nenhuma casa encontrada</p>
               )
               return (
-                <div className="grid grid-cols-3 sm:grid-cols-4 gap-2 py-1">
+                <div className="flex flex-col gap-1 py-1">
                   {filtered.map(b => {
                     const added = alreadyAdded.has(b.id)
                     const selected = selectedBet === b.id
@@ -239,26 +239,21 @@ export default function AddBetToProfile({ profileId }: Props) {
                         type="button"
                         disabled={added}
                         onClick={() => setSelectedBet(selected ? "" : b.id)}
-                        className={`relative flex flex-col items-center gap-1.5 p-2.5 rounded-xl border transition-all text-center
+                        className={`relative flex items-center justify-between px-3 py-2.5 rounded-xl border transition-all text-left
                           ${added ? "opacity-40 cursor-not-allowed border-[var(--border)] bg-[var(--bg-muted)]" : selected
                             ? "border-[#1e3a8a] bg-[#1e3a8a]/5 shadow-sm"
                             : "border-[var(--border)] bg-[var(--bg-surface)] hover:border-[#1e3a8a]/40 hover:bg-[#1e3a8a]/5"
                           }`}
                       >
-                        {selected && (
-                          <span className="absolute top-1.5 right-1.5 w-4 h-4 rounded-full bg-[#1e3a8a] flex items-center justify-center">
-                            <Check className="w-2.5 h-2.5 text-white" />
-                          </span>
-                        )}
-                        <div className="w-9 h-9 rounded-lg border border-[var(--border)] bg-white flex items-center justify-center overflow-hidden p-0.5 flex-shrink-0">
-                          {b.logo_url ? (
-                            <img src={b.logo_url} alt={b.nome} className="w-full h-full object-contain" onError={handleLogoError} />
-                          ) : (
-                            <span className="text-xs font-bold text-[var(--text-secondary)]">{b.nome.charAt(0)}</span>
+                        <span className={`text-sm font-medium ${selected ? "text-[var(--accent-text)]" : "text-[var(--text-primary)]"}`}>{b.nome}</span>
+                        <span className="flex items-center gap-1.5 flex-shrink-0">
+                          {added && <span className="text-xs text-[var(--text-muted)]">Adicionada</span>}
+                          {selected && (
+                            <span className="w-4 h-4 rounded-full bg-[#1e3a8a] flex items-center justify-center">
+                              <Check className="w-2.5 h-2.5 text-white" />
+                            </span>
                           )}
-                        </div>
-                        <span className="text-[10px] leading-tight text-[var(--text-primary)] font-medium line-clamp-2">{b.nome}</span>
-                        {added && <span className="text-[9px] text-[var(--text-muted)]">Adicionada</span>}
+                        </span>
                       </button>
                     )
                   })}
