@@ -541,7 +541,7 @@ export default function AddBetToProfile({ profileId }: Props) {
                   {/* Info — left column */}
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 flex-wrap">
-                      <p className="font-semibold text-[var(--text-primary)]">{pb.bet?.nome ?? "Bet"}</p>
+                      <p className="font-semibold text-[var(--accent-text)]">{pb.bet?.nome ?? "Bet"}</p>
                       <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium ${pb.ativo ? "bg-green-500/10 text-green-600" : "bg-red-500/10 text-red-500"}`}>
                         <span className={`w-1.5 h-1.5 rounded-full ${pb.ativo ? "bg-green-500" : "bg-red-500"}`} />
                         {pb.ativo ? "Ativa" : "Inativa"}
