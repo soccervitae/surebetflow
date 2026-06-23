@@ -28,7 +28,7 @@ export default function AddBetToProfile({ profileId }: Props) {
   const [selectedBet, setSelectedBet] = useState("")
   const [email, setEmail] = useState("")
   const [senha, setSenha] = useState("")
-  const [showSenha, setShowSenha] = useState(false)
+  const [showSenha, setShowSenha] = useState(true)
   const [loading, setLoading] = useState(false)
   const [revealedPasswords, setRevealedPasswords] = useState<Record<string, boolean>>({})
   const [betSearch, setBetSearch] = useState("")
@@ -280,7 +280,7 @@ export default function AddBetToProfile({ profileId }: Props) {
                 <Input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="email@casa.com" autoComplete="off" />
               </div>
               <div className="flex-1 space-y-1.5">
-                <Label className="text-xs">Senha *</Label>
+                <Label className="text-xs">Senha da conta *</Label>
                 <div className="relative">
                   <Input
                     type={showSenha ? "text" : "password"}
@@ -288,7 +288,7 @@ export default function AddBetToProfile({ profileId }: Props) {
                     onChange={e => setSenha(e.target.value)}
                     placeholder="Senha da conta"
                     className="pr-10"
-                    autoComplete="new-password"
+                    autoComplete="off"
                   />
                   <button
                     type="button"
