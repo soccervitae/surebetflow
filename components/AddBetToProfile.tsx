@@ -550,6 +550,11 @@ export default function AddBetToProfile({ profileId }: Props) {
                     <p className={`text-sm font-bold mt-0.5 ${pb.saldo > 0 ? "text-[var(--accent-text)]" : pb.saldo < 0 ? "text-[#DC2626]" : "text-[var(--text-secondary)]"}`}>
                       {formatCurrency(pb.saldo)}
                     </p>
+                    {(pb as ProfileBetWithBet & { saldo_bonus?: number }).saldo_bonus != null && (pb as ProfileBetWithBet & { saldo_bonus?: number }).saldo_bonus! > 0 && (
+                      <p className="text-xs font-semibold text-purple-500 mt-0.5">
+                        Bônus: {formatCurrency((pb as ProfileBetWithBet & { saldo_bonus?: number }).saldo_bonus!)}
+                      </p>
+                    )}
                   </div>
 
                   {/* Right: + circle button */}

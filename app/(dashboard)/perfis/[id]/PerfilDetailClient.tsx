@@ -16,7 +16,7 @@ import AddBetToProfile from "@/components/AddBetToProfile"
 import { formatCurrency } from "@/lib/utils"
 import { useToast } from "@/hooks/useToast"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { DollarSign, TrendingUp, Clock, ArrowUpRight, Pencil, Calculator, ArrowDownCircle, ArrowUpCircle } from "lucide-react"
+import { DollarSign, TrendingUp, Clock, ArrowUpRight, Pencil, Calculator, ArrowDownCircle, ArrowUpCircle, Gift } from "lucide-react"
 import SurebetCalculator from "@/components/SurebetCalculator"
 import type { Profile, ProfileDashboard, Aposta, MovimentacaoFinanceira, ProfileBet } from "@/lib/types"
 
@@ -52,11 +52,12 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
   const [movLoaded, setMovLoaded] = useState(false)
   const [profileBetsFinanceiro, setProfileBetsFinanceiro] = useState<(ProfileBet & { bet?: { id: string; nome: string } })[]>([])
   const [finPeriodo, setFinPeriodo] = useState<"hoje" | "semana" | "mes" | "todos">("mes")
-  const [finTipo, setFinTipo] = useState<"todos" | "deposito" | "saque">("todos")
+  const [finTipo, setFinTipo] = useState<"todos" | "deposito" | "saque" | "bonus">("todos")
   const [finCasa, setFinCasa] = useState("todos")
+  const [bonusEntries, setBonusEntries] = useState<{ id: string; profile_bet_id: string | null; valor: number; descricao: string | null; created_at: string; _tipo: "bonus" }[]>([])
   const [finShowForm, setFinShowForm] = useState(false)
   const [finFormBet, setFinFormBet] = useState("")
-  const [finFormTipo, setFinFormTipo] = useState<"deposito" | "saque">("deposito")
+  const [finFormTipo, setFinFormTipo] = useState<"deposito" | "saque" | "bonus">("deposito")
   const [finFormValor, setFinFormValor] = useState("")
   const [finFormDescricao, setFinFormDescricao] = useState("")
   const [finSaving, setFinSaving] = useState(false)
@@ -92,7 +93,7 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
   }
 
   async function loadMovimentacoes() {
-    const [movRes, betsRes] = await Promise.all([
+    const [movRes, betsRes, bonusRes] = await Promise.all([
       supabase
         .from("movimentacoes_financeiras")
         .select("*, profile_bet:profile_bets(*, bet:bets(*))")
@@ -101,10 +102,16 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
       supabase
         .from("profile_bets")
         .select("*, bet:bets(*)")
+        .eq("profile_id", profile.id),
+      supabase
+        .from("bonus")
+        .select("*")
         .eq("profile_id", profile.id)
+        .order("created_at", { ascending: false }),
     ])
     if (movRes.data) setMovimentacoes(movRes.data as MovimentacaoFinanceira[])
     if (betsRes.data) setProfileBetsFinanceiro(betsRes.data as (ProfileBet & { bet?: { id: string; nome: string } })[])
+    if (bonusRes.data) setBonusEntries(bonusRes.data.map(b => ({ ...b, _tipo: "bonus" as const })))
     setMovLoaded(true)
   }
 
@@ -124,8 +131,20 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
     return true
   })
 
+  // Filtrar bonus entries
+  const bonusFiltered = bonusEntries.filter(b => {
+    const date = new Date(b.created_at)
+    if (finPeriodo === "hoje") { if (date.toDateString() !== nowFin.toDateString()) return false }
+    else if (finPeriodo === "semana") { const s = new Date(nowFin); s.setDate(nowFin.getDate() - 7); if (date < s) return false }
+    else if (finPeriodo === "mes") { if (date.getMonth() !== nowFin.getMonth() || date.getFullYear() !== nowFin.getFullYear()) return false }
+    if (finTipo !== "todos" && finTipo !== "bonus") return false
+    if (finCasa !== "todos" && b.profile_bet_id !== finCasa) return false
+    return true
+  })
+
   const totalDepositos = finFiltered.filter(m => m.tipo === "deposito").reduce((s, m) => s + m.valor, 0)
   const totalSaques = finFiltered.filter(m => m.tipo === "saque").reduce((s, m) => s + m.valor, 0)
+  const totalBonus = (finTipo === "todos" || finTipo === "bonus") ? bonusFiltered.reduce((s, b) => s + b.valor, 0) : 0
   const saldoLiquido = totalDepositos - totalSaques
 
   async function handleFinSave() {
@@ -135,16 +154,40 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
       return
     }
     setFinSaving(true)
-    const { error } = await supabase.from("movimentacoes_financeiras").insert({
-      profile_id: profile.id,
-      profile_bet_id: finFormBet || null,
-      tipo: finFormTipo,
-      valor,
-      descricao: finFormDescricao.trim() || null,
-    })
-    if (error) {
-      toast({ title: "Erro ao registrar movimentação", variant: "destructive" })
+
+    if (finFormTipo === "bonus") {
+      // Inserir na tabela bonus
+      const { error } = await supabase.from("bonus").insert({
+        profile_id: profile.id,
+        profile_bet_id: finFormBet || null,
+        valor,
+        descricao: finFormDescricao.trim() || null,
+      })
+      if (error) {
+        toast({ title: "Erro ao registrar bônus", variant: "destructive" })
+        setFinSaving(false)
+        return
+      }
+      // Atualiza saldo_bonus do profile_bet
+      if (finFormBet) {
+        const { data: bns } = await supabase.from("bonus").select("valor").eq("profile_bet_id", finFormBet)
+        const totalBonus = (bns ?? []).reduce((acc, b) => acc + b.valor, 0)
+        await supabase.from("profile_bets").update({ saldo_bonus: totalBonus }).eq("id", finFormBet)
+      }
     } else {
+      // Inserir em movimentacoes_financeiras
+      const { error } = await supabase.from("movimentacoes_financeiras").insert({
+        profile_id: profile.id,
+        profile_bet_id: finFormBet || null,
+        tipo: finFormTipo,
+        valor,
+        descricao: finFormDescricao.trim() || null,
+      })
+      if (error) {
+        toast({ title: "Erro ao registrar movimentação", variant: "destructive" })
+        setFinSaving(false)
+        return
+      }
       // Atualiza saldo do profile_bet vinculado
       if (finFormBet) {
         const { data: movs } = await supabase
@@ -154,15 +197,16 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
         const saldoReal = (movs ?? []).reduce((acc, m) => acc + (m.tipo === "deposito" ? m.valor : -m.valor), 0)
         await supabase.from("profile_bets").update({ saldo: saldoReal }).eq("id", finFormBet)
       }
-      toast({ title: "Movimentação registrada!" })
-      setFinShowForm(false)
-      setFinFormBet("")
-      setFinFormTipo("deposito")
-      setFinFormValor("")
-      setFinFormDescricao("")
-      await loadMovimentacoes()
-      router.refresh()
     }
+
+    toast({ title: finFormTipo === "bonus" ? "Bônus registrado!" : "Movimentação registrada!" })
+    setFinShowForm(false)
+    setFinFormBet("")
+    setFinFormTipo("deposito")
+    setFinFormValor("")
+    setFinFormDescricao("")
+    await loadMovimentacoes()
+    router.refresh()
     setFinSaving(false)
   }
 
@@ -559,6 +603,12 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
                 <p className={`text-lg font-bold ${saldoLiquido >= 0 ? "text-[var(--accent-text)]" : "text-[#DC2626]"}`}>{formatCurrency(saldoLiquido)}</p>
               </CardContent>
             </Card>
+            <Card>
+              <CardContent className="p-4">
+                <p className="text-xs text-[var(--text-secondary)] mb-1">Total Bônus</p>
+                <p className="text-lg font-bold text-purple-500">{formatCurrency(totalBonus)}</p>
+              </CardContent>
+            </Card>
           </div>
 
           {/* Filters + Add button */}
@@ -577,14 +627,15 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
               ))}
             </div>
             <div className="flex gap-1">
-              {(["todos", "deposito", "saque"] as const).map(t => (
+              {(["todos", "deposito", "saque", "bonus"] as const).map(t => (
                 <button key={t} onClick={() => setFinTipo(t)}
                   className={`px-3 py-1 rounded-lg text-xs font-medium border transition-colors ${finTipo === t
                     ? t === "deposito" ? "bg-[#1e3a8a] text-white border-[#1e3a8a]"
                       : t === "saque" ? "bg-[#DC2626] text-white border-[#DC2626]"
+                      : t === "bonus" ? "bg-purple-600 text-white border-purple-600"
                       : "bg-[var(--bg-surface)] text-[var(--text-primary)] border-[var(--border)]"
                     : "bg-transparent text-[var(--text-secondary)] border-[var(--border)] hover:text-[var(--text-primary)]"}`}>
-                  {t === "todos" ? "Todos" : t === "deposito" ? "Depósito" : "Saque"}
+                  {t === "todos" ? "Todos" : t === "deposito" ? "Depósito" : t === "saque" ? "Saque" : "Bônus"}
                 </button>
               ))}
             </div>
@@ -609,11 +660,12 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
                 <div className="grid grid-cols-2 gap-3">
                   <div className="space-y-1.5">
                     <Label>Tipo</Label>
-                    <Select value={finFormTipo} onValueChange={v => setFinFormTipo(v as "deposito" | "saque")}>
+                    <Select value={finFormTipo} onValueChange={v => setFinFormTipo(v as "deposito" | "saque" | "bonus")}>
                       <SelectTrigger><SelectValue /></SelectTrigger>
                       <SelectContent>
                         <SelectItem value="deposito">Depósito</SelectItem>
                         <SelectItem value="saque">Saque</SelectItem>
+                        <SelectItem value="bonus">Bônus</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
@@ -655,10 +707,33 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
           {/* List */}
           {!movLoaded ? (
             <Card><CardContent className="py-8 text-center text-[var(--text-secondary)] text-sm">Carregando...</CardContent></Card>
-          ) : finFiltered.length === 0 ? (
+          ) : (finFiltered.length === 0 && bonusFiltered.length === 0) ? (
             <Card><CardContent className="py-8 text-center text-[var(--text-secondary)] text-sm">Nenhuma movimentação encontrada</CardContent></Card>
           ) : (
             <div className="space-y-2">
+              {/* Bonus entries */}
+              {bonusFiltered.map(b => {
+                const betNome = profileBetsFinanceiro.find(pb => pb.id === b.profile_bet_id)?.bet?.nome
+                return (
+                  <Card key={`bonus-${b.id}`}>
+                    <CardContent className="p-4">
+                      <div className="flex items-center gap-3">
+                        <div className="p-2 rounded-lg bg-purple-500/10">
+                          <Gift className="h-4 w-4 text-purple-500" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          {betNome && <p className="text-xs font-semibold text-[var(--accent-text)] mb-0.5">{betNome}</p>}
+                          <p className="text-sm font-medium text-[var(--text-primary)]">Bônus</p>
+                          {b.descricao && <p className="text-xs text-[var(--text-muted)] truncate">{b.descricao}</p>}
+                          <p className="text-xs text-[var(--text-secondary)]">{new Date(b.created_at).toLocaleDateString("pt-BR")}</p>
+                        </div>
+                        <p className="text-sm font-bold text-purple-500">+{formatCurrency(b.valor)}</p>
+                      </div>
+                    </CardContent>
+                  </Card>
+                )
+              })}
+              {/* Movimentações regulares */}
               {finFiltered.map(m => (
                 <Card key={m.id}>
                   <CardContent className="p-4">
