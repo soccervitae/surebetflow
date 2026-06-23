@@ -5,7 +5,7 @@ import {
   ShieldCheck, Calculator, Wallet, Lock, BarChart3, TrendingUp,
   CheckCircle, ArrowRight, Zap, Users, Target, RefreshCw, ChevronDown
 } from "lucide-react"
-import { LogoIcon } from "@/components/Logo"
+import Image from "next/image"
 
 export default async function LandingPage() {
   const supabase = await createClient()
@@ -40,10 +40,7 @@ export default async function LandingPage() {
       {/* Navbar */}
       <nav className="sticky top-0 z-50 bg-[#0a0a0a]/90 backdrop-blur border-b border-white/5">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-2.5">
-            <LogoIcon size="sm" />
-            <span className="font-bold text-white text-lg">SurebetFlow</span>
-          </div>
+          <Image src="/logo-dark.svg" alt="SurebetFlow" width={200} height={52} priority />
           <div className="flex items-center gap-3">
             <Link href="/login" className="text-sm font-medium text-gray-400 hover:text-white transition-colors">
               Entrar
@@ -336,11 +333,8 @@ export default async function LandingPage() {
       {/* Footer */}
       <footer className="border-t border-white/5 py-8 bg-[#0a0a0a]">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div className="flex items-center gap-2">
-            <LogoIcon size="sm" />
-            <span className="font-bold text-white text-sm">SurebetFlow</span>
-          </div>
-          <p className="text-xs text-gray-600">© 2026 SureBetFlow. Todos os direitos reservados.</p>
+          <Image src="/logo-dark.svg" alt="SurebetFlow" width={150} height={39} />
+          <p className="text-xs text-gray-600">© 2026 SurebetFlow. Todos os direitos reservados.</p>
           <div className="flex gap-4">
             <Link href="/login" className="text-xs text-gray-500 hover:text-white transition-colors">Entrar</Link>
             <Link href="/cadastro" className="text-xs text-gray-500 hover:text-white transition-colors">Cadastrar</Link>

@@ -7,9 +7,10 @@ import { createClient } from "@/lib/supabase/client"
 import { useTheme } from "@/components/ThemeProvider"
 import {
   Home, Users, Wallet, CreditCard,
-  Settings, LogOut, TrendingUp, Bell, ChevronLeft, ChevronRight,
+  Settings, LogOut, Bell, ChevronLeft, ChevronRight,
   Circle, Sun, Moon, MessageCircle
 } from "lucide-react"
+import Logo from "@/components/Logo"
 import { cn } from "@/lib/utils"
 
 const navItems = [
@@ -85,10 +86,10 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           "flex items-center gap-3 px-4 py-5 border-b border-[var(--border)]",
           collapsed && "justify-center px-0"
         )}>
-          <div className="w-8 h-8 bg-[#1e3a8a] rounded-lg flex items-center justify-center flex-shrink-0">
-            <TrendingUp className="w-4 h-4 text-white" />
-          </div>
-          {!collapsed && <span className="font-bold text-[var(--text-primary)] text-sm">SurebetFlow</span>}
+          {collapsed
+            ? <Logo size="sm" showText={false} />
+            : <Logo size="sm" />
+          }
         </div>
 
         {/* Nav */}

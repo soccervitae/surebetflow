@@ -1,5 +1,5 @@
+import Image from "next/image"
 import Link from "next/link"
-import { TrendingUp } from "lucide-react"
 
 export default function AuthLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -7,10 +7,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
           <Link href="/" className="inline-flex flex-col items-center gap-3">
-            <div className="w-12 h-12 bg-[#1e3a8a] rounded-xl flex items-center justify-center">
-              <TrendingUp className="w-6 h-6 text-white" />
-            </div>
-            <span className="font-bold text-white text-xl">SurebetFlow</span>
+            <Image src="/logo-dark.svg" alt="SurebetFlow" width={220} height={57} priority />
           </Link>
           <p className="text-gray-500 text-sm mt-2">Gerenciador de Apostas Seguras</p>
         </div>
