@@ -213,11 +213,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
         {/* Mobile top bar */}
         <header className="md:hidden flex items-center justify-between px-4 py-3 bg-[var(--bg-surface)] border-b border-[var(--border)] sticky top-0 z-10">
-          <div className="flex items-center gap-2.5">
-            <div className="w-7 h-7 bg-[#1e3a8a] rounded-lg flex items-center justify-center">
-              <TrendingUp className="w-3.5 h-3.5 text-white" />
-            </div>
-            <span className="font-bold text-[var(--text-primary)] text-sm">SureBetFlow</span>
+          <div className="flex items-center">
+            <Logo size="sm" />
           </div>
           <div className="flex items-center gap-2">
             <button onClick={toggle}
