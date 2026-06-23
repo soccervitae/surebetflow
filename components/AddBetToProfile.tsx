@@ -92,7 +92,7 @@ export default function AddBetToProfile({ profileId }: Props) {
       return
     }
     if (profileBets.some(pb => pb.bet_id === selectedBet)) {
-      toast({ title: "Esta casa já foi adicionada a este perfil", variant: "destructive" })
+      toast({ title: "Esta bet já foi adicionada a este perfil", variant: "destructive" })
       return
     }
     setLoading(true)
@@ -106,7 +106,7 @@ export default function AddBetToProfile({ profileId }: Props) {
         saldo: 0,
       })
       if (error) throw new Error(error.message)
-      toast({ title: "Casa de apostas adicionada com sucesso!" })
+      toast({ title: "Bet adicionada com sucesso!" })
       setShowForm(false)
       setSelectedBet("")
       setEmail("")
@@ -132,7 +132,7 @@ export default function AddBetToProfile({ profileId }: Props) {
       toast({ title: "Erro ao remover", variant: "destructive" })
     } else {
       setProfileBets(prev => prev.filter(pb => pb.id !== deletarDialog.id))
-      toast({ title: "Casa de apostas removida" })
+      toast({ title: "Bet removida" })
       setDeletarDialog(null)
     }
     setDeletando(false)
@@ -147,7 +147,7 @@ export default function AddBetToProfile({ profileId }: Props) {
       toast({ title: "Erro ao atualizar status", variant: "destructive" })
     } else {
       setProfileBets(prev => prev.map(pb => pb.id === ativoDialog.id ? { ...pb, ativo: novoAtivo } : pb))
-      toast({ title: novoAtivo ? "Casa ativada" : "Casa desativada" })
+      toast({ title: novoAtivo ? "Bet ativada" : "Bet desativada" })
       setAtivoDialog(null)
     }
     setTogglingAtivo(false)
@@ -192,7 +192,7 @@ export default function AddBetToProfile({ profileId }: Props) {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <h3 className="font-medium text-[var(--text-primary)]">Casas de Apostas</h3>
+        <h3 className="font-medium text-[var(--text-primary)]">Bets</h3>
         <Button size="sm" onClick={() => { setShowForm(true); setSelectedBet(""); setEmail(""); setSenha("") }}>
           <Plus className="h-4 w-4 mr-1" />
           Adicionar
@@ -203,7 +203,7 @@ export default function AddBetToProfile({ profileId }: Props) {
       <Dialog open={showForm} onOpenChange={open => { if (!open) { setShowForm(false); setSelectedBet(""); setEmail(""); setSenha(""); setBetSearch("") } }}>
         <DialogContent className="max-w-2xl p-0 gap-0 flex flex-col max-h-[90vh]">
           <DialogHeader className="px-5 pt-5 pb-3 border-b border-[var(--border)] flex-shrink-0">
-            <DialogTitle>Adicionar Casa de Apostas</DialogTitle>
+            <DialogTitle>Adicionar Bet</DialogTitle>
           </DialogHeader>
 
           {/* Busca */}
@@ -212,7 +212,7 @@ export default function AddBetToProfile({ profileId }: Props) {
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--text-muted)]" />
               <Input
                 className="pl-9"
-                placeholder="Buscar casa de apostas..."
+                placeholder="Buscar bet..."
                 value={betSearch}
                 onChange={e => setBetSearch(e.target.value)}
                 autoComplete="off"
@@ -226,7 +226,7 @@ export default function AddBetToProfile({ profileId }: Props) {
               const alreadyAdded = new Set(profileBets.map(pb => pb.bet_id))
               const filtered = bets.filter(b => b.nome.toLowerCase().includes(betSearch.toLowerCase()))
               if (filtered.length === 0) return (
-                <p className="text-sm text-[var(--text-muted)] text-center py-8">Nenhuma casa encontrada</p>
+                <p className="text-sm text-[var(--text-muted)] text-center py-8">Nenhuma bet encontrada</p>
               )
               return (
                 <div className="flex flex-col gap-1 py-1">
@@ -266,13 +266,13 @@ export default function AddBetToProfile({ profileId }: Props) {
           <form onSubmit={handleSubmit} className="border-t border-[var(--border)] px-5 py-4 flex-shrink-0 space-y-3 bg-[var(--bg-surface)]">
             {selectedBet && (
               <p className="text-xs text-[var(--text-secondary)]">
-                Casa selecionada: <strong className="text-[var(--text-primary)]">{bets.find(b => b.id === selectedBet)?.nome}</strong>
+                Bet selecionada: <strong className="text-[var(--text-primary)]">{bets.find(b => b.id === selectedBet)?.nome}</strong>
               </p>
             )}
             <div className="flex gap-3">
               <div className="flex-1 space-y-1.5">
                 <Label className="text-xs">E-mail *</Label>
-                <Input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="email@casa.com" autoComplete="off" />
+                <Input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="email@bet.com" autoComplete="off" />
               </div>
               <div className="flex-1 space-y-1.5">
                 <Label className="text-xs">Senha *</Label>
@@ -347,7 +347,7 @@ export default function AddBetToProfile({ profileId }: Props) {
       <Dialog open={!!deletarDialog} onOpenChange={open => !open && setDeletarDialog(null)}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Remover Casa de Apostas</DialogTitle>
+            <DialogTitle>Remover Bet</DialogTitle>
           </DialogHeader>
           <p className="text-sm text-[var(--text-secondary)]">
             Tem certeza que deseja remover <strong className="text-[var(--text-primary)]">{deletarDialog?.bet?.nome}</strong>? Esta ação não pode ser desfeita.
@@ -368,9 +368,9 @@ export default function AddBetToProfile({ profileId }: Props) {
             <DialogTitle>Não é possível remover</DialogTitle>
           </DialogHeader>
           <p className="text-sm text-[var(--text-secondary)]">
-            A casa <strong className="text-[var(--text-primary)]">{saldoNaoZeradoDialog?.bet?.nome}</strong> ainda possui saldo de{" "}
+            A bet <strong className="text-[var(--text-primary)]">{saldoNaoZeradoDialog?.bet?.nome}</strong> ainda possui saldo de{" "}
             <strong className="text-[var(--text-primary)]">{formatCurrency(saldoNaoZeradoDialog?.saldo ?? 0)}</strong>.
-            Realize um saque para zerar o saldo antes de remover a casa de apostas.
+            Realize um saque para zerar o saldo antes de remover a bet.
           </p>
           <DialogFooter>
             <Button onClick={() => setSaldoNaoZeradoDialog(null)}>Entendido</Button>
@@ -382,10 +382,10 @@ export default function AddBetToProfile({ profileId }: Props) {
       <Dialog open={!!ativoDialog} onOpenChange={open => !open && setAtivoDialog(null)}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>{ativoDialog?.ativo ? "Desativar" : "Ativar"} Casa de Apostas</DialogTitle>
+            <DialogTitle>{ativoDialog?.ativo ? "Desativar" : "Ativar"} Bet</DialogTitle>
           </DialogHeader>
           <p className="text-sm text-[var(--text-secondary)]">
-            Tem certeza que deseja {ativoDialog?.ativo ? "desativar" : "ativar"} a casa{" "}
+            Tem certeza que deseja {ativoDialog?.ativo ? "desativar" : "ativar"} a bet{" "}
             <strong className="text-[var(--text-primary)]">{ativoDialog?.bet?.nome}</strong>?
           </p>
           <DialogFooter>
@@ -402,7 +402,7 @@ export default function AddBetToProfile({ profileId }: Props) {
       </Dialog>
 
       {profileBets.length === 0 ? (
-        <p className="text-sm text-[var(--text-secondary)] text-center py-6">Nenhuma casa de apostas adicionada</p>
+        <p className="text-sm text-[var(--text-secondary)] text-center py-6">Nenhuma bet adicionada</p>
       ) : (
         <div className="space-y-3">
           {profileBets.map(pb => (
@@ -423,7 +423,7 @@ export default function AddBetToProfile({ profileId }: Props) {
                   {/* Info — left column */}
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 flex-wrap">
-                      <p className="font-semibold text-[var(--text-primary)]">{pb.bet?.nome ?? "Casa"}</p>
+                      <p className="font-semibold text-[var(--text-primary)]">{pb.bet?.nome ?? "Bet"}</p>
                       <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium ${pb.ativo ? "bg-green-500/10 text-green-600" : "bg-red-500/10 text-red-500"}`}>
                         <span className={`w-1.5 h-1.5 rounded-full ${pb.ativo ? "bg-green-500" : "bg-red-500"}`} />
                         {pb.ativo ? "Ativa" : "Inativa"}
