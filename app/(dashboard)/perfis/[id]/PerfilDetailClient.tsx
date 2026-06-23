@@ -322,12 +322,23 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
             ))}
           </div>
         </div>
-        {/* Desktop: pill tabs */}
-        <TabsList className="hidden md:flex w-auto">
-          <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
-          <TabsTrigger value="casas">Bets</TabsTrigger>
-          <TabsTrigger value="financeiro">Financeiro</TabsTrigger>
-        </TabsList>
+        {/* Desktop: botões */}
+        <div className="hidden md:flex items-center gap-2">
+          {[
+            { value: "dashboard", label: "Dashboard" },
+            { value: "casas", label: "Bets" },
+            { value: "financeiro", label: "Financeiro" },
+          ].map(tab => (
+            <Button
+              key={tab.value}
+              size="sm"
+              variant={activeTab === tab.value ? "default" : "outline"}
+              onClick={() => { setActiveTab(tab.value); if (tab.value === "financeiro" && !movLoaded) loadMovimentacoes() }}
+            >
+              {tab.label}
+            </Button>
+          ))}
+        </div>
 
         {/* Dashboard Tab */}
         <TabsContent value="dashboard" className="space-y-6">
@@ -551,6 +562,11 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
           </div>
 
           {/* Filters + Add button */}
+          <div className="flex flex-wrap items-center gap-2 justify-between">
+          <Button size="sm" onClick={() => { if (!movLoaded) loadMovimentacoes(); setFinShowForm(true) }}>
+            Nova Movimentação
+          </Button>
+          </div>
           <div className="flex flex-wrap items-center gap-2">
             <div className="flex gap-1 bg-[var(--bg-elevated)] rounded-lg p-1">
               {(["hoje", "semana", "mes", "todos"] as const).map(p => (
