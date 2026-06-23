@@ -467,7 +467,7 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
                               const isGreen = greenLegId === leg.id
                               const isRed = greenLegId !== null && greenLegId !== leg.id
                               return (
-                                <div key={leg.id} className={`rounded-xl px-3 py-3 flex items-start gap-3 ${
+                                <div key={leg.id} className={`rounded-xl px-3 py-3 flex items-center gap-3 ${
                                   isGreen ? "bg-green-500/10" : isRed ? "bg-[#DC2626]/5" : "bg-[var(--bg-elevated)]"
                                 }`}>
                                   <div className="flex-1 min-w-0 space-y-1">
@@ -475,10 +475,10 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
                                       {leg.profile_bet?.bet?.nome ?? "Casa"}
                                     </p>
                                     <p className="text-sm text-[var(--text-secondary)] leading-snug">{leg.resultado_apostado}</p>
-                                    <p className="text-sm text-[var(--text-muted)]">@{Number(leg.odd).toFixed(2)} · {formatCurrency(leg.stake)}</p>
+                                    <p className="text-sm text-[var(--text-secondary)]">@{Number(leg.odd).toFixed(2)} · {formatCurrency(leg.stake)}</p>
                                   </div>
                                   {(isGreen || isRed) && (
-                                    <span className={`px-2.5 py-1 rounded text-xs font-bold flex-shrink-0 mt-0.5 ${
+                                    <span className={`px-2.5 py-1 rounded text-xs font-bold flex-shrink-0 ${
                                       isGreen ? "bg-green-600 text-white" : "bg-[#DC2626] text-white"
                                     }`}>
                                       {isGreen ? "GREEN" : "RED"}

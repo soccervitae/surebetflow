@@ -346,7 +346,7 @@ export default function ApostaDetailClient({ aposta: initial }: { aposta: Aposta
                 return (
                   <div
                     key={leg.id}
-                    className={`rounded-xl px-3 py-3 flex items-start gap-3 ${
+                    className={`rounded-xl px-3 py-3 flex items-center gap-3 ${
                       isGreen ? "bg-green-500/10" :
                       isRed ? "bg-[#DC2626]/5" :
                       "bg-[var(--bg-elevated)]"
@@ -358,7 +358,7 @@ export default function ApostaDetailClient({ aposta: initial }: { aposta: Aposta
                         {leg.profile_bet?.bet?.nome ?? "Bet"}
                       </p>
                       <p className="text-sm text-[var(--text-secondary)] leading-snug">{leg.resultado_apostado}</p>
-                      <p className="text-sm text-[var(--text-muted)]">@{Number(leg.odd).toFixed(2)} · {formatCurrency(leg.stake)}</p>
+                      <p className="text-sm text-[var(--text-secondary)]">@{Number(leg.odd).toFixed(2)} · {formatCurrency(leg.stake)}</p>
                       {calc && (
                         <p className={`text-sm font-bold ${calc.valor >= 0 ? "text-green-600" : "text-[#DC2626]"}`}>
                           {calc.tipo === "green"
@@ -368,7 +368,7 @@ export default function ApostaDetailClient({ aposta: initial }: { aposta: Aposta
                       )}
                     </div>
                     {/* GREEN/RED toggle badges */}
-                    <div className="flex flex-col gap-1.5 flex-shrink-0 pt-0.5">
+                    <div className="flex flex-col gap-1.5 flex-shrink-0">
                       <button
                         type="button"
                         onClick={() => handleLegClick(leg.id, "green")}
