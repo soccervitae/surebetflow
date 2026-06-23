@@ -331,13 +331,88 @@ export default async function LandingPage() {
       </section>
 
       {/* Footer */}
-      <footer className="border-t border-white/5 py-8 bg-[#0B1220]">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <Image src="/logo-dark.svg" alt="SurebetFlow" width={150} height={39} />
-          <p className="text-xs text-gray-600">© 2026 SurebetFlow. Todos os direitos reservados.</p>
-          <div className="flex gap-4">
-            <Link href="/login" className="text-xs text-gray-500 hover:text-white transition-colors">Entrar</Link>
-            <Link href="/cadastro" className="text-xs text-gray-500 hover:text-white transition-colors">Cadastrar</Link>
+      <footer className="border-t border-white/5 bg-[#0B1220]">
+        {/* Main footer */}
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 py-14 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10">
+          {/* Brand */}
+          <div className="lg:col-span-1 flex flex-col gap-4">
+            <Image src="/logo-dark.svg" alt="SurebetFlow" width={160} height={41} />
+            <p className="text-sm text-gray-500 leading-relaxed max-w-xs">
+              Plataforma profissional para apostadores de arbitragem. Calcule, gerencie e lucre com matemática.
+            </p>
+            <div className="flex items-center gap-1.5 mt-1">
+              <div className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
+              <span className="text-xs text-gray-500">Sistema operacional</span>
+            </div>
+          </div>
+
+          {/* Plataforma */}
+          <div className="flex flex-col gap-3">
+            <h4 className="text-xs font-semibold text-gray-400 uppercase tracking-widest">Plataforma</h4>
+            <ul className="space-y-2">
+              {[
+                { label: "Dashboard", href: "/dashboard" },
+                { label: "Calculadora", href: "/calculadora" },
+                { label: "Perfis", href: "/perfis" },
+                { label: "Financeiro", href: "/financeiro" },
+                { label: "Apostas", href: "/apostas" },
+              ].map(l => (
+                <li key={l.label}>
+                  <Link href={l.href} className="text-sm text-gray-500 hover:text-white transition-colors">{l.label}</Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Conta */}
+          <div className="flex flex-col gap-3">
+            <h4 className="text-xs font-semibold text-gray-400 uppercase tracking-widest">Conta</h4>
+            <ul className="space-y-2">
+              {[
+                { label: "Entrar", href: "/login" },
+                { label: "Criar conta", href: "/cadastro" },
+                { label: "Assinatura", href: "/assinatura" },
+                { label: "Configurações", href: "/configuracoes" },
+                { label: "Suporte", href: "/suporte" },
+              ].map(l => (
+                <li key={l.label}>
+                  <Link href={l.href} className="text-sm text-gray-500 hover:text-white transition-colors">{l.label}</Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* CTA */}
+          <div className="flex flex-col gap-4">
+            <h4 className="text-xs font-semibold text-gray-400 uppercase tracking-widest">Comece agora</h4>
+            <p className="text-sm text-gray-500 leading-relaxed">
+              Junte-se a apostadores que já profissionalizaram sua operação.
+            </p>
+            <Link href="/cadastro" className="inline-flex items-center justify-center gap-2 bg-[#1e3a8a] hover:bg-[#1e40af] text-white text-sm font-semibold px-5 py-2.5 rounded-xl transition-colors">
+              Criar conta grátis <ArrowRight className="w-3.5 h-3.5" />
+            </Link>
+            <div className="flex flex-col gap-1.5 mt-1">
+              <div className="flex items-center gap-2">
+                <CheckCircle className="w-3.5 h-3.5 text-green-400 flex-shrink-0" />
+                <span className="text-xs text-gray-500">Sem cartão de crédito</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <CheckCircle className="w-3.5 h-3.5 text-green-400 flex-shrink-0" />
+                <span className="text-xs text-gray-500">Cancele quando quiser</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Bottom bar */}
+        <div className="border-t border-white/5">
+          <div className="max-w-6xl mx-auto px-4 sm:px-6 py-4 flex flex-col sm:flex-row items-center justify-between gap-3">
+            <p className="text-xs text-gray-600">© 2026 SurebetFlow. Todos os direitos reservados.</p>
+            <div className="flex items-center gap-5">
+              <Link href="/termos" className="text-xs text-gray-600 hover:text-gray-400 transition-colors">Termos de uso</Link>
+              <Link href="/privacidade" className="text-xs text-gray-600 hover:text-gray-400 transition-colors">Privacidade</Link>
+              <Link href="/suporte" className="text-xs text-gray-600 hover:text-gray-400 transition-colors">Contato</Link>
+            </div>
           </div>
         </div>
       </footer>
