@@ -35,7 +35,7 @@ export default function OnboardingPerfilPage() {
           <div className="inline-flex items-center justify-center w-12 h-12 bg-[#1e3a8a] rounded-xl mb-4">
             <span className="text-white font-bold text-xl">S</span>
           </div>
-          <h1 className="text-2xl font-bold text-gray-900">Bem-vindo ao SureBetFlow!</h1>
+          <h1 className="text-2xl font-bold text-gray-900">Bem-vindo ao SurebetFlow!</h1>
           <p className="text-gray-500 text-sm mt-2">
             Antes de começar, crie seu primeiro perfil de apostador.
           </p>

@@ -1,7 +1,7 @@
 import { ImageResponse } from "next/og"
 
 export const runtime = "edge"
-export const alt = "SureBetFlow — Calculadora e Gerenciador de Surebet"
+export const alt = "SurebetFlow — Calculadora e Gerenciador de Surebet"
 export const size = { width: 1200, height: 630 }
 export const contentType = "image/png"
 
@@ -97,7 +97,7 @@ export default function OGImage() {
               </svg>
             </div>
             <span style={{ fontSize: "36px", fontWeight: 800, color: "white" }}>
-              SureBetFlow
+              SurebetFlow
             </span>
           </div>
 
