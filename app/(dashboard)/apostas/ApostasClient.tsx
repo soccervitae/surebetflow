@@ -205,7 +205,7 @@ export default function ApostasClient({ apostas: initialApostas, profiles }: Pro
                           isGreen ? "bg-green-500/10" : isRed ? "bg-[#DC2626]/5" : "bg-[var(--bg-elevated)]"
                         }`}>
                           <div className="flex-1 min-w-0 space-y-1">
-                            <p className={`text-base font-bold leading-tight ${isGreen ? "text-green-600" : isRed ? "text-[#DC2626]" : "text-[var(--text-primary)]"}`}>
+                            <p className={`text-base font-bold leading-tight ${isGreen ? "text-green-600" : isRed ? "text-[#DC2626]" : "text-[var(--accent-text)]"}`}>
                               {leg.profile_bet?.bet?.nome ?? "Casa"}
                             </p>
                             <p className="text-sm text-[var(--text-secondary)] leading-snug">{leg.resultado_apostado}</p>

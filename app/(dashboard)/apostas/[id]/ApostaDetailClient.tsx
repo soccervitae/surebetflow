@@ -354,7 +354,7 @@ export default function ApostaDetailClient({ aposta: initial }: { aposta: Aposta
                   >
                     {/* Info: stacked vertically */}
                     <div className="flex-1 min-w-0 space-y-1">
-                      <p className={`text-base font-bold leading-tight ${isGreen ? "text-green-600" : isRed ? "text-[#DC2626]" : "text-[var(--text-primary)]"}`}>
+                      <p className={`text-base font-bold leading-tight ${isGreen ? "text-green-600" : isRed ? "text-[#DC2626]" : "text-[var(--accent-text)]"}`}>
                         {leg.profile_bet?.bet?.nome ?? "Bet"}
                       </p>
                       <p className="text-sm text-[var(--text-secondary)] leading-snug">{leg.resultado_apostado}</p>
