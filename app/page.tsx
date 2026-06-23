@@ -40,7 +40,7 @@ export default async function LandingPage() {
       {/* Navbar */}
       <nav className="sticky top-0 z-50 bg-[#0B1220]/90 backdrop-blur border-b border-white/5">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
-          <Image src="https://gkkuttabavwxjuibmrnr.supabase.co/storage/v1/object/public/logos/surebetflow-horizontal-vazada-branca.png" alt="SurebetFlow" width={280} height={72} priority />
+          <Image src="https://gkkuttabavwxjuibmrnr.supabase.co/storage/v1/object/public/logos/surebetflow-horizontal-vazada-branca%20(1).png" alt="SurebetFlow" width={280} height={72} priority />
           <div className="flex items-center gap-3">
             <Link href="/login" className="text-sm font-medium text-gray-400 hover:text-white transition-colors">
               Entrar
@@ -336,7 +336,7 @@ export default async function LandingPage() {
         <div className="max-w-6xl mx-auto px-4 sm:px-6 py-14 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10">
           {/* Brand */}
           <div className="lg:col-span-1 flex flex-col gap-4">
-            <Image src="https://gkkuttabavwxjuibmrnr.supabase.co/storage/v1/object/public/logos/surebetflow-horizontal-vazada-branca.png" alt="SurebetFlow" width={200} height={52} />
+            <Image src="https://gkkuttabavwxjuibmrnr.supabase.co/storage/v1/object/public/logos/surebetflow-horizontal-vazada-branca%20(1).png" alt="SurebetFlow" width={200} height={52} />
             <p className="text-sm text-gray-500 leading-relaxed max-w-xs">
               Plataforma profissional para apostadores de arbitragem. Calcule, gerencie e lucre com matemática.
             </p>
