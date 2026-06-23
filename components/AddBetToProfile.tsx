@@ -506,7 +506,15 @@ export default function AddBetToProfile({ profileId }: Props) {
                       <p className="text-xs text-[var(--text-muted)] font-medium uppercase tracking-wide">Senha</p>
                       <div className="flex items-center gap-2">
                         <p className="text-sm text-[var(--text-primary)] font-mono flex-1">
-                          {revealedPasswords[pb.id] ? (pb.senha_encrypted as unknown as string || "—") : "••••••••"}
+                          {revealedPasswords[pb.id]
+                            ? (() => {
+                                const raw = pb.senha_encrypted as unknown as { type?: string; data?: number[] } | string | null
+                                if (!raw) return "—"
+                                if (typeof raw === "string") return raw
+                                if (raw.data) return String.fromCharCode(...raw.data)
+                                return "—"
+                              })()
+                            : "••••••••"}
                         </p>
                         <button
                           className="p-1 rounded text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors"
