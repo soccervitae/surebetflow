@@ -3,14 +3,13 @@
 import { useState } from "react"
 import { createClient } from "@/lib/supabase/client"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { formatCurrency } from "@/lib/utils"
 import { useToast } from "@/hooks/useToast"
-import { ArrowDownLeft, ArrowUpRight, Plus, Filter, DollarSign, X } from "lucide-react"
+import { ArrowDownLeft, ArrowUpRight, Plus, Filter, DollarSign, X, ArrowDownCircle, ArrowUpCircle } from "lucide-react"
 import type { MovimentacaoFinanceira } from "@/lib/types"
 
 interface Props {
@@ -307,30 +306,36 @@ export default function FinanceiroClient({ movimentacoes: initial, profiles, pro
           {filtered.map(mov => (
             <Card key={mov.id}>
               <CardContent className="p-4">
-                <div className="flex items-center gap-4">
+                <div className="flex items-center gap-3">
                   <div className={`p-2 rounded-lg ${mov.tipo === "deposito" ? "bg-[#1e3a8a]/10" : "bg-[#DC2626]/10"}`}>
                     {mov.tipo === "deposito"
-                      ? <ArrowDownLeft className="h-4 w-4 text-[#1e3a8a]" />
-                      : <ArrowUpRight className="h-4 w-4 text-[#DC2626]" />
+                      ? <ArrowDownCircle className="h-4 w-4 text-[var(--accent-text)]" />
+                      : <ArrowUpCircle className="h-4 w-4 text-[#DC2626]" />
                     }
                   </div>
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2">
-                      <p className="font-medium text-[var(--text-primary)] text-sm">
-                        {mov.tipo === "deposito" ? "Depósito" : "Saque"}
+                    {mov.profile_bet?.bet?.nome && (
+                      <p className="text-xs font-semibold text-[var(--accent-text)] mb-0.5">
+                        {mov.profile_bet.bet.nome}
                       </p>
-                      {mov.profile_bet?.bet && (
-                        <Badge variant="secondary">{mov.profile_bet.bet.nome}</Badge>
-                      )}
-                    </div>
+                    )}
+                    <p className="text-sm font-medium text-[var(--text-primary)]">
+                      {mov.tipo === "deposito" ? "Depósito" : "Saque"}
+                    </p>
+                    {mov.profile && (
+                      <p className="text-xs text-[var(--text-secondary)]">
+                        {mov.profile.apelido || `${mov.profile.nome} ${mov.profile.sobrenome}`}
+                      </p>
+                    )}
+                    {mov.descricao && (
+                      <p className="text-xs text-[var(--text-muted)] truncate">{mov.descricao}</p>
+                    )}
                     <p className="text-xs text-[var(--text-secondary)]">
-                      {mov.profile ? (mov.profile.apelido || `${mov.profile.nome} ${mov.profile.sobrenome}`) : "—"}
-                      {mov.descricao && ` · ${mov.descricao}`}
-                      {" · "}{new Date(mov.created_at).toLocaleDateString("pt-BR")}
+                      {new Date(mov.created_at).toLocaleDateString("pt-BR")}
                     </p>
                   </div>
-                  <p className={`font-bold text-base flex-shrink-0 ${mov.tipo === "deposito" ? "text-[#1e3a8a]" : "text-[#DC2626]"}`}>
-                    {mov.tipo === "deposito" ? "+" : "-"}{formatCurrency(mov.valor)}
+                  <p className={`font-bold text-sm flex-shrink-0 ${mov.tipo === "deposito" ? "text-[var(--accent-text)]" : "text-[#DC2626]"}`}>
+                    {mov.tipo === "saque" ? "-" : "+"}{formatCurrency(mov.valor)}
                   </p>
                 </div>
               </CardContent>
