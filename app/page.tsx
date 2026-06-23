@@ -123,7 +123,7 @@ export default async function LandingPage() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
           {[
             { icon: Calculator, color: "bg-[#1e3a8a]/10", iconColor: "text-[#60a5fa]", title: "Calculadora 2-way e 3-way", desc: "Detecta arbitragem em tempo real e calcula automaticamente a distribuição ideal das stakes." },
-            { icon: Lock, color: "bg-blue-500/10", iconColor: "text-blue-400", title: "Senhas criptografadas AES-256", desc: "Suas credenciais das casas de apostas ficam protegidas com criptografia de nível militar." },
+            { icon: Target, color: "bg-green-500/10", iconColor: "text-green-400", title: "Gestão de banca", desc: "Controle seu capital por perfil e casa. Saiba exatamente quanto você tem disponível em cada bet." },
             { icon: Users, color: "bg-purple-500/10", iconColor: "text-purple-400", title: "Perfis ilimitados", desc: "Crie perfis separados para você, familiares ou sócios. Cada perfil é totalmente isolado." },
             { icon: Wallet, color: "bg-yellow-500/10", iconColor: "text-yellow-400", title: "Controle financeiro", desc: "Registre depósitos e saques por bet. Visualize saldo, lucro realizado e pendente." },
             { icon: BarChart3, color: "bg-[#1e3a8a]/10", iconColor: "text-[#60a5fa]", title: "Dashboard com gráficos", desc: "Acompanhe a evolução do lucro acumulado. Veja ROI, total investido e apostas ativas." },
@@ -278,7 +278,7 @@ export default async function LandingPage() {
                   "Calculadora 2-way e 3-way",
                   "Dashboard financeiro completo",
                   "Histórico completo de apostas",
-                  "Senhas criptografadas AES-256",
+                  "Gestão de banca por perfil",
                   "Suporte prioritário por ticket",
                 ].map(f => (
                   <li key={f} className="flex items-center gap-2">
