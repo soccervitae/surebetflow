@@ -237,10 +237,27 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         </header>
 
         {/* Main */}
-        <main className="flex-1 p-4 md:p-6 pb-24 md:pb-6">
+        <main className="flex-1 p-4 md:p-6 pt-[72px] md:pt-4 pb-24 md:pb-6">
           {children}
         </main>
       </div>
+
+      {/* Top header mobile */}
+      <header className="md:hidden fixed top-0 left-0 right-0 bg-[var(--bg-surface)] border-b border-[var(--border)] z-20 flex items-center justify-between px-4 h-14">
+        <Logo size="sm" />
+        <div className="flex items-center gap-2">
+          <button
+            onClick={toggle}
+            title={isDark ? "Modo claro" : "Modo escuro"}
+            className="w-8 h-8 flex items-center justify-center rounded-lg text-[var(--text-secondary)]"
+          >
+            {isDark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+          </button>
+          <div className="w-7 h-7 bg-[#1e3a8a] rounded-full flex items-center justify-center text-white text-xs font-bold">
+            {userInitials}
+          </div>
+        </div>
+      </header>
 
       {/* Bottom nav mobile */}
       <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-[var(--bg-surface)] border-t border-[var(--border)] z-20 flex">

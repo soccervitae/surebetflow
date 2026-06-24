@@ -22,23 +22,33 @@ export default function PrintsClient() {
   const [downloading, setDownloading] = useState<string | null>(null)
   const iframeRefs = useRef<Record<string, HTMLIFrameElement | null>>({})
 
+  function forceLight(iframe: HTMLIFrameElement) {
+    try {
+      const doc = iframe.contentDocument
+      if (!doc) return
+      doc.documentElement.classList.remove("dark")
+      doc.documentElement.classList.add("light")
+      iframe.contentWindow?.localStorage?.setItem("sbf-theme", "light")
+    } catch {}
+  }
+
   async function handleDownload(page: { label: string; href: string }) {
     setDownloading(page.href)
     try {
       const html2canvas = (await import("html2canvas")).default
       const iframe = iframeRefs.current[page.href]
       if (!iframe || !iframe.contentDocument?.body) {
-        // Fallback: open in new window
         window.open(page.href, "_blank")
         return
       }
+      forceLight(iframe)
       const canvas = await html2canvas(iframe.contentDocument.body, {
         width: FRAME_W,
         height: FRAME_H,
         scale: 2,
         useCORS: true,
         allowTaint: true,
-        backgroundColor: "#0B1220",
+        backgroundColor: "#ffffff",
       })
       const link = document.createElement("a")
       link.download = `surebetflow-${page.label.toLowerCase().replace(/\s+/g, "-")}-mobile.png`
@@ -120,6 +130,7 @@ export default function PrintsClient() {
                     className="border-0"
                     title={page.label}
                     sandbox="allow-same-origin allow-scripts allow-forms"
+                    onLoad={e => forceLight(e.currentTarget)}
                   />
                 </div>
               </div>
