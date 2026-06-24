@@ -253,9 +253,12 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           >
             {isDark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
           </button>
-          <div className="w-7 h-7 bg-[#1e3a8a] rounded-full flex items-center justify-center text-white text-xs font-bold">
+          <button
+            onClick={() => setConfirmLogout(true)}
+            className="w-7 h-7 bg-[#1e3a8a] rounded-full flex items-center justify-center text-white text-xs font-bold"
+          >
             {userInitials}
-          </div>
+          </button>
         </div>
       </header>
 
