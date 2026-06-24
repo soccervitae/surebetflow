@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import React, { useEffect, useState } from "react"
 import { useRouter, usePathname } from "next/navigation"
 import Link from "next/link"
 import { createClient } from "@/lib/supabase/client"
@@ -8,7 +8,7 @@ import { useTheme } from "@/components/ThemeProvider"
 import {
   Home, Users, Wallet, CreditCard,
   Settings, LogOut, Bell, ChevronLeft, ChevronRight,
-  Circle, Sun, Moon, MessageCircle
+  Circle, Sun, Moon, MessageCircle, BookOpen
 } from "lucide-react"
 import Logo from "@/components/Logo"
 import { cn } from "@/lib/utils"
@@ -254,47 +254,21 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           >
             {isDark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
           </button>
-          <div className="relative">
-            <button
-              onClick={() => setShowUserMenu(v => !v)}
-              className="w-7 h-7 bg-[#1e3a8a] rounded-full flex items-center justify-center text-white text-xs font-bold"
-            >
-              {userInitials}
-            </button>
-            {showUserMenu && (
-              <>
-                <div className="fixed inset-0 z-30" onClick={() => setShowUserMenu(false)} />
-                <div className="absolute right-0 top-9 z-40 w-48 bg-[var(--bg-surface)] border border-[var(--border)] rounded-xl shadow-xl overflow-hidden">
-                  <div className="px-4 py-3 border-b border-[var(--border)]">
-                    <p className="text-xs font-medium text-[var(--text-primary)] truncate">{userName}</p>
-                  </div>
-                  <Link
-                    href="/configuracoes"
-                    onClick={() => setShowUserMenu(false)}
-                    className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-[var(--text-secondary)] hover:bg-[var(--bg-elevated)] hover:text-[var(--text-primary)] transition-colors"
-                  >
-                    <Settings className="w-4 h-4" />
-                    Configurações
-                  </Link>
-                  <button
-                    onClick={() => { setShowUserMenu(false); setConfirmLogout(true) }}
-                    className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-red-400 hover:bg-red-500/10 transition-colors"
-                  >
-                    <LogOut className="w-4 h-4" />
-                    Sair
-                  </button>
-                </div>
-              </>
-            )}
+          <div className="w-7 h-7 bg-[#1e3a8a] rounded-full flex items-center justify-center text-white text-xs font-bold">
+            {userInitials}
           </div>
         </div>
       </header>
 
       {/* Bottom nav mobile */}
       <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-[var(--bg-surface)] border-t border-[var(--border)] z-20 flex">
-        {navItems.slice(0, 5).map(({ href, icon: Icon, label }) => {
+        {([
+          { href: "/dashboard", icon: Home, label: "Dashboard" },
+          { href: "/perfis", icon: Users, label: "Perfis" },
+          { href: "/financeiro", icon: Wallet, label: "Financeiro" },
+          { href: "/tutorial", icon: BookOpen, label: "Tutorial" },
+        ] as { href: string; icon: React.ElementType; label: string }[]).map(({ href, icon: Icon, label }) => {
           const active = pathname === href || (href !== "/" && pathname.startsWith(href))
-          const isSuporteLink = href === "/suporte"
           return (
             <Link
               key={href}
@@ -304,18 +278,67 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 active ? "text-[#1e3a8a]" : "text-[var(--text-secondary)]"
               )}
             >
-              <span className="relative">
-                <Icon className="w-5 h-5" />
-                {isSuporteLink && unread > 0 && (
-                  <span className="absolute -top-1 -right-1 min-w-[14px] h-[14px] px-0.5 flex items-center justify-center rounded-full bg-red-500 text-white text-[9px] font-bold leading-none">
-                    {unread > 9 ? "9+" : unread}
-                  </span>
-                )}
-              </span>
+              <Icon className="w-5 h-5" />
               <span>{label}</span>
             </Link>
           )
         })}
+        {/* Avatar / user menu */}
+        <div className="flex-1 flex flex-col items-center py-2 text-xs gap-1 relative">
+          <button
+            onClick={() => setShowUserMenu(v => !v)}
+            className="w-7 h-7 bg-[#1e3a8a] rounded-full flex items-center justify-center text-white text-xs font-bold"
+          >
+            {userInitials}
+          </button>
+          <span className="text-[var(--text-secondary)]">Conta</span>
+          {showUserMenu && (
+            <>
+              <div className="fixed inset-0 z-30" onClick={() => setShowUserMenu(false)} />
+              <div className="absolute bottom-14 right-0 z-40 w-52 bg-[var(--bg-surface)] border border-[var(--border)] rounded-xl shadow-xl overflow-hidden">
+                <div className="px-4 py-3 border-b border-[var(--border)]">
+                  <p className="text-xs font-medium text-[var(--text-primary)] truncate">{userName}</p>
+                </div>
+                <Link
+                  href="/suporte"
+                  onClick={() => setShowUserMenu(false)}
+                  className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-[var(--text-secondary)] hover:bg-[var(--bg-elevated)] hover:text-[var(--text-primary)] transition-colors"
+                >
+                  <MessageCircle className="w-4 h-4" />
+                  Suporte
+                  {unread > 0 && (
+                    <span className="ml-auto min-w-[18px] h-[18px] px-1 flex items-center justify-center rounded-full bg-red-500 text-white text-[10px] font-bold leading-none">
+                      {unread > 99 ? "99+" : unread}
+                    </span>
+                  )}
+                </Link>
+                <Link
+                  href="/assinatura"
+                  onClick={() => setShowUserMenu(false)}
+                  className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-[var(--text-secondary)] hover:bg-[var(--bg-elevated)] hover:text-[var(--text-primary)] transition-colors"
+                >
+                  <CreditCard className="w-4 h-4" />
+                  Assinatura
+                </Link>
+                <Link
+                  href="/configuracoes"
+                  onClick={() => setShowUserMenu(false)}
+                  className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-[var(--text-secondary)] hover:bg-[var(--bg-elevated)] hover:text-[var(--text-primary)] transition-colors"
+                >
+                  <Settings className="w-4 h-4" />
+                  Configurações
+                </Link>
+                <button
+                  onClick={() => { setShowUserMenu(false); setConfirmLogout(true) }}
+                  className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-red-400 hover:bg-red-500/10 transition-colors"
+                >
+                  <LogOut className="w-4 h-4" />
+                  Sair
+                </button>
+              </div>
+            </>
+          )}
+        </div>
       </nav>
 
       {/* Logout confirmation dialog */}
