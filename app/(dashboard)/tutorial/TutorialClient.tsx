@@ -209,8 +209,8 @@ export default function TutorialClient() {
       </div>
 
       {/* Scrollable tabs */}
-      <div className="-mx-4 mb-6">
-        <div className="flex overflow-x-auto px-4 pb-0 scrollbar-hide border-b border-[var(--border)]">
+      <div className="mb-6">
+        <div className="flex overflow-x-auto scrollbar-hide border-b border-[var(--border)]">
           {SECTIONS.map(({ id, label, icon: Icon }) => (
             <button
               key={id}
