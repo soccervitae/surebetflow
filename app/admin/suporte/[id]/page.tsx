@@ -1,9 +1,11 @@
 import { createAdminClient } from "@/lib/supabase/admin"
+import { createClient } from "@/lib/supabase/server"
 import { notFound } from "next/navigation"
 import AdminTicketClient from "./AdminTicketClient"
 
 export default async function AdminTicketPage({ params }: { params: { id: string } }) {
   const supabase = createAdminClient()
+  const serverClient = await createClient()
 
   const { data: ticket } = await supabase
     .from("tickets")
@@ -25,8 +27,11 @@ export default async function AdminTicketPage({ params }: { params: { id: string
     await supabase.from("ticket_mensagens").update({ lida: true }).in("id", unreadIds)
   }
 
-  const { data: { user } } = await supabase.auth.admin.getUserById(ticket.user_id)
-  const userEmail = user?.email ?? ticket.user_id
+  const { data: { user: adminUser } } = await serverClient.auth.getUser()
+  const adminId = adminUser?.id ?? ""
 
-  return <AdminTicketClient ticket={ticket} mensagens={mensagens ?? []} userEmail={userEmail} />
+  const { data: { user: ticketUser } } = await supabase.auth.admin.getUserById(ticket.user_id)
+  const userEmail = ticketUser?.email ?? ticket.user_id
+
+  return <AdminTicketClient ticket={ticket} mensagens={mensagens ?? []} userEmail={userEmail} adminId={adminId} />
 }

@@ -14,10 +14,11 @@ const STATUS_LABEL: Record<string, { label: string; color: string; bg: string }>
   fechado:    { label: "Fechado",    color: "text-gray-400",   bg: "bg-gray-500/10" },
 }
 
-export default function AdminTicketClient({ ticket: initial, mensagens: initialMsgs, userEmail }: {
+export default function AdminTicketClient({ ticket: initial, mensagens: initialMsgs, userEmail, adminId }: {
   ticket: Ticket
   mensagens: Mensagem[]
   userEmail: string
+  adminId: string
 }) {
   const [ticket, setTicket] = useState(initial)
   const [mensagens, setMensagens] = useState(initialMsgs)
@@ -39,7 +40,8 @@ export default function AdminTicketClient({ ticket: initial, mensagens: initialM
         table: "ticket_mensagens",
         filter: `ticket_id=eq.${ticket.id}`,
       }, (payload) => {
-        setMensagens(prev => [...prev, payload.new as Mensagem])
+        const nova = payload.new as Mensagem
+        setMensagens(prev => prev.some(m => m.id === nova.id) ? prev : [...prev, nova])
       })
       .on("postgres_changes", {
         event: "UPDATE",
@@ -59,12 +61,18 @@ export default function AdminTicketClient({ ticket: initial, mensagens: initialM
     if (!texto.trim() || ticket.status === "fechado") return
     setSending(true)
 
-    await supabase.from("ticket_mensagens").insert({
-      ticket_id: ticket.id,
-      sender_id: ticket.user_id,
-      is_admin: true,
-      conteudo: texto.trim(),
-    })
+    const { data: nova } = await supabase
+      .from("ticket_mensagens")
+      .insert({
+        ticket_id: ticket.id,
+        sender_id: adminId,
+        is_admin: true,
+        conteudo: texto.trim(),
+      })
+      .select()
+      .single()
+
+    if (nova) setMensagens(prev => [...prev, nova as Mensagem])
 
     await supabase.from("tickets").update({ status: "respondido" }).eq("id", ticket.id)
 
