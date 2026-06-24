@@ -57,16 +57,16 @@ export default function HomeDashboard({ dashboard, profiles, recentApostas, apos
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
         {stats.map(({ label, value, icon: Icon, color, ring, bg }) => (
-          <div key={label} className={`rounded-xl border ${ring} bg-[var(--bg-surface)] p-5`}>
-            <div className="flex items-center gap-3">
-              <div className={`p-2 ${bg} rounded-lg border ${ring}`}>
-                <Icon className={`h-5 w-5 ${color}`} />
+          <div key={label} className={`rounded-xl border ${ring} bg-[var(--bg-surface)] p-4`}>
+            <div className="flex items-center gap-2 min-w-0">
+              <div className={`p-2 ${bg} rounded-lg flex-shrink-0`}>
+                <Icon className={`h-4 w-4 ${color}`} />
               </div>
               <div className="min-w-0">
-                <p className="text-xs text-[var(--text-secondary)]">{label}</p>
-                <p className={`text-lg font-bold ${color} truncate`}>{value}</p>
+                <p className="text-xs text-[var(--text-secondary)] truncate">{label}</p>
+                <p className={`text-sm font-bold ${color} truncate`}>{value}</p>
               </div>
             </div>
           </div>
