@@ -31,6 +31,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const [userName, setUserName] = useState("")
   const [userInitials, setUserInitials] = useState("")
   const [confirmLogout, setConfirmLogout] = useState(false)
+  const [showUserMenu, setShowUserMenu] = useState(false)
   const [unread, setUnread] = useState(0)
 
   useEffect(() => {
@@ -253,12 +254,39 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           >
             {isDark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
           </button>
-          <button
-            onClick={() => setConfirmLogout(true)}
-            className="w-7 h-7 bg-[#1e3a8a] rounded-full flex items-center justify-center text-white text-xs font-bold"
-          >
-            {userInitials}
-          </button>
+          <div className="relative">
+            <button
+              onClick={() => setShowUserMenu(v => !v)}
+              className="w-7 h-7 bg-[#1e3a8a] rounded-full flex items-center justify-center text-white text-xs font-bold"
+            >
+              {userInitials}
+            </button>
+            {showUserMenu && (
+              <>
+                <div className="fixed inset-0 z-30" onClick={() => setShowUserMenu(false)} />
+                <div className="absolute right-0 top-9 z-40 w-48 bg-[var(--bg-surface)] border border-[var(--border)] rounded-xl shadow-xl overflow-hidden">
+                  <div className="px-4 py-3 border-b border-[var(--border)]">
+                    <p className="text-xs font-medium text-[var(--text-primary)] truncate">{userName}</p>
+                  </div>
+                  <Link
+                    href="/configuracoes"
+                    onClick={() => setShowUserMenu(false)}
+                    className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-[var(--text-secondary)] hover:bg-[var(--bg-elevated)] hover:text-[var(--text-primary)] transition-colors"
+                  >
+                    <Settings className="w-4 h-4" />
+                    Configurações
+                  </Link>
+                  <button
+                    onClick={() => { setShowUserMenu(false); setConfirmLogout(true) }}
+                    className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-red-400 hover:bg-red-500/10 transition-colors"
+                  >
+                    <LogOut className="w-4 h-4" />
+                    Sair
+                  </button>
+                </div>
+              </>
+            )}
+          </div>
         </div>
       </header>
 
