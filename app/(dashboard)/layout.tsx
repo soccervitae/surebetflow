@@ -31,6 +31,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const [userName, setUserName] = useState("")
   const [userInitials, setUserInitials] = useState("")
   const [confirmLogout, setConfirmLogout] = useState(false)
+  const [unread, setUnread] = useState(0)
 
   useEffect(() => {
     const supabase = createClient()
@@ -49,7 +50,24 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         setUserName(email)
         setUserInitials(email.charAt(0).toUpperCase())
       }
+
+      async function fetchUnread() {
+        const { count } = await supabase
+          .from("ticket_mensagens")
+          .select("id", { count: "exact", head: true })
+          .eq("is_admin", true)
+          .eq("lida", false)
+        setUnread(count ?? 0)
+      }
+      fetchUnread()
+
+      const channel = supabase
+        .channel("user-unread")
+        .on("postgres_changes", { event: "*", schema: "public", table: "ticket_mensagens" }, fetchUnread)
+        .subscribe()
+
       setReady(true)
+      return () => { supabase.removeChannel(channel) }
     })
   }, [router, pathname])
 
@@ -101,6 +119,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           )}
           {navItems.map(({ href, icon: Icon, label }) => {
             const active = pathname === href || (href !== "/" && pathname.startsWith(href))
+            const isSuporteLink = href === "/suporte"
             return (
               <Link
                 key={href}
@@ -114,8 +133,22 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                     : "text-[var(--text-secondary)] hover:bg-[var(--bg-elevated)] hover:text-[var(--text-primary)]"
                 )}
               >
-                <Icon className="w-4 h-4 flex-shrink-0" />
-                {!collapsed && label}
+                <span className="relative flex-shrink-0">
+                  <Icon className="w-4 h-4" />
+                  {isSuporteLink && unread > 0 && collapsed && (
+                    <span className="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-red-500" />
+                  )}
+                </span>
+                {!collapsed && (
+                  <>
+                    <span className="flex-1">{label}</span>
+                    {isSuporteLink && unread > 0 && (
+                      <span className="ml-auto min-w-[18px] h-[18px] px-1 flex items-center justify-center rounded-full bg-red-500 text-white text-[10px] font-bold leading-none">
+                        {unread > 99 ? "99+" : unread}
+                      </span>
+                    )}
+                  </>
+                )}
               </Link>
             )
           })}
@@ -213,6 +246,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-[var(--bg-surface)] border-t border-[var(--border)] z-20 flex">
         {navItems.slice(0, 5).map(({ href, icon: Icon, label }) => {
           const active = pathname === href || (href !== "/" && pathname.startsWith(href))
+          const isSuporteLink = href === "/suporte"
           return (
             <Link
               key={href}
@@ -222,7 +256,14 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 active ? "text-[#1e3a8a]" : "text-[var(--text-secondary)]"
               )}
             >
-              <Icon className="w-5 h-5" />
+              <span className="relative">
+                <Icon className="w-5 h-5" />
+                {isSuporteLink && unread > 0 && (
+                  <span className="absolute -top-1 -right-1 min-w-[14px] h-[14px] px-0.5 flex items-center justify-center rounded-full bg-red-500 text-white text-[9px] font-bold leading-none">
+                    {unread > 9 ? "9+" : unread}
+                  </span>
+                )}
+              </span>
               <span>{label}</span>
             </Link>
           )
