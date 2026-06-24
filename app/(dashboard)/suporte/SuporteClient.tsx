@@ -82,7 +82,7 @@ export default function SuporteClient({ tickets: initial, userId }: { tickets: T
           className="inline-flex items-center gap-2 bg-[#1e3a8a] hover:bg-[#1e40af] text-white text-sm font-medium px-4 py-2 rounded-lg transition-colors"
         >
           <Plus className="w-4 h-4" />
-          Novo ticket
+          Novo
         </button>
       </div>
 
