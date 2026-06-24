@@ -57,7 +57,7 @@ export default function HomeDashboard({ dashboard, profiles, recentApostas, apos
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
         {stats.map(({ label, value, icon: Icon, color, ring, bg }) => (
           <div key={label} className={`rounded-xl border ${ring} bg-[var(--bg-surface)] p-5`}>
             <div className="flex items-center gap-3">
