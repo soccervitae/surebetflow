@@ -64,6 +64,11 @@ export default function ConfiguracoesPage() {
   const [passwordSuccess, setPasswordSuccess] = useState("")
   const [savingPassword, setSavingPassword] = useState(false)
 
+  const [nome, setNome] = useState("")
+  const [sobrenome, setSobrenome] = useState("")
+  const [savingProfile, setSavingProfile] = useState(false)
+  const [profileSuccess, setProfileSuccess] = useState("")
+
   const [uploading, setUploading] = useState(false)
   const [logoutAllOpen, setLogoutAllOpen] = useState(false)
   const [loggingOut, setLoggingOut] = useState(false)
@@ -72,13 +77,15 @@ export default function ConfiguracoesPage() {
 
   useEffect(() => {
     const supabase = createClient()
-    supabase.auth.getUser().then(({ data: { user } }) => {
+    supabase.auth.getUser().then(async ({ data: { user } }) => {
       if (user) {
         setEmail(user.email ?? "")
         setUserId(user.id)
         setAvatarUrl(user.user_metadata?.avatar_url ?? "")
         setLastSignIn(user.last_sign_in_at ?? null)
         setCreatedAt(user.created_at ?? null)
+        const { data: profile } = await supabase.from("profiles").select("nome, sobrenome").eq("id", user.id).single()
+        if (profile) { setNome(profile.nome ?? ""); setSobrenome(profile.sobrenome ?? "") }
       }
     })
 
@@ -116,6 +123,18 @@ export default function ConfiguracoesPage() {
     } finally {
       setUploading(false)
     }
+  }
+
+  async function handleSaveProfile(e: React.FormEvent) {
+    e.preventDefault()
+    if (!userId) return
+    setSavingProfile(true)
+    setProfileSuccess("")
+    const supabase = createClient()
+    await supabase.from("profiles").update({ nome: nome.trim(), sobrenome: sobrenome.trim() }).eq("id", userId)
+    setProfileSuccess("Perfil atualizado com sucesso!")
+    setSavingProfile(false)
+    setTimeout(() => setProfileSuccess(""), 3000)
   }
 
   async function handleChangePassword(e: React.FormEvent) {
@@ -280,6 +299,28 @@ export default function ConfiguracoesPage() {
             <Input value={email} disabled className="bg-[var(--bg-muted)] text-[var(--text-secondary)]" />
             <p className="text-xs text-[var(--text-muted)]">Para alterar o e-mail, entre em contato com o suporte.</p>
           </div>
+
+          <form onSubmit={handleSaveProfile} className="space-y-3">
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-1.5">
+                <Label htmlFor="nome">Nome</Label>
+                <Input id="nome" value={nome} onChange={e => setNome(e.target.value)} placeholder="Seu nome" />
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="sobrenome">Sobrenome</Label>
+                <Input id="sobrenome" value={sobrenome} onChange={e => setSobrenome(e.target.value)} placeholder="Seu sobrenome" />
+              </div>
+            </div>
+            {profileSuccess && (
+              <p className="text-sm text-[var(--accent-text)] bg-[#1e3a8a]/5 border border-[#1e3a8a]/20 rounded-lg px-3 py-2">
+                {profileSuccess}
+              </p>
+            )}
+            <Button type="submit" className="bg-[#1e3a8a] hover:bg-[#1e40af] text-white" disabled={savingProfile}>
+              <User className="h-4 w-4 mr-2" />
+              {savingProfile ? "Salvando..." : "Salvar alterações"}
+            </Button>
+          </form>
         </CardContent>
       </Card>
 
