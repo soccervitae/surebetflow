@@ -208,8 +208,8 @@ export default function TutorialClient() {
         </div>
       </div>
 
-      {/* Mobile scrollable tabs */}
-      <div className="-mx-4 mb-6 md:hidden">
+      {/* Scrollable tabs */}
+      <div className="-mx-4 mb-6">
         <div className="flex overflow-x-auto px-4 pb-0 scrollbar-hide border-b border-[var(--border)]">
           {SECTIONS.map(({ id, label, icon: Icon }) => (
             <button
@@ -228,34 +228,9 @@ export default function TutorialClient() {
         </div>
       </div>
 
-      <div className="flex gap-6">
-        {/* Desktop sidebar nav */}
-        <div className="hidden md:block w-52 shrink-0">
-          <div className="bg-[var(--bg-surface)] border border-[var(--border)] rounded-2xl overflow-hidden sticky top-6">
-            <div className="px-3 py-2 border-b border-[var(--border)]">
-              <p className="text-xs font-semibold text-[var(--text-muted)] uppercase tracking-wider">Seções</p>
-            </div>
-            <ul className="py-1.5">
-              {SECTIONS.map(({ id, label, icon: Icon }) => (
-                <li key={id}>
-                  <button
-                    onClick={() => setActive(id)}
-                    className={`w-full flex items-center gap-2.5 px-3 py-2 text-sm rounded-lg mx-1.5 transition-colors text-left
-                      ${active === id ? "bg-[#1e3a8a]/15 text-[var(--accent-text)] font-medium" : "text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-white/5"}`}
-                    style={{ width: "calc(100% - 12px)" }}
-                  >
-                    <Icon className="w-3.5 h-3.5 shrink-0" />
-                    {label}
-                    {active === id && <ChevronRight className="w-3 h-3 ml-auto" />}
-                  </button>
-                </li>
-              ))}
-            </ul>
-          </div>
-        </div>
-
-        {/* Content — shared mobile + desktop */}
-        <div className="flex-1 min-w-0 space-y-8 overflow-hidden">
+      <div>
+        {/* Content */}
+        <div className="space-y-8 overflow-hidden">
 
           {/* ── DASHBOARD ── */}
           {active === "inicio" && (

@@ -2,8 +2,8 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { useState } from "react"
-import { LayoutDashboard, Users, Building2, ClipboardList, LogOut, MessageCircle, Settings, CreditCard } from "lucide-react"
+import { useState, useEffect } from "react"
+import { LayoutDashboard, Users, Building2, ClipboardList, LogOut, MessageCircle, Settings, CreditCard, Camera } from "lucide-react"
 import { createClient } from "@/lib/supabase/client"
 import { useRouter } from "next/navigation"
 
@@ -14,6 +14,7 @@ const navItems = [
   { href: "/admin/casas", label: "Casas de Apostas", icon: Building2 },
   { href: "/admin/apostas", label: "Apostas", icon: ClipboardList },
   { href: "/admin/suporte", label: "Suporte", icon: MessageCircle },
+  { href: "/admin/prints", label: "Prints Mobile", icon: Camera },
   { href: "/admin/configuracoes", label: "Configurações", icon: Settings },
 ]
 
@@ -22,6 +23,25 @@ export default function AdminLayoutClient({ children }: { children: React.ReactN
   const router = useRouter()
   const supabase = createClient()
   const [confirmOpen, setConfirmOpen] = useState(false)
+  const [unread, setUnread] = useState(0)
+
+  useEffect(() => {
+    async function fetchUnread() {
+      const { count } = await supabase
+        .from("ticket_mensagens")
+        .select("id", { count: "exact", head: true })
+        .eq("is_admin", false)
+        .eq("lida", false)
+      setUnread(count ?? 0)
+    }
+    fetchUnread()
+
+    const channel = supabase
+      .channel("admin-unread")
+      .on("postgres_changes", { event: "*", schema: "public", table: "ticket_mensagens" }, fetchUnread)
+      .subscribe()
+    return () => { supabase.removeChannel(channel) }
+  }, [supabase])
 
   async function handleLogout() {
     await supabase.auth.signOut()
@@ -38,6 +58,7 @@ export default function AdminLayoutClient({ children }: { children: React.ReactN
         <nav className="flex-1 p-3 space-y-1">
           {navItems.map(({ href, label, icon: Icon }) => {
             const active = href === "/admin" ? pathname === "/admin" : pathname.startsWith(href)
+            const isSuporteLink = href === "/admin/suporte"
             return (
               <Link
                 key={href}
@@ -49,7 +70,12 @@ export default function AdminLayoutClient({ children }: { children: React.ReactN
                 }`}
               >
                 <Icon className="h-4 w-4 flex-shrink-0" />
-                {label}
+                <span className="flex-1">{label}</span>
+                {isSuporteLink && unread > 0 && (
+                  <span className="ml-auto min-w-[18px] h-[18px] px-1 flex items-center justify-center rounded-full bg-red-500 text-white text-[10px] font-bold leading-none">
+                    {unread > 99 ? "99+" : unread}
+                  </span>
+                )}
               </Link>
             )
           })}

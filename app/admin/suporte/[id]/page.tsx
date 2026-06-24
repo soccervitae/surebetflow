@@ -5,6 +5,7 @@ import AdminTicketClient from "./AdminTicketClient"
 
 export default async function AdminTicketPage({ params }: { params: { id: string } }) {
   const supabase = createAdminClient()
+  const serverClient = await createClient()
 
   const { data: ticket } = await supabase
     .from("tickets")
@@ -26,13 +27,11 @@ export default async function AdminTicketPage({ params }: { params: { id: string
     await supabase.from("ticket_mensagens").update({ lida: true }).in("id", unreadIds)
   }
 
-  const { data: { user } } = await supabase.auth.admin.getUserById(ticket.user_id)
-  const userEmail = user?.email ?? ticket.user_id
-
-  // Get the logged-in admin's own user ID
-  const clientSupabase = await createClient()
-  const { data: { user: adminUser } } = await clientSupabase.auth.getUser()
+  const { data: { user: adminUser } } = await serverClient.auth.getUser()
   const adminId = adminUser?.id ?? ""
+
+  const { data: { user: ticketUser } } = await supabase.auth.admin.getUserById(ticket.user_id)
+  const userEmail = ticketUser?.email ?? ticket.user_id
 
   return <AdminTicketClient ticket={ticket} mensagens={mensagens ?? []} userEmail={userEmail} adminId={adminId} />
 }

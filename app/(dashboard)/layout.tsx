@@ -6,30 +6,20 @@ import Link from "next/link"
 import { createClient } from "@/lib/supabase/client"
 import { useTheme } from "@/components/ThemeProvider"
 import {
-  Home, Users, Wallet, CreditCard, BookOpen,
+  Home, Users, Wallet, CreditCard,
   Settings, LogOut, Bell, ChevronLeft, ChevronRight,
-  Circle, Sun, Moon, MessageCircle, HelpCircle
+  Circle, Sun, Moon, MessageCircle
 } from "lucide-react"
 import Logo from "@/components/Logo"
 import { cn } from "@/lib/utils"
 
 const navItems = [
-  { href: "/dashboard",     icon: Home,          label: "Dashboard" },
-  { href: "/perfis",        icon: Users,         label: "Perfis" },
-  { href: "/apostas",       icon: BookOpen,      label: "Apostas" },
-  { href: "/financeiro",    icon: Wallet,        label: "Financeiro" },
-  { href: "/assinatura",    icon: CreditCard,    label: "Assinatura" },
-  { href: "/tutorial",      icon: HelpCircle,    label: "Tutorial" },
-  { href: "/suporte",       icon: MessageCircle, label: "Suporte" },
-  { href: "/configuracoes", icon: Settings,      label: "Configurações" },
-]
-
-const bottomItems = [
-  { href: "/dashboard",  icon: Home,       label: "Dashboard" },
-  { href: "/perfis",     icon: Users,      label: "Perfis" },
-  { href: "/apostas",    icon: BookOpen,   label: "Apostas" },
-  { href: "/tutorial",   icon: HelpCircle, label: "Tutorial" },
-  { href: "/financeiro", icon: Wallet,     label: "Financeiro" },
+  { href: "/dashboard", icon: Home, label: "Dashboard" },
+  { href: "/perfis", icon: Users, label: "Perfis" },
+  { href: "/financeiro", icon: Wallet, label: "Financeiro" },
+  { href: "/assinatura", icon: CreditCard, label: "Assinatura" },
+  { href: "/suporte", icon: MessageCircle, label: "Suporte" },
+  { href: "/configuracoes", icon: Settings, label: "Configurações" },
 ]
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
@@ -41,7 +31,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const [userName, setUserName] = useState("")
   const [userInitials, setUserInitials] = useState("")
   const [confirmLogout, setConfirmLogout] = useState(false)
-  const [avatarMenuOpen, setAvatarMenuOpen] = useState(false)
+  const [unread, setUnread] = useState(0)
 
   useEffect(() => {
     const supabase = createClient()
@@ -60,11 +50,26 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         setUserName(email)
         setUserInitials(email.charAt(0).toUpperCase())
       }
+
+      async function fetchUnread() {
+        const { count } = await supabase
+          .from("ticket_mensagens")
+          .select("id", { count: "exact", head: true })
+          .eq("is_admin", true)
+          .eq("lida", false)
+        setUnread(count ?? 0)
+      }
+      fetchUnread()
+
+      const channel = supabase
+        .channel("user-unread")
+        .on("postgres_changes", { event: "*", schema: "public", table: "ticket_mensagens" }, fetchUnread)
+        .subscribe()
+
       setReady(true)
+      return () => { supabase.removeChannel(channel) }
     })
   }, [router, pathname])
-
-  useEffect(() => { setAvatarMenuOpen(false) }, [pathname])
 
   async function handleLogout() {
     const supabase = createClient()
@@ -88,13 +93,13 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
   return (
     <div className="flex min-h-screen bg-[var(--bg-base)]">
-
-      {/* ── DESKTOP SIDEBAR ── */}
+      {/* Sidebar */}
       <aside className={cn(
         "hidden md:flex flex-col fixed top-0 left-0 h-full z-20 transition-all duration-200",
         "bg-[var(--bg-surface)] border-r border-[var(--border)]",
         sidebarW
       )}>
+        {/* Logo */}
         <div className={cn(
           "flex items-center gap-3 px-4 py-5 border-b border-[var(--border)]",
           collapsed && "justify-center px-0"
@@ -105,6 +110,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           }
         </div>
 
+        {/* Nav */}
         <nav className="flex-1 px-2 py-4 space-y-0.5 overflow-y-auto">
           {!collapsed && (
             <p className="text-[10px] font-semibold text-[var(--text-muted)] uppercase tracking-widest px-3 pb-2">
@@ -113,6 +119,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           )}
           {navItems.map(({ href, icon: Icon, label }) => {
             const active = pathname === href || (href !== "/" && pathname.startsWith(href))
+            const isSuporteLink = href === "/suporte"
             return (
               <Link
                 key={href}
@@ -122,17 +129,32 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                   "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all",
                   collapsed && "justify-center px-0",
                   active
-                    ? "bg-[#1e3a8a]/15 text-[var(--accent-text)] border border-[#1e3a8a]/20"
+                    ? "bg-[#1e3a8a]/15 text-[#1e3a8a] border border-[#1e3a8a]/20"
                     : "text-[var(--text-secondary)] hover:bg-[var(--bg-elevated)] hover:text-[var(--text-primary)]"
                 )}
               >
-                <Icon className="w-4 h-4 flex-shrink-0" />
-                {!collapsed && label}
+                <span className="relative flex-shrink-0">
+                  <Icon className="w-4 h-4" />
+                  {isSuporteLink && unread > 0 && collapsed && (
+                    <span className="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-red-500" />
+                  )}
+                </span>
+                {!collapsed && (
+                  <>
+                    <span className="flex-1">{label}</span>
+                    {isSuporteLink && unread > 0 && (
+                      <span className="ml-auto min-w-[18px] h-[18px] px-1 flex items-center justify-center rounded-full bg-red-500 text-white text-[10px] font-bold leading-none">
+                        {unread > 99 ? "99+" : unread}
+                      </span>
+                    )}
+                  </>
+                )}
               </Link>
             )
           })}
         </nav>
 
+        {/* Bottom */}
         <div className="border-t border-[var(--border)] p-2 space-y-1">
           {!collapsed && (
             <p className="text-[10px] font-semibold text-[var(--text-muted)] uppercase tracking-widest px-3 pb-1">
@@ -149,7 +171,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             {!collapsed && (
               <div className="flex-1 min-w-0">
                 <p className="text-xs font-medium text-[var(--text-primary)] truncate">{userName}</p>
-                <p className="text-[10px] text-[var(--accent-text)] font-semibold">APOSTADOR</p>
+                <p className="text-[10px] text-[#1e3a8a] font-semibold">APOSTADOR</p>
               </div>
             )}
           </div>
@@ -179,27 +201,30 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         </div>
       </aside>
 
-      {/* ── CONTENT ── */}
+      {/* Content */}
       <div className={cn(
         "flex-1 flex flex-col transition-all duration-200",
         collapsed ? "md:ml-16" : "md:ml-60"
       )}>
-
-        {/* Desktop top bar */}
+        {/* Top bar */}
         <header className="hidden md:flex items-center justify-between px-6 py-3 bg-[var(--bg-surface)] border-b border-[var(--border)] sticky top-0 z-10">
           <div className="flex items-center gap-2 text-sm text-[var(--text-secondary)]">
-            <Circle className="w-2 h-2 fill-[var(--accent-text)] text-[var(--accent-text)]" />
+            <Circle className="w-2 h-2 fill-[#1e3a8a] text-[#1e3a8a]" />
             <span>Sessão ativa</span>
             <span className="opacity-30">•</span>
             <span className="text-[var(--text-primary)] font-medium">{userName}</span>
             <span className="opacity-30">•</span>
-            <span className="text-xs font-semibold bg-[#1e3a8a]/20 text-[var(--accent-text)] px-2 py-0.5 rounded border border-[#1e3a8a]/30">
+            <span className="text-xs font-semibold bg-[#1e3a8a]/20 text-[#1e3a8a] px-2 py-0.5 rounded border border-[#1e3a8a]/30">
               APOSTADOR
             </span>
           </div>
           <div className="flex items-center gap-2">
-            <button onClick={toggle} title={isDark ? "Modo claro" : "Modo escuro"}
-              className="w-8 h-8 flex items-center justify-center rounded-lg text-[var(--text-secondary)] hover:bg-[var(--bg-elevated)] hover:text-[var(--text-primary)] transition-colors">
+            {/* Theme toggle */}
+            <button
+              onClick={toggle}
+              title={isDark ? "Modo claro" : "Modo escuro"}
+              className="w-8 h-8 flex items-center justify-center rounded-lg text-[var(--text-secondary)] hover:bg-[var(--bg-elevated)] hover:text-[var(--text-primary)] transition-colors"
+            >
               {isDark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
             </button>
             <button className="w-8 h-8 flex items-center justify-center rounded-lg text-[var(--text-secondary)] hover:bg-[var(--bg-elevated)] hover:text-[var(--text-primary)] transition-colors">
@@ -211,84 +236,41 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           </div>
         </header>
 
-        {/* Mobile top bar */}
-        <header className="md:hidden flex items-center justify-between px-4 py-3 bg-[var(--bg-surface)] border-b border-[var(--border)] sticky top-0 z-10">
-          <div className="flex items-center">
-            <Logo size="sm" />
-          </div>
-          <div className="flex items-center gap-2">
-            <button onClick={toggle}
-              className="w-8 h-8 flex items-center justify-center rounded-xl text-[var(--text-secondary)] hover:bg-[var(--bg-elevated)] transition-colors">
-              {isDark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
-            </button>
-            <button
-              onClick={() => setAvatarMenuOpen(v => !v)}
-              className="w-8 h-8 bg-[#1e3a8a] rounded-full flex items-center justify-center text-white text-xs font-bold"
-            >
-              {userInitials}
-            </button>
-          </div>
-        </header>
-
-        {/* Mobile avatar dropdown */}
-        {avatarMenuOpen && (
-          <>
-            <div className="md:hidden fixed inset-0 z-30" onClick={() => setAvatarMenuOpen(false)} />
-            <div className="md:hidden fixed top-14 right-4 z-40 w-56 bg-[var(--bg-surface)] border border-[var(--border)] rounded-2xl shadow-2xl overflow-hidden">
-              <div className="px-4 py-3 border-b border-[var(--border)]">
-                <p className="text-sm font-semibold text-[var(--text-primary)] truncate">{userName}</p>
-                <p className="text-[11px] text-[var(--accent-text)] font-semibold">APOSTADOR</p>
-              </div>
-              <div className="p-2 space-y-1">
-                <Link href="/configuracoes"
-                  className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-[var(--text-secondary)] hover:bg-[var(--bg-elevated)] hover:text-[var(--text-primary)] transition-colors">
-                  <Settings className="w-4 h-4" />
-                  Configurações
-                </Link>
-                <button
-                  onClick={() => { setAvatarMenuOpen(false); setConfirmLogout(true) }}
-                  className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-red-400 hover:bg-red-500/10 transition-colors w-full"
-                >
-                  <LogOut className="w-4 h-4" />
-                  Sair
-                </button>
-              </div>
-            </div>
-          </>
-        )}
-
-        {/* Main content */}
+        {/* Main */}
         <main className="flex-1 p-4 md:p-6 pb-24 md:pb-6">
           {children}
         </main>
       </div>
 
-      {/* ── MOBILE BOTTOM NAV ── */}
-      <nav className="md:hidden fixed bottom-0 left-0 right-0 z-20 bg-[var(--bg-surface)] border-t border-[var(--border)]"
-        style={{ paddingBottom: "env(safe-area-inset-bottom)" }}>
-        <div className="flex items-center">
-          {bottomItems.map(({ href, icon: Icon, label }) => {
-            const active = pathname === href || (href !== "/" && pathname.startsWith(href))
-            return (
-              <Link key={href} href={href}
-                className={cn(
-                  "flex-1 flex flex-col items-center justify-center py-2.5 gap-1 transition-colors relative",
-                  active ? "text-[var(--accent-text)]" : "text-[var(--text-muted)]"
-                )}
-              >
-                {active && (
-                  <span className="absolute top-0 left-1/2 -translate-x-1/2 w-8 h-0.5 bg-[#1e3a8a] rounded-full" />
-                )}
+      {/* Bottom nav mobile */}
+      <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-[var(--bg-surface)] border-t border-[var(--border)] z-20 flex">
+        {navItems.slice(0, 5).map(({ href, icon: Icon, label }) => {
+          const active = pathname === href || (href !== "/" && pathname.startsWith(href))
+          const isSuporteLink = href === "/suporte"
+          return (
+            <Link
+              key={href}
+              href={href}
+              className={cn(
+                "flex-1 flex flex-col items-center py-2 text-xs gap-1",
+                active ? "text-[#1e3a8a]" : "text-[var(--text-secondary)]"
+              )}
+            >
+              <span className="relative">
                 <Icon className="w-5 h-5" />
-                <span className="text-[10px] font-medium">{label}</span>
-              </Link>
-            )
-          })}
-
-        </div>
+                {isSuporteLink && unread > 0 && (
+                  <span className="absolute -top-1 -right-1 min-w-[14px] h-[14px] px-0.5 flex items-center justify-center rounded-full bg-red-500 text-white text-[9px] font-bold leading-none">
+                    {unread > 9 ? "9+" : unread}
+                  </span>
+                )}
+              </span>
+              <span>{label}</span>
+            </Link>
+          )
+        })}
       </nav>
 
-      {/* ── LOGOUT DIALOG ── */}
+      {/* Logout confirmation dialog */}
       {confirmLogout && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <div className="bg-[var(--bg-surface)] border border-[var(--border)] rounded-2xl p-6 w-full max-w-sm shadow-xl">
@@ -300,12 +282,16 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               Você será desconectado e precisará fazer login novamente.
             </p>
             <div className="flex gap-3">
-              <button onClick={() => setConfirmLogout(false)}
-                className="flex-1 px-4 py-2.5 rounded-xl border border-[var(--border)] text-[var(--text-secondary)] hover:bg-[var(--bg-elevated)] text-sm font-medium transition-colors">
+              <button
+                onClick={() => setConfirmLogout(false)}
+                className="flex-1 px-4 py-2.5 rounded-xl border border-[var(--border)] text-[var(--text-secondary)] hover:bg-[var(--bg-elevated)] text-sm font-medium transition-colors"
+              >
                 Cancelar
               </button>
-              <button onClick={handleLogout}
-                className="flex-1 px-4 py-2.5 rounded-xl bg-red-600 hover:bg-red-700 text-white text-sm font-semibold transition-colors">
+              <button
+                onClick={handleLogout}
+                className="flex-1 px-4 py-2.5 rounded-xl bg-red-600 hover:bg-red-700 text-white text-sm font-semibold transition-colors"
+              >
                 Sair
               </button>
             </div>
