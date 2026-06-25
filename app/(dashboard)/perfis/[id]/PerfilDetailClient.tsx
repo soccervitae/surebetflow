@@ -16,7 +16,7 @@ import AddBetToProfile from "@/components/AddBetToProfile"
 import { formatCurrency } from "@/lib/utils"
 import { useToast } from "@/hooks/useToast"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { DollarSign, TrendingUp, Clock, ArrowUpRight, Pencil, Calculator, ArrowDownCircle, ArrowUpCircle, Gift } from "lucide-react"
+import { DollarSign, TrendingUp, Clock, ArrowUpRight, Pencil, Calculator, ArrowDownCircle, ArrowUpCircle, Gift, ArrowDownLeft, Wallet } from "lucide-react"
 import SurebetCalculator from "@/components/SurebetCalculator"
 import type { Profile, ProfileDashboard, Aposta, MovimentacaoFinanceira, ProfileBet } from "@/lib/types"
 
@@ -584,31 +584,27 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
         {/* Financeiro Tab */}
         <TabsContent value="financeiro" className="space-y-4">
           {/* Summary cards */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <Card>
-              <CardContent className="p-4">
-                <p className="text-xs text-[var(--text-secondary)] mb-1">Depositado</p>
-                <p className="text-lg font-bold text-[var(--accent-text)]">{formatCurrency(totalDepositos)}</p>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardContent className="p-4">
-                <p className="text-xs text-[var(--text-secondary)] mb-1">Sacado</p>
-                <p className="text-lg font-bold text-[#DC2626]">{formatCurrency(totalSaques)}</p>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardContent className="p-4">
-                <p className="text-xs text-[var(--text-secondary)] mb-1">Saldo Líquido</p>
-                <p className={`text-lg font-bold ${saldoLiquido >= 0 ? "text-[var(--accent-text)]" : "text-[#DC2626]"}`}>{formatCurrency(saldoLiquido)}</p>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardContent className="p-4">
-                <p className="text-xs text-[var(--text-secondary)] mb-1">Total Bônus</p>
-                <p className="text-lg font-bold text-purple-500">{formatCurrency(totalBonus)}</p>
-              </CardContent>
-            </Card>
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+            {[
+              { label: "Depositado",   value: formatCurrency(totalDepositos), icon: ArrowDownLeft,  bg: "bg-[#1e3a8a]/10",  color: "text-[var(--accent-text)]" },
+              { label: "Sacado",       value: formatCurrency(totalSaques),    icon: ArrowUpRight,   bg: "bg-[#DC2626]/10",  color: "text-[#DC2626]" },
+              { label: "Saldo Líquido",value: formatCurrency(saldoLiquido),   icon: Wallet,         bg: saldoLiquido >= 0 ? "bg-[#1e3a8a]/10" : "bg-[#DC2626]/10", color: saldoLiquido >= 0 ? "text-[var(--accent-text)]" : "text-[#DC2626]" },
+              { label: "Total Bônus",  value: formatCurrency(totalBonus),     icon: Gift,           bg: "bg-purple-500/10", color: "text-purple-500" },
+            ].map(({ label, value, icon: Icon, bg, color }) => (
+              <Card key={label} className="overflow-hidden">
+                <CardContent className="p-4">
+                  <div className="flex items-center gap-2 min-w-0">
+                    <div className={`p-2 ${bg} rounded-lg flex-shrink-0`}>
+                      <Icon className={`h-4 w-4 ${color}`} />
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <p className="text-xs text-[var(--text-secondary)] truncate">{label}</p>
+                      <p className={`text-sm font-bold ${color} truncate`}>{value}</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
           </div>
 
           {/* Filters */}
