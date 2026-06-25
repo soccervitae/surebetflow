@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useRef } from "react"
+import { useTheme } from "@/components/ThemeProvider"
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetClose } from "@/components/ui/sheet"
 import {
   BookOpen, Home, Users, Calculator, DollarSign,
@@ -46,38 +47,30 @@ function Step({ num, text }: { num: number; text: string }) {
 const IFRAME_W = 390
 const IFRAME_H = 844
 
-/* ── iPhone 15 Frame (always dark) ── */
-function IPhone15Frame({ children }: { children: React.ReactNode }) {
+/* ── iPhone 15 Frame ── */
+function IPhone15Frame({ dark, children }: { dark: boolean; children: React.ReactNode }) {
+  const frameC = dark ? "border-gray-800 bg-gray-900" : "border-[#b8b8ba] bg-[#e8e8ed]"
+  const sideC  = dark ? "bg-gray-700" : "bg-[#b8b8ba]"
+  const screenBg = dark ? "bg-[#0b1220]" : "bg-white"
+  const homeC  = dark ? "bg-white/30" : "bg-gray-400/50"
   return (
     <div className="relative mx-auto" style={{ width: 256 }}>
-      {/* Silent toggle */}
-      <div className="absolute left-[-4px] top-[78px] w-[4px] h-5 rounded-l-sm bg-gray-700" />
-      {/* Volume up */}
-      <div className="absolute left-[-4px] top-[112px] w-[4px] h-[26px] rounded-l-sm bg-gray-700" />
-      {/* Volume down */}
-      <div className="absolute left-[-4px] top-[148px] w-[4px] h-[26px] rounded-l-sm bg-gray-700" />
-      {/* Power */}
-      <div className="absolute right-[-4px] top-[128px] w-[4px] h-[42px] rounded-r-sm bg-gray-700" />
-
-      {/* Body */}
+      <div className={`absolute left-[-4px] top-[78px] w-[4px] h-5 rounded-l-sm ${sideC}`} />
+      <div className={`absolute left-[-4px] top-[112px] w-[4px] h-[26px] rounded-l-sm ${sideC}`} />
+      <div className={`absolute left-[-4px] top-[148px] w-[4px] h-[26px] rounded-l-sm ${sideC}`} />
+      <div className={`absolute right-[-4px] top-[128px] w-[4px] h-[42px] rounded-r-sm ${sideC}`} />
       <div
-        className="relative rounded-[2.6rem] border-[5px] border-gray-800 bg-gray-900 overflow-hidden shadow-2xl"
+        className={`relative rounded-[2.6rem] border-[5px] ${frameC} overflow-hidden shadow-2xl`}
         style={{ aspectRatio: "390/844" }}
       >
-        {/* Screen bg */}
-        <div className="absolute inset-0 bg-[#0b1220]" />
-
-        {/* Dynamic Island */}
+        <div className={`absolute inset-0 ${screenBg}`} />
         <div className="absolute top-0 left-0 right-0 flex justify-center z-30" style={{ paddingTop: 10 }}>
           <div className="bg-black rounded-full" style={{ width: 90, height: 24 }} />
         </div>
-
-        {/* Content area — iframe fills from top to bottom, overlaid by Dynamic Island */}
         <div className="absolute inset-0 overflow-hidden">
           {children}
-          {/* Home indicator */}
           <div className="absolute bottom-1 left-0 right-0 flex justify-center z-30">
-            <div className="w-24 h-[3px] rounded-full bg-white/30" />
+            <div className={`w-24 h-[3px] rounded-full ${homeC}`} />
           </div>
         </div>
       </div>
@@ -87,10 +80,12 @@ function IPhone15Frame({ children }: { children: React.ReactNode }) {
 
 /* ── Real iframe inside iPhone 15 frame ── */
 function IFramePhone({ href }: { href: string }) {
+  const { theme } = useTheme()
+  const dark = theme === "dark"
   const innerW = 246
   const scale = innerW / IFRAME_W
   return (
-    <IPhone15Frame>
+    <IPhone15Frame dark={dark}>
       <div style={{
         position: "absolute",
         top: 0, left: 0,
