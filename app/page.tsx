@@ -166,7 +166,7 @@ export default async function LandingPage() {
                   icon: Bot,
                   color: "bg-[#1e3a8a]/10 text-[#5b7ec9]",
                   title: "IA que entende surebets",
-                  desc: "Nossa IA foi treinada para reconhecer oportunidades de arbitragem de qualquer localizador — Surebet.today, BetBurger, RebelBetting e outros.",
+                  desc: "Nossa IA foi treinada para reconhecer oportunidades de arbitragem de qualquer localizador.",
                 },
                 {
                   icon: ClipboardPaste,
