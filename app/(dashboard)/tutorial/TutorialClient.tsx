@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useRef } from "react"
-import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet"
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetClose } from "@/components/ui/sheet"
 import {
   BookOpen, Home, Users, Calculator, DollarSign,
   Settings, HelpCircle, ChevronRight, CheckCircle,
@@ -9,7 +9,7 @@ import {
   Search, CreditCard, MessageSquare, Star, Zap,
   BarChart2, ChevronLeft, Circle, Bell, Sun,
   Filter, ArrowRight, QrCode, Activity, Hash,
-  Calendar, RefreshCw, Lock, MoreHorizontal,
+  Calendar, RefreshCw, Lock, MoreHorizontal, X,
 } from "lucide-react"
 
 const SECTIONS = [
@@ -1060,7 +1060,7 @@ export default function TutorialClient() {
             <button
               onClick={() => sheetIdx > 0 && setSheetSection(IDS[sheetIdx - 1])}
               disabled={sheetIdx === 0}
-              className="flex items-center gap-1 text-sm text-[var(--text-secondary)] disabled:opacity-30 transition-colors"
+              className="flex items-center gap-1 text-sm text-[var(--text-secondary)] disabled:opacity-30 transition-colors p-1"
             >
               <ChevronLeft className="w-4 h-4" />
             </button>
@@ -1070,13 +1070,18 @@ export default function TutorialClient() {
                 {currentSection?.label}
               </SheetTitle>
             </div>
-            <button
-              onClick={() => sheetIdx < IDS.length - 1 && setSheetSection(IDS[sheetIdx + 1])}
-              disabled={sheetIdx === IDS.length - 1}
-              className="flex items-center gap-1 text-sm text-[var(--text-secondary)] disabled:opacity-30 transition-colors"
-            >
-              <ChevronRight className="w-4 h-4" />
-            </button>
+            <div className="flex items-center gap-1">
+              <button
+                onClick={() => sheetIdx < IDS.length - 1 && setSheetSection(IDS[sheetIdx + 1])}
+                disabled={sheetIdx === IDS.length - 1}
+                className="flex items-center gap-1 text-sm text-[var(--text-secondary)] disabled:opacity-30 transition-colors p-1"
+              >
+                <ChevronRight className="w-4 h-4" />
+              </button>
+              <SheetClose className="p-1 rounded-lg text-[var(--text-secondary)] hover:bg-[var(--bg-elevated)] hover:text-[var(--text-primary)] transition-colors ml-1">
+                <X className="w-4 h-4" />
+              </SheetClose>
+            </div>
           </div>
 
           {/* Progress dots */}
