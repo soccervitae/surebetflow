@@ -8,8 +8,8 @@ import {
   TrendingUp, Clock, ArrowUpRight, Wallet, Plus,
   Search, CreditCard, Star, Zap,
   BarChart2, ChevronLeft, Circle, Bell, Sun,
-  Filter, ArrowRight, QrCode, Activity, Hash,
-  Calendar, RefreshCw, Lock, MoreHorizontal, X,
+  Filter, ArrowRight, Activity, Hash,
+  Calendar, RefreshCw, X,
 } from "lucide-react"
 
 const SECTIONS = [
@@ -43,77 +43,41 @@ function Step({ num, text }: { num: number; text: string }) {
   )
 }
 
-/* ── Color tokens for dark / light phone content ── */
-function mc(dark: boolean) {
-  return {
-    screen:   dark ? "bg-[#0b1220]" : "bg-[#f0f4f8]",
-    header:   dark ? "bg-[#0f1a2e] border-white/5"   : "bg-white border-gray-200",
-    card:     dark ? "bg-white/5 border-white/10"     : "bg-white border-gray-200",
-    input:    dark ? "bg-black/40 border-white/10"    : "bg-gray-100 border-gray-200",
-    t1:       dark ? "text-white"    : "text-gray-900",
-    t2:       dark ? "text-gray-400" : "text-gray-500",
-    t3:       dark ? "text-gray-600" : "text-gray-400",
-    navBg:    dark ? "bg-[#0f1a2e] border-t border-white/5"  : "bg-white border-t border-gray-200",
-    navIcon:  dark ? "text-gray-500"  : "text-gray-400",
-    navActive:dark ? "text-[#60a5fa]" : "text-[#1e3a8a]",
-    dot:      dark ? "bg-[#60a5fa]"   : "bg-[#1e3a8a]",
-    bar:      dark ? "bg-[#1e3a8a]/60" : "bg-[#1e3a8a]/50",
-    badge:    dark ? "bg-[#1e3a8a]/20 border-[#1e3a8a]/30 text-[#60a5fa]"
-                   : "bg-[#1e3a8a]/10 border-[#1e3a8a]/20 text-[#1e3a8a]",
-  }
-}
+const IFRAME_W = 390
+const IFRAME_H = 844
 
-/* ── iPhone 15 Frame ── */
-function IPhone15Frame({ dark, children }: { dark: boolean; children: React.ReactNode }) {
-  const frameC = dark ? "border-gray-800 bg-gray-900"    : "border-[#b8b8ba] bg-[#e8e8ed]"
-  const sideC  = dark ? "bg-gray-700"                    : "bg-[#b8b8ba]"
-  const silentC= dark ? "bg-gray-700"                    : "bg-[#b8b8ba]"
+/* ── iPhone 15 Frame (always dark) ── */
+function IPhone15Frame({ children }: { children: React.ReactNode }) {
   return (
     <div className="relative mx-auto" style={{ width: 256 }}>
       {/* Silent toggle */}
-      <div className={`absolute left-[-4px] top-[78px] w-[4px] h-5 rounded-l-sm ${silentC}`} />
+      <div className="absolute left-[-4px] top-[78px] w-[4px] h-5 rounded-l-sm bg-gray-700" />
       {/* Volume up */}
-      <div className={`absolute left-[-4px] top-[112px] w-[4px] h-[26px] rounded-l-sm ${sideC}`} />
+      <div className="absolute left-[-4px] top-[112px] w-[4px] h-[26px] rounded-l-sm bg-gray-700" />
       {/* Volume down */}
-      <div className={`absolute left-[-4px] top-[148px] w-[4px] h-[26px] rounded-l-sm ${sideC}`} />
+      <div className="absolute left-[-4px] top-[148px] w-[4px] h-[26px] rounded-l-sm bg-gray-700" />
       {/* Power */}
-      <div className={`absolute right-[-4px] top-[128px] w-[4px] h-[42px] rounded-r-sm ${sideC}`} />
+      <div className="absolute right-[-4px] top-[128px] w-[4px] h-[42px] rounded-r-sm bg-gray-700" />
 
       {/* Body */}
       <div
-        className={`relative rounded-[2.6rem] border-[5px] ${frameC} overflow-hidden shadow-2xl`}
+        className="relative rounded-[2.6rem] border-[5px] border-gray-800 bg-gray-900 overflow-hidden shadow-2xl"
         style={{ aspectRatio: "390/844" }}
       >
         {/* Screen bg */}
-        <div className={`absolute inset-0 ${mc(dark).screen}`} />
+        <div className="absolute inset-0 bg-[#0b1220]" />
 
         {/* Dynamic Island */}
         <div className="absolute top-0 left-0 right-0 flex justify-center z-30" style={{ paddingTop: 10 }}>
           <div className="bg-black rounded-full" style={{ width: 90, height: 24 }} />
         </div>
 
-        {/* Status bar */}
-        <div className={`absolute left-0 right-0 flex items-center justify-between px-5 z-20 ${mc(dark).t1}`}
-             style={{ top: 38, height: 20 }}>
-          <span className={`text-[8px] font-semibold ${mc(dark).t1}`}>9:41</span>
-          <div className="flex items-center gap-1.5">
-            <div className={`w-3 h-2 ${mc(dark).t2} flex items-end gap-[1px]`}>
-              {[3,5,7,9].map((h,i)=>(<div key={i} className={`w-[2px] rounded-sm ${mc(dark).t1} opacity-${i<3?"60":"100"}`} style={{height:h}}/>))}
-            </div>
-            <div className={`text-[7px] font-medium ${mc(dark).t1}`}>5G</div>
-            <div className={`w-5 h-2.5 rounded-sm border ${dark?"border-gray-500":"border-gray-400"} relative`}>
-              <div className={`absolute inset-[1px] left-[1px] right-[2px] rounded-sm ${dark?"bg-white":"bg-gray-800"}`} style={{right:4}}/>
-              <div className={`absolute right-[-2px] top-1/2 -translate-y-1/2 w-[2px] h-1 rounded-r-sm ${dark?"bg-gray-500":"border-gray-400"}`}/>
-            </div>
-          </div>
-        </div>
-
-        {/* Content area */}
-        <div className="absolute left-0 right-0 bottom-0 overflow-hidden" style={{ top: 60 }}>
+        {/* Content area — iframe fills from top to bottom, overlaid by Dynamic Island */}
+        <div className="absolute inset-0 overflow-hidden">
           {children}
           {/* Home indicator */}
-          <div className="absolute bottom-1 left-0 right-0 flex justify-center">
-            <div className={`w-24 h-[3px] rounded-full ${dark ? "bg-white/30" : "bg-gray-400/50"}`} />
+          <div className="absolute bottom-1 left-0 right-0 flex justify-center z-30">
+            <div className="w-24 h-[3px] rounded-full bg-white/30" />
           </div>
         </div>
       </div>
@@ -121,55 +85,28 @@ function IPhone15Frame({ dark, children }: { dark: boolean; children: React.Reac
   )
 }
 
-/* ── Phone nav bar inside mockup ── */
-function PhoneNav({ dark, activeNav }: { dark: boolean; activeNav: string }) {
-  const cl = mc(dark)
-  const nav = [
-    { href: "/dashboard", icon: Home,     label: "Dashboard" },
-    { href: "/perfis",    icon: Users,    label: "Perfis" },
-    { href: "/apostas",   icon: BookOpen, label: "Apostas" },
-    { href: "/financeiro",icon: Wallet,   label: "Financeiro" },
-    { href: "/mais",      icon: MoreHorizontal, label: "Mais" },
-  ]
+/* ── Real iframe inside iPhone 15 frame ── */
+function IFramePhone({ href }: { href: string }) {
+  const innerW = 246
+  const scale = innerW / IFRAME_W
   return (
-    <div className={`${cl.navBg} flex items-center justify-around px-1 py-1.5`}>
-      {nav.map(({ href, icon: Icon, label }) => {
-        const isActive = activeNav === href
-        return (
-          <div key={href} className="flex flex-col items-center gap-0.5">
-            {isActive && <div className={`w-3 h-0.5 rounded-full -mt-1.5 mb-0.5 ${cl.dot}`} />}
-            <Icon className={`w-4 h-4 ${isActive ? cl.navActive : cl.navIcon}`} />
-            <span className={`text-[6px] font-medium ${isActive ? cl.navActive : cl.navIcon}`}>{label}</span>
-          </div>
-        )
-      })}
-    </div>
-  )
-}
-
-/* ── Phone header inside mockup ── */
-function PhoneHeader({ dark }: { dark: boolean }) {
-  const cl = mc(dark)
-  return (
-    <div className={`${cl.header} flex items-center justify-between px-3 py-2 border-b`}>
-      <div className={`w-5 h-5 bg-[#1e3a8a] rounded-lg flex items-center justify-center`}>
-        <TrendingUp className="w-3 h-3 text-white" />
-      </div>
-      <span className={`text-[10px] font-bold ${cl.t1}`}>SureBetFlow</span>
-      <div className="w-5 h-5 bg-[#1e3a8a] rounded-full flex items-center justify-center text-white text-[7px] font-bold">JS</div>
-    </div>
-  )
-}
-
-/* ── Full phone wrapper used in mobile content ── */
-function PhoneMock({ dark, activeNav, children }: { dark: boolean; activeNav: string; children: React.ReactNode }) {
-  const cl = mc(dark)
-  return (
-    <IPhone15Frame dark={dark}>
-      <div className={`flex flex-col h-full ${cl.screen}`}>
-        <PhoneHeader dark={dark} />
-        <div className="flex-1 overflow-hidden p-2.5">{children}</div>
-        <PhoneNav dark={dark} activeNav={activeNav} />
+    <IPhone15Frame>
+      <div style={{
+        position: "absolute",
+        top: 0, left: 0,
+        width: IFRAME_W,
+        height: IFRAME_H,
+        transform: `scale(${scale})`,
+        transformOrigin: "top left",
+      }}>
+        <iframe
+          src={href}
+          width={IFRAME_W}
+          height={IFRAME_H}
+          className="border-0"
+          sandbox="allow-same-origin allow-scripts allow-forms"
+          title={href}
+        />
       </div>
     </IPhone15Frame>
   )
@@ -249,18 +186,15 @@ function MockShell({ url, children }: { url: string; children: React.ReactNode }
   )
 }
 
-function MockBoth({ url, activeNav, dark, mobileContent, children }: {
-  url: string; activeNav: string; dark: boolean;
-  mobileContent: React.ReactNode;
+function MockBoth({ url, mobileHref, children }: {
+  url: string; mobileHref: string;
   children: React.ReactNode
 }) {
   return (
     <div className="space-y-4">
-      {/* Mobile: iPhone 15 mockup */}
+      {/* Mobile: real iframe in iPhone 15 frame */}
       <div className="md:hidden flex justify-center py-2">
-        <PhoneMock dark={dark} activeNav={activeNav}>
-          {mobileContent}
-        </PhoneMock>
+        <IFramePhone href={mobileHref} />
       </div>
       {/* Desktop: browser mockup */}
       <div className="hidden md:block">
@@ -272,9 +206,6 @@ function MockBoth({ url, activeNav, dark, mobileContent, children }: {
 
 /* ── SECTION CONTENT ── */
 function SectionContent({ id, sectionIndex: _ }: { id: string; sectionIndex: number }) {
-  const dark = true
-  const cl = mc(dark)
-
   return (
     <div className="space-y-8 overflow-hidden">
 
@@ -286,32 +217,7 @@ function SectionContent({ id, sectionIndex: _ }: { id: string; sectionIndex: num
             <p className="text-sm text-[var(--text-secondary)]">Visão consolidada de todos os seus perfis e apostas.</p>
           </div>
 
-          <MockBoth url="/dashboard" activeNav="/dashboard" dark={dark} mobileContent={
-            <>
-              <p className={`text-[10px] font-bold mb-2 ${cl.t1}`}>Dashboard</p>
-              <div className="grid grid-cols-2 gap-1.5 mb-2">
-                {[
-                  { l: "Saldo Total",     v: "R$ 2.000,00", c: dark?"text-blue-400":"text-blue-600",   bg: dark?"bg-blue-500/10 border-blue-500/20":"bg-blue-50 border-blue-200" },
-                  { l: "Lucro Realizado", v: "R$ 120,00",   c: dark?"text-[#60a5fa]":"text-[#1e3a8a]",  bg: dark?"bg-blue-500/10 border-blue-500/20":"bg-blue-50 border-blue-200" },
-                  { l: "Lucro Pendente",  v: "R$ 0,00",     c: dark?"text-yellow-400":"text-yellow-600",bg: dark?"bg-yellow-500/10 border-yellow-500/20":"bg-yellow-50 border-yellow-200" },
-                  { l: "ROI",             v: "5.00%",       c: dark?"text-purple-400":"text-purple-600",bg: dark?"bg-purple-500/10 border-purple-500/20":"bg-purple-50 border-purple-200" },
-                ].map(({ l, v, c, bg }) => (
-                  <div key={l} className={`rounded-xl border ${bg} p-2`}>
-                    <p className={`text-[7px] mb-0.5 ${cl.t2}`}>{l}</p>
-                    <p className={`text-[9px] font-bold ${c}`}>{v}</p>
-                  </div>
-                ))}
-              </div>
-              <div className={`${cl.card} rounded-xl border p-2`}>
-                <p className={`text-[8px] font-semibold mb-1.5 ${cl.t1}`}>Lucro Acumulado</p>
-                <div className="flex items-end gap-1 h-12 px-1">
-                  {[2,5,3,8,6,9,7].map((h,i) => (
-                    <div key={i} className={`flex-1 ${cl.bar} rounded-t`} style={{ height:`${h*10}%` }} />
-                  ))}
-                </div>
-              </div>
-            </>
-          }>
+          <MockBoth url="/dashboard" mobileHref="/dashboard">
             <p className="text-[10px] font-bold text-white mb-3">Painel Geral 📊</p>
             <div className="grid grid-cols-4 gap-2 mb-3">
               {[
@@ -384,34 +290,7 @@ function SectionContent({ id, sectionIndex: _ }: { id: string; sectionIndex: num
             <p className="text-sm text-[var(--text-secondary)]">Organize suas apostas separando diferentes estratégias ou bancas.</p>
           </div>
 
-          <MockBoth url="/perfis" activeNav="/perfis" dark={dark} mobileContent={
-            <>
-              <div className="flex items-center justify-between mb-2">
-                <p className={`text-[10px] font-bold ${cl.t1}`}>Perfis</p>
-                <div className="flex items-center gap-1 bg-[#1e3a8a] px-2 py-1 rounded-lg">
-                  <Plus className="w-2.5 h-2.5 text-white" /><span className="text-[7px] text-white">Novo</span>
-                </div>
-              </div>
-              {["Perfil Principal", "Banca Conservadora"].map((name, i) => (
-                <div key={i} className={`${cl.card} rounded-xl border p-2.5 mb-1.5`}>
-                  <div className="flex items-center gap-2 mb-1.5">
-                    <div className="w-7 h-7 rounded-full bg-[#1e3a8a] flex items-center justify-center text-white text-[8px] font-bold shrink-0">{name[0]}S</div>
-                    <div>
-                      <p className={`text-[9px] font-semibold ${cl.t1}`}>{name}</p>
-                      <span className="text-[7px] bg-green-500/10 text-green-500 px-1 rounded-full border border-green-500/20">Ativo</span>
-                    </div>
-                  </div>
-                  <div className="grid grid-cols-3 gap-1 text-center">
-                    {["12 apostas","R$ 120","5% ROI"].map(v=>(
-                      <div key={v} className={`${cl.input} rounded-lg border p-1`}>
-                        <p className={`text-[7px] font-bold ${cl.t1}`}>{v}</p>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              ))}
-            </>
-          }>
+          <MockBoth url="/perfis" mobileHref="/perfis">
             <div className="flex items-center justify-between mb-3">
               <p className="text-[11px] font-bold text-white">Perfis</p>
               <div className="flex items-center gap-1 bg-[#1e3a8a] px-2 py-1 rounded-lg">
@@ -464,32 +343,7 @@ function SectionContent({ id, sectionIndex: _ }: { id: string; sectionIndex: num
             <p className="text-sm text-[var(--text-secondary)]">Calcule apostas 2-way e 3-way para garantir lucro independente do resultado.</p>
           </div>
 
-          <MockBoth url="/calculadora" activeNav="/dashboard" dark={dark} mobileContent={
-            <>
-              <p className={`text-[10px] font-bold mb-2 ${cl.t1}`}>Calculadora de Surebet</p>
-              <div className="space-y-1.5 mb-2">
-                {["Resultado 1 — Casa A","Resultado 2 — Casa B"].map((label,i)=>(
-                  <div key={i} className={`${cl.card} rounded-xl border p-2`}>
-                    <p className={`text-[7px] mb-1 ${cl.t2}`}>{label}</p>
-                    <div className="flex gap-2">
-                      <div className={`flex-1 ${cl.input} rounded-lg border px-2 py-1`}>
-                        <p className={`text-[6px] ${cl.t3}`}>Odd</p>
-                        <p className={`text-[9px] font-mono ${cl.t1}`}>{["2.10","2.20"][i]}</p>
-                      </div>
-                      <div className={`flex-1 ${cl.input} rounded-lg border px-2 py-1`}>
-                        <p className={`text-[6px] ${cl.t3}`}>Stake</p>
-                        <p className={`text-[9px] font-mono font-bold ${dark?"text-[#60a5fa]":"text-[#1e3a8a]"}`}>{["R$95,24","R$90,91"][i]}</p>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-              <div className="bg-green-500/10 border border-green-500/20 rounded-xl p-2 flex items-center justify-between">
-                <div><p className={`text-[7px] ${cl.t2}`}>Lucro garantido</p><p className="text-[10px] font-bold text-green-500">R$ 9,83</p></div>
-                <div className="text-right"><p className={`text-[7px] ${cl.t2}`}>ROI</p><p className="text-[10px] font-bold text-green-500">5.2%</p></div>
-              </div>
-            </>
-          }>
+          <MockBoth url="/calculadora" mobileHref="/dashboard">
             <p className="text-[10px] font-bold text-white mb-1">Calculadora de Surebet</p>
             <div className="grid grid-cols-2 gap-2 mb-2">
               {["Resultado 1 — Casa A","Resultado 2 — Casa B"].map((label,i)=>(
@@ -537,34 +391,7 @@ function SectionContent({ id, sectionIndex: _ }: { id: string; sectionIndex: num
             <p className="text-sm text-[var(--text-secondary)]">Registre e acompanhe todas as suas apostas em um só lugar.</p>
           </div>
 
-          <MockBoth url="/apostas" activeNav="/apostas" dark={dark} mobileContent={
-            <>
-              <div className="flex items-center justify-between mb-2">
-                <p className={`text-[10px] font-bold ${cl.t1}`}>Apostas</p>
-                <div className="bg-[#1e3a8a] rounded-lg px-2 py-1 flex items-center gap-1">
-                  <Plus className="w-2.5 h-2.5 text-white"/><span className="text-[7px] text-white">Nova</span>
-                </div>
-              </div>
-              <div className="space-y-1.5">
-                {[
-                  { ev: "Flamengo x Corinthians", casa: "Bet365 · R$ 95,24", lucro: "+R$ 9,83", s: "green" },
-                  { ev: "Real Madrid x Barcelona", casa: "Betano · R$ 100,00", lucro: "-R$ 100,00", s: "red" },
-                  { ev: "Djokovic x Alcaraz", casa: "Superbet · R$ 80,00", lucro: "Pendente", s: "yellow" },
-                ].map(({ ev, casa, lucro, s }, i) => (
-                  <div key={i} className={`${cl.card} rounded-xl border px-2.5 py-2 flex items-center justify-between`}>
-                    <div className="flex items-center gap-2">
-                      <div className={`w-1.5 h-7 rounded-full ${s==="green"?"bg-green-500":s==="red"?"bg-red-500":"bg-yellow-500"}`} />
-                      <div>
-                        <p className={`text-[8px] font-semibold truncate max-w-[110px] ${cl.t1}`}>{ev}</p>
-                        <p className={`text-[7px] ${cl.t2}`}>{casa}</p>
-                      </div>
-                    </div>
-                    <span className={`text-[8px] font-bold ${s==="green"?"text-green-500":s==="red"?"text-red-500":"text-yellow-500"}`}>{lucro}</span>
-                  </div>
-                ))}
-              </div>
-            </>
-          }>
+          <MockBoth url="/apostas" mobileHref="/apostas">
             <div className="flex items-center justify-between mb-3">
               <p className="text-[11px] font-bold text-white">Apostas</p>
               <div className="flex items-center gap-1">
@@ -631,32 +458,7 @@ function SectionContent({ id, sectionIndex: _ }: { id: string; sectionIndex: num
             <p className="text-sm text-[var(--text-secondary)]">Análise detalhada do seu desempenho financeiro.</p>
           </div>
 
-          <MockBoth url="/financeiro" activeNav="/financeiro" dark={dark} mobileContent={
-            <>
-              <p className={`text-[10px] font-bold mb-2 ${cl.t1}`}>Financeiro</p>
-              <div className="grid grid-cols-2 gap-1.5 mb-2">
-                {[
-                  { l:"Total Investido", v:"R$ 2.400", c:cl.t1 },
-                  { l:"Lucro Realizado", v:"R$ 120,00", c:dark?"text-[#60a5fa]":"text-[#1e3a8a]" },
-                  { l:"Lucro Pendente",  v:"R$ 0,00",   c:dark?"text-yellow-400":"text-yellow-600" },
-                  { l:"ROI Médio",       v:"5.00%",     c:dark?"text-green-400":"text-green-600" },
-                ].map(({l,v,c})=>(
-                  <div key={l} className={`${cl.card} rounded-xl border p-2 text-center`}>
-                    <p className={`text-[6px] mb-0.5 ${cl.t2}`}>{l}</p>
-                    <p className={`text-[9px] font-bold ${c}`}>{v}</p>
-                  </div>
-                ))}
-              </div>
-              <div className={`${cl.card} rounded-xl border p-2`}>
-                <p className={`text-[8px] font-semibold mb-1.5 ${cl.t1}`}>Evolução da Banca</p>
-                <div className="flex items-end gap-0.5 h-12 px-1">
-                  {[3,5,4,7,5,9,8,6,8,10].map((h,i)=>(
-                    <div key={i} className={`flex-1 ${cl.bar} rounded-t`} style={{height:`${h*9}%`}} />
-                  ))}
-                </div>
-              </div>
-            </>
-          }>
+          <MockBoth url="/financeiro" mobileHref="/financeiro">
             <p className="text-[10px] font-bold text-white mb-3">Financeiro</p>
             <div className="grid grid-cols-4 gap-1.5 mb-3">
               {[
@@ -720,39 +522,7 @@ function SectionContent({ id, sectionIndex: _ }: { id: string; sectionIndex: num
             <p className="text-sm text-[var(--text-secondary)]">Gerencie seu plano e forma de pagamento.</p>
           </div>
 
-          <MockBoth url="/assinatura" activeNav="/dashboard" dark={dark} mobileContent={
-            <>
-              <div className="flex items-center gap-2 mb-2">
-                <CreditCard className={`w-3.5 h-3.5 ${dark?"text-[#60a5fa]":"text-[#1e3a8a]"}`} />
-                <p className={`text-[10px] font-bold ${cl.t1}`}>Assinatura</p>
-              </div>
-              <div className={`${cl.card} rounded-xl border p-2.5 mb-2`}>
-                <div className="flex items-center gap-1.5 mb-1">
-                  <Star className={`w-3 h-3 ${dark?"text-[#60a5fa]":"text-[#1e3a8a]"}`} />
-                  <span className={`text-[9px] font-bold ${cl.t1}`}>Pro</span>
-                  <span className="text-[7px] bg-green-500/20 text-green-500 px-1.5 rounded-full border border-green-500/20 ml-1">Ativa</span>
-                </div>
-                <p className={`text-[11px] font-bold ${cl.t1}`}>R$ 99<span className={`text-[8px] font-normal ${cl.t2}`}>,00/mês</span></p>
-                <p className={`text-[7px] mt-0.5 ${cl.t2}`}>Próxima cobrança em <span className={cl.t1}>21/07/2026</span></p>
-                <div className="mt-2 flex items-center gap-1 bg-[#1e3a8a] w-fit px-2 py-1 rounded-lg">
-                  <RefreshCw className="w-2.5 h-2.5 text-white" />
-                  <span className="text-[7px] text-white font-medium">Atualizar pagamento</span>
-                </div>
-              </div>
-              <div className={`${cl.card} rounded-xl border overflow-hidden`}>
-                {[
-                  { l:"Status", v:"Ativa", c:"text-green-500" },
-                  { l:"Plano", v:"Pro · R$ 99/mês", c:cl.t1 },
-                  { l:"Próx. cobrança", v:"21/07/2026", c:cl.t1 },
-                ].map(({l,v,c})=>(
-                  <div key={l} className={`flex items-center justify-between px-2.5 py-1.5 border-b last:border-0 ${dark?"border-white/5":"border-gray-100"}`}>
-                    <span className={`text-[7px] ${cl.t2}`}>{l}</span>
-                    <span className={`text-[7px] font-medium ${c}`}>{v}</span>
-                  </div>
-                ))}
-              </div>
-            </>
-          }>
+          <MockBoth url="/assinatura" mobileHref="/assinatura">
             <div className="flex items-center gap-2 mb-3">
               <div className="w-6 h-6 bg-[#1e3a8a]/10 rounded-lg flex items-center justify-center">
                 <CreditCard className="w-3 h-3 text-[var(--accent-text)]" />
@@ -812,27 +582,7 @@ function SectionContent({ id, sectionIndex: _ }: { id: string; sectionIndex: num
             <p className="text-sm text-[var(--text-secondary)]">Personalize sua conta e preferências.</p>
           </div>
 
-          <MockBoth url="/configuracoes" activeNav="/dashboard" dark={dark} mobileContent={
-            <>
-              <p className={`text-[10px] font-bold mb-2 ${cl.t1}`}>Minha Conta</p>
-              <div className="space-y-1.5">
-                {[
-                  { label:"Dados pessoais",  sub:"Altere nome, foto e e-mail" },
-                  { label:"Segurança",       sub:"Alterar senha de acesso" },
-                  { label:"Aparência",       sub:"Tema claro ou escuro" },
-                  { label:"Termos e Privacidade", sub:"Políticas do serviço" },
-                ].map(({label,sub})=>(
-                  <div key={label} className={`${cl.card} rounded-xl border px-3 py-2 flex items-center justify-between`}>
-                    <div>
-                      <p className={`text-[9px] font-medium ${cl.t1}`}>{label}</p>
-                      <p className={`text-[7px] ${cl.t2}`}>{sub}</p>
-                    </div>
-                    <ArrowRight className={`w-3 h-3 ${cl.t3}`} />
-                  </div>
-                ))}
-              </div>
-            </>
-          }>
+          <MockBoth url="/configuracoes" mobileHref="/configuracoes">
             <p className="text-[10px] font-bold text-white mb-3">Minha Conta</p>
             <div className="space-y-1.5">
               {[
@@ -883,40 +633,7 @@ function SectionContent({ id, sectionIndex: _ }: { id: string; sectionIndex: num
             <p className="text-sm text-[var(--text-secondary)]">Abra tickets e acompanhe o atendimento da nossa equipe.</p>
           </div>
 
-          <MockBoth url="/suporte" activeNav="/dashboard" dark={dark} mobileContent={
-            <>
-              <div className="flex items-center justify-between mb-2">
-                <p className={`text-[10px] font-bold ${cl.t1}`}>Suporte</p>
-                <div className="flex items-center gap-1 bg-[#1e3a8a] px-2 py-1 rounded-lg">
-                  <Plus className="w-2.5 h-2.5 text-white"/><span className="text-[7px] text-white">Novo ticket</span>
-                </div>
-              </div>
-              <div className={`${cl.card} rounded-xl border p-2 mb-2`}>
-                <p className={`text-[8px] font-semibold mb-1.5 ${cl.t1}`}>Novo Ticket</p>
-                <div className="space-y-1.5">
-                  <div className={`${cl.input} rounded-lg border px-2 py-1.5 flex items-center justify-between`}>
-                    <span className={`text-[7px] ${cl.t2}`}>Selecione o assunto</span>
-                    <ChevronRight className={`w-2 h-2 ${cl.t3} rotate-90`} />
-                  </div>
-                  <div className={`${cl.input} rounded-lg border px-2 py-3`}>
-                    <p className={`text-[6px] ${cl.t3}`}>Descreva seu problema...</p>
-                  </div>
-                  <div className="bg-[#1e3a8a] rounded-lg py-1.5 text-center">
-                    <span className="text-[7px] text-white font-medium">Abrir ticket</span>
-                  </div>
-                </div>
-              </div>
-              {[
-                { assunto:"Dúvidas", status:"respondido", cor:"text-blue-500", badge:dark?"bg-blue-500/10 border-blue-500/20":"bg-blue-50 border-blue-200" },
-                { assunto:"Sugestões", status:"aberto", cor:"text-yellow-500", badge:dark?"bg-yellow-500/10 border-yellow-500/20":"bg-yellow-50 border-yellow-200" },
-              ].map(({assunto,status,cor,badge})=>(
-                <div key={assunto} className={`${cl.card} rounded-xl border p-2 mb-1 flex items-center justify-between`}>
-                  <p className={`text-[8px] font-semibold ${cl.t1}`}>{assunto}</p>
-                  <span className={`text-[7px] font-medium border px-1.5 py-0.5 rounded-full ${badge} ${cor}`}>{status}</span>
-                </div>
-              ))}
-            </>
-          }>
+          <MockBoth url="/suporte" mobileHref="/suporte">
             <div className="flex items-center justify-between mb-3">
               <p className="text-[11px] font-bold text-white">Suporte</p>
               <div className="flex items-center gap-1 bg-[#1e3a8a] px-2 py-1 rounded-lg">
