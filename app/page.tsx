@@ -3,7 +3,8 @@ import { createClient } from "@/lib/supabase/server"
 import Link from "next/link"
 import {
   ShieldCheck, Calculator, Wallet, Lock, BarChart3, TrendingUp,
-  CheckCircle, ArrowRight, Zap, Users, Target, RefreshCw, ChevronDown, Gift
+  CheckCircle, ArrowRight, Zap, Users, Target, RefreshCw, ChevronDown, Gift,
+  Sparkles, ClipboardPaste, ImageIcon, Bot
 } from "lucide-react"
 import Image from "next/image"
 
@@ -140,8 +141,145 @@ export default async function LandingPage() {
         </div>
       </section>
 
-      {/* Múltiplos Perfis */}
+      {/* IA Section */}
       <section className="border-y border-white/5 py-20 bg-[#111]">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6">
+          <div className="text-center mb-14">
+            <div className="inline-flex items-center gap-2 bg-[#1e3a8a]/10 border border-[#1e3a8a]/30 text-[#5b7ec9] text-sm font-semibold px-4 py-1.5 rounded-full mb-5">
+              <Sparkles className="w-3.5 h-3.5" />
+              Inteligência Artificial nativa
+            </div>
+            <h2 className="text-3xl sm:text-4xl font-extrabold text-white mb-4">
+              Continue usando o localizador<br className="hidden sm:block" /> de surebets que você já usa
+            </h2>
+            <p className="text-gray-400 max-w-2xl mx-auto text-lg">
+              A IA da SurebetFlow lê o conteúdo do seu localizador — texto copiado ou print da tela — e preenche todos os campos automaticamente quando você for registrar a aposta.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
+            {/* Steps */}
+            <div className="space-y-5">
+              {[
+                {
+                  icon: Bot,
+                  color: "bg-[#1e3a8a]/10 text-[#5b7ec9]",
+                  title: "IA que entende surebets",
+                  desc: "Nossa IA foi treinada para reconhecer oportunidades de arbitragem de qualquer localizador — Surebet.today, BetBurger, RebelBetting e outros.",
+                },
+                {
+                  icon: ClipboardPaste,
+                  color: "bg-purple-500/10 text-purple-400",
+                  title: "Cole o texto com um clique",
+                  desc: "Copie os dados diretamente do localizador, cole no SurebetFlow e a IA identifica casas, odds, mercado e evento automaticamente.",
+                },
+                {
+                  icon: ImageIcon,
+                  color: "bg-yellow-500/10 text-yellow-400",
+                  title: "Ou envie um print da tela",
+                  desc: "Fez um screenshot do site? Basta enviar a imagem. A IA lê visualmente e extrai todas as informações para preencher os campos.",
+                },
+                {
+                  icon: Sparkles,
+                  color: "bg-blue-500/10 text-blue-400",
+                  title: "Múltiplas surebets de uma vez",
+                  desc: "Se o print contiver várias oportunidades, a IA lista todas e você escolhe qual usar — sem precisar digitar nada.",
+                },
+              ].map((item) => (
+                <div key={item.title} className="flex items-start gap-4 p-4 rounded-2xl bg-[#0a0a0a] border border-white/5 hover:border-white/10 transition-colors">
+                  <div className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 ${item.color}`}>
+                    <item.icon className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <p className="font-semibold text-white mb-1">{item.title}</p>
+                    <p className="text-sm text-gray-400 leading-relaxed">{item.desc}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Visual mockup */}
+            <div className="bg-[#0a0a0a] border border-white/5 rounded-2xl p-6 space-y-4">
+              <div className="flex items-center gap-2 mb-2">
+                <div className="w-2 h-2 rounded-full bg-red-500" />
+                <div className="w-2 h-2 rounded-full bg-yellow-500" />
+                <div className="w-2 h-2 rounded-full bg-green-500" />
+                <span className="text-xs text-gray-600 ml-2">SurebetFlow — Nova Aposta</span>
+              </div>
+
+              {/* AI bar */}
+              <div className="flex items-center justify-between bg-[#1e3a8a]/10 border border-[#1e3a8a]/20 rounded-xl px-4 py-3">
+                <div className="flex items-center gap-2">
+                  <Sparkles className="w-4 h-4 text-[#5b7ec9]" />
+                  <span className="text-sm font-medium text-[#5b7ec9]">Preencher com IA</span>
+                </div>
+                <div className="flex gap-2">
+                  <span className="flex items-center gap-1 text-xs text-[#5b7ec9] bg-[#1e3a8a]/20 px-2.5 py-1 rounded-lg border border-[#1e3a8a]/30">
+                    <ClipboardPaste className="w-3 h-3" /> Colar texto
+                  </span>
+                  <span className="flex items-center gap-1 text-xs text-[#5b7ec9] bg-[#1e3a8a]/20 px-2.5 py-1 rounded-lg border border-[#1e3a8a]/30">
+                    <ImageIcon className="w-3 h-3" /> Imagem
+                  </span>
+                </div>
+              </div>
+
+              {/* Filled fields */}
+              <div className="grid grid-cols-2 gap-3">
+                {[
+                  { label: "Esporte", value: "Futebol", filled: true },
+                  { label: "Evento", value: "Arsenal x Chelsea", filled: true },
+                  { label: "Tipo", value: "2-way", filled: true },
+                  { label: "Investimento", value: "R$ 500,00", filled: true },
+                ].map(f => (
+                  <div key={f.label} className="space-y-1">
+                    <p className="text-xs text-gray-500">{f.label}</p>
+                    <div className={`text-sm rounded-lg px-3 py-2 border ${f.filled ? "bg-[#1e3a8a]/5 border-[#1e3a8a]/20 text-white" : "bg-white/5 border-white/5 text-gray-600"}`}>
+                      {f.value}
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                {[
+                  { label: "Casa 1", bet: "Betano", odd: "2.15", market: "Arsenal" },
+                  { label: "Casa 2", bet: "Bet365", odd: "2.20", market: "Chelsea" },
+                ].map(leg => (
+                  <div key={leg.label} className="bg-[#111] border border-white/5 rounded-xl p-3 space-y-2">
+                    <p className="text-xs font-medium text-gray-400">{leg.label}</p>
+                    <div className="text-xs bg-[#1e3a8a]/5 border border-[#1e3a8a]/20 rounded-lg px-2 py-1.5 text-white">{leg.bet}</div>
+                    <div className="grid grid-cols-2 gap-1.5">
+                      <div className="text-xs bg-[#1e3a8a]/5 border border-[#1e3a8a]/20 rounded-lg px-2 py-1.5 text-white">{leg.market}</div>
+                      <div className="text-xs bg-[#1e3a8a]/5 border border-[#1e3a8a]/20 rounded-lg px-2 py-1.5 text-white font-mono">{leg.odd}</div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              <div className="bg-[#1e3a8a]/10 border border-[#1e3a8a]/20 rounded-xl px-4 py-3 flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <CheckCircle className="w-4 h-4 text-[#5b7ec9]" />
+                  <span className="text-sm font-semibold text-[#5b7ec9]">Arbitragem encontrada!</span>
+                </div>
+                <div className="text-right">
+                  <p className="text-xs text-gray-400">ROI</p>
+                  <p className="text-sm font-bold text-white">2.4%</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="mt-12 text-center">
+            <Link href="/cadastro" className="inline-flex items-center gap-2 bg-[#1e3a8a] hover:bg-[#1e40af] text-white font-semibold px-8 py-3.5 rounded-xl transition-colors">
+              <Sparkles className="w-4 h-4" />
+              Experimentar a IA grátis
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* Múltiplos Perfis */}
+      <section className="border-y border-white/5 py-20 bg-[#0a0a0a]">
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
           <div className="text-center mb-12">
             <div className="inline-flex items-center gap-2 bg-purple-500/10 border border-purple-500/20 text-purple-400 text-sm font-medium px-4 py-1.5 rounded-full mb-4">
