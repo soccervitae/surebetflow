@@ -206,7 +206,7 @@ export default function TutorialClient() {
   }
 
   return (
-    <div className="max-w-5xl mx-auto">
+    <div className="max-w-5xl mx-auto overflow-x-hidden">
       {/* Header */}
       <div className="flex items-center gap-3 mb-6">
         <div className="hidden md:flex w-9 h-9 bg-[#1e3a8a]/10 rounded-xl items-center justify-center shrink-0">
@@ -258,7 +258,7 @@ export default function TutorialClient() {
         </div>
       </div>
 
-      <div onTouchStart={handleTouchStart} onTouchEnd={handleTouchEnd}>
+      <div onTouchStart={handleTouchStart} onTouchEnd={handleTouchEnd} className="overflow-x-hidden">
         {/* Content (shared mobile + desktop) */}
         <div className="space-y-8 overflow-hidden">
 
