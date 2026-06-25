@@ -66,6 +66,7 @@ export default function ConfiguracoesPage() {
 
   const [nome, setNome] = useState("")
   const [sobrenome, setSobrenome] = useState("")
+  const [dataNascimento, setDataNascimento] = useState("")
   const [savingProfile, setSavingProfile] = useState(false)
   const [profileSuccess, setProfileSuccess] = useState("")
 
@@ -85,7 +86,7 @@ export default function ConfiguracoesPage() {
         setLastSignIn(user.last_sign_in_at ?? null)
         setCreatedAt(user.created_at ?? null)
         const { data: profile } = await supabase.from("profiles").select("nome, sobrenome").eq("id", user.id).single()
-        if (profile) { setNome(profile.nome ?? ""); setSobrenome(profile.sobrenome ?? "") }
+        if (profile) { setNome(profile.nome ?? ""); setSobrenome(profile.sobrenome ?? ""); setDataNascimento(profile.data_nascimento ?? "") }
       }
     })
 
@@ -131,7 +132,7 @@ export default function ConfiguracoesPage() {
     setSavingProfile(true)
     setProfileSuccess("")
     const supabase = createClient()
-    await supabase.from("profiles").update({ nome: nome.trim(), sobrenome: sobrenome.trim() }).eq("id", userId)
+    await supabase.from("profiles").update({ nome: nome.trim(), sobrenome: sobrenome.trim(), data_nascimento: dataNascimento || null }).eq("id", userId)
     setProfileSuccess("Perfil atualizado com sucesso!")
     setSavingProfile(false)
     setTimeout(() => setProfileSuccess(""), 3000)
@@ -310,6 +311,10 @@ export default function ConfiguracoesPage() {
                 <Label htmlFor="sobrenome">Sobrenome</Label>
                 <Input id="sobrenome" value={sobrenome} onChange={e => setSobrenome(e.target.value)} placeholder="Seu sobrenome" />
               </div>
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="dataNascimento">Data de nascimento</Label>
+              <Input id="dataNascimento" type="date" value={dataNascimento} onChange={e => setDataNascimento(e.target.value)} />
             </div>
             {profileSuccess && (
               <p className="text-sm text-[var(--accent-text)] bg-[#1e3a8a]/5 border border-[#1e3a8a]/20 rounded-lg px-3 py-2">
