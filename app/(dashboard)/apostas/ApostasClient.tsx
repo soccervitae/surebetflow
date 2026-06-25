@@ -34,8 +34,11 @@ export default function ApostasClient({ apostas: initialApostas, profiles }: Pro
   const [apostas, setApostas] = useState(initialApostas)
   const [filterStatus, setFilterStatus] = useState("todos")
   const [filterProfile, setFilterProfile] = useState("todos")
-  const [filterPeriod, setFilterPeriod] = useState<"todos" | "dia" | "semana" | "mes" | "ano" | "custom">("todos")
+  const [filterPeriod, setFilterPeriod] = useState<"todos" | "dia" | "semana" | "mes" | "custom">("todos")
+  const [filterCustomMode, setFilterCustomMode] = useState<"single" | "range">("single")
   const [filterCustomDate, setFilterCustomDate] = useState("")
+  const [filterCustomFrom, setFilterCustomFrom] = useState("")
+  const [filterCustomTo, setFilterCustomTo] = useState("")
   const [finalizarDialog, setFinalizarDialog] = useState<Aposta | null>(null)
   const [deletarDialog, setDeletarDialog] = useState<Aposta | null>(null)
   const [showFilter, setShowFilter] = useState(false)
@@ -75,15 +78,17 @@ export default function ApostasClient({ apostas: initialApostas, profiles }: Pro
       const to = new Date(now); to.setHours(23, 59, 59, 999)
       return { from, to }
     }
-    if (filterPeriod === "ano") {
-      const from = new Date(now.getFullYear(), 0, 1, 0, 0, 0, 0)
-      const to = new Date(now); to.setHours(23, 59, 59, 999)
-      return { from, to }
-    }
-    if (filterPeriod === "custom" && filterCustomDate) {
-      const from = new Date(filterCustomDate); from.setHours(0, 0, 0, 0)
-      const to = new Date(filterCustomDate); to.setHours(23, 59, 59, 999)
-      return { from, to }
+    if (filterPeriod === "custom") {
+      if (filterCustomMode === "single" && filterCustomDate) {
+        const from = new Date(filterCustomDate); from.setHours(0, 0, 0, 0)
+        const to = new Date(filterCustomDate); to.setHours(23, 59, 59, 999)
+        return { from, to }
+      }
+      if (filterCustomMode === "range") {
+        const from = filterCustomFrom ? (() => { const d = new Date(filterCustomFrom); d.setHours(0,0,0,0); return d })() : null
+        const to = filterCustomTo ? (() => { const d = new Date(filterCustomTo); d.setHours(23,59,59,999); return d })() : null
+        return { from, to }
+      }
     }
     return { from: null, to: null }
   }
@@ -210,7 +215,7 @@ export default function ApostasClient({ apostas: initialApostas, profiles }: Pro
               Período
             </Label>
             <div className="flex flex-wrap gap-2">
-              {(["todos", "dia", "semana", "mes", "ano"] as const).map(p => (
+              {(["todos", "dia", "semana", "mes"] as const).map(p => (
                 <button
                   key={p}
                   onClick={() => setFilterPeriod(p)}
@@ -220,35 +225,80 @@ export default function ApostasClient({ apostas: initialApostas, profiles }: Pro
                       : "border-[var(--border)] text-[var(--text-secondary)] hover:bg-[var(--bg-elevated)]"
                   }`}
                 >
-                  {{ todos: "Todos", dia: "Hoje", semana: "Semana", mes: "Mês", ano: "Ano" }[p]}
+                  {{ todos: "Todos", dia: "Hoje", semana: "Semana", mes: "Mês" }[p]}
                 </button>
               ))}
               <button
                 onClick={() => setFilterPeriod("custom")}
-                className={`flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors border ${
+                title="Data personalizada"
+                className={`flex items-center justify-center w-[34px] h-[34px] rounded-lg transition-colors border ${
                   filterPeriod === "custom"
                     ? "bg-[#1e3a8a] border-[#1e3a8a] text-white"
                     : "border-[var(--border)] text-[var(--text-secondary)] hover:bg-[var(--bg-elevated)]"
                 }`}
               >
-                <CalendarIcon className="h-3 w-3" />
-                Data específica
+                <CalendarIcon className="h-3.5 w-3.5" />
               </button>
             </div>
 
             {filterPeriod === "custom" && (
-              <Input
-                type="date"
-                value={filterCustomDate}
-                onChange={e => setFilterCustomDate(e.target.value)}
-                className="text-sm mt-1 max-w-[180px]"
-              />
+              <div className="mt-2 space-y-2">
+                {/* Mode toggle */}
+                <div className="flex gap-1 p-0.5 bg-[var(--bg-elevated)] rounded-lg w-fit">
+                  <button
+                    onClick={() => setFilterCustomMode("single")}
+                    className={`px-3 py-1 rounded-md text-xs font-medium transition-colors ${
+                      filterCustomMode === "single"
+                        ? "bg-[var(--bg-surface)] text-[var(--text-primary)] shadow-sm"
+                        : "text-[var(--text-secondary)]"
+                    }`}
+                  >
+                    Data
+                  </button>
+                  <button
+                    onClick={() => setFilterCustomMode("range")}
+                    className={`px-3 py-1 rounded-md text-xs font-medium transition-colors ${
+                      filterCustomMode === "range"
+                        ? "bg-[var(--bg-surface)] text-[var(--text-primary)] shadow-sm"
+                        : "text-[var(--text-secondary)]"
+                    }`}
+                  >
+                    Intervalo
+                  </button>
+                </div>
+                {filterCustomMode === "single" ? (
+                  <Input
+                    type="date"
+                    value={filterCustomDate}
+                    onChange={e => setFilterCustomDate(e.target.value)}
+                    className="text-xs h-8 max-w-[160px]"
+                  />
+                ) : (
+                  <div className="flex items-center gap-2">
+                    <Input
+                      type="date"
+                      value={filterCustomFrom}
+                      onChange={e => setFilterCustomFrom(e.target.value)}
+                      className="text-xs h-8 max-w-[140px]"
+                      placeholder="Início"
+                    />
+                    <span className="text-[var(--text-muted)] text-xs">até</span>
+                    <Input
+                      type="date"
+                      value={filterCustomTo}
+                      onChange={e => setFilterCustomTo(e.target.value)}
+                      className="text-xs h-8 max-w-[140px]"
+                      placeholder="Fim"
+                    />
+                  </div>
+                )}
+              </div>
             )}
           </div>
 
           {(filterStatus !== "todos" || filterProfile !== "todos" || filterPeriod !== "todos") && (
             <button
-              onClick={() => { setFilterStatus("todos"); setFilterProfile("todos"); setFilterPeriod("todos"); setFilterCustomDate("") }}
+              onClick={() => { setFilterStatus("todos"); setFilterProfile("todos"); setFilterPeriod("todos"); setFilterCustomDate(""); setFilterCustomFrom(""); setFilterCustomTo("") }}
               className="text-xs text-[var(--text-secondary)] hover:text-[var(--text-primary)] flex items-center gap-1 transition-colors"
             >
               <X className="h-3 w-3" />
