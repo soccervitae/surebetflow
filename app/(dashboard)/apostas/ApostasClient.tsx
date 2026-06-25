@@ -13,7 +13,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet"
 import { formatCurrency } from "@/lib/utils"
 import { useToast } from "@/hooks/useToast"
-import { BookOpen, Filter, X, Plus, Calculator, CalendarIcon } from "lucide-react"
+import { BookOpen, Filter, X, Plus, Calculator, CalendarIcon, ChevronDown } from "lucide-react"
 import type { Aposta, ApostaLeg } from "@/lib/types"
 import SurebetCalculator from "@/components/SurebetCalculator"
 
@@ -34,8 +34,8 @@ export default function ApostasClient({ apostas: initialApostas, profiles }: Pro
   const [apostas, setApostas] = useState(initialApostas)
   const [filterStatus, setFilterStatus] = useState("todos")
   const [filterProfile, setFilterProfile] = useState("todos")
-  const [filterDateFrom, setFilterDateFrom] = useState("")
-  const [filterDateTo, setFilterDateTo] = useState("")
+  const [filterPeriod, setFilterPeriod] = useState<"todos" | "dia" | "semana" | "mes" | "ano" | "custom">("todos")
+  const [filterCustomDate, setFilterCustomDate] = useState("")
   const [finalizarDialog, setFinalizarDialog] = useState<Aposta | null>(null)
   const [deletarDialog, setDeletarDialog] = useState<Aposta | null>(null)
   const [showFilter, setShowFilter] = useState(false)
@@ -58,19 +58,43 @@ export default function ApostasClient({ apostas: initialApostas, profiles }: Pro
     return parseFloat(formatted.replace(/\./g, "").replace(",", ".")) || 0
   }
 
+  function getPeriodRange(): { from: Date | null; to: Date | null } {
+    const now = new Date()
+    if (filterPeriod === "dia") {
+      const from = new Date(now); from.setHours(0, 0, 0, 0)
+      const to = new Date(now); to.setHours(23, 59, 59, 999)
+      return { from, to }
+    }
+    if (filterPeriod === "semana") {
+      const from = new Date(now); from.setDate(now.getDate() - now.getDay()); from.setHours(0, 0, 0, 0)
+      const to = new Date(now); to.setHours(23, 59, 59, 999)
+      return { from, to }
+    }
+    if (filterPeriod === "mes") {
+      const from = new Date(now.getFullYear(), now.getMonth(), 1, 0, 0, 0, 0)
+      const to = new Date(now); to.setHours(23, 59, 59, 999)
+      return { from, to }
+    }
+    if (filterPeriod === "ano") {
+      const from = new Date(now.getFullYear(), 0, 1, 0, 0, 0, 0)
+      const to = new Date(now); to.setHours(23, 59, 59, 999)
+      return { from, to }
+    }
+    if (filterPeriod === "custom" && filterCustomDate) {
+      const from = new Date(filterCustomDate); from.setHours(0, 0, 0, 0)
+      const to = new Date(filterCustomDate); to.setHours(23, 59, 59, 999)
+      return { from, to }
+    }
+    return { from: null, to: null }
+  }
+
   const filtered = apostas.filter(a => {
     if (filterStatus !== "todos" && a.status !== filterStatus) return false
     if (filterProfile !== "todos" && a.profile_id !== filterProfile) return false
-    if (filterDateFrom) {
-      const from = new Date(filterDateFrom)
-      from.setHours(0, 0, 0, 0)
-      if (new Date(a.created_at) < from) return false
-    }
-    if (filterDateTo) {
-      const to = new Date(filterDateTo)
-      to.setHours(23, 59, 59, 999)
-      if (new Date(a.created_at) > to) return false
-    }
+    const { from, to } = getPeriodRange()
+    const created = new Date(a.created_at)
+    if (from && created < from) return false
+    if (to && created > to) return false
     return true
   })
 
@@ -143,12 +167,14 @@ export default function ApostasClient({ apostas: initialApostas, profiles }: Pro
 
       {/* Filters — always visible (mobile + desktop) */}
       <Card>
-        <CardContent className="p-4">
-          <div className="hidden md:flex items-center gap-2 mb-3">
+        <CardContent className="p-4 space-y-4">
+          <div className="hidden md:flex items-center gap-2">
             <Filter className="h-4 w-4 text-[var(--text-secondary)]" />
             <span className="text-sm font-medium text-[var(--text-primary)]">Filtros</span>
           </div>
-          <div className="grid grid-cols-2 sm:grid-cols-2 gap-3">
+
+          {/* Status + Perfil */}
+          <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1.5">
               <Label className="text-xs">Status</Label>
               <Select value={filterStatus} onValueChange={setFilterStatus}>
@@ -175,35 +201,55 @@ export default function ApostasClient({ apostas: initialApostas, profiles }: Pro
                 </SelectContent>
               </Select>
             </div>
-            <div className="space-y-1.5">
-              <Label className="text-xs flex items-center gap-1">
-                <CalendarIcon className="h-3 w-3" />
-                De
-              </Label>
-              <Input
-                type="date"
-                value={filterDateFrom}
-                onChange={e => setFilterDateFrom(e.target.value)}
-                className="text-xs"
-              />
-            </div>
-            <div className="space-y-1.5">
-              <Label className="text-xs flex items-center gap-1">
-                <CalendarIcon className="h-3 w-3" />
-                Até
-              </Label>
-              <Input
-                type="date"
-                value={filterDateTo}
-                onChange={e => setFilterDateTo(e.target.value)}
-                className="text-xs"
-              />
-            </div>
           </div>
-          {(filterStatus !== "todos" || filterProfile !== "todos" || filterDateFrom || filterDateTo) && (
+
+          {/* Period pills */}
+          <div className="space-y-2">
+            <Label className="text-xs flex items-center gap-1">
+              <CalendarIcon className="h-3 w-3" />
+              Período
+            </Label>
+            <div className="flex flex-wrap gap-2">
+              {(["todos", "dia", "semana", "mes", "ano"] as const).map(p => (
+                <button
+                  key={p}
+                  onClick={() => setFilterPeriod(p)}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors border ${
+                    filterPeriod === p
+                      ? "bg-[#1e3a8a] border-[#1e3a8a] text-white"
+                      : "border-[var(--border)] text-[var(--text-secondary)] hover:bg-[var(--bg-elevated)]"
+                  }`}
+                >
+                  {{ todos: "Todos", dia: "Hoje", semana: "Semana", mes: "Mês", ano: "Ano" }[p]}
+                </button>
+              ))}
+              <button
+                onClick={() => setFilterPeriod("custom")}
+                className={`flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors border ${
+                  filterPeriod === "custom"
+                    ? "bg-[#1e3a8a] border-[#1e3a8a] text-white"
+                    : "border-[var(--border)] text-[var(--text-secondary)] hover:bg-[var(--bg-elevated)]"
+                }`}
+              >
+                <CalendarIcon className="h-3 w-3" />
+                Data específica
+              </button>
+            </div>
+
+            {filterPeriod === "custom" && (
+              <Input
+                type="date"
+                value={filterCustomDate}
+                onChange={e => setFilterCustomDate(e.target.value)}
+                className="text-sm mt-1 max-w-[180px]"
+              />
+            )}
+          </div>
+
+          {(filterStatus !== "todos" || filterProfile !== "todos" || filterPeriod !== "todos") && (
             <button
-              onClick={() => { setFilterStatus("todos"); setFilterProfile("todos"); setFilterDateFrom(""); setFilterDateTo("") }}
-              className="mt-3 text-xs text-[var(--text-secondary)] hover:text-[var(--text-primary)] flex items-center gap-1 transition-colors"
+              onClick={() => { setFilterStatus("todos"); setFilterProfile("todos"); setFilterPeriod("todos"); setFilterCustomDate("") }}
+              className="text-xs text-[var(--text-secondary)] hover:text-[var(--text-primary)] flex items-center gap-1 transition-colors"
             >
               <X className="h-3 w-3" />
               Limpar filtros
