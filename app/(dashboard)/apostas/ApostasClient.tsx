@@ -10,10 +10,12 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet"
 import { formatCurrency } from "@/lib/utils"
 import { useToast } from "@/hooks/useToast"
-import { BookOpen, Filter, X } from "lucide-react"
+import { BookOpen, Filter, X, Plus } from "lucide-react"
 import type { Aposta, ApostaLeg } from "@/lib/types"
+import NovaApostaForm from "./NovaApostaForm"
 
 interface Props {
   apostas: (Aposta & { profile?: { nome: string; sobrenome: string; apelido?: string | null } })[]
@@ -35,6 +37,8 @@ export default function ApostasClient({ apostas: initialApostas, profiles }: Pro
   const [finalizarDialog, setFinalizarDialog] = useState<Aposta | null>(null)
   const [deletarDialog, setDeletarDialog] = useState<Aposta | null>(null)
   const [showFilter, setShowFilter] = useState(false)
+  const [novaSheet, setNovaSheet] = useState(false)   // mobile
+  const [novaModal, setNovaModal] = useState(false)   // desktop
   const [resultadoReal, setResultadoReal] = useState("")
   const [finalizando, setFinalizando] = useState(false)
   const [deletando, setDeletando] = useState(false)
@@ -107,17 +111,34 @@ export default function ApostasClient({ apostas: initialApostas, profiles }: Pro
           <h1 className="text-2xl font-bold text-[var(--text-primary)]">Apostas</h1>
           <p className="text-[var(--text-secondary)] text-sm mt-1">Histórico completo de todas as suas apostas</p>
         </div>
-        <button
-          onClick={() => setShowFilter(v => !v)}
-          className={`md:hidden flex items-center gap-1.5 px-3 py-2 rounded-xl border text-sm font-medium transition-colors ${
-            showFilter
-              ? "bg-[#1e3a8a]/10 border-[#1e3a8a]/30 text-[var(--accent-text)]"
-              : "border-[var(--border)] text-[var(--text-secondary)] hover:bg-[var(--bg-elevated)]"
-          }`}
-        >
-          {showFilter ? <X className="h-4 w-4" /> : <Filter className="h-4 w-4" />}
-          Filtrar
-        </button>
+        <div className="flex items-center gap-2">
+          {/* Nova — mobile opens Sheet, desktop opens Modal */}
+          <button
+            onClick={() => setNovaSheet(true)}
+            className="md:hidden flex items-center gap-1.5 px-3 py-2 rounded-xl bg-[#1e3a8a] text-white text-sm font-medium"
+          >
+            <Plus className="h-4 w-4" />
+            Nova
+          </button>
+          <button
+            onClick={() => setNovaModal(true)}
+            className="hidden md:flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#1e3a8a] hover:bg-[#1e40af] text-white text-sm font-medium transition-colors"
+          >
+            <Plus className="h-4 w-4" />
+            Nova aposta
+          </button>
+          <button
+            onClick={() => setShowFilter(v => !v)}
+            className={`md:hidden flex items-center gap-1.5 px-3 py-2 rounded-xl border text-sm font-medium transition-colors ${
+              showFilter
+                ? "bg-[#1e3a8a]/10 border-[#1e3a8a]/30 text-[var(--accent-text)]"
+                : "border-[var(--border)] text-[var(--text-secondary)] hover:bg-[var(--bg-elevated)]"
+            }`}
+          >
+            {showFilter ? <X className="h-4 w-4" /> : <Filter className="h-4 w-4" />}
+            Filtrar
+          </button>
+        </div>
       </div>
 
       {/* Filters — always visible on desktop, toggle on mobile */}
@@ -266,6 +287,36 @@ export default function ApostasClient({ apostas: initialApostas, profiles }: Pro
           })}
         </div>
       )}
+
+      {/* Nova aposta — Sheet mobile */}
+      <Sheet open={novaSheet} onOpenChange={setNovaSheet}>
+        <SheetContent side="bottom" className="h-[92vh] flex flex-col p-0 rounded-t-2xl">
+          <SheetHeader className="px-5 pt-5 pb-3 border-b border-[var(--border)] flex-shrink-0">
+            <SheetTitle>Nova aposta</SheetTitle>
+          </SheetHeader>
+          <div className="flex-1 overflow-y-auto px-5 py-4">
+            <NovaApostaForm
+              profiles={profiles}
+              onCreated={a => { setApostas(prev => [a, ...prev]); setNovaSheet(false) }}
+              onClose={() => setNovaSheet(false)}
+            />
+          </div>
+        </SheetContent>
+      </Sheet>
+
+      {/* Nova aposta — Modal desktop */}
+      <Dialog open={novaModal} onOpenChange={setNovaModal}>
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Nova aposta</DialogTitle>
+          </DialogHeader>
+          <NovaApostaForm
+            profiles={profiles}
+            onCreated={a => { setApostas(prev => [a, ...prev]); setNovaModal(false) }}
+            onClose={() => setNovaModal(false)}
+          />
+        </DialogContent>
+      </Dialog>
 
       <Dialog open={!!deletarDialog} onOpenChange={open => !open && setDeletarDialog(null)}>
         <DialogContent>
