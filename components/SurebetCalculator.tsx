@@ -573,7 +573,7 @@ export default function SurebetCalculator({ profiles, defaultProfileId, onSaved 
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <div className="space-y-2">
               <Label>Esporte</Label>
               <select
