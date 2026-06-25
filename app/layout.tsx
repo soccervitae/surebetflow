@@ -3,6 +3,7 @@ import { Inter, Space_Grotesk, JetBrains_Mono } from "next/font/google"
 import "./globals.css"
 import { Toaster } from "@/components/ui/toaster"
 import { ThemeProvider } from "@/components/ThemeProvider"
+import CookieBanner from "@/components/CookieBanner"
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" })
 const spaceGrotesk = Space_Grotesk({ subsets: ["latin"], variable: "--font-display", weight: ["400","500","600","700"] })
@@ -78,6 +79,7 @@ export default function RootLayout({
         <ThemeProvider>
           {children}
           <Toaster />
+          <CookieBanner />
         </ThemeProvider>
       </body>
     </html>
