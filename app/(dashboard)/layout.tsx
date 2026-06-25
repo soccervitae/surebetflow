@@ -97,12 +97,12 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       {/* Sidebar */}
       <aside className={cn(
         "hidden md:flex flex-col fixed top-0 left-0 h-full z-20 transition-all duration-200",
-        "bg-[var(--bg-surface)] border-r border-[var(--border)]",
+        "bg-[#0b1631] border-r border-white/5",
         sidebarW
       )}>
         {/* Logo */}
         <div className={cn(
-          "flex items-center gap-3 px-4 py-5 border-b border-[var(--border)]",
+          "flex items-center gap-3 px-4 py-5 border-b border-white/5",
           collapsed && "justify-center px-0"
         )}>
           {collapsed
@@ -114,7 +114,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         {/* Nav */}
         <nav className="flex-1 px-2 py-4 space-y-0.5 overflow-y-auto">
           {!collapsed && (
-            <p className="text-[10px] font-semibold text-[var(--text-muted)] uppercase tracking-widest px-3 pb-2">
+            <p className="text-[10px] font-semibold text-white/30 uppercase tracking-widest px-3 pb-2">
               Menu Principal
             </p>
           )}
@@ -130,8 +130,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                   "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all",
                   collapsed && "justify-center px-0",
                   active
-                    ? "bg-[#1e3a8a]/15 text-[#1e3a8a] border border-[#1e3a8a]/20"
-                    : "text-[var(--text-secondary)] hover:bg-[var(--bg-elevated)] hover:text-[var(--text-primary)]"
+                    ? "bg-white/10 text-white border border-white/10"
+                    : "text-white/50 hover:bg-white/5 hover:text-white/90"
                 )}
               >
                 <span className="relative flex-shrink-0">
@@ -156,14 +156,14 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         </nav>
 
         {/* Bottom */}
-        <div className="border-t border-[var(--border)] p-2 space-y-1">
+        <div className="border-t border-white/5 p-2 space-y-1">
           {!collapsed && (
-            <p className="text-[10px] font-semibold text-[var(--text-muted)] uppercase tracking-widest px-3 pb-1">
+            <p className="text-[10px] font-semibold text-white/30 uppercase tracking-widest px-3 pb-1">
               Sessão Segura
             </p>
           )}
           <div className={cn(
-            "flex items-center gap-3 px-3 py-2 rounded-lg bg-[var(--bg-elevated)]",
+            "flex items-center gap-3 px-3 py-2 rounded-lg bg-white/5",
             collapsed && "justify-center px-0"
           )}>
             <div className="w-7 h-7 bg-[#1e3a8a] rounded-full flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
@@ -171,8 +171,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             </div>
             {!collapsed && (
               <div className="flex-1 min-w-0">
-                <p className="text-xs font-medium text-[var(--text-primary)] truncate">{userName}</p>
-                <p className="text-[10px] text-[#1e3a8a] font-semibold">APOSTADOR</p>
+                <p className="text-xs font-medium text-white truncate">{userName}</p>
+                <p className="text-[10px] text-[#5b7ec9] font-semibold">APOSTADOR</p>
               </div>
             )}
           </div>
@@ -180,7 +180,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             onClick={() => setConfirmLogout(true)}
             title={collapsed ? "Sair" : undefined}
             className={cn(
-              "flex items-center gap-3 px-3 py-2 w-full rounded-lg text-sm font-medium text-[var(--text-secondary)] hover:bg-[var(--bg-elevated)] hover:text-[var(--text-primary)] transition-colors",
+              "flex items-center gap-3 px-3 py-2 w-full rounded-lg text-sm font-medium text-white/50 hover:bg-white/5 hover:text-white/90 transition-colors",
               collapsed && "justify-center px-0"
             )}
           >
@@ -190,7 +190,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           <button
             onClick={() => setCollapsed(v => !v)}
             className={cn(
-              "flex items-center gap-3 px-3 py-2 w-full rounded-lg text-sm text-[var(--text-secondary)] hover:bg-[var(--bg-elevated)] hover:text-[var(--text-primary)] transition-colors",
+              "flex items-center gap-3 px-3 py-2 w-full rounded-lg text-sm text-white/50 hover:bg-white/5 hover:text-white/90 transition-colors",
               collapsed && "justify-center px-0"
             )}
           >
