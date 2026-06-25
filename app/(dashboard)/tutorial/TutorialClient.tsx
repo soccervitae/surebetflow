@@ -795,7 +795,7 @@ export default function TutorialClient() {
       <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
         <SheetContent
           side="bottom"
-          className="h-[90vh] flex flex-col p-0 rounded-t-2xl"
+          className="h-[80vh] flex flex-col p-0 rounded-t-2xl"
           onTouchStart={handleTouchStart}
           onTouchEnd={handleTouchEnd}
         >
