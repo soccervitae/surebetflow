@@ -18,10 +18,9 @@ const navItems = [
   { href: "/dashboard", icon: Home, label: "Dashboard" },
   { href: "/perfis", icon: Users, label: "Perfis" },
   { href: "/financeiro", icon: Wallet, label: "Financeiro" },
-  { href: "/assinatura", icon: CreditCard, label: "Assinatura" },
-  { href: "/suporte", icon: MessageCircle, label: "Suporte" },
   { href: "/tutorial", icon: BookOpen, label: "Tutorial" },
-  { href: "/configuracoes", icon: Settings, label: "Configurações" },
+  { href: "/suporte", icon: MessageCircle, label: "Suporte" },
+  { href: "/configuracoes", icon: Settings, label: "Minha Conta" },
 ]
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
