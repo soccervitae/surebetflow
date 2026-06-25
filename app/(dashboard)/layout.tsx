@@ -8,7 +8,7 @@ import { useTheme } from "@/components/ThemeProvider"
 import {
   Home, Users, Wallet, CreditCard, Settings,
   LogOut, Bell, ChevronLeft, ChevronRight,
-  Circle, Sun, Moon, MessageCircle, BookOpen
+  Circle, Sun, Moon, MessageCircle, BookOpen, ClipboardList
 } from "lucide-react"
 import Logo, { LogoIcon } from "@/components/Logo"
 import Image from "next/image"
@@ -17,6 +17,7 @@ import { cn } from "@/lib/utils"
 const navItems = [
   { href: "/dashboard", icon: Home, label: "Dashboard" },
   { href: "/perfis", icon: Users, label: "Perfis" },
+  { href: "/apostas", icon: ClipboardList, label: "Apostas" },
   { href: "/financeiro", icon: Wallet, label: "Financeiro" },
   { href: "/tutorial", icon: BookOpen, label: "Tutorial" },
   { href: "/suporte", icon: MessageCircle, label: "Suporte" },
