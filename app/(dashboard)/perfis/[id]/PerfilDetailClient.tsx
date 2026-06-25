@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useRef } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { createClient } from "@/lib/supabase/client"
@@ -281,6 +281,22 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
   }
 
   const [activeTab, setActiveTab] = useState("dashboard")
+  const TABS = ["dashboard", "casas", "financeiro"]
+
+  function changeTab(v: string) {
+    setActiveTab(v)
+    if (v === "financeiro" && !movLoaded) loadMovimentacoes()
+  }
+
+  const touchStartX = useRef(0)
+  function handleTouchStart(e: React.TouchEvent) { touchStartX.current = e.touches[0].clientX }
+  function handleTouchEnd(e: React.TouchEvent) {
+    const dx = e.changedTouches[0].clientX - touchStartX.current
+    if (Math.abs(dx) < 50) return
+    const idx = TABS.indexOf(activeTab)
+    if (dx < 0 && idx < TABS.length - 1) changeTab(TABS[idx + 1])
+    if (dx > 0 && idx > 0) changeTab(TABS[idx - 1])
+  }
 
   return (
     <div className="space-y-6">
@@ -344,7 +360,7 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
         </div>
       </div>
 
-      <Tabs value={activeTab} onValueChange={v => { setActiveTab(v); if (v === "financeiro" && !movLoaded) loadMovimentacoes() }}>
+      <Tabs value={activeTab} onValueChange={changeTab}>
         {/* Mobile: scrollable underline tabs */}
         <div className="-mx-4 md:hidden">
           <div className="flex overflow-x-auto scrollbar-hide px-4 border-b border-[var(--border)]">
@@ -355,7 +371,7 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
             ].map(tab => (
               <button
                 key={tab.value}
-                onClick={() => { setActiveTab(tab.value); if (tab.value === "financeiro" && !movLoaded) loadMovimentacoes() }}
+                onClick={() => changeTab(tab.value)}
                 className={`whitespace-nowrap flex-shrink-0 px-4 py-3 text-sm font-medium border-b-2 -mb-px transition-colors ${
                   activeTab === tab.value
                     ? "border-[#1e3a8a] text-[var(--accent-text)]"
@@ -378,12 +394,15 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
               key={tab.value}
               size="sm"
               variant={activeTab === tab.value ? "default" : "outline"}
-              onClick={() => { setActiveTab(tab.value); if (tab.value === "financeiro" && !movLoaded) loadMovimentacoes() }}
+              onClick={() => changeTab(tab.value)}
             >
               {tab.label}
             </Button>
           ))}
         </div>
+
+        {/* Swipe wrapper (mobile) */}
+        <div onTouchStart={handleTouchStart} onTouchEnd={handleTouchEnd}>
 
         {/* Dashboard Tab */}
         <TabsContent value="dashboard" className="space-y-6">
@@ -773,6 +792,7 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
           )}
         </TabsContent>
 
+        </div> {/* end swipe wrapper */}
       </Tabs>
 
       {/* Confirmar Ativo/Inativo Dialog */}
