@@ -266,11 +266,12 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       {/* Bottom nav mobile */}
       <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-[var(--bg-surface)] border-t border-[var(--border)] z-20 flex">
         {([
-          { href: "/dashboard",   icon: Home,       label: "Dashboard" },
-          { href: "/perfis",      icon: Users,      label: "Perfis" },
-          { href: "/financeiro",  icon: Wallet,     label: "Financeiro" },
-          { href: "/tutorial",    icon: BookOpen,   label: "Tutorial" },
-          { href: "/assinatura",  icon: CreditCard, label: "Assinatura" },
+          { href: "/dashboard",     icon: Home,          label: "Dashboard" },
+          { href: "/perfis",        icon: Users,         label: "Perfis" },
+          { href: "/apostas",       icon: ClipboardList, label: "Apostas" },
+          { href: "/financeiro",    icon: Wallet,        label: "Financeiro" },
+          { href: "/tutorial",      icon: BookOpen,      label: "Tutorial" },
+          { href: "/configuracoes", icon: Settings,      label: "Minha Conta" },
         ] as { href: string; icon: React.ElementType; label: string }[]).map(({ href, icon: Icon, label }) => {
           const active = pathname === href || (href !== "/" && pathname.startsWith(href))
           return (
