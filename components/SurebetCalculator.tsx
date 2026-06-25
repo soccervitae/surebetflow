@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, useCallback } from "react"
+import { useState, useEffect, useCallback, useRef } from "react"
 import { createClient } from "@/lib/supabase/client"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -9,7 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { formatCurrency } from "@/lib/utils"
 import { useToast } from "@/hooks/useToast"
-import { Calculator, Check, X, Loader2, ClipboardPaste, Sparkles } from "lucide-react"
+import { Calculator, Check, X, Loader2, ClipboardPaste, Sparkles, ImageIcon, ChevronLeft, ChevronRight } from "lucide-react"
 import type { Profile, ProfileBet } from "@/lib/types"
 
 interface Leg {
@@ -32,6 +32,20 @@ interface ParsedLeg {
   bookmakerName: string
   market: string
   odd: string
+}
+
+interface AiLeg {
+  bookmaker: string
+  mercado: string
+  odd: number
+}
+
+interface AiSurebet {
+  evento: string
+  esporte: string
+  tipo: "2-way" | "3-way"
+  roi: number | null
+  legs: AiLeg[]
 }
 
 function parseSurebetText(text: string): { event: string; sport: string; legs: ParsedLeg[] } {
@@ -123,6 +137,11 @@ export default function SurebetCalculator({ profiles, defaultProfileId, onSaved 
   ])
   const [pasteText, setPasteText] = useState("")
   const [showPaste, setShowPaste] = useState(false)
+  const [aiMode, setAiMode] = useState<"text" | "image">("text")
+  const [aiLoading, setAiLoading] = useState(false)
+  const [aiSurebets, setAiSurebets] = useState<AiSurebet[] | null>(null)
+  const [aiSelectedIdx, setAiSelectedIdx] = useState(0)
+  const imageInputRef = useRef<HTMLInputElement>(null)
   const [userStakes, setUserStakes] = useState<(number | null)[]>([null, null, null])
   const { toast } = useToast()
   const supabase = createClient()
@@ -180,6 +199,80 @@ export default function SurebetCalculator({ profiles, defaultProfileId, onSaved 
 
   function updateLeg(index: number, field: keyof Leg, value: string) {
     setLegs(prev => prev.map((leg, i) => i === index ? { ...leg, [field]: value } : leg))
+  }
+
+  function applyAiSurebet(sb: AiSurebet) {
+    if (sb.evento) setEvento(sb.evento)
+    if (sb.esporte) setEsporte(sb.esporte)
+    const newTipo: "2-way" | "3-way" = sb.tipo === "3-way" ? "3-way" : "2-way"
+    setTipo(newTipo)
+
+    const allProfileBets = Object.values(profileBets).flat() as (ProfileBet & { bet?: { nome: string } })[]
+    const newLegs = sb.legs.map(leg => {
+      const searchName = normalizeName(leg.bookmaker ?? "")
+      const matched = allProfileBets.find(pb => {
+        const betNome = normalizeName(pb.bet?.nome ?? "")
+        return betNome && (betNome.includes(searchName) || searchName.includes(betNome))
+      })
+      return {
+        profileBetId: matched?.id ?? "",
+        resultadoApostado: leg.mercado ?? "",
+        odd: String(leg.odd ?? ""),
+      }
+    })
+    setLegs(newLegs)
+    setShowPaste(false)
+    setPasteText("")
+    setAiSurebets(null)
+
+    const unmatched = sb.legs.filter((_, i) => !newLegs[i].profileBetId).map(l => l.bookmaker).filter(Boolean)
+    if (unmatched.length > 0) {
+      toast({ title: `Preenchido! Selecione manualmente: ${unmatched.join(", ")}`, variant: "destructive" })
+    } else {
+      toast({ title: "Aposta preenchida automaticamente!" })
+    }
+  }
+
+  async function handleAiParse(text?: string, imageBase64?: string, imageMediaType?: string) {
+    setAiLoading(true)
+    try {
+      const res = await fetch("/api/ai/parse-surebet", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text, imageBase64, imageMediaType }),
+      })
+      const data = await res.json()
+      if (!res.ok || data.error) throw new Error(data.error ?? "Erro da IA")
+      const surebets: AiSurebet[] = data.surebets ?? []
+      if (surebets.length === 0) {
+        toast({ title: "Nenhuma surebet identificada", variant: "destructive" })
+        return
+      }
+      if (surebets.length === 1) {
+        applyAiSurebet(surebets[0])
+      } else {
+        setAiSurebets(surebets)
+        setAiSelectedIdx(0)
+      }
+    } catch (err: unknown) {
+      toast({ title: (err as Error)?.message ?? "Erro ao analisar", variant: "destructive" })
+    } finally {
+      setAiLoading(false)
+    }
+  }
+
+  async function handleImageUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    if (!file) return
+    const reader = new FileReader()
+    reader.onload = async () => {
+      const dataUrl = reader.result as string
+      const base64 = dataUrl.split(",")[1]
+      const mediaType = file.type || "image/jpeg"
+      await handleAiParse(undefined, base64, mediaType)
+    }
+    reader.readAsDataURL(file)
+    e.target.value = ""
   }
 
   function handleParsePaste() {
@@ -325,19 +418,122 @@ export default function SurebetCalculator({ profiles, defaultProfileId, onSaved 
   return (
     <div className="space-y-4">
 
-      {/* Paste block */}
+      {/* AI Import block */}
       <Card className="border-dashed border-[#1e3a8a]/40 bg-[#1e3a8a]/5">
         <CardContent className="p-4">
-          {!showPaste ? (
-            <button
-              type="button"
-              onClick={() => setShowPaste(true)}
-              className="w-full flex items-center justify-center gap-3 py-2 text-sm text-[#1e3a8a] font-medium hover:opacity-80 transition-opacity"
-            >
-              <ClipboardPaste className="h-4 w-4" />
-              Colar dados da surebet para preenchimento automático
-            </button>
+          {/* Selection picker when multiple surebets found */}
+          {aiSurebets && aiSurebets.length > 1 ? (
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Sparkles className="h-4 w-4 text-[#1e3a8a]" />
+                  <p className="text-sm font-semibold text-[var(--text-primary)]">
+                    {aiSurebets.length} surebets encontradas — escolha uma
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setAiSurebets(null)}
+                  className="text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors"
+                >
+                  <X className="h-4 w-4" />
+                </button>
+              </div>
+
+              <div className="space-y-2 max-h-60 overflow-y-auto pr-1">
+                {aiSurebets.map((sb, idx) => (
+                  <button
+                    key={idx}
+                    type="button"
+                    onClick={() => setAiSelectedIdx(idx)}
+                    className={`w-full text-left p-3 rounded-xl border transition-all ${
+                      aiSelectedIdx === idx
+                        ? "border-[#1e3a8a] bg-[#1e3a8a]/10"
+                        : "border-[var(--border)] bg-[var(--bg-surface)] hover:border-[#1e3a8a]/40"
+                    }`}
+                  >
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium text-[var(--text-primary)] truncate">{sb.evento || "Evento desconhecido"}</p>
+                        <p className="text-xs text-[var(--text-secondary)] mt-0.5">
+                          {sb.esporte} · {sb.tipo} · {sb.legs.length} casas
+                          {sb.roi ? ` · ROI ${sb.roi.toFixed(1)}%` : ""}
+                        </p>
+                        <p className="text-xs text-[var(--text-muted)] mt-0.5 truncate">
+                          {sb.legs.map(l => l.bookmaker).join(" × ")}
+                        </p>
+                      </div>
+                      {aiSelectedIdx === idx && (
+                        <div className="w-5 h-5 rounded-full bg-[#1e3a8a] flex items-center justify-center flex-shrink-0 mt-0.5">
+                          <Check className="h-3 w-3 text-white" />
+                        </div>
+                      )}
+                    </div>
+                  </button>
+                ))}
+              </div>
+
+              <div className="flex items-center gap-2 pt-1">
+                <button
+                  type="button"
+                  onClick={() => setAiSelectedIdx(i => Math.max(0, i - 1))}
+                  disabled={aiSelectedIdx === 0}
+                  className="p-1.5 rounded-lg border border-[var(--border)] text-[var(--text-secondary)] disabled:opacity-30 hover:bg-[var(--bg-elevated)] transition-colors"
+                >
+                  <ChevronLeft className="h-4 w-4" />
+                </button>
+                <span className="text-xs text-[var(--text-secondary)] flex-1 text-center">
+                  {aiSelectedIdx + 1} de {aiSurebets.length}
+                </span>
+                <button
+                  type="button"
+                  onClick={() => setAiSelectedIdx(i => Math.min(aiSurebets.length - 1, i + 1))}
+                  disabled={aiSelectedIdx === aiSurebets.length - 1}
+                  className="p-1.5 rounded-lg border border-[var(--border)] text-[var(--text-secondary)] disabled:opacity-30 hover:bg-[var(--bg-elevated)] transition-colors"
+                >
+                  <ChevronRight className="h-4 w-4" />
+                </button>
+                <Button
+                  type="button"
+                  onClick={() => applyAiSurebet(aiSurebets[aiSelectedIdx])}
+                  className="flex-1 bg-[#1e3a8a] hover:bg-[#1e40af] text-white"
+                >
+                  Usar esta surebet
+                </Button>
+              </div>
+            </div>
+          ) : !showPaste ? (
+            /* Collapsed — two action buttons */
+            <div className="flex items-center gap-2">
+              <Sparkles className="h-4 w-4 text-[#1e3a8a] flex-shrink-0" />
+              <span className="text-sm text-[#1e3a8a] font-medium flex-1">Preencher com IA</span>
+              <button
+                type="button"
+                onClick={() => { setAiMode("text"); setShowPaste(true) }}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-[#1e3a8a]/30 text-[#1e3a8a] text-xs font-medium hover:bg-[#1e3a8a]/10 transition-colors"
+              >
+                <ClipboardPaste className="h-3.5 w-3.5" />
+                Colar texto
+              </button>
+              <button
+                type="button"
+                onClick={() => imageInputRef.current?.click()}
+                disabled={aiLoading}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-[#1e3a8a]/30 text-[#1e3a8a] text-xs font-medium hover:bg-[#1e3a8a]/10 transition-colors disabled:opacity-50"
+              >
+                {aiLoading ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <ImageIcon className="h-3.5 w-3.5" />}
+                {aiLoading ? "Lendo..." : "Imagem"}
+              </button>
+              <input
+                ref={imageInputRef}
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={handleImageUpload}
+              />
+            </div>
           ) : (
+            /* Text paste panel */
             <div className="space-y-3">
               <div className="flex items-center gap-2">
                 <Sparkles className="h-4 w-4 text-[#1e3a8a]" />
@@ -346,18 +542,18 @@ export default function SurebetCalculator({ profiles, defaultProfileId, onSaved 
               <textarea
                 value={pasteText}
                 onChange={e => setPasteText(e.target.value)}
-                placeholder={`Cole aqui. Exemplo:\n6,07%\n1 dia\n\nBetano (BR)\nFutebol\t23/06\n14:00\tPortugal – Uzbequistão\n...\t Acima 33.5 - tackles\n5.40`}
-                className="w-full h-44 p-3 text-sm rounded-lg border border-[var(--border)] bg-[var(--bg-surface)] text-[var(--text-primary)] placeholder:text-[var(--text-muted)] resize-none focus:outline-none focus:ring-1 focus:ring-[#1e3a8a] font-mono"
+                placeholder={`Cole aqui o texto copiado do site de surebets...`}
+                className="w-full h-36 p-3 text-sm rounded-lg border border-[var(--border)] bg-[var(--bg-surface)] text-[var(--text-primary)] placeholder:text-[var(--text-muted)] resize-none focus:outline-none focus:ring-1 focus:ring-[#1e3a8a] font-mono"
               />
               <div className="flex gap-2">
                 <Button
                   type="button"
-                  onClick={handleParsePaste}
-                  disabled={!pasteText.trim()}
+                  onClick={() => handleAiParse(pasteText)}
+                  disabled={!pasteText.trim() || aiLoading}
                   className="flex-1 bg-[#1e3a8a] hover:bg-[#1e40af] text-white"
                 >
-                  <Sparkles className="h-4 w-4 mr-2" />
-                  Analisar e preencher automaticamente
+                  {aiLoading ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Sparkles className="h-4 w-4 mr-2" />}
+                  {aiLoading ? "Analisando..." : "Analisar com IA"}
                 </Button>
                 <Button type="button" variant="outline" onClick={() => { setShowPaste(false); setPasteText("") }}>
                   Cancelar
