@@ -361,9 +361,9 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
       </div>
 
       <Tabs value={activeTab} onValueChange={changeTab}>
-        {/* Mobile: scrollable underline tabs */}
+        {/* Mobile: full-width centered tabs */}
         <div className="-mx-4 md:hidden">
-          <div className="flex overflow-x-auto scrollbar-hide px-4 border-b border-[var(--border)]">
+          <div className="flex border-b border-[var(--border)]">
             {[
               { value: "dashboard", label: "Dashboard" },
               { value: "casas", label: "Bets" },
@@ -372,7 +372,7 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
               <button
                 key={tab.value}
                 onClick={() => changeTab(tab.value)}
-                className={`whitespace-nowrap flex-shrink-0 px-4 py-3 text-sm font-medium border-b-2 -mb-px transition-colors ${
+                className={`flex-1 py-3 text-sm font-medium border-b-2 -mb-px transition-colors text-center ${
                   activeTab === tab.value
                     ? "border-[#1e3a8a] text-[var(--accent-text)]"
                     : "border-transparent text-[var(--text-secondary)]"
