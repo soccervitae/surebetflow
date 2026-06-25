@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useRef } from "react"
 import {
   BookOpen, Home, Users, Calculator, DollarSign,
   Settings, HelpCircle, ChevronRight, CheckCircle,
@@ -194,6 +194,16 @@ function MockShell({ url, children }: { url: string; children: React.ReactNode }
 
 export default function TutorialClient() {
   const [active, setActive] = useState("inicio")
+  const IDS = SECTIONS.map(s => s.id)
+  const touchStartX = useRef(0)
+  function handleTouchStart(e: React.TouchEvent) { touchStartX.current = e.touches[0].clientX }
+  function handleTouchEnd(e: React.TouchEvent) {
+    const dx = e.changedTouches[0].clientX - touchStartX.current
+    if (Math.abs(dx) < 50) return
+    const idx = IDS.indexOf(active)
+    if (dx < 0 && idx < IDS.length - 1) setActive(IDS[idx + 1])
+    if (dx > 0 && idx > 0) setActive(IDS[idx - 1])
+  }
 
   return (
     <div className="max-w-5xl mx-auto">
@@ -228,28 +238,27 @@ export default function TutorialClient() {
         </div>
       </div>
 
-      {/* Mobile: section cards */}
-      <div className="md:hidden grid grid-cols-2 gap-3 mb-6">
-        {SECTIONS.map(({ id, label, icon: Icon }) => {
-          const isActive = active === id
-          return (
+      {/* Mobile: scrollable tabs */}
+      <div className="-mx-4 md:hidden mb-6">
+        <div className="flex overflow-x-auto scrollbar-hide border-b border-[var(--border)]">
+          {SECTIONS.map(({ id, label, icon: Icon }) => (
             <button
               key={id}
               onClick={() => setActive(id)}
-              className={`flex flex-col items-center gap-2 p-4 rounded-xl border text-sm font-medium transition-all ${
-                isActive
-                  ? "border-[#1e3a8a]/40 bg-[#1e3a8a]/10 text-[var(--accent-text)]"
-                  : "border-[var(--border)] bg-[var(--bg-surface)] text-[var(--text-secondary)]"
+              className={`flex items-center gap-1.5 px-4 py-2.5 text-sm font-medium whitespace-nowrap flex-shrink-0 border-b-2 -mb-px transition-colors ${
+                active === id
+                  ? "border-[#1e3a8a] text-[var(--accent-text)]"
+                  : "border-transparent text-[var(--text-secondary)]"
               }`}
             >
-              <Icon className="w-5 h-5" />
-              <span>{label}</span>
+              <Icon className="w-3.5 h-3.5 shrink-0" />
+              {label}
             </button>
-          )
-        })}
+          ))}
+        </div>
       </div>
 
-      <div>
+      <div onTouchStart={handleTouchStart} onTouchEnd={handleTouchEnd}>
         {/* Content (shared mobile + desktop) */}
         <div className="space-y-8 overflow-hidden">
 
