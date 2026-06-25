@@ -206,11 +206,22 @@ export default function ConfiguracoesPage() {
   const DeviceIcon = device?.icone === "smartphone" ? Smartphone : Monitor
   const isDark = theme === "dark"
 
+  const TABS = ["conta", "assinatura", "configuracoes"] as const
   const tabs = [
-    { key: "conta" as const,         label: "Minha Conta",   icon: User },
-    { key: "assinatura" as const,    label: "Assinatura",    icon: CreditCard },
+    { key: "conta" as const,          label: "Minha Conta",   icon: User },
+    { key: "assinatura" as const,     label: "Assinatura",    icon: CreditCard },
     { key: "configuracoes" as const,  label: "Configurações", icon: Settings },
   ]
+
+  const touchStartX = useRef(0)
+  function handleTouchStart(e: React.TouchEvent) { touchStartX.current = e.touches[0].clientX }
+  function handleTouchEnd(e: React.TouchEvent) {
+    const dx = e.changedTouches[0].clientX - touchStartX.current
+    if (Math.abs(dx) < 50) return
+    const idx = TABS.indexOf(tab)
+    if (dx < 0 && idx < TABS.length - 1) setTab(TABS[idx + 1])
+    if (dx > 0 && idx > 0) setTab(TABS[idx - 1])
+  }
 
   return (
     <div className="max-w-2xl mx-auto space-y-6 p-4 md:p-6">
@@ -224,8 +235,26 @@ export default function ConfiguracoesPage() {
         </div>
       </div>
 
-      {/* Tabs */}
-      <div className="flex gap-1 bg-[var(--bg-elevated)] p-1 rounded-xl">
+      {/* Tabs — mobile: full-width border-b; desktop: pills */}
+      <div className="-mx-4 md:mx-0 md:hidden">
+        <div className="flex border-b border-[var(--border)]">
+          {tabs.map(({ key, label, icon: Icon }) => (
+            <button
+              key={key}
+              onClick={() => setTab(key)}
+              className={`flex-1 flex items-center justify-center gap-1.5 py-3 text-sm font-medium border-b-2 -mb-px transition-colors ${
+                tab === key
+                  ? "border-[#1e3a8a] text-[var(--accent-text)]"
+                  : "border-transparent text-[var(--text-secondary)]"
+              }`}
+            >
+              <Icon className="w-4 h-4 flex-shrink-0" />
+              <span>{label}</span>
+            </button>
+          ))}
+        </div>
+      </div>
+      <div className="hidden md:flex gap-1 bg-[var(--bg-elevated)] p-1 rounded-xl">
         {tabs.map(({ key, label, icon: Icon }) => (
           <button
             key={key}
@@ -241,6 +270,9 @@ export default function ConfiguracoesPage() {
           </button>
         ))}
       </div>
+
+      {/* Swipe wrapper */}
+      <div onTouchStart={handleTouchStart} onTouchEnd={handleTouchEnd}>
 
       {/* ── ABA: MINHA CONTA ── */}
       {tab === "conta" && (
@@ -643,6 +675,8 @@ export default function ConfiguracoesPage() {
           </Card>
         </>
       )}
+
+      </div> {/* end swipe wrapper */}
 
       <Dialog open={logoutAllOpen} onOpenChange={setLogoutAllOpen}>
         <DialogContent>
