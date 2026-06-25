@@ -795,42 +795,29 @@ export default function TutorialClient() {
       <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
         <SheetContent
           side="bottom"
-          className="h-[80vh] flex flex-col p-0 rounded-t-2xl"
+          className="h-[80vh] flex flex-col p-0 rounded-t-2xl [&>button]:hidden"
           onTouchStart={handleTouchStart}
           onTouchEnd={handleTouchEnd}
         >
-          {/* Sheet header with navigation */}
+          {/* Sheet header — título + fechar */}
           <div className="flex items-center justify-between px-4 py-3 border-b border-[var(--border)] flex-shrink-0">
-            <button
-              onClick={() => sheetIdx > 0 && setSheetSection(IDS[sheetIdx - 1])}
-              disabled={sheetIdx === 0}
-              className="flex items-center gap-1 text-sm text-[var(--text-secondary)] disabled:opacity-30 transition-colors p-1"
-            >
-              <ChevronLeft className="w-4 h-4" />
-            </button>
             <div className="flex items-center gap-2">
               {currentSection && <currentSection.icon className="w-4 h-4 text-[var(--accent-text)]" />}
               <SheetTitle className="text-sm font-semibold text-[var(--text-primary)]">
                 {currentSection?.label}
               </SheetTitle>
             </div>
-            <div className="flex items-center gap-1">
-              <button
-                onClick={() => sheetIdx < IDS.length - 1 && setSheetSection(IDS[sheetIdx + 1])}
-                disabled={sheetIdx === IDS.length - 1}
-                className="flex items-center gap-1 text-sm text-[var(--text-secondary)] disabled:opacity-30 transition-colors p-1"
-              >
-                <ChevronRight className="w-4 h-4" />
-              </button>
-              <SheetClose className="p-1 rounded-lg text-[var(--text-secondary)] hover:bg-[var(--bg-elevated)] hover:text-[var(--text-primary)] transition-colors ml-1">
-                <X className="w-4 h-4" />
-              </SheetClose>
-            </div>
+            <button
+              onClick={() => setSheetOpen(false)}
+              className="p-1.5 rounded-lg text-[var(--text-secondary)] hover:bg-[var(--bg-elevated)] hover:text-[var(--text-primary)] transition-colors"
+            >
+              <X className="w-4 h-4" />
+            </button>
           </div>
 
           {/* Progress dots */}
           <div className="flex items-center justify-center gap-1.5 py-2 flex-shrink-0">
-            {SECTIONS.map((s, i) => (
+            {SECTIONS.map(s => (
               <button
                 key={s.id}
                 onClick={() => setSheetSection(s.id)}
@@ -843,9 +830,29 @@ export default function TutorialClient() {
             ))}
           </div>
 
-          {/* Scrollable content */}
-          <div className="flex-1 overflow-y-auto px-4 pb-8">
-            <SectionContent id={sheetSection} sectionIndex={sheetIdx} />
+          {/* Scrollable content with slide arrows on sides */}
+          <div className="flex-1 overflow-y-auto relative">
+            {/* Arrow left */}
+            <button
+              onClick={() => sheetIdx > 0 && setSheetSection(IDS[sheetIdx - 1])}
+              disabled={sheetIdx === 0}
+              className="fixed left-2 top-1/2 -translate-y-1/2 z-50 w-9 h-9 flex items-center justify-center rounded-full bg-[var(--bg-surface)] border border-[var(--border)] shadow-md text-[var(--text-secondary)] disabled:opacity-20 transition-all active:scale-95"
+            >
+              <ChevronLeft className="w-5 h-5" />
+            </button>
+
+            {/* Arrow right */}
+            <button
+              onClick={() => sheetIdx < IDS.length - 1 && setSheetSection(IDS[sheetIdx + 1])}
+              disabled={sheetIdx === IDS.length - 1}
+              className="fixed right-2 top-1/2 -translate-y-1/2 z-50 w-9 h-9 flex items-center justify-center rounded-full bg-[var(--bg-surface)] border border-[var(--border)] shadow-md text-[var(--accent-text)] disabled:opacity-20 transition-all active:scale-95"
+            >
+              <ChevronRight className="w-5 h-5" />
+            </button>
+
+            <div className="px-4 pb-8 pt-2">
+              <SectionContent id={sheetSection} sectionIndex={sheetIdx} />
+            </div>
           </div>
         </SheetContent>
       </Sheet>
