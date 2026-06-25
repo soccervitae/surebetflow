@@ -146,7 +146,7 @@ export default async function LandingPage() {
       <section className="border-y border-white/5 py-20 bg-[#0d1b3e]">
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
           <div className="text-center mb-14">
-            <div className="inline-flex items-center gap-2 bg-[#1e3a8a]/10 border border-[#1e3a8a]/30 text-[#5b7ec9] text-sm font-semibold px-4 py-1.5 rounded-full mb-5">
+            <div className="inline-flex items-center gap-2 bg-white/5 border border-white/10 text-gray-400 text-sm font-semibold px-4 py-1.5 rounded-full mb-5">
               <Sparkles className="w-3.5 h-3.5" />
               Inteligência Artificial nativa
             </div>
@@ -283,7 +283,7 @@ export default async function LandingPage() {
       <section className="border-y border-white/5 py-20 bg-[#0f172a]">
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
           <div className="text-center mb-12">
-            <div className="inline-flex items-center gap-2 bg-purple-500/10 border border-purple-500/20 text-purple-400 text-sm font-medium px-4 py-1.5 rounded-full mb-4">
+            <div className="inline-flex items-center gap-2 bg-white/5 border border-white/10 text-gray-400 text-sm font-medium px-4 py-1.5 rounded-full mb-4">
               <Users className="w-3.5 h-3.5" />
               Gestão por perfis
             </div>
