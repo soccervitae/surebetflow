@@ -6,8 +6,8 @@ import Link from "next/link"
 import { createClient } from "@/lib/supabase/client"
 import { useTheme } from "@/components/ThemeProvider"
 import {
-  Home, Users, Wallet, CreditCard,
-  Settings, LogOut, Bell, ChevronLeft, ChevronRight,
+  Home, Users, Wallet, CreditCard, Settings,
+  LogOut, Bell, ChevronLeft, ChevronRight,
   Circle, Sun, Moon, MessageCircle, BookOpen
 } from "lucide-react"
 import Logo, { LogoIcon } from "@/components/Logo"
@@ -256,19 +256,20 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           >
             {isDark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
           </button>
-          <div className="w-7 h-7 bg-[#1e3a8a] rounded-full flex items-center justify-center text-white text-xs font-bold">
+          <Link href="/configuracoes" className="w-7 h-7 bg-[#1e3a8a] rounded-full flex items-center justify-center text-white text-xs font-bold">
             {userInitials}
-          </div>
+          </Link>
         </div>
       </header>
 
       {/* Bottom nav mobile */}
       <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-[var(--bg-surface)] border-t border-[var(--border)] z-20 flex">
         {([
-          { href: "/dashboard", icon: Home, label: "Dashboard" },
-          { href: "/perfis", icon: Users, label: "Perfis" },
-          { href: "/financeiro", icon: Wallet, label: "Financeiro" },
-          { href: "/tutorial", icon: BookOpen, label: "Tutorial" },
+          { href: "/dashboard",   icon: Home,       label: "Dashboard" },
+          { href: "/perfis",      icon: Users,      label: "Perfis" },
+          { href: "/financeiro",  icon: Wallet,     label: "Financeiro" },
+          { href: "/tutorial",    icon: BookOpen,   label: "Tutorial" },
+          { href: "/assinatura",  icon: CreditCard, label: "Assinatura" },
         ] as { href: string; icon: React.ElementType; label: string }[]).map(({ href, icon: Icon, label }) => {
           const active = pathname === href || (href !== "/" && pathname.startsWith(href))
           return (
@@ -285,19 +286,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             </Link>
           )
         })}
-        {/* Avatar / configurações */}
-        <Link
-          href="/configuracoes"
-          className={cn(
-            "flex-1 flex flex-col items-center py-2 text-xs gap-1",
-            pathname.startsWith("/configuracoes") ? "text-[#1e3a8a]" : "text-[var(--text-secondary)]"
-          )}
-        >
-          <div className="w-7 h-7 bg-[#1e3a8a] rounded-full flex items-center justify-center text-white text-xs font-bold">
-            {userInitials}
-          </div>
-          <span>Conta</span>
-        </Link>
       </nav>
 
       {/* Logout confirmation dialog */}
