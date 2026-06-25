@@ -11,11 +11,12 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet"
 import {
   Settings, Camera, Loader2, Shield, Monitor, Smartphone,
   MapPin, Clock, LogOut, Key, User, AlertTriangle, Sun, Moon,
   FileText, Lock, ExternalLink, CreditCard, CheckCircle, XCircle,
-  Calendar, RefreshCw, Star
+  Calendar, RefreshCw, Star, Pencil
 } from "lucide-react"
 
 interface Assinatura {
@@ -86,6 +87,8 @@ export default function ConfiguracoesPage() {
   const [profileSuccess, setProfileSuccess] = useState("")
 
   const [uploading, setUploading] = useState(false)
+  const [showEditSheet, setShowEditSheet] = useState(false)
+  const [showEditModal, setShowEditModal] = useState(false)
   const [logoutAllOpen, setLogoutAllOpen] = useState(false)
   const [loggingOut, setLoggingOut] = useState(false)
   const [assinatura, setAssinatura] = useState<Assinatura | null>(null)
@@ -277,67 +280,48 @@ export default function ConfiguracoesPage() {
       {/* ── ABA: MINHA CONTA ── */}
       {tab === "conta" && (
         <>
+          {/* Profile card — centered */}
           <Card>
-            <CardHeader className="pb-3">
-              <CardTitle className="text-base flex items-center gap-2">
-                <User className="h-4 w-4" /> Dados pessoais
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex items-center gap-4">
-                <div className="relative">
-                  <Avatar className="h-16 w-16">
-                    {avatarUrl && <AvatarImage src={avatarUrl} alt="Foto da conta" />}
-                    <AvatarFallback className="text-xl">{email.charAt(0).toUpperCase()}</AvatarFallback>
-                  </Avatar>
-                  <button
-                    onClick={() => fileInputRef.current?.click()}
-                    disabled={uploading}
-                    className="absolute -bottom-1 -right-1 w-6 h-6 rounded-full bg-[#1e3a8a] text-white flex items-center justify-center hover:bg-[#1e40af] transition-colors disabled:opacity-50"
-                  >
-                    {uploading ? <Loader2 className="w-3 h-3 animate-spin" /> : <Camera className="w-3 h-3" />}
-                  </button>
-                  <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handlePhotoUpload} />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="font-medium text-[var(--text-primary)] truncate">{email}</p>
-                  <p className="text-xs text-[var(--text-muted)] mt-0.5">
-                    Conta criada em {formatDate(createdAt)}
-                  </p>
-                </div>
+            <CardContent className="pt-8 pb-6 flex flex-col items-center gap-3">
+              <div className="relative">
+                <Avatar className="h-20 w-20">
+                  {avatarUrl && <AvatarImage src={avatarUrl} alt="Foto da conta" />}
+                  <AvatarFallback className="text-2xl">
+                    {nome ? nome.charAt(0).toUpperCase() : email.charAt(0).toUpperCase()}
+                  </AvatarFallback>
+                </Avatar>
+                <button
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={uploading}
+                  className="absolute -bottom-1 -right-1 w-7 h-7 rounded-full bg-[#1e3a8a] text-white flex items-center justify-center hover:bg-[#1e40af] transition-colors disabled:opacity-50 shadow"
+                >
+                  {uploading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Camera className="w-3.5 h-3.5" />}
+                </button>
+                <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handlePhotoUpload} />
               </div>
 
-              <div className="space-y-1.5">
-                <Label>E-mail</Label>
-                <Input value={email} disabled className="bg-[var(--bg-muted)] text-[var(--text-secondary)]" />
-                <p className="text-xs text-[var(--text-muted)]">Para alterar o e-mail, entre em contato com o suporte.</p>
-              </div>
+              {(nome || sobrenome) && (
+                <p className="text-lg font-semibold text-[var(--text-primary)]">{`${nome} ${sobrenome}`.trim()}</p>
+              )}
+              <p className="text-sm text-[var(--text-secondary)]">{email}</p>
+              {createdAt && (
+                <p className="text-xs text-[var(--text-muted)]">Conta criada em {formatDate(createdAt)}</p>
+              )}
 
-              <form onSubmit={handleSaveProfile} className="space-y-3">
-                <div className="grid grid-cols-2 gap-3">
-                  <div className="space-y-1.5">
-                    <Label htmlFor="nome">Nome</Label>
-                    <Input id="nome" value={nome} onChange={e => setNome(e.target.value)} placeholder="Seu nome" />
-                  </div>
-                  <div className="space-y-1.5">
-                    <Label htmlFor="sobrenome">Sobrenome</Label>
-                    <Input id="sobrenome" value={sobrenome} onChange={e => setSobrenome(e.target.value)} placeholder="Seu sobrenome" />
-                  </div>
-                </div>
-                <div className="space-y-1.5">
-                  <Label htmlFor="dataNascimento">Data de nascimento</Label>
-                  <Input id="dataNascimento" type="date" value={dataNascimento} onChange={e => setDataNascimento(e.target.value)} />
-                </div>
-                {profileSuccess && (
-                  <p className="text-sm text-[var(--accent-text)] bg-[#1e3a8a]/5 border border-[#1e3a8a]/20 rounded-lg px-3 py-2">
-                    {profileSuccess}
-                  </p>
-                )}
-                <Button type="submit" className="bg-[#1e3a8a] hover:bg-[#1e40af] text-white" disabled={savingProfile}>
-                  <User className="h-4 w-4 mr-2" />
-                  {savingProfile ? "Salvando..." : "Salvar alterações"}
-                </Button>
-              </form>
+              <div className="flex gap-2 mt-2">
+                <button
+                  onClick={() => setShowEditSheet(true)}
+                  className="md:hidden flex items-center gap-2 px-4 py-2 rounded-xl bg-[#1e3a8a] hover:bg-[#1e40af] text-white text-sm font-medium transition-colors"
+                >
+                  <Pencil className="w-4 h-4" /> Editar conta
+                </button>
+                <button
+                  onClick={() => setShowEditModal(true)}
+                  className="hidden md:flex items-center gap-2 px-4 py-2 rounded-xl bg-[#1e3a8a] hover:bg-[#1e40af] text-white text-sm font-medium transition-colors"
+                >
+                  <Pencil className="w-4 h-4" /> Editar conta
+                </button>
+              </div>
             </CardContent>
           </Card>
 
@@ -677,6 +661,84 @@ export default function ConfiguracoesPage() {
       )}
 
       </div> {/* end swipe wrapper */}
+
+      {/* Edit profile form — shared between Sheet and Dialog */}
+      {(() => {
+        const editForm = (
+          <form onSubmit={handleSaveProfile} className="space-y-4">
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-1.5">
+                <Label htmlFor="edit-nome">Nome</Label>
+                <Input id="edit-nome" value={nome} onChange={e => setNome(e.target.value)} placeholder="Seu nome" />
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="edit-sobrenome">Sobrenome</Label>
+                <Input id="edit-sobrenome" value={sobrenome} onChange={e => setSobrenome(e.target.value)} placeholder="Seu sobrenome" />
+              </div>
+            </div>
+            <div className="space-y-1.5">
+              <Label>E-mail</Label>
+              <Input value={email} disabled className="bg-[var(--bg-muted)] text-[var(--text-secondary)]" />
+              <p className="text-xs text-[var(--text-muted)]">Para alterar o e-mail, entre em contato com o suporte.</p>
+            </div>
+            {profileSuccess && (
+              <p className="text-sm text-[var(--accent-text)] bg-[#1e3a8a]/5 border border-[#1e3a8a]/20 rounded-lg px-3 py-2">
+                {profileSuccess}
+              </p>
+            )}
+            <div className="flex gap-3">
+              <Button type="submit" className="flex-1 bg-[#1e3a8a] hover:bg-[#1e40af] text-white" disabled={savingProfile}>
+                <User className="h-4 w-4 mr-2" />
+                {savingProfile ? "Salvando..." : "Salvar alterações"}
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => { setShowEditSheet(false); setShowEditModal(false) }}
+              >
+                Cancelar
+              </Button>
+            </div>
+          </form>
+        )
+        return (
+          <>
+            {/* Sheet — mobile */}
+            <Sheet open={showEditSheet} onOpenChange={setShowEditSheet}>
+              <SheetContent
+                side="bottom"
+                className="h-[80vh] flex flex-col p-0 rounded-t-2xl"
+                onTouchStart={e => { (e.currentTarget as any)._swipeY = e.touches[0].clientY }}
+                onTouchEnd={e => {
+                  const startY = (e.currentTarget as any)._swipeY
+                  if (startY !== undefined && e.changedTouches[0].clientY - startY > 80) setShowEditSheet(false)
+                }}
+              >
+                <SheetHeader className="px-5 pt-5 pb-3 border-b border-[var(--border)] flex-shrink-0">
+                  <SheetTitle className="flex items-center gap-2">
+                    <Pencil className="h-4 w-4 text-[var(--accent-text)]" />
+                    Editar conta
+                  </SheetTitle>
+                </SheetHeader>
+                <div className="flex-1 overflow-y-auto px-5 py-4">{editForm}</div>
+              </SheetContent>
+            </Sheet>
+
+            {/* Dialog — desktop */}
+            <Dialog open={showEditModal} onOpenChange={setShowEditModal}>
+              <DialogContent className="max-w-md">
+                <DialogHeader>
+                  <DialogTitle className="flex items-center gap-2">
+                    <Pencil className="h-5 w-5 text-[var(--accent-text)]" />
+                    Editar conta
+                  </DialogTitle>
+                </DialogHeader>
+                {editForm}
+              </DialogContent>
+            </Dialog>
+          </>
+        )
+      })()}
 
       <Dialog open={logoutAllOpen} onOpenChange={setLogoutAllOpen}>
         <DialogContent>
