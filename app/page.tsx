@@ -336,6 +336,8 @@ export default async function LandingPage() {
           <Image src="/logo-dark.svg" alt="SurebetFlow" width={150} height={39} />
           <p className="text-xs text-gray-600">© 2026 SurebetFlow. Todos os direitos reservados.</p>
           <div className="flex gap-4">
+            <Link href="/privacidade" className="text-xs text-gray-500 hover:text-white transition-colors">Privacidade</Link>
+            <Link href="/termos" className="text-xs text-gray-500 hover:text-white transition-colors">Termos de Uso</Link>
             <Link href="/login" className="text-xs text-gray-500 hover:text-white transition-colors">Entrar</Link>
             <Link href="/cadastro" className="text-xs text-gray-500 hover:text-white transition-colors">Cadastrar</Link>
           </div>
