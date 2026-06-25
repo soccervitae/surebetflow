@@ -31,7 +31,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const [userName, setUserName] = useState("")
   const [userInitials, setUserInitials] = useState("")
   const [confirmLogout, setConfirmLogout] = useState(false)
-  const [showUserMenu, setShowUserMenu] = useState(false)
   const [unread, setUnread] = useState(0)
 
   useEffect(() => {
@@ -285,62 +284,19 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             </Link>
           )
         })}
-        {/* Avatar / user menu */}
-        <div className="flex-1 flex flex-col items-center py-2 text-xs gap-1 relative">
-          <button
-            onClick={() => setShowUserMenu(v => !v)}
-            className="w-7 h-7 bg-[#1e3a8a] rounded-full flex items-center justify-center text-white text-xs font-bold"
-          >
-            {userInitials}
-          </button>
-          <span className="text-[var(--text-secondary)]">Conta</span>
-          {showUserMenu && (
-            <>
-              <div className="fixed inset-0 z-30" onClick={() => setShowUserMenu(false)} />
-              <div className="absolute bottom-14 right-0 z-40 w-52 bg-[var(--bg-surface)] border border-[var(--border)] rounded-xl shadow-xl overflow-hidden">
-                <div className="px-4 py-3 border-b border-[var(--border)]">
-                  <p className="text-xs font-medium text-[var(--text-primary)] truncate">{userName}</p>
-                </div>
-                <Link
-                  href="/suporte"
-                  onClick={() => setShowUserMenu(false)}
-                  className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-[var(--text-secondary)] hover:bg-[var(--bg-elevated)] hover:text-[var(--text-primary)] transition-colors"
-                >
-                  <MessageCircle className="w-4 h-4" />
-                  Suporte
-                  {unread > 0 && (
-                    <span className="ml-auto min-w-[18px] h-[18px] px-1 flex items-center justify-center rounded-full bg-red-500 text-white text-[10px] font-bold leading-none">
-                      {unread > 99 ? "99+" : unread}
-                    </span>
-                  )}
-                </Link>
-                <Link
-                  href="/assinatura"
-                  onClick={() => setShowUserMenu(false)}
-                  className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-[var(--text-secondary)] hover:bg-[var(--bg-elevated)] hover:text-[var(--text-primary)] transition-colors"
-                >
-                  <CreditCard className="w-4 h-4" />
-                  Assinatura
-                </Link>
-                <Link
-                  href="/configuracoes"
-                  onClick={() => setShowUserMenu(false)}
-                  className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-[var(--text-secondary)] hover:bg-[var(--bg-elevated)] hover:text-[var(--text-primary)] transition-colors"
-                >
-                  <Settings className="w-4 h-4" />
-                  Configurações
-                </Link>
-                <button
-                  onClick={() => { setShowUserMenu(false); setConfirmLogout(true) }}
-                  className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-red-400 hover:bg-red-500/10 transition-colors"
-                >
-                  <LogOut className="w-4 h-4" />
-                  Sair
-                </button>
-              </div>
-            </>
+        {/* Avatar / configurações */}
+        <Link
+          href="/configuracoes"
+          className={cn(
+            "flex-1 flex flex-col items-center py-2 text-xs gap-1",
+            pathname.startsWith("/configuracoes") ? "text-[#1e3a8a]" : "text-[var(--text-secondary)]"
           )}
-        </div>
+        >
+          <div className="w-7 h-7 bg-[#1e3a8a] rounded-full flex items-center justify-center text-white text-xs font-bold">
+            {userInitials}
+          </div>
+          <span>Conta</span>
+        </Link>
       </nav>
 
       {/* Logout confirmation dialog */}
