@@ -290,7 +290,7 @@ export default function ApostasClient({ apostas: initialApostas, profiles }: Pro
 
       {/* Nova aposta — Sheet mobile */}
       <Sheet open={novaSheet} onOpenChange={setNovaSheet}>
-        <SheetContent side="bottom" className="h-[92vh] flex flex-col p-0 rounded-t-2xl">
+        <SheetContent side="bottom" className="h-[70vh] flex flex-col p-0 rounded-t-2xl">
           <SheetHeader className="px-5 pt-5 pb-3 border-b border-[var(--border)] flex-shrink-0">
             <SheetTitle className="flex items-center gap-2">
               <Calculator className="h-4 w-4 text-[var(--accent-text)]" />
