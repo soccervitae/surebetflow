@@ -10,7 +10,8 @@ import {
   Settings, LogOut, Bell, ChevronLeft, ChevronRight,
   Circle, Sun, Moon, MessageCircle, BookOpen
 } from "lucide-react"
-import Logo from "@/components/Logo"
+import Logo, { LogoIcon } from "@/components/Logo"
+import Image from "next/image"
 import { cn } from "@/lib/utils"
 
 const navItems = [
@@ -107,8 +108,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           collapsed && "justify-center px-0"
         )}>
           {collapsed
-            ? <Logo size="sm" showText={false} />
-            : <Logo size="sm" />
+            ? <LogoIcon size="sm" />
+            : <Image src="https://gkkuttabavwxjuibmrnr.supabase.co/storage/v1/object/public/logos/surebetflow-horizontal-vazada-branca%20(1).png" alt="SurebetFlow" width={140} height={36} priority />
           }
         </div>
 
