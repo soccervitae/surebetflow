@@ -75,6 +75,12 @@ export default function ApostaDetailClient({ aposta: initial }: { aposta: Aposta
   const [editarOpen, setEditarOpen] = useState(false)
   const [editEvento, setEditEvento] = useState(initial.evento)
   const [editEsporte, setEditEsporte] = useState(initial.esporte ?? "")
+  const [editDataEvento, setEditDataEvento] = useState(
+    initial.data_evento ? initial.data_evento.slice(0, 10) : ""
+  )
+  const [editHoraEvento, setEditHoraEvento] = useState(
+    initial.data_evento ? initial.data_evento.slice(11, 16) : ""
+  )
   const [editTipo, setEditTipo] = useState<"2-way" | "3-way">(initial.tipo)
   const [editLegs, setEditLegs] = useState(
     (initial.legs ?? []).map(l => ({
@@ -191,7 +197,15 @@ export default function ApostaDetailClient({ aposta: initial }: { aposta: Aposta
 
       const { error: apostaErr } = await supabase
         .from("apostas")
-        .update({ evento: editEvento.trim(), esporte: editEsporte.trim() || null, tipo: editTipo, investimento_total, lucro_garantido, roi_percentual })
+        .update({
+          evento: editEvento.trim(),
+          esporte: editEsporte.trim() || null,
+          tipo: editTipo,
+          investimento_total,
+          lucro_garantido,
+          roi_percentual,
+          data_evento: editDataEvento ? `${editDataEvento}${editHoraEvento ? `T${editHoraEvento}:00` : "T00:00:00"}` : null,
+        })
         .eq("id", aposta.id)
       if (apostaErr) throw apostaErr
 
@@ -204,6 +218,7 @@ export default function ApostaDetailClient({ aposta: initial }: { aposta: Aposta
       }
 
       setAposta(prev => ({ ...prev, evento: editEvento.trim(), esporte: editEsporte.trim() || null, tipo: editTipo, investimento_total, lucro_garantido, roi_percentual,
+        data_evento: editDataEvento ? `${editDataEvento}${editHoraEvento ? `T${editHoraEvento}:00` : "T00:00:00"}` : null,
         legs: prev.legs?.map((l, i) => ({ ...l, resultado_apostado: editLegs[i].resultado_apostado.trim(), odd: parseFloat(editLegs[i].odd), stake: stakes[i] }))
       }))
       toast({ title: "Aposta atualizada com sucesso!" })
@@ -402,6 +417,19 @@ export default function ApostaDetailClient({ aposta: initial }: { aposta: Aposta
       {/* Datas */}
       <Card>
         <CardContent className="p-4 space-y-2">
+          {aposta.data_evento && (
+            <div className="flex items-center justify-between text-sm">
+              <div className="flex items-center gap-2 text-[var(--text-secondary)]">
+                <CalendarDays className="w-4 h-4" />
+                <span>Data do evento</span>
+              </div>
+              <span className="font-medium text-[var(--text-primary)]">
+                {new Date(aposta.data_evento).toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit", year: "numeric" })}
+                {" "}
+                {new Date(aposta.data_evento).toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" })}
+              </span>
+            </div>
+          )}
           <div className="flex items-center justify-between text-sm">
             <div className="flex items-center gap-2 text-[var(--text-secondary)]">
               <CalendarDays className="w-4 h-4" />
@@ -482,7 +510,16 @@ export default function ApostaDetailClient({ aposta: initial }: { aposta: Aposta
               <Label>Esporte</Label>
               <Input value={editEsporte} onChange={e => setEditEsporte(e.target.value)} placeholder="Ex: Futebol" />
             </div>
-
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-2">
+                <Label>Data do evento</Label>
+                <Input type="date" value={editDataEvento} onChange={e => setEditDataEvento(e.target.value)} />
+              </div>
+              <div className="space-y-2">
+                <Label>Hora do evento</Label>
+                <Input type="time" value={editHoraEvento} onChange={e => setEditHoraEvento(e.target.value)} />
+              </div>
+            </div>
 
             <div className="space-y-3">
               <Label>Entradas</Label>

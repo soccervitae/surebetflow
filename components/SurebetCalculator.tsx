@@ -129,6 +129,8 @@ export default function SurebetCalculator({ profiles, defaultProfileId, onSaved 
   const tipo = numLegs >= 3 ? "3-way" : "2-way"
   const [evento, setEvento] = useState("")
   const [esporte, setEsporte] = useState("")
+  const [dataEvento, setDataEvento] = useState("")
+  const [horaEvento, setHoraEvento] = useState("")
   const [investimentoTotal, setInvestimentoTotal] = useState("100,00")
   const [profileBets, setProfileBets] = useState<Record<string, ProfileBet[]>>({})
   const [saving, setSaving] = useState(false)
@@ -372,6 +374,7 @@ export default function SurebetCalculator({ profiles, defaultProfileId, onSaved 
           evento: evento.trim(),
           esporte: esporte.trim() || null,
           tipo,
+          data_evento: dataEvento ? `${dataEvento}${horaEvento ? `T${horaEvento}:00` : "T00:00:00"}` : null,
           investimento_total: investment,
           lucro_garantido: parseFloat(lucroGarantido.toFixed(2)),
           roi_percentual: parseFloat(roi.toFixed(4)),
@@ -396,6 +399,8 @@ export default function SurebetCalculator({ profiles, defaultProfileId, onSaved 
       toast({ title: "Aposta salva com sucesso!" })
       setEvento("")
       setEsporte("")
+      setDataEvento("")
+      setHoraEvento("")
       setNumLegs(2)
       setLegs([{ profileBetId: "", resultadoApostado: "", odd: "" }, { profileBetId: "", resultadoApostado: "", odd: "" }])
       onSaved?.()
@@ -584,7 +589,14 @@ export default function SurebetCalculator({ profiles, defaultProfileId, onSaved 
               <Label>Evento</Label>
               <Input value={evento} onChange={e => setEvento(e.target.value)} placeholder="Ex: Flamengo x Corinthians" />
             </div>
-
+            <div className="space-y-2">
+              <Label>Data do evento</Label>
+              <Input type="date" value={dataEvento} onChange={e => setDataEvento(e.target.value)} />
+            </div>
+            <div className="space-y-2">
+              <Label>Hora do evento</Label>
+              <Input type="time" value={horaEvento} onChange={e => setHoraEvento(e.target.value)} />
+            </div>
             <div className="space-y-2">
               <Label>Investimento Total (R$)</Label>
               <Input

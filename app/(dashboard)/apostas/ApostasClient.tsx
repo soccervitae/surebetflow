@@ -366,7 +366,17 @@ export default function ApostasClient({ apostas: initialApostas, profiles }: Pro
                           </td>
                           {/* Data */}
                           <td className="px-4 py-3 whitespace-nowrap text-[var(--text-secondary)]">
-                            {li === 0 ? new Date(aposta.created_at).toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit" }) : ""}
+                            {li === 0 ? (() => {
+                              const d = aposta.data_evento ? new Date(aposta.data_evento) : new Date(aposta.created_at)
+                              return (
+                                <div>
+                                  <p>{d.toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit" })}</p>
+                                  {aposta.data_evento && (
+                                    <p className="text-xs text-[var(--text-muted)]">{d.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" })}</p>
+                                  )}
+                                </div>
+                              )
+                            })() : ""}
                           </td>
                           {/* Evento */}
                           <td className="px-4 py-3 max-w-[200px]">
@@ -408,6 +418,12 @@ export default function ApostasClient({ apostas: initialApostas, profiles }: Pro
                   <p className="text-xs text-[var(--text-secondary)] mb-2">
                     Perfil: {aposta.profile ? (aposta.profile.apelido || `${aposta.profile.nome} ${aposta.profile.sobrenome}`) : "—"} · {new Date(aposta.created_at).toLocaleDateString("pt-BR")}
                   </p>
+                  {aposta.data_evento && (
+                    <p className="text-xs text-[var(--text-muted)] mb-2 flex items-center gap-1">
+                      <CalendarIcon className="h-3 w-3" />
+                      Evento: {new Date(aposta.data_evento).toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit", year: "numeric" })} às {new Date(aposta.data_evento).toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" })}
+                    </p>
+                  )}
 
                   {legs.length > 0 && (
                     <div className="space-y-1.5 mb-3">

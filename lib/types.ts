@@ -60,6 +60,7 @@ export interface Aposta {
   status: ApostaStatus
   resultado_real?: number | null
   finalizada_at?: string | null
+  data_evento?: string | null
   created_at: string
   updated_at: string
   legs?: ApostaLeg[]
