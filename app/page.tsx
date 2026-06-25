@@ -511,7 +511,7 @@ export default async function LandingPage() {
       <footer className="border-t border-white/5 py-8 bg-[#0f172a]">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-4">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/logo-dark.svg" alt="SurebetFlow" width={150} height={39} />
+          <img src="https://gkkuttabavwxjuibmrnr.supabase.co/storage/v1/object/public/logos/surebetflow-horizontal-vazada-branca%20(1).png" alt="SurebetFlow" className="h-8 w-auto" />
           <p className="text-xs text-gray-600">© 2026 SurebetFlow. Todos os direitos reservados.</p>
           <div className="flex gap-4">
             <Link href="/privacidade" className="text-xs text-gray-500 hover:text-white transition-colors">Privacidade</Link>
