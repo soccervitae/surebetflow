@@ -13,7 +13,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet"
 import { formatCurrency } from "@/lib/utils"
 import { useToast } from "@/hooks/useToast"
-import { BookOpen, Filter, X, Plus, Calculator } from "lucide-react"
+import { BookOpen, Filter, X, Plus, Calculator, CalendarIcon } from "lucide-react"
 import type { Aposta, ApostaLeg } from "@/lib/types"
 import SurebetCalculator from "@/components/SurebetCalculator"
 
@@ -34,6 +34,8 @@ export default function ApostasClient({ apostas: initialApostas, profiles }: Pro
   const [apostas, setApostas] = useState(initialApostas)
   const [filterStatus, setFilterStatus] = useState("todos")
   const [filterProfile, setFilterProfile] = useState("todos")
+  const [filterDateFrom, setFilterDateFrom] = useState("")
+  const [filterDateTo, setFilterDateTo] = useState("")
   const [finalizarDialog, setFinalizarDialog] = useState<Aposta | null>(null)
   const [deletarDialog, setDeletarDialog] = useState<Aposta | null>(null)
   const [showFilter, setShowFilter] = useState(false)
@@ -59,6 +61,16 @@ export default function ApostasClient({ apostas: initialApostas, profiles }: Pro
   const filtered = apostas.filter(a => {
     if (filterStatus !== "todos" && a.status !== filterStatus) return false
     if (filterProfile !== "todos" && a.profile_id !== filterProfile) return false
+    if (filterDateFrom) {
+      const from = new Date(filterDateFrom)
+      from.setHours(0, 0, 0, 0)
+      if (new Date(a.created_at) < from) return false
+    }
+    if (filterDateTo) {
+      const to = new Date(filterDateTo)
+      to.setHours(23, 59, 59, 999)
+      if (new Date(a.created_at) > to) return false
+    }
     return true
   })
 
@@ -112,7 +124,6 @@ export default function ApostasClient({ apostas: initialApostas, profiles }: Pro
           <p className="text-[var(--text-secondary)] text-sm mt-1">Histórico completo de todas as suas apostas</p>
         </div>
         <div className="flex items-center gap-2">
-          {/* Nova — mobile opens Sheet, desktop opens Modal */}
           <button
             onClick={() => setNovaSheet(true)}
             className="md:hidden flex items-center gap-1.5 px-3 py-2 rounded-xl bg-[#1e3a8a] text-white text-sm font-medium"
@@ -127,63 +138,79 @@ export default function ApostasClient({ apostas: initialApostas, profiles }: Pro
             <Plus className="h-4 w-4" />
             Nova aposta
           </button>
-          <button
-            onClick={() => setShowFilter(v => !v)}
-            className={`md:hidden flex items-center gap-1.5 px-3 py-2 rounded-xl border text-sm font-medium transition-colors ${
-              showFilter
-                ? "bg-[#1e3a8a]/10 border-[#1e3a8a]/30 text-[var(--accent-text)]"
-                : "border-[var(--border)] text-[var(--text-secondary)] hover:bg-[var(--bg-elevated)]"
-            }`}
-          >
-            {showFilter ? <X className="h-4 w-4" /> : <Filter className="h-4 w-4" />}
-            Filtrar
-          </button>
         </div>
       </div>
 
-      {/* Filters — always visible on desktop, toggle on mobile */}
-      <div className={`${showFilter ? "block" : "hidden"} md:block`}>
-        <Card>
-          <CardContent className="p-4">
-            <div className="hidden md:flex items-center gap-2 mb-3">
-              <Filter className="h-4 w-4 text-[var(--text-secondary)]" />
-              <span className="text-sm font-medium text-[var(--text-primary)]">Filtros</span>
+      {/* Filters — always visible (mobile + desktop) */}
+      <Card>
+        <CardContent className="p-4">
+          <div className="hidden md:flex items-center gap-2 mb-3">
+            <Filter className="h-4 w-4 text-[var(--text-secondary)]" />
+            <span className="text-sm font-medium text-[var(--text-primary)]">Filtros</span>
+          </div>
+          <div className="grid grid-cols-2 sm:grid-cols-2 gap-3">
+            <div className="space-y-1.5">
+              <Label className="text-xs">Status</Label>
+              <Select value={filterStatus} onValueChange={setFilterStatus}>
+                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="todos">Todos</SelectItem>
+                  <SelectItem value="pendente">Pendentes</SelectItem>
+                  <SelectItem value="finalizada">Finalizadas</SelectItem>
+                  <SelectItem value="cancelada">Canceladas</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div className="space-y-1.5">
-                <Label className="text-xs">Status</Label>
-                <Select value={filterStatus} onValueChange={setFilterStatus}>
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="todos">Todos</SelectItem>
-                    <SelectItem value="pendente">Pendentes</SelectItem>
-                    <SelectItem value="finalizada">Finalizadas</SelectItem>
-                    <SelectItem value="cancelada">Canceladas</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="space-y-1.5">
-                <Label className="text-xs">Perfil</Label>
-                <Select value={filterProfile} onValueChange={setFilterProfile}>
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="todos">Todos os perfis</SelectItem>
-                    {profiles.map(p => (
-                      <SelectItem key={p.id} value={p.id}>
-                        {p.apelido || `${p.nome} ${p.sobrenome}`}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
+            <div className="space-y-1.5">
+              <Label className="text-xs">Perfil</Label>
+              <Select value={filterProfile} onValueChange={setFilterProfile}>
+                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="todos">Todos os perfis</SelectItem>
+                  {profiles.map(p => (
+                    <SelectItem key={p.id} value={p.id}>
+                      {p.apelido || `${p.nome} ${p.sobrenome}`}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
-          </CardContent>
-        </Card>
-      </div>
+            <div className="space-y-1.5">
+              <Label className="text-xs flex items-center gap-1">
+                <CalendarIcon className="h-3 w-3" />
+                De
+              </Label>
+              <Input
+                type="date"
+                value={filterDateFrom}
+                onChange={e => setFilterDateFrom(e.target.value)}
+                className="text-xs"
+              />
+            </div>
+            <div className="space-y-1.5">
+              <Label className="text-xs flex items-center gap-1">
+                <CalendarIcon className="h-3 w-3" />
+                Até
+              </Label>
+              <Input
+                type="date"
+                value={filterDateTo}
+                onChange={e => setFilterDateTo(e.target.value)}
+                className="text-xs"
+              />
+            </div>
+          </div>
+          {(filterStatus !== "todos" || filterProfile !== "todos" || filterDateFrom || filterDateTo) && (
+            <button
+              onClick={() => { setFilterStatus("todos"); setFilterProfile("todos"); setFilterDateFrom(""); setFilterDateTo("") }}
+              className="mt-3 text-xs text-[var(--text-secondary)] hover:text-[var(--text-primary)] flex items-center gap-1 transition-colors"
+            >
+              <X className="h-3 w-3" />
+              Limpar filtros
+            </button>
+          )}
+        </CardContent>
+      </Card>
 
       {/* List */}
       {filtered.length === 0 ? (
