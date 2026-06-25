@@ -85,8 +85,8 @@ export default function ConfiguracoesPage() {
         setAvatarUrl(user.user_metadata?.avatar_url ?? "")
         setLastSignIn(user.last_sign_in_at ?? null)
         setCreatedAt(user.created_at ?? null)
-        const { data: profile } = await supabase.from("profiles").select("nome, sobrenome").eq("id", user.id).single()
-        if (profile) { setNome(profile.nome ?? ""); setSobrenome(profile.sobrenome ?? ""); setDataNascimento(profile.data_nascimento ?? "") }
+        const { data: usuario } = await supabase.from("usuarios").select("nome, sobrenome, data_nascimento").eq("id", user.id).single()
+        if (usuario) { setNome(usuario.nome ?? ""); setSobrenome(usuario.sobrenome ?? ""); setDataNascimento(usuario.data_nascimento ?? "") }
       }
     })
 
@@ -132,7 +132,7 @@ export default function ConfiguracoesPage() {
     setSavingProfile(true)
     setProfileSuccess("")
     const supabase = createClient()
-    await supabase.from("profiles").update({ nome: nome.trim(), sobrenome: sobrenome.trim(), data_nascimento: dataNascimento || null }).eq("id", userId)
+    await supabase.from("usuarios").update({ nome: nome.trim(), sobrenome: sobrenome.trim(), data_nascimento: dataNascimento || null }).eq("id", userId)
     setProfileSuccess("Perfil atualizado com sucesso!")
     setSavingProfile(false)
     setTimeout(() => setProfileSuccess(""), 3000)

@@ -38,16 +38,18 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     const supabase = createClient()
     supabase.auth.getUser().then(async ({ data: { user } }) => {
       if (!user) { router.push("/login"); return }
-      const { data: profile } = await supabase
-        .from("profiles")
+      const { data: usuario } = await supabase
+        .from("usuarios")
         .select("nome, sobrenome")
-        .limit(1)
+        .eq("id", user.id)
         .single()
-      if (profile) {
-        setUserName(`${profile.nome} ${profile.sobrenome}`)
-        setUserInitials(`${profile.nome.charAt(0)}${profile.sobrenome.charAt(0)}`.toUpperCase())
+      const email = user.email ?? ""
+      if (usuario?.nome) {
+        const fullName = `${usuario.nome} ${usuario.sobrenome ?? ""}`.trim()
+        setUserName(fullName)
+        const initials = `${usuario.nome.charAt(0)}${usuario.sobrenome?.charAt(0) ?? ""}`.toUpperCase()
+        setUserInitials(initials)
       } else {
-        const email = user.email ?? ""
         setUserName(email)
         setUserInitials(email.charAt(0).toUpperCase())
       }
