@@ -611,12 +611,8 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
             </Card>
           </div>
 
-          {/* Filters + Add button */}
-          <div className="flex flex-wrap items-center gap-2 justify-between">
-          <Button size="sm" onClick={() => { if (!movLoaded) loadMovimentacoes(); setFinShowForm(true) }}>
-            Nova Movimentação
-          </Button>
-          </div>
+          {/* Filters */}
+          <div className="flex flex-wrap items-center gap-2 justify-between"></div>
           <div className="flex flex-wrap items-center gap-2">
             <div className="flex gap-1 bg-[var(--bg-elevated)] rounded-lg p-1">
               {(["hoje", "semana", "mes", "todos"] as const).map(p => (
