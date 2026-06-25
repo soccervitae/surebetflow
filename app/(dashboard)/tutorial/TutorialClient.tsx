@@ -6,10 +6,10 @@ import {
   BookOpen, Home, Users, Calculator, DollarSign,
   Settings, HelpCircle, ChevronRight, CheckCircle,
   TrendingUp, Clock, ArrowUpRight, Wallet, Plus,
-  Search, CreditCard, MessageSquare, Star, Zap,
+  Search, CreditCard, Star, Zap,
   BarChart2, ChevronLeft, Circle, Bell, Sun,
   Filter, ArrowRight, QrCode, Activity, Hash,
-  Calendar, RefreshCw, Lock, MoreHorizontal, X,
+  Calendar, RefreshCw, Lock, MoreHorizontal, X, Moon,
 } from "lucide-react"
 
 const SECTIONS = [
@@ -43,49 +43,77 @@ function Step({ num, text }: { num: number; text: string }) {
   )
 }
 
-/* ── MOCKUP SHELL MOBILE ── */
-function MockShellMobile({ activeNav, children }: { activeNav: string; children: React.ReactNode }) {
-  const nav = [
-    { href: "/dashboard", icon: Home,     label: "Dashboard" },
-    { href: "/perfis",    icon: Users,    label: "Perfis" },
-    { href: "/apostas",   icon: BookOpen, label: "Apostas" },
-    { href: "/financeiro",icon: Wallet,   label: "Financeiro" },
-  ]
+/* ── Color tokens for dark / light phone content ── */
+function mc(dark: boolean) {
+  return {
+    screen:   dark ? "bg-[#0b1220]" : "bg-[#f0f4f8]",
+    header:   dark ? "bg-[#0f1a2e] border-white/5"   : "bg-white border-gray-200",
+    card:     dark ? "bg-white/5 border-white/10"     : "bg-white border-gray-200",
+    input:    dark ? "bg-black/40 border-white/10"    : "bg-gray-100 border-gray-200",
+    t1:       dark ? "text-white"    : "text-gray-900",
+    t2:       dark ? "text-gray-400" : "text-gray-500",
+    t3:       dark ? "text-gray-600" : "text-gray-400",
+    navBg:    dark ? "bg-[#0f1a2e] border-t border-white/5"  : "bg-white border-t border-gray-200",
+    navIcon:  dark ? "text-gray-500"  : "text-gray-400",
+    navActive:dark ? "text-[#60a5fa]" : "text-[#1e3a8a]",
+    dot:      dark ? "bg-[#60a5fa]"   : "bg-[#1e3a8a]",
+    bar:      dark ? "bg-[#1e3a8a]/60" : "bg-[#1e3a8a]/50",
+    badge:    dark ? "bg-[#1e3a8a]/20 border-[#1e3a8a]/30 text-[#60a5fa]"
+                   : "bg-[#1e3a8a]/10 border-[#1e3a8a]/20 text-[#1e3a8a]",
+  }
+}
+
+/* ── iPhone 15 Frame ── */
+function IPhone15Frame({ dark, children }: { dark: boolean; children: React.ReactNode }) {
+  const frameC = dark ? "border-gray-800 bg-gray-900"    : "border-[#b8b8ba] bg-[#e8e8ed]"
+  const sideC  = dark ? "bg-gray-700"                    : "bg-[#b8b8ba]"
+  const silentC= dark ? "bg-gray-700"                    : "bg-[#b8b8ba]"
   return (
-    <div className="rounded-2xl border border-[var(--border)] shadow-xl overflow-hidden mx-auto" style={{ maxWidth: 320 }}>
-      <div className="bg-[#1a1a1a] px-4 py-1.5 flex items-center justify-between border-b border-white/5">
-        <span className="text-[9px] text-gray-500 font-mono">9:41</span>
-        <div className="w-14 h-3 bg-black/60 rounded-full" />
-        <div className="flex items-center gap-1">
-          <div className="w-3 h-1.5 bg-gray-500 rounded-sm" />
-          <div className="w-1.5 h-1.5 bg-gray-500 rounded-full" />
+    <div className="relative mx-auto" style={{ width: 256 }}>
+      {/* Silent toggle */}
+      <div className={`absolute left-[-4px] top-[78px] w-[4px] h-5 rounded-l-sm ${silentC}`} />
+      {/* Volume up */}
+      <div className={`absolute left-[-4px] top-[112px] w-[4px] h-[26px] rounded-l-sm ${sideC}`} />
+      {/* Volume down */}
+      <div className={`absolute left-[-4px] top-[148px] w-[4px] h-[26px] rounded-l-sm ${sideC}`} />
+      {/* Power */}
+      <div className={`absolute right-[-4px] top-[128px] w-[4px] h-[42px] rounded-r-sm ${sideC}`} />
+
+      {/* Body */}
+      <div
+        className={`relative rounded-[2.6rem] border-[5px] ${frameC} overflow-hidden shadow-2xl`}
+        style={{ aspectRatio: "390/844" }}
+      >
+        {/* Screen bg */}
+        <div className={`absolute inset-0 ${mc(dark).screen}`} />
+
+        {/* Dynamic Island */}
+        <div className="absolute top-0 left-0 right-0 flex justify-center z-30" style={{ paddingTop: 10 }}>
+          <div className="bg-black rounded-full" style={{ width: 90, height: 24 }} />
         </div>
-      </div>
-      <div className="bg-[#0d0d0d] flex flex-col" style={{ minHeight: 400 }}>
-        <div className="flex items-center justify-between px-3 py-2 bg-[#111] border-b border-white/5">
-          <div className="w-6 h-6 bg-[#1e3a8a] rounded-lg flex items-center justify-center">
-            <TrendingUp className="w-3 h-3 text-white" />
+
+        {/* Status bar */}
+        <div className={`absolute left-0 right-0 flex items-center justify-between px-5 z-20 ${mc(dark).t1}`}
+             style={{ top: 38, height: 20 }}>
+          <span className={`text-[8px] font-semibold ${mc(dark).t1}`}>9:41</span>
+          <div className="flex items-center gap-1.5">
+            <div className={`w-3 h-2 ${mc(dark).t2} flex items-end gap-[1px]`}>
+              {[3,5,7,9].map((h,i)=>(<div key={i} className={`w-[2px] rounded-sm ${mc(dark).t1} opacity-${i<3?"60":"100"}`} style={{height:h}}/>))}
+            </div>
+            <div className={`text-[7px] font-medium ${mc(dark).t1}`}>5G</div>
+            <div className={`w-5 h-2.5 rounded-sm border ${dark?"border-gray-500":"border-gray-400"} relative`}>
+              <div className={`absolute inset-[1px] left-[1px] right-[2px] rounded-sm ${dark?"bg-white":"bg-gray-800"}`} style={{right:4}}/>
+              <div className={`absolute right-[-2px] top-1/2 -translate-y-1/2 w-[2px] h-1 rounded-r-sm ${dark?"bg-gray-500":"border-gray-400"}`}/>
+            </div>
           </div>
-          <span className="text-[10px] font-bold text-white">SureBetFlow</span>
-          <div className="w-6 h-6 bg-[#1e3a8a] rounded-full flex items-center justify-center text-white text-[7px] font-bold">JS</div>
         </div>
-        <div className="flex-1 p-3 overflow-hidden">
+
+        {/* Content area */}
+        <div className="absolute left-0 right-0 bottom-0 overflow-hidden" style={{ top: 60 }}>
           {children}
-        </div>
-        <div className="bg-[#111] border-t border-white/5 flex items-center justify-around px-2 py-1.5">
-          {nav.map(({ href, icon: Icon, label }) => {
-            const isActive = activeNav === href
-            return (
-              <div key={href} className="flex flex-col items-center gap-0.5">
-                {isActive && <div className="w-4 h-0.5 bg-[#60a5fa] rounded-full -mt-1.5 mb-0.5" />}
-                <Icon className={`w-4 h-4 ${isActive ? "text-[#60a5fa]" : "text-gray-500"}`} />
-                <span className={`text-[7px] font-medium ${isActive ? "text-[#60a5fa]" : "text-gray-500"}`}>{label}</span>
-              </div>
-            )
-          })}
-          <div className="flex flex-col items-center gap-0.5">
-            <MoreHorizontal className="w-4 h-4 text-gray-500" />
-            <span className="text-[7px] font-medium text-gray-500">Mais</span>
+          {/* Home indicator */}
+          <div className="absolute bottom-1 left-0 right-0 flex justify-center">
+            <div className={`w-24 h-[3px] rounded-full ${dark ? "bg-white/30" : "bg-gray-400/50"}`} />
           </div>
         </div>
       </div>
@@ -93,16 +121,57 @@ function MockShellMobile({ activeNav, children }: { activeNav: string; children:
   )
 }
 
-function MockBoth({ url, activeNav, mobileContent, children }: {
-  url: string; activeNav: string;
-  mobileContent: React.ReactNode;
-  children: React.ReactNode
-}) {
+/* ── Phone nav bar inside mockup ── */
+function PhoneNav({ dark, activeNav }: { dark: boolean; activeNav: string }) {
+  const cl = mc(dark)
+  const nav = [
+    { href: "/dashboard", icon: Home,     label: "Dashboard" },
+    { href: "/perfis",    icon: Users,    label: "Perfis" },
+    { href: "/apostas",   icon: BookOpen, label: "Apostas" },
+    { href: "/financeiro",icon: Wallet,   label: "Financeiro" },
+    { href: "/mais",      icon: MoreHorizontal, label: "Mais" },
+  ]
   return (
-    <>
-      <div className="md:hidden"><MockShellMobile activeNav={activeNav}>{mobileContent}</MockShellMobile></div>
-      <div className="hidden md:block"><MockShell url={url}>{children}</MockShell></div>
-    </>
+    <div className={`${cl.navBg} flex items-center justify-around px-1 py-1.5`}>
+      {nav.map(({ href, icon: Icon, label }) => {
+        const isActive = activeNav === href
+        return (
+          <div key={href} className="flex flex-col items-center gap-0.5">
+            {isActive && <div className={`w-3 h-0.5 rounded-full -mt-1.5 mb-0.5 ${cl.dot}`} />}
+            <Icon className={`w-4 h-4 ${isActive ? cl.navActive : cl.navIcon}`} />
+            <span className={`text-[6px] font-medium ${isActive ? cl.navActive : cl.navIcon}`}>{label}</span>
+          </div>
+        )
+      })}
+    </div>
+  )
+}
+
+/* ── Phone header inside mockup ── */
+function PhoneHeader({ dark }: { dark: boolean }) {
+  const cl = mc(dark)
+  return (
+    <div className={`${cl.header} flex items-center justify-between px-3 py-2 border-b`}>
+      <div className={`w-5 h-5 bg-[#1e3a8a] rounded-lg flex items-center justify-center`}>
+        <TrendingUp className="w-3 h-3 text-white" />
+      </div>
+      <span className={`text-[10px] font-bold ${cl.t1}`}>SureBetFlow</span>
+      <div className="w-5 h-5 bg-[#1e3a8a] rounded-full flex items-center justify-center text-white text-[7px] font-bold">JS</div>
+    </div>
+  )
+}
+
+/* ── Full phone wrapper used in mobile content ── */
+function PhoneMock({ dark, activeNav, children }: { dark: boolean; activeNav: string; children: React.ReactNode }) {
+  const cl = mc(dark)
+  return (
+    <IPhone15Frame dark={dark}>
+      <div className={`flex flex-col h-full ${cl.screen}`}>
+        <PhoneHeader dark={dark} />
+        <div className="flex-1 overflow-hidden p-2.5">{children}</div>
+        <PhoneNav dark={dark} activeNav={activeNav} />
+      </div>
+    </IPhone15Frame>
   )
 }
 
@@ -139,7 +208,7 @@ function MockShell({ url, children }: { url: string; children: React.ReactNode }
               { href: "/financeiro",   icon: Wallet,      label: "Financeiro" },
               { href: "/assinatura",   icon: CreditCard,  label: "Assinatura" },
             ].map(({ href, icon: Icon, label }) => {
-              const active = url === href || (url.startsWith(href) && href !== "/dashboard") || (url === href)
+              const active = url === href || (url.startsWith(href) && href !== "/dashboard")
               return (
                 <div key={href} className={`flex items-center gap-2 px-2 py-1.5 rounded-md text-[9px] font-medium ${active ? "bg-[#1e3a8a]/20 text-[var(--accent-text)] border border-[#1e3a8a]/25" : "text-gray-500"}`}>
                   <Icon className="w-3 h-3 shrink-0" />
@@ -163,7 +232,6 @@ function MockShell({ url, children }: { url: string; children: React.ReactNode }
             <div className="flex items-center gap-1.5 text-[9px] text-gray-500">
               <Circle className="w-1.5 h-1.5 fill-[var(--accent-text)] text-[var(--accent-text)]" />
               Sessão ativa · <span className="text-white">João Silva</span>
-              <span className="text-[8px] bg-[#1e3a8a]/20 text-[var(--accent-text)] px-1.5 py-0.5 rounded border border-[#1e3a8a]/30 ml-1">APOSTADOR</span>
             </div>
             <div className="flex items-center gap-1.5">
               <Sun className="w-3 h-3 text-gray-500" />
@@ -181,8 +249,43 @@ function MockShell({ url, children }: { url: string; children: React.ReactNode }
   )
 }
 
-/* ── SECTION CONTENT (shared between desktop and Sheet) ── */
-function SectionContent({ id }: { id: string }) {
+function MockBoth({ url, activeNav, dark, mobileContent, children }: {
+  url: string; activeNav: string; dark: boolean;
+  mobileContent: React.ReactNode;
+  children: React.ReactNode
+}) {
+  return (
+    <div className="space-y-4">
+      {/* Mobile: iPhone 15 mockup */}
+      <div className="md:hidden flex justify-center py-2">
+        <PhoneMock dark={dark} activeNav={activeNav}>
+          {mobileContent}
+        </PhoneMock>
+      </div>
+      {/* Desktop: browser mockup */}
+      <div className="hidden md:block">
+        <MockShell url={url}>{children}</MockShell>
+      </div>
+      {/* Theme badge */}
+      <div className="md:hidden flex justify-center">
+        <span className={`inline-flex items-center gap-1.5 text-[10px] font-medium px-2.5 py-1 rounded-full border ${
+          dark
+            ? "bg-gray-900/50 border-gray-700 text-gray-400"
+            : "bg-gray-100 border-gray-300 text-gray-500"
+        }`}>
+          {dark ? <Moon className="w-3 h-3" /> : <Sun className="w-3 h-3" />}
+          {dark ? "Modo escuro" : "Modo claro"}
+        </span>
+      </div>
+    </div>
+  )
+}
+
+/* ── SECTION CONTENT ── */
+function SectionContent({ id, sectionIndex }: { id: string; sectionIndex: number }) {
+  const dark = sectionIndex % 2 === 0
+  const cl = mc(dark)
+
   return (
     <div className="space-y-8 overflow-hidden">
 
@@ -194,27 +297,27 @@ function SectionContent({ id }: { id: string }) {
             <p className="text-sm text-[var(--text-secondary)]">Visão consolidada de todos os seus perfis e apostas.</p>
           </div>
 
-          <MockBoth url="/dashboard" activeNav="/dashboard" mobileContent={
+          <MockBoth url="/dashboard" activeNav="/dashboard" dark={dark} mobileContent={
             <>
-              <p className="text-[10px] font-bold text-white mb-2">Dashboard</p>
+              <p className={`text-[10px] font-bold mb-2 ${cl.t1}`}>Dashboard</p>
               <div className="grid grid-cols-2 gap-1.5 mb-2">
                 {[
-                  { l: "Saldo Total", v: "R$ 2.000,00", c: "text-blue-400", bg: "bg-blue-500/10 border-blue-500/20" },
-                  { l: "Lucro Realizado", v: "R$ 120,00", c: "text-[#60a5fa]", bg: "bg-blue-500/10 border-blue-500/20" },
-                  { l: "Lucro Pendente", v: "R$ 0,00", c: "text-yellow-400", bg: "bg-yellow-500/10 border-yellow-500/20" },
-                  { l: "ROI", v: "5.00%", c: "text-purple-400", bg: "bg-purple-500/10 border-purple-500/20" },
+                  { l: "Saldo Total",     v: "R$ 2.000,00", c: dark?"text-blue-400":"text-blue-600",   bg: dark?"bg-blue-500/10 border-blue-500/20":"bg-blue-50 border-blue-200" },
+                  { l: "Lucro Realizado", v: "R$ 120,00",   c: dark?"text-[#60a5fa]":"text-[#1e3a8a]",  bg: dark?"bg-blue-500/10 border-blue-500/20":"bg-blue-50 border-blue-200" },
+                  { l: "Lucro Pendente",  v: "R$ 0,00",     c: dark?"text-yellow-400":"text-yellow-600",bg: dark?"bg-yellow-500/10 border-yellow-500/20":"bg-yellow-50 border-yellow-200" },
+                  { l: "ROI",             v: "5.00%",       c: dark?"text-purple-400":"text-purple-600",bg: dark?"bg-purple-500/10 border-purple-500/20":"bg-purple-50 border-purple-200" },
                 ].map(({ l, v, c, bg }) => (
                   <div key={l} className={`rounded-xl border ${bg} p-2`}>
-                    <p className="text-[7px] text-gray-400 mb-0.5">{l}</p>
+                    <p className={`text-[7px] mb-0.5 ${cl.t2}`}>{l}</p>
                     <p className={`text-[9px] font-bold ${c}`}>{v}</p>
                   </div>
                 ))}
               </div>
-              <div className="bg-white/5 border border-white/10 rounded-xl p-2">
-                <p className="text-[8px] font-semibold text-gray-300 mb-1.5">Lucro Acumulado</p>
+              <div className={`${cl.card} rounded-xl border p-2`}>
+                <p className={`text-[8px] font-semibold mb-1.5 ${cl.t1}`}>Lucro Acumulado</p>
                 <div className="flex items-end gap-1 h-12 px-1">
                   {[2,5,3,8,6,9,7].map((h,i) => (
-                    <div key={i} className="flex-1 bg-[#1e3a8a]/60 rounded-t" style={{ height:`${h*10}%` }} />
+                    <div key={i} className={`flex-1 ${cl.bar} rounded-t`} style={{ height:`${h*10}%` }} />
                   ))}
                 </div>
               </div>
@@ -238,21 +341,19 @@ function SectionContent({ id }: { id: string }) {
               <div className="col-span-2 rounded-xl border border-white/5 bg-white/5 p-2">
                 <div className="flex items-center justify-between mb-2">
                   <p className="text-[8px] font-semibold text-gray-300 uppercase tracking-wide">Lucro Acumulado</p>
-                  <p className="text-[7px] text-gray-500">Apostas finalizadas</p>
                 </div>
                 <div className="flex items-end gap-1 h-10 px-1">
-                  {[2, 5, 3, 8, 6, 9, 7].map((h, i) => (
-                    <div key={i} className="flex-1 bg-[#1e3a8a]/50 rounded-t" style={{ height: `${h * 10}%` }} />
+                  {[2,5,3,8,6,9,7].map((h,i) => (
+                    <div key={i} className="flex-1 bg-[#1e3a8a]/50 rounded-t" style={{ height:`${h*10}%` }} />
                   ))}
                 </div>
               </div>
               <div className="rounded-xl border border-white/5 bg-white/5 p-2">
-                <p className="text-[8px] font-semibold text-gray-300 uppercase tracking-wide mb-2">Resumo Financeiro</p>
+                <p className="text-[8px] font-semibold text-gray-300 uppercase tracking-wide mb-2">Resumo</p>
                 {[
-                  { l: "Total Investido", v: "R$ 2.400,00", c: "text-white" },
-                  { l: "Lucro Realizado", v: "R$ 120,00", c: "text-[var(--accent-text)]" },
-                  { l: "Lucro Pendente", v: "R$ 0,00", c: "text-yellow-500" },
-                  { l: "Total Apostas", v: "1", c: "text-white" },
+                  { l: "Total", v: "R$ 2.400", c: "text-white" },
+                  { l: "Lucro", v: "R$ 120", c: "text-[var(--accent-text)]" },
+                  { l: "ROI", v: "5%", c: "text-purple-400" },
                 ].map(({ l, v, c }) => (
                   <div key={l} className="flex justify-between py-0.5 border-b border-white/5 last:border-0">
                     <span className="text-[7px] text-gray-500">{l}</span>
@@ -267,10 +368,10 @@ function SectionContent({ id }: { id: string }) {
             <h3 className="text-sm font-semibold text-[var(--text-primary)]">O que você encontra aqui</h3>
             <div className="grid grid-cols-2 gap-3">
               {[
-                { icon: TrendingUp, label: "Lucro Realizado", desc: "Soma de todos os lucros confirmados" },
-                { icon: Clock,      label: "Lucro Pendente",  desc: "Apostas ainda não finalizadas" },
-                { icon: ArrowUpRight, label: "ROI",           desc: "Retorno sobre investimento total" },
-                { icon: BarChart2,  label: "Gráfico",         desc: "Evolução do lucro acumulado ao longo do tempo" },
+                { icon: TrendingUp,   label: "Lucro Realizado", desc: "Soma de todos os lucros confirmados" },
+                { icon: Clock,        label: "Lucro Pendente",  desc: "Apostas ainda não finalizadas" },
+                { icon: ArrowUpRight, label: "ROI",             desc: "Retorno sobre investimento total" },
+                { icon: BarChart2,    label: "Gráfico",         desc: "Evolução do lucro acumulado ao longo do tempo" },
               ].map(({ icon: Icon, label, desc }) => (
                 <div key={label} className="bg-[var(--bg-surface)] border border-[var(--border)] rounded-xl p-4">
                   <div className="flex items-center gap-2 mb-1.5">
@@ -294,26 +395,28 @@ function SectionContent({ id }: { id: string }) {
             <p className="text-sm text-[var(--text-secondary)]">Organize suas apostas separando diferentes estratégias ou bancas.</p>
           </div>
 
-          <MockBoth url="/perfis" activeNav="/perfis" mobileContent={
+          <MockBoth url="/perfis" activeNav="/perfis" dark={dark} mobileContent={
             <>
               <div className="flex items-center justify-between mb-2">
-                <p className="text-[10px] font-bold text-white">Perfis</p>
+                <p className={`text-[10px] font-bold ${cl.t1}`}>Perfis</p>
                 <div className="flex items-center gap-1 bg-[#1e3a8a] px-2 py-1 rounded-lg">
                   <Plus className="w-2.5 h-2.5 text-white" /><span className="text-[7px] text-white">Novo</span>
                 </div>
               </div>
               {["Perfil Principal", "Banca Conservadora"].map((name, i) => (
-                <div key={i} className="bg-white/5 border border-white/10 rounded-xl p-2.5 mb-1.5">
+                <div key={i} className={`${cl.card} rounded-xl border p-2.5 mb-1.5`}>
                   <div className="flex items-center gap-2 mb-1.5">
                     <div className="w-7 h-7 rounded-full bg-[#1e3a8a] flex items-center justify-center text-white text-[8px] font-bold shrink-0">{name[0]}S</div>
                     <div>
-                      <p className="text-[9px] font-semibold text-white">{name}</p>
-                      <span className="text-[7px] bg-green-500/10 text-green-400 px-1 rounded-full border border-green-500/20">Ativo</span>
+                      <p className={`text-[9px] font-semibold ${cl.t1}`}>{name}</p>
+                      <span className="text-[7px] bg-green-500/10 text-green-500 px-1 rounded-full border border-green-500/20">Ativo</span>
                     </div>
                   </div>
                   <div className="grid grid-cols-3 gap-1 text-center">
                     {["12 apostas","R$ 120","5% ROI"].map(v=>(
-                      <div key={v} className="bg-black/30 rounded-lg p-1"><p className="text-[7px] font-bold text-white">{v}</p></div>
+                      <div key={v} className={`${cl.input} rounded-lg border p-1`}>
+                        <p className={`text-[7px] font-bold ${cl.t1}`}>{v}</p>
+                      </div>
                     ))}
                   </div>
                 </div>
@@ -321,10 +424,7 @@ function SectionContent({ id }: { id: string }) {
             </>
           }>
             <div className="flex items-center justify-between mb-3">
-              <div>
-                <p className="text-[11px] font-bold text-white">Perfis</p>
-                <p className="text-[8px] text-gray-500">Gerencie seus perfis de apostador</p>
-              </div>
+              <p className="text-[11px] font-bold text-white">Perfis</p>
               <div className="flex items-center gap-1 bg-[#1e3a8a] px-2 py-1 rounded-lg">
                 <Plus className="w-2.5 h-2.5 text-white" />
                 <span className="text-[8px] text-white font-medium">Novo perfil</span>
@@ -332,26 +432,19 @@ function SectionContent({ id }: { id: string }) {
             </div>
             <div className="grid grid-cols-2 gap-2">
               {["Perfil Principal", "Banca Conservadora"].map((name, i) => (
-                <div key={i} className="bg-white/5 border border-white/10 hover:border-[#1e3a8a]/40 rounded-xl p-2.5 cursor-pointer">
+                <div key={i} className="bg-white/5 border border-white/10 rounded-xl p-2.5">
                   <div className="flex items-start gap-2 mb-2">
-                    <div className="w-8 h-8 rounded-full bg-[#1e3a8a] flex items-center justify-center text-white text-[9px] font-bold shrink-0">
-                      {name[0]}S
-                    </div>
+                    <div className="w-8 h-8 rounded-full bg-[#1e3a8a] flex items-center justify-center text-white text-[9px] font-bold shrink-0">{name[0]}S</div>
                     <div className="min-w-0">
-                      <div className="flex items-center gap-1 flex-wrap">
-                        <p className="text-[9px] font-semibold text-white truncate">{name}</p>
-                        <span className="text-[7px] bg-green-500/10 text-green-500 px-1 rounded-full border border-green-500/20 flex items-center gap-0.5">
-                          <span className="w-1 h-1 rounded-full bg-green-500" />Ativo
-                        </span>
-                      </div>
-                      <p className="text-[7px] text-gray-500">perfil@email.com</p>
+                      <p className="text-[9px] font-semibold text-white truncate">{name}</p>
+                      <span className="text-[7px] bg-green-500/10 text-green-500 px-1 rounded-full border border-green-500/20">Ativo</span>
                     </div>
                   </div>
                   <div className="grid grid-cols-3 gap-1">
-                    {["Apostas", "Lucro", "ROI"].map((lbl, j) => (
+                    {["Apostas","Lucro","ROI"].map((lbl,j) => (
                       <div key={lbl} className="bg-black/30 rounded-lg p-1 text-center">
                         <p className="text-[6px] text-gray-500">{lbl}</p>
-                        <p className="text-[8px] font-bold text-white">{["12", "R$120", "5%"][j]}</p>
+                        <p className="text-[8px] font-bold text-white">{["12","R$120","5%"][j]}</p>
                       </div>
                     ))}
                   </div>
@@ -382,63 +475,54 @@ function SectionContent({ id }: { id: string }) {
             <p className="text-sm text-[var(--text-secondary)]">Calcule apostas 2-way e 3-way para garantir lucro independente do resultado.</p>
           </div>
 
-          <MockBoth url="/calculadora" activeNav="/dashboard" mobileContent={
+          <MockBoth url="/calculadora" activeNav="/dashboard" dark={dark} mobileContent={
             <>
-              <p className="text-[10px] font-bold text-white mb-2">Calculadora de Surebet</p>
+              <p className={`text-[10px] font-bold mb-2 ${cl.t1}`}>Calculadora de Surebet</p>
               <div className="space-y-1.5 mb-2">
                 {["Resultado 1 — Casa A","Resultado 2 — Casa B"].map((label,i)=>(
-                  <div key={i} className="bg-white/5 border border-white/10 rounded-xl p-2">
-                    <p className="text-[7px] text-gray-400 mb-1">{label}</p>
+                  <div key={i} className={`${cl.card} rounded-xl border p-2`}>
+                    <p className={`text-[7px] mb-1 ${cl.t2}`}>{label}</p>
                     <div className="flex gap-2">
-                      <div className="flex-1 bg-black/40 border border-white/10 rounded-lg px-2 py-1">
-                        <p className="text-[6px] text-gray-500">Odd</p>
-                        <p className="text-[9px] text-white font-mono">{["2.10","2.20"][i]}</p>
+                      <div className={`flex-1 ${cl.input} rounded-lg border px-2 py-1`}>
+                        <p className={`text-[6px] ${cl.t3}`}>Odd</p>
+                        <p className={`text-[9px] font-mono ${cl.t1}`}>{["2.10","2.20"][i]}</p>
                       </div>
-                      <div className="flex-1 bg-black/40 border border-white/10 rounded-lg px-2 py-1">
-                        <p className="text-[6px] text-gray-500">Stake</p>
-                        <p className="text-[9px] text-[#60a5fa] font-mono font-bold">{["R$95,24","R$90,91"][i]}</p>
+                      <div className={`flex-1 ${cl.input} rounded-lg border px-2 py-1`}>
+                        <p className={`text-[6px] ${cl.t3}`}>Stake</p>
+                        <p className={`text-[9px] font-mono font-bold ${dark?"text-[#60a5fa]":"text-[#1e3a8a]"}`}>{["R$95,24","R$90,91"][i]}</p>
                       </div>
                     </div>
                   </div>
                 ))}
               </div>
               <div className="bg-green-500/10 border border-green-500/20 rounded-xl p-2 flex items-center justify-between">
-                <div><p className="text-[7px] text-gray-400">Lucro garantido</p><p className="text-[10px] font-bold text-green-400">R$ 9,83</p></div>
-                <div className="text-right"><p className="text-[7px] text-gray-400">ROI</p><p className="text-[10px] font-bold text-green-400">5.2%</p></div>
+                <div><p className={`text-[7px] ${cl.t2}`}>Lucro garantido</p><p className="text-[10px] font-bold text-green-500">R$ 9,83</p></div>
+                <div className="text-right"><p className={`text-[7px] ${cl.t2}`}>ROI</p><p className="text-[10px] font-bold text-green-500">5.2%</p></div>
               </div>
             </>
           }>
             <p className="text-[10px] font-bold text-white mb-1">Calculadora de Surebet</p>
-            <p className="text-[8px] text-gray-500 mb-3">Calcule suas surebets 2-way e 3-way</p>
             <div className="grid grid-cols-2 gap-2 mb-2">
-              {["Resultado 1 — Casa A", "Resultado 2 — Casa B"].map((label, i) => (
+              {["Resultado 1 — Casa A","Resultado 2 — Casa B"].map((label,i)=>(
                 <div key={i} className="bg-white/5 border border-white/10 rounded-xl p-2">
                   <p className="text-[7px] text-gray-400 mb-1.5">{label}</p>
                   <div className="space-y-1">
                     <div className="bg-black/40 border border-white/10 rounded-lg px-2 py-1">
                       <p className="text-[7px] text-gray-500">Odd</p>
-                      <p className="text-[9px] text-white font-mono">{["2.10", "2.20"][i]}</p>
+                      <p className="text-[9px] text-white font-mono">{["2.10","2.20"][i]}</p>
                     </div>
                     <div className="bg-black/40 border border-white/10 rounded-lg px-2 py-1">
                       <p className="text-[7px] text-gray-500">Stake sugerida</p>
-                      <p className="text-[9px] text-[var(--accent-text)] font-mono font-bold">{["R$ 95,24", "R$ 90,91"][i]}</p>
+                      <p className="text-[9px] text-[var(--accent-text)] font-mono font-bold">{["R$ 95,24","R$ 90,91"][i]}</p>
                     </div>
                   </div>
                 </div>
               ))}
             </div>
             <div className="bg-green-500/10 border border-green-500/20 rounded-xl p-2 flex items-center justify-between">
-              <div>
-                <p className="text-[7px] text-gray-400">Lucro garantido</p>
-                <p className="text-[10px] font-bold text-green-400">R$ 9,83</p>
-              </div>
-              <div className="text-right">
-                <p className="text-[7px] text-gray-400">ROI</p>
-                <p className="text-[10px] font-bold text-green-400">5.2%</p>
-              </div>
-              <div className="bg-[#1e3a8a] px-2 py-1 rounded-lg">
-                <p className="text-[7px] text-white font-medium">Registrar apostas</p>
-              </div>
+              <div><p className="text-[7px] text-gray-400">Lucro garantido</p><p className="text-[10px] font-bold text-green-400">R$ 9,83</p></div>
+              <div className="text-right"><p className="text-[7px] text-gray-400">ROI</p><p className="text-[10px] font-bold text-green-400">5.2%</p></div>
+              <div className="bg-[#1e3a8a] px-2 py-1 rounded-lg"><p className="text-[7px] text-white font-medium">Registrar apostas</p></div>
             </div>
           </MockBoth>
 
@@ -464,10 +548,10 @@ function SectionContent({ id }: { id: string }) {
             <p className="text-sm text-[var(--text-secondary)]">Registre e acompanhe todas as suas apostas em um só lugar.</p>
           </div>
 
-          <MockBoth url="/apostas" activeNav="/apostas" mobileContent={
+          <MockBoth url="/apostas" activeNav="/apostas" dark={dark} mobileContent={
             <>
               <div className="flex items-center justify-between mb-2">
-                <p className="text-[10px] font-bold text-white">Apostas</p>
+                <p className={`text-[10px] font-bold ${cl.t1}`}>Apostas</p>
                 <div className="bg-[#1e3a8a] rounded-lg px-2 py-1 flex items-center gap-1">
                   <Plus className="w-2.5 h-2.5 text-white"/><span className="text-[7px] text-white">Nova</span>
                 </div>
@@ -478,31 +562,26 @@ function SectionContent({ id }: { id: string }) {
                   { ev: "Real Madrid x Barcelona", casa: "Betano · R$ 100,00", lucro: "-R$ 100,00", s: "red" },
                   { ev: "Djokovic x Alcaraz", casa: "Superbet · R$ 80,00", lucro: "Pendente", s: "yellow" },
                 ].map(({ ev, casa, lucro, s }, i) => (
-                  <div key={i} className="bg-white/5 border border-white/10 rounded-xl px-2.5 py-2 flex items-center justify-between">
+                  <div key={i} className={`${cl.card} rounded-xl border px-2.5 py-2 flex items-center justify-between`}>
                     <div className="flex items-center gap-2">
-                      <div className={`w-1.5 h-8 rounded-full ${s==="green"?"bg-green-500":s==="red"?"bg-red-500":"bg-yellow-500"}`} />
+                      <div className={`w-1.5 h-7 rounded-full ${s==="green"?"bg-green-500":s==="red"?"bg-red-500":"bg-yellow-500"}`} />
                       <div>
-                        <p className="text-[8px] font-semibold text-white truncate max-w-[120px]">{ev}</p>
-                        <p className="text-[7px] text-gray-500">{casa}</p>
+                        <p className={`text-[8px] font-semibold truncate max-w-[110px] ${cl.t1}`}>{ev}</p>
+                        <p className={`text-[7px] ${cl.t2}`}>{casa}</p>
                       </div>
                     </div>
-                    <span className={`text-[8px] font-bold ${s==="green"?"text-green-400":s==="red"?"text-red-400":"text-yellow-400"}`}>{lucro}</span>
+                    <span className={`text-[8px] font-bold ${s==="green"?"text-green-500":s==="red"?"text-red-500":"text-yellow-500"}`}>{lucro}</span>
                   </div>
                 ))}
               </div>
             </>
           }>
             <div className="flex items-center justify-between mb-3">
-              <div>
-                <p className="text-[11px] font-bold text-white">Apostas</p>
-              </div>
+              <p className="text-[11px] font-bold text-white">Apostas</p>
               <div className="flex items-center gap-1">
                 <div className="bg-white/5 border border-white/10 rounded-lg px-2 py-1 flex items-center gap-1">
                   <Search className="w-2.5 h-2.5 text-gray-500" />
                   <span className="text-[7px] text-gray-500">Buscar...</span>
-                </div>
-                <div className="bg-white/5 border border-white/10 rounded-lg p-1">
-                  <Filter className="w-2.5 h-2.5 text-gray-500" />
                 </div>
                 <div className="bg-[#1e3a8a] rounded-lg px-2 py-1 flex items-center gap-1">
                   <Plus className="w-2.5 h-2.5 text-white" />
@@ -518,13 +597,13 @@ function SectionContent({ id }: { id: string }) {
               ].map(({ ev, casa, stake, lucro, s }, i) => (
                 <div key={i} className="bg-white/5 border border-white/10 rounded-xl px-2.5 py-2 flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <div className={`w-1.5 h-6 rounded-full ${s === "green" ? "bg-green-500" : s === "red" ? "bg-red-500" : "bg-yellow-500"}`} />
+                    <div className={`w-1.5 h-6 rounded-full ${s==="green"?"bg-green-500":s==="red"?"bg-red-500":"bg-yellow-500"}`} />
                     <div>
                       <p className="text-[8px] font-semibold text-white">{ev}</p>
                       <p className="text-[7px] text-gray-500">{casa} · {stake}</p>
                     </div>
                   </div>
-                  <span className={`text-[8px] font-bold ${s === "green" ? "text-green-400" : s === "red" ? "text-red-400" : "text-yellow-400"}`}>{lucro}</span>
+                  <span className={`text-[8px] font-bold ${s==="green"?"text-green-400":s==="red"?"text-red-400":"text-yellow-400"}`}>{lucro}</span>
                 </div>
               ))}
             </div>
@@ -539,7 +618,6 @@ function SectionContent({ id }: { id: string }) {
               <Step num={4} text="Após o resultado, volte e marque como Ganho, Perdido ou Devolvido." />
             </div>
           </div>
-
           <div className="grid grid-cols-3 gap-3">
             {[
               { label: "Pendente",  color: "text-yellow-400", bg: "bg-yellow-500/10 border-yellow-500/20", desc: "Aguardando resultado" },
@@ -564,27 +642,27 @@ function SectionContent({ id }: { id: string }) {
             <p className="text-sm text-[var(--text-secondary)]">Análise detalhada do seu desempenho financeiro.</p>
           </div>
 
-          <MockBoth url="/financeiro" activeNav="/financeiro" mobileContent={
+          <MockBoth url="/financeiro" activeNav="/financeiro" dark={dark} mobileContent={
             <>
-              <p className="text-[10px] font-bold text-white mb-2">Financeiro</p>
+              <p className={`text-[10px] font-bold mb-2 ${cl.t1}`}>Financeiro</p>
               <div className="grid grid-cols-2 gap-1.5 mb-2">
                 {[
-                  { l:"Total Investido", v:"R$ 2.400", c:"text-white" },
-                  { l:"Lucro Realizado", v:"R$ 120,00", c:"text-[#60a5fa]" },
-                  { l:"Lucro Pendente", v:"R$ 0,00", c:"text-yellow-400" },
-                  { l:"ROI Médio", v:"5.00%", c:"text-green-400" },
+                  { l:"Total Investido", v:"R$ 2.400", c:cl.t1 },
+                  { l:"Lucro Realizado", v:"R$ 120,00", c:dark?"text-[#60a5fa]":"text-[#1e3a8a]" },
+                  { l:"Lucro Pendente",  v:"R$ 0,00",   c:dark?"text-yellow-400":"text-yellow-600" },
+                  { l:"ROI Médio",       v:"5.00%",     c:dark?"text-green-400":"text-green-600" },
                 ].map(({l,v,c})=>(
-                  <div key={l} className="bg-white/5 border border-white/10 rounded-xl p-2 text-center">
-                    <p className="text-[6px] text-gray-500 mb-0.5">{l}</p>
+                  <div key={l} className={`${cl.card} rounded-xl border p-2 text-center`}>
+                    <p className={`text-[6px] mb-0.5 ${cl.t2}`}>{l}</p>
                     <p className={`text-[9px] font-bold ${c}`}>{v}</p>
                   </div>
                 ))}
               </div>
-              <div className="bg-white/5 border border-white/10 rounded-xl p-2">
-                <p className="text-[8px] font-semibold text-gray-300 mb-1.5">Evolução da Banca</p>
+              <div className={`${cl.card} rounded-xl border p-2`}>
+                <p className={`text-[8px] font-semibold mb-1.5 ${cl.t1}`}>Evolução da Banca</p>
                 <div className="flex items-end gap-0.5 h-12 px-1">
                   {[3,5,4,7,5,9,8,6,8,10].map((h,i)=>(
-                    <div key={i} className="flex-1 bg-[#1e3a8a]/60 rounded-t" style={{height:`${h*9}%`}} />
+                    <div key={i} className={`flex-1 ${cl.bar} rounded-t`} style={{height:`${h*9}%`}} />
                   ))}
                 </div>
               </div>
@@ -609,13 +687,13 @@ function SectionContent({ id }: { id: string }) {
                 <p className="text-[8px] font-semibold text-gray-300 uppercase tracking-wide">Evolução da Banca</p>
                 <div className="flex gap-1">
                   {["Dia","Sem","Mês","Ano"].map(f => (
-                    <span key={f} className={`text-[6px] px-1.5 py-0.5 rounded ${f === "Mês" ? "bg-[#1e3a8a] text-white" : "text-gray-500"}`}>{f}</span>
+                    <span key={f} className={`text-[6px] px-1.5 py-0.5 rounded ${f==="Mês"?"bg-[#1e3a8a] text-white":"text-gray-500"}`}>{f}</span>
                   ))}
                 </div>
               </div>
               <div className="flex items-end gap-1 h-12 px-1">
-                {[3,5,4,7,5,9,8,6,8,10].map((h, i) => (
-                  <div key={i} className="flex-1 bg-[#1e3a8a]/60 rounded-t" style={{ height: `${h * 9}%` }} />
+                {[3,5,4,7,5,9,8,6,8,10].map((h,i) => (
+                  <div key={i} className="flex-1 bg-[#1e3a8a]/60 rounded-t" style={{height:`${h*9}%`}} />
                 ))}
               </div>
             </div>
@@ -625,9 +703,9 @@ function SectionContent({ id }: { id: string }) {
             <h3 className="text-sm font-semibold text-[var(--text-primary)]">O que você encontra aqui</h3>
             <div className="space-y-2.5">
               {[
-                { icon: BarChart2,   label: "Evolução da banca",    desc: "Gráfico do crescimento do saldo ao longo do tempo com filtros de período." },
-                { icon: ArrowUpRight,label: "ROI por período",      desc: "Retorno sobre investimento filtrado por dia, semana, mês ou ano." },
-                { icon: Filter,      label: "Filtros avançados",    desc: "Filtre por perfil e bet para análises específicas." },
+                { icon: BarChart2,    label: "Evolução da banca",  desc: "Gráfico do crescimento do saldo ao longo do tempo com filtros de período." },
+                { icon: ArrowUpRight, label: "ROI por período",    desc: "Retorno sobre investimento filtrado por dia, semana, mês ou ano." },
+                { icon: Filter,       label: "Filtros avançados",  desc: "Filtre por perfil e bet para análises específicas." },
               ].map(({ icon: Icon, label, desc }) => (
                 <div key={label} className="flex items-start gap-3 bg-[var(--bg-surface)] border border-[var(--border)] rounded-xl p-4">
                   <div className="w-8 h-8 bg-[#1e3a8a]/10 rounded-lg flex items-center justify-center shrink-0">
@@ -653,33 +731,33 @@ function SectionContent({ id }: { id: string }) {
             <p className="text-sm text-[var(--text-secondary)]">Gerencie seu plano e forma de pagamento.</p>
           </div>
 
-          <MockBoth url="/assinatura" activeNav="/dashboard" mobileContent={
+          <MockBoth url="/assinatura" activeNav="/dashboard" dark={dark} mobileContent={
             <>
               <div className="flex items-center gap-2 mb-2">
-                <CreditCard className="w-3.5 h-3.5 text-[#60a5fa]" />
-                <p className="text-[10px] font-bold text-white">Assinatura</p>
+                <CreditCard className={`w-3.5 h-3.5 ${dark?"text-[#60a5fa]":"text-[#1e3a8a]"}`} />
+                <p className={`text-[10px] font-bold ${cl.t1}`}>Assinatura</p>
               </div>
-              <div className="bg-white/5 border border-[#1e3a8a]/30 rounded-xl p-2.5 mb-2">
+              <div className={`${cl.card} rounded-xl border p-2.5 mb-2`}>
                 <div className="flex items-center gap-1.5 mb-1">
-                  <Star className="w-3 h-3 text-[#60a5fa]" />
-                  <span className="text-[9px] font-bold text-white">Pro</span>
-                  <span className="text-[7px] bg-green-500/20 text-green-400 px-1.5 rounded-full border border-green-500/20 ml-1">Ativa</span>
+                  <Star className={`w-3 h-3 ${dark?"text-[#60a5fa]":"text-[#1e3a8a]"}`} />
+                  <span className={`text-[9px] font-bold ${cl.t1}`}>Pro</span>
+                  <span className="text-[7px] bg-green-500/20 text-green-500 px-1.5 rounded-full border border-green-500/20 ml-1">Ativa</span>
                 </div>
-                <p className="text-[11px] font-bold text-white">R$ 99<span className="text-[8px] font-normal text-gray-500">,00/mês</span></p>
-                <p className="text-[7px] text-gray-400 mt-0.5">Próxima cobrança em <span className="text-white">21/07/2026</span></p>
+                <p className={`text-[11px] font-bold ${cl.t1}`}>R$ 99<span className={`text-[8px] font-normal ${cl.t2}`}>,00/mês</span></p>
+                <p className={`text-[7px] mt-0.5 ${cl.t2}`}>Próxima cobrança em <span className={cl.t1}>21/07/2026</span></p>
                 <div className="mt-2 flex items-center gap-1 bg-[#1e3a8a] w-fit px-2 py-1 rounded-lg">
                   <RefreshCw className="w-2.5 h-2.5 text-white" />
                   <span className="text-[7px] text-white font-medium">Atualizar pagamento</span>
                 </div>
               </div>
-              <div className="bg-white/5 border border-white/10 rounded-xl overflow-hidden">
+              <div className={`${cl.card} rounded-xl border overflow-hidden`}>
                 {[
-                  { l:"Status", v:"Ativa", c:"text-green-400" },
-                  { l:"Plano", v:"Pro · R$ 99/mês", c:"text-white" },
-                  { l:"Próx. cobrança", v:"21/07/2026", c:"text-white" },
+                  { l:"Status", v:"Ativa", c:"text-green-500" },
+                  { l:"Plano", v:"Pro · R$ 99/mês", c:cl.t1 },
+                  { l:"Próx. cobrança", v:"21/07/2026", c:cl.t1 },
                 ].map(({l,v,c})=>(
-                  <div key={l} className="flex items-center justify-between px-2.5 py-1.5 border-b border-white/5 last:border-0">
-                    <span className="text-[7px] text-gray-500">{l}</span>
+                  <div key={l} className={`flex items-center justify-between px-2.5 py-1.5 border-b last:border-0 ${dark?"border-white/5":"border-gray-100"}`}>
+                    <span className={`text-[7px] ${cl.t2}`}>{l}</span>
                     <span className={`text-[7px] font-medium ${c}`}>{v}</span>
                   </div>
                 ))}
@@ -690,15 +768,9 @@ function SectionContent({ id }: { id: string }) {
               <div className="w-6 h-6 bg-[#1e3a8a]/10 rounded-lg flex items-center justify-center">
                 <CreditCard className="w-3 h-3 text-[var(--accent-text)]" />
               </div>
-              <div>
-                <p className="text-[10px] font-bold text-white">Assinatura</p>
-                <p className="text-[7px] text-gray-500">Gerencie seu plano do SureBetFlow</p>
-              </div>
+              <p className="text-[10px] font-bold text-white">Assinatura</p>
             </div>
             <div className="bg-white/5 border border-[#1e3a8a]/30 rounded-xl p-2.5 mb-2 relative">
-              <div className="absolute top-2 right-2">
-                <span className="text-[6px] bg-[#1e3a8a]/20 text-[var(--accent-text)] px-1.5 py-0.5 rounded-full">Plano único</span>
-              </div>
               <div className="flex items-center gap-1.5 mb-1">
                 <Star className="w-3 h-3 text-[var(--accent-text)]" />
                 <span className="text-[9px] font-bold text-white">Pro</span>
@@ -712,14 +784,11 @@ function SectionContent({ id }: { id: string }) {
               </div>
             </div>
             <div className="bg-white/5 border border-white/10 rounded-xl overflow-hidden">
-              <div className="px-2.5 py-1.5 border-b border-white/5">
-                <p className="text-[8px] font-semibold text-white">Detalhes da assinatura</p>
-              </div>
               {[
                 { icon: Activity, l: "Status", v: "Ativa", c: "text-green-400" },
                 { icon: Star,     l: "Plano",  v: "Pro — R$ 99,00/mês", c: "text-white" },
                 { icon: Calendar, l: "Próxima cobrança", v: "21/07/2026", c: "text-white" },
-                { icon: Hash,     l: "ID da assinatura", v: "pix_123456...", c: "text-gray-500" },
+                { icon: Hash,     l: "ID", v: "pix_123456...", c: "text-gray-500" },
               ].map(({ icon: Icon, l, v, c }) => (
                 <div key={l} className="flex items-center justify-between px-2.5 py-1.5 border-b border-white/5 last:border-0">
                   <div className="flex items-center gap-1.5">
@@ -754,36 +823,36 @@ function SectionContent({ id }: { id: string }) {
             <p className="text-sm text-[var(--text-secondary)]">Personalize sua conta e preferências.</p>
           </div>
 
-          <MockBoth url="/configuracoes" activeNav="/dashboard" mobileContent={
+          <MockBoth url="/configuracoes" activeNav="/dashboard" dark={dark} mobileContent={
             <>
-              <p className="text-[10px] font-bold text-white mb-2">Configurações</p>
+              <p className={`text-[10px] font-bold mb-2 ${cl.t1}`}>Minha Conta</p>
               <div className="space-y-1.5">
                 {[
-                  { label:"Meu perfil",   sub:"Altere nome, foto e e-mail" },
-                  { label:"Segurança",    sub:"Alterar senha de acesso" },
-                  { label:"Aparência",    sub:"Tema claro ou escuro" },
-                  { label:"Notificações", sub:"Gerencie alertas por e-mail" },
+                  { label:"Dados pessoais",  sub:"Altere nome, foto e e-mail" },
+                  { label:"Segurança",       sub:"Alterar senha de acesso" },
+                  { label:"Aparência",       sub:"Tema claro ou escuro" },
+                  { label:"Termos e Privacidade", sub:"Políticas do serviço" },
                 ].map(({label,sub})=>(
-                  <div key={label} className="bg-white/5 border border-white/10 rounded-xl px-3 py-2 flex items-center justify-between">
+                  <div key={label} className={`${cl.card} rounded-xl border px-3 py-2 flex items-center justify-between`}>
                     <div>
-                      <p className="text-[9px] font-medium text-white">{label}</p>
-                      <p className="text-[7px] text-gray-500">{sub}</p>
+                      <p className={`text-[9px] font-medium ${cl.t1}`}>{label}</p>
+                      <p className={`text-[7px] ${cl.t2}`}>{sub}</p>
                     </div>
-                    <ArrowRight className="w-3 h-3 text-gray-600" />
+                    <ArrowRight className={`w-3 h-3 ${cl.t3}`} />
                   </div>
                 ))}
               </div>
             </>
           }>
-            <p className="text-[10px] font-bold text-white mb-3">Configurações</p>
+            <p className="text-[10px] font-bold text-white mb-3">Minha Conta</p>
             <div className="space-y-1.5">
               {[
-                { label: "Meu perfil",    sub: "Altere nome, foto e e-mail da conta" },
-                { label: "Segurança",     sub: "Alterar senha de acesso" },
-                { label: "Aparência",     sub: "Tema claro ou escuro" },
-                { label: "Notificações",  sub: "Gerencie alertas por e-mail" },
+                { label: "Dados pessoais",       sub: "Altere nome, foto e e-mail da conta" },
+                { label: "Segurança",            sub: "Alterar senha de acesso" },
+                { label: "Aparência",            sub: "Tema claro ou escuro" },
+                { label: "Termos e Privacidade", sub: "Políticas do serviço" },
               ].map(({ label, sub }) => (
-                <div key={label} className="bg-white/5 border border-white/10 rounded-xl px-3 py-2 flex items-center justify-between hover:border-[#1e3a8a]/30 cursor-pointer">
+                <div key={label} className="bg-white/5 border border-white/10 rounded-xl px-3 py-2 flex items-center justify-between">
                   <div>
                     <p className="text-[9px] font-medium text-white">{label}</p>
                     <p className="text-[7px] text-gray-500">{sub}</p>
@@ -798,10 +867,10 @@ function SectionContent({ id }: { id: string }) {
             <h3 className="text-sm font-semibold text-[var(--text-primary)]">O que você pode configurar</h3>
             <div className="space-y-2.5">
               {[
-                { label: "Meu perfil",    desc: "Atualize seu nome, foto de perfil e endereço de e-mail." },
-                { label: "Segurança",     desc: "Altere sua senha de acesso quando necessário." },
-                { label: "Aparência",     desc: "Alterne entre tema escuro e claro conforme sua preferência." },
-                { label: "Notificações",  desc: "Escolha quais alertas deseja receber por e-mail." },
+                { label: "Dados pessoais",  desc: "Atualize seu nome, foto de perfil e endereço de e-mail." },
+                { label: "Segurança",       desc: "Altere sua senha de acesso quando necessário." },
+                { label: "Aparência",       desc: "Alterne entre tema escuro e claro conforme sua preferência." },
+                { label: "Legal",           desc: "Acesse Política de Privacidade e Termos de Uso." },
               ].map(({ label, desc }) => (
                 <div key={label} className="flex items-start gap-3 bg-[var(--bg-surface)] border border-[var(--border)] rounded-xl p-4">
                   <CheckCircle className="w-4 h-4 text-[var(--accent-text)] shrink-0 mt-0.5" />
@@ -825,23 +894,23 @@ function SectionContent({ id }: { id: string }) {
             <p className="text-sm text-[var(--text-secondary)]">Abra tickets e acompanhe o atendimento da nossa equipe.</p>
           </div>
 
-          <MockBoth url="/suporte" activeNav="/dashboard" mobileContent={
+          <MockBoth url="/suporte" activeNav="/dashboard" dark={dark} mobileContent={
             <>
               <div className="flex items-center justify-between mb-2">
-                <p className="text-[10px] font-bold text-white">Suporte</p>
+                <p className={`text-[10px] font-bold ${cl.t1}`}>Suporte</p>
                 <div className="flex items-center gap-1 bg-[#1e3a8a] px-2 py-1 rounded-lg">
                   <Plus className="w-2.5 h-2.5 text-white"/><span className="text-[7px] text-white">Novo ticket</span>
                 </div>
               </div>
-              <div className="bg-white/5 border border-white/10 rounded-xl p-2 mb-2">
-                <p className="text-[8px] font-semibold text-white mb-1.5">Novo Ticket</p>
+              <div className={`${cl.card} rounded-xl border p-2 mb-2`}>
+                <p className={`text-[8px] font-semibold mb-1.5 ${cl.t1}`}>Novo Ticket</p>
                 <div className="space-y-1.5">
-                  <div className="bg-black/40 border border-white/10 rounded-lg px-2 py-1.5 flex items-center justify-between">
-                    <span className="text-[7px] text-gray-400">Selecione o assunto</span>
-                    <ChevronRight className="w-2 h-2 text-gray-600 rotate-90" />
+                  <div className={`${cl.input} rounded-lg border px-2 py-1.5 flex items-center justify-between`}>
+                    <span className={`text-[7px] ${cl.t2}`}>Selecione o assunto</span>
+                    <ChevronRight className={`w-2 h-2 ${cl.t3} rotate-90`} />
                   </div>
-                  <div className="bg-black/40 border border-white/10 rounded-lg px-2 py-3">
-                    <p className="text-[6px] text-gray-600">Descreva seu problema...</p>
+                  <div className={`${cl.input} rounded-lg border px-2 py-3`}>
+                    <p className={`text-[6px] ${cl.t3}`}>Descreva seu problema...</p>
                   </div>
                   <div className="bg-[#1e3a8a] rounded-lg py-1.5 text-center">
                     <span className="text-[7px] text-white font-medium">Abrir ticket</span>
@@ -849,21 +918,18 @@ function SectionContent({ id }: { id: string }) {
                 </div>
               </div>
               {[
-                { assunto:"Dúvidas", status:"respondido", cor:"text-blue-400", badge:"bg-blue-500/10 border-blue-500/20" },
-                { assunto:"Sugestões", status:"aberto", cor:"text-yellow-400", badge:"bg-yellow-500/10 border-yellow-500/20" },
+                { assunto:"Dúvidas", status:"respondido", cor:"text-blue-500", badge:dark?"bg-blue-500/10 border-blue-500/20":"bg-blue-50 border-blue-200" },
+                { assunto:"Sugestões", status:"aberto", cor:"text-yellow-500", badge:dark?"bg-yellow-500/10 border-yellow-500/20":"bg-yellow-50 border-yellow-200" },
               ].map(({assunto,status,cor,badge})=>(
-                <div key={assunto} className="bg-white/5 border border-white/10 rounded-xl p-2 mb-1 flex items-center justify-between">
-                  <p className="text-[8px] font-semibold text-white">{assunto}</p>
+                <div key={assunto} className={`${cl.card} rounded-xl border p-2 mb-1 flex items-center justify-between`}>
+                  <p className={`text-[8px] font-semibold ${cl.t1}`}>{assunto}</p>
                   <span className={`text-[7px] font-medium border px-1.5 py-0.5 rounded-full ${badge} ${cor}`}>{status}</span>
                 </div>
               ))}
             </>
           }>
             <div className="flex items-center justify-between mb-3">
-              <div>
-                <p className="text-[11px] font-bold text-white">Suporte</p>
-                <p className="text-[7px] text-gray-500">Envie mensagens e acompanhe seus tickets</p>
-              </div>
+              <p className="text-[11px] font-bold text-white">Suporte</p>
               <div className="flex items-center gap-1 bg-[#1e3a8a] px-2 py-1 rounded-lg">
                 <Plus className="w-2.5 h-2.5 text-white" />
                 <span className="text-[7px] text-white font-medium">Novo ticket</span>
@@ -871,37 +937,19 @@ function SectionContent({ id }: { id: string }) {
             </div>
             <div className="bg-white/5 border border-white/10 rounded-xl p-2.5 mb-2">
               <p className="text-[8px] font-semibold text-white mb-2">Novo Ticket</p>
-              <div className="grid grid-cols-3 gap-2 mb-2">
-                <div className="col-span-2">
-                  <p className="text-[6px] text-gray-500 mb-1">Assunto</p>
-                  <div className="bg-black/40 border border-white/10 rounded-lg px-2 py-1.5 flex items-center justify-between">
-                    <span className="text-[7px] text-gray-400">Selecione o assunto</span>
-                    <ChevronRight className="w-2 h-2 text-gray-600 rotate-90" />
-                  </div>
-                  <div className="mt-1 bg-black/40 border border-white/10 rounded-lg px-1.5 py-0.5 flex gap-1">
-                    {["Dúvidas", "Sugestões", "Críticas"].map(o => (
-                      <span key={o} className={`text-[6px] px-1 py-0.5 rounded ${o === "Dúvidas" ? "bg-[#1e3a8a] text-white" : "text-gray-500"}`}>{o}</span>
-                    ))}
-                  </div>
+              <div className="space-y-1.5">
+                <div className="bg-black/40 border border-white/10 rounded-lg px-2 py-1.5 flex items-center justify-between">
+                  <span className="text-[7px] text-gray-400">Selecione o assunto</span>
+                  <ChevronRight className="w-2 h-2 text-gray-600 rotate-90" />
                 </div>
-                <div>
-                  <p className="text-[6px] text-gray-500 mb-1">Prioridade</p>
-                  <div className="bg-black/40 border border-white/10 rounded-lg px-2 py-1.5 flex items-center justify-between">
-                    <span className="text-[7px] text-gray-400">Normal</span>
-                    <ChevronRight className="w-2 h-2 text-gray-600 rotate-90" />
-                  </div>
-                </div>
-              </div>
-              <div>
-                <p className="text-[6px] text-gray-500 mb-1">Mensagem</p>
                 <div className="bg-black/40 border border-white/10 rounded-lg px-2 py-2 h-8">
-                  <p className="text-[6px] text-gray-600">Descreva detalhadamente sua dúvida ou problema...</p>
+                  <p className="text-[6px] text-gray-600">Descreva detalhadamente...</p>
                 </div>
               </div>
             </div>
             {[
-              { assunto: "Dúvidas", msg: "Como funciona o cálculo de ROI?", status: "respondido", cor: "text-blue-400", badge: "bg-blue-500/10 border-blue-500/20" },
-              { assunto: "Sugestões", msg: "Adicionar exportação para Excel", status: "aberto", cor: "text-yellow-400", badge: "bg-yellow-500/10 border-yellow-500/20" },
+              { assunto:"Dúvidas", msg:"Como funciona o cálculo de ROI?", status:"respondido", cor:"text-blue-400", badge:"bg-blue-500/10 border-blue-500/20" },
+              { assunto:"Sugestões", msg:"Adicionar exportação para Excel", status:"aberto", cor:"text-yellow-400", badge:"bg-yellow-500/10 border-yellow-500/20" },
             ].map(({ assunto, msg, status, cor, badge }) => (
               <div key={assunto} className="bg-white/5 border border-white/10 rounded-xl p-2 mb-1 flex items-center justify-between">
                 <div>
@@ -924,7 +972,6 @@ function SectionContent({ id }: { id: string }) {
               <Step num={6} text="Acompanhe e responda clicando no ticket aberto na lista." />
             </div>
           </div>
-
           <div className="grid grid-cols-3 gap-3">
             {[
               { label: "Aberto",     color: "text-yellow-400", bg: "bg-yellow-500/10 border-yellow-500/20", desc: "Aguardando resposta" },
@@ -980,18 +1027,21 @@ export default function TutorialClient() {
 
       {/* Mobile: card grid */}
       <div className="md:hidden grid grid-cols-2 gap-3 mb-2">
-        {SECTIONS.map(({ id, label, icon: Icon }) => (
-          <button
-            key={id}
-            onClick={() => openSheet(id)}
-            className="flex flex-col items-center gap-3 p-5 bg-[var(--bg-surface)] border border-[var(--border)] rounded-2xl hover:border-[#1e3a8a]/40 hover:bg-[#1e3a8a]/5 transition-all text-left active:scale-95"
-          >
-            <div className="w-10 h-10 bg-[#1e3a8a]/10 rounded-xl flex items-center justify-center">
-              <Icon className="w-5 h-5 text-[var(--accent-text)]" />
-            </div>
-            <span className="text-sm font-medium text-[var(--text-primary)] text-center leading-tight">{label}</span>
-          </button>
-        ))}
+        {SECTIONS.map(({ id, label, icon: Icon }, idx) => {
+          const dark = idx % 2 === 0
+          return (
+            <button
+              key={id}
+              onClick={() => openSheet(id)}
+              className="flex flex-col items-center gap-3 p-5 bg-[var(--bg-surface)] border border-[var(--border)] rounded-2xl hover:border-[#1e3a8a]/40 hover:bg-[#1e3a8a]/5 transition-all text-left active:scale-95"
+            >
+              <div className="w-10 h-10 bg-[#1e3a8a]/10 rounded-xl flex items-center justify-center">
+                <Icon className="w-5 h-5 text-[var(--accent-text)]" />
+              </div>
+              <span className="text-sm font-medium text-[var(--text-primary)] text-center leading-tight">{label}</span>
+            </button>
+          )
+        })}
       </div>
 
       {/* Desktop: tabs + content */}
@@ -1015,15 +1065,11 @@ export default function TutorialClient() {
           </div>
         </div>
 
-        <SectionContent id={active} />
+        <SectionContent id={active} sectionIndex={SECTIONS.findIndex(s => s.id === active)} />
 
-        {/* Desktop bottom navigation */}
         <div className="flex items-center justify-between pt-4 mt-8 border-t border-[var(--border)]">
           <button
-            onClick={() => {
-              const idx = SECTIONS.findIndex(s => s.id === active)
-              if (idx > 0) setActive(SECTIONS[idx - 1].id)
-            }}
+            onClick={() => { const idx = SECTIONS.findIndex(s => s.id === active); if (idx > 0) setActive(SECTIONS[idx - 1].id) }}
             disabled={SECTIONS[0].id === active}
             className="flex items-center gap-2 text-sm text-[var(--text-secondary)] hover:text-[var(--text-primary)] disabled:opacity-30 transition-colors"
           >
@@ -1034,10 +1080,7 @@ export default function TutorialClient() {
             {SECTIONS.findIndex(s => s.id === active) + 1} / {SECTIONS.length}
           </span>
           <button
-            onClick={() => {
-              const idx = SECTIONS.findIndex(s => s.id === active)
-              if (idx < SECTIONS.length - 1) setActive(SECTIONS[idx + 1].id)
-            }}
+            onClick={() => { const idx = SECTIONS.findIndex(s => s.id === active); if (idx < SECTIONS.length - 1) setActive(SECTIONS[idx + 1].id) }}
             disabled={SECTIONS[SECTIONS.length - 1].id === active}
             className="flex items-center gap-2 text-sm text-[var(--accent-text)] hover:text-[#1e40af] disabled:opacity-30 transition-colors font-medium"
           >
@@ -1101,7 +1144,7 @@ export default function TutorialClient() {
 
           {/* Scrollable content */}
           <div className="flex-1 overflow-y-auto px-4 pb-8">
-            <SectionContent id={sheetSection} />
+            <SectionContent id={sheetSection} sectionIndex={sheetIdx} />
           </div>
         </SheetContent>
       </Sheet>
