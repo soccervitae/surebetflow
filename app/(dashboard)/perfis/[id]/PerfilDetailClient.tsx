@@ -16,7 +16,7 @@ import AddBetToProfile from "@/components/AddBetToProfile"
 import { formatCurrency } from "@/lib/utils"
 import { useToast } from "@/hooks/useToast"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { DollarSign, TrendingUp, Clock, ArrowUpRight, Pencil, Calculator, ArrowDownCircle, ArrowUpCircle, Gift, ArrowDownLeft, Wallet } from "lucide-react"
+import { DollarSign, TrendingUp, Clock, ArrowUpRight, Pencil, Calculator, ArrowDownCircle, ArrowUpCircle, Gift, ArrowDownLeft, Wallet, SlidersHorizontal, X } from "lucide-react"
 import SurebetCalculator from "@/components/SurebetCalculator"
 import type { Profile, ProfileDashboard, Aposta, MovimentacaoFinanceira, ProfileBet } from "@/lib/types"
 
@@ -56,6 +56,7 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
   const [finCasa, setFinCasa] = useState("todos")
   const [bonusEntries, setBonusEntries] = useState<{ id: string; profile_bet_id: string | null; valor: number; descricao: string | null; created_at: string; _tipo: "bonus" }[]>([])
   const [finShowForm, setFinShowForm] = useState(false)
+  const [finShowFilter, setFinShowFilter] = useState(false)
   const [finFormBet, setFinFormBet] = useState("")
   const [finFormTipo, setFinFormTipo] = useState<"deposito" | "saque" | "bonus">("deposito")
   const [finFormValor, setFinFormValor] = useState("")
@@ -608,8 +609,22 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
           </div>
 
           {/* Filters */}
-          <div className="flex flex-wrap items-center gap-2 justify-between"></div>
-          <div className="flex flex-wrap items-center gap-2">
+          {/* Mobile: toggle button */}
+          <div className="flex md:hidden items-center justify-between">
+            <span className="text-xs text-[var(--text-secondary)]">
+              {finPeriodo === "hoje" ? "Hoje" : finPeriodo === "semana" ? "Semana" : finPeriodo === "mes" ? "Mês" : "Todos"} · {finTipo === "todos" ? "Todos" : finTipo === "deposito" ? "Depósito" : finTipo === "saque" ? "Saque" : "Bônus"}
+            </span>
+            <button
+              onClick={() => setFinShowFilter(v => !v)}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-xs font-medium transition-colors ${finShowFilter ? "border-[#1e3a8a]/40 bg-[#1e3a8a]/10 text-[var(--accent-text)]" : "border-[var(--border)] text-[var(--text-secondary)]"}`}
+            >
+              {finShowFilter ? <X className="w-3.5 h-3.5" /> : <SlidersHorizontal className="w-3.5 h-3.5" />}
+              Filtrar
+            </button>
+          </div>
+
+          {/* Filter options: always visible on desktop, toggle on mobile */}
+          <div className={`${finShowFilter ? "flex" : "hidden"} md:flex flex-wrap items-center gap-2`}>
             <div className="flex gap-1 bg-[var(--bg-elevated)] rounded-lg p-1">
               {(["hoje", "semana", "mes", "todos"] as const).map(p => (
                 <button key={p} onClick={() => setFinPeriodo(p)}
