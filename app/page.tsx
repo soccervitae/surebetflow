@@ -56,7 +56,7 @@ export default async function LandingPage() {
 
       {/* Hero */}
       <section className="max-w-6xl mx-auto px-4 sm:px-6 pt-24 pb-28 text-center">
-        <div className="inline-flex items-center gap-2 bg-[#1e3a8a]/10 border border-[#1e3a8a]/20 text-[#1e3a8a] text-sm font-medium px-4 py-1.5 rounded-full mb-8">
+        <div className="inline-flex items-center gap-2 bg-white/5 border border-white/10 text-gray-400 text-sm font-medium px-4 py-1.5 rounded-full mb-8">
           <Zap className="w-3.5 h-3.5" />
           Lucro garantido — é matemática pura
         </div>
