@@ -395,24 +395,61 @@ export default async function LandingPage() {
       {/* Planos */}
       <section className="border-y border-white/5 py-20 bg-[#0d1b3e]">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 text-center">
-          <h2 className="text-3xl font-bold text-white mb-4">Um plano. Acesso completo.</h2>
-          <p className="text-gray-400 mb-12 max-w-xl mx-auto">Sem planos confusos. Tudo incluso por um preço justo.</p>
-          <div className="max-w-sm mx-auto">
+          <h2 className="text-3xl font-bold text-white mb-4">Escolha seu plano</h2>
+          <p className="text-gray-400 mb-12 max-w-xl mx-auto">Sem taxas escondidas. Cancele quando quiser.</p>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-3xl mx-auto">
+
             {/* Plano Pro */}
-            <div className="bg-[#0f172a] border-2 border-[#1e3a8a] rounded-2xl p-8 text-left relative">
-              <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-                <span className="bg-[#1e3a8a] text-white text-xs font-bold px-3 py-1 rounded-full">PLANO PRO</span>
+            <div className="bg-[#0f172a] border border-white/10 rounded-2xl p-8 text-left relative flex flex-col">
+              <div className="mb-4">
+                <span className="bg-white/10 text-white text-xs font-bold px-3 py-1 rounded-full">PLANO PRO</span>
               </div>
-              <p className="text-gray-400 text-sm mb-2">Acesso completo à plataforma</p>
+              <p className="text-gray-400 text-sm mb-2">Para apostadores individuais</p>
               <div className="flex items-end gap-1 mb-1">
                 <span className="text-gray-500 text-lg font-medium">R$</span>
                 <span className="text-5xl font-extrabold text-white">99</span>
                 <span className="text-gray-500 text-lg font-medium mb-1">,00/mês</span>
               </div>
               <p className="text-xs text-gray-500 mb-6">Cancele quando quiser, sem fidelidade</p>
-              <ul className="space-y-3 text-sm mb-8">
+              <ul className="space-y-3 text-sm mb-8 flex-1">
                 {[
-                  "Perfis ilimitados de apostador",
+                  "Até 5 perfis de apostador",
+                  "Casas de apostas ilimitadas",
+                  "Calculadora 2-way e 3-way",
+                  "Controle de bônus por casa de apostas",
+                  "Dashboard financeiro completo",
+                  "Histórico completo de apostas",
+                  "Suporte por ticket",
+                ].map(f => (
+                  <li key={f} className="flex items-center gap-2">
+                    <CheckCircle className="w-4 h-4 text-gray-400 flex-shrink-0" />
+                    <span className="text-gray-300">{f}</span>
+                  </li>
+                ))}
+              </ul>
+              <Link href="/cadastro" className="block w-full bg-white/10 hover:bg-white/20 text-white font-semibold py-3 rounded-xl transition-colors text-center">
+                Começar agora
+              </Link>
+            </div>
+
+            {/* Plano Pro Max */}
+            <div className="bg-[#0f172a] border-2 border-[#1e3a8a] rounded-2xl p-8 text-left relative flex flex-col">
+              <div className="absolute -top-3 left-1/2 -translate-x-1/2">
+                <span className="bg-[#1e3a8a] text-white text-xs font-bold px-3 py-1 rounded-full">MAIS POPULAR</span>
+              </div>
+              <div className="mb-4">
+                <span className="bg-[#1e3a8a]/20 text-[#93c5fd] text-xs font-bold px-3 py-1 rounded-full border border-[#1e3a8a]/40">PLANO PRO MAX</span>
+              </div>
+              <p className="text-gray-400 text-sm mb-2">Para grupos e operações maiores</p>
+              <div className="flex items-end gap-1 mb-1">
+                <span className="text-gray-500 text-lg font-medium">R$</span>
+                <span className="text-5xl font-extrabold text-white">179</span>
+                <span className="text-gray-500 text-lg font-medium mb-1">,90/mês</span>
+              </div>
+              <p className="text-xs text-gray-500 mb-6">Cancele quando quiser, sem fidelidade</p>
+              <ul className="space-y-3 text-sm mb-8 flex-1">
+                {[
+                  "Até 20 perfis de apostador",
                   "Casas de apostas ilimitadas",
                   "Calculadora 2-way e 3-way",
                   "Controle de bônus por casa de apostas",
@@ -430,6 +467,7 @@ export default async function LandingPage() {
                 Começar agora
               </Link>
             </div>
+
           </div>
         </div>
       </section>
