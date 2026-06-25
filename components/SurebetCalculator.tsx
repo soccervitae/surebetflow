@@ -125,7 +125,8 @@ function parseSurebetText(text: string): { event: string; sport: string; legs: P
 
 export default function SurebetCalculator({ profiles, defaultProfileId, onSaved }: Props) {
   const filteredProfiles = defaultProfileId ? profiles.filter(p => p.id === defaultProfileId) : profiles
-  const [tipo, setTipo] = useState<"2-way" | "3-way">("2-way")
+  const [numLegs, setNumLegs] = useState(2)
+  const tipo = numLegs >= 3 ? "3-way" : "2-way"
   const [evento, setEvento] = useState("")
   const [esporte, setEsporte] = useState("")
   const [investimentoTotal, setInvestimentoTotal] = useState("100,00")
@@ -146,21 +147,13 @@ export default function SurebetCalculator({ profiles, defaultProfileId, onSaved 
   const { toast } = useToast()
   const supabase = createClient()
 
-  const numLegs = tipo === "2-way" ? 2 : 3
-
   useEffect(() => {
-    if (tipo === "2-way") {
-      setLegs(prev => prev.slice(0, 2).concat(
-        prev.length < 2 ? [{ profileBetId: "", resultadoApostado: "", odd: "" }] : []
-      ))
-    } else {
-      setLegs(prev => {
-        const newLegs = [...prev]
-        while (newLegs.length < 3) newLegs.push({ profileBetId: "", resultadoApostado: "", odd: "" })
-        return newLegs.slice(0, 3)
-      })
-    }
-  }, [tipo])
+    setLegs(prev => {
+      const cur = [...prev]
+      while (cur.length < numLegs) cur.push({ profileBetId: "", resultadoApostado: "", odd: "" })
+      return cur.slice(0, numLegs)
+    })
+  }, [numLegs])
 
   const loadProfileBets = useCallback(async () => {
     const { data } = await supabase
@@ -204,8 +197,7 @@ export default function SurebetCalculator({ profiles, defaultProfileId, onSaved 
   function applyAiSurebet(sb: AiSurebet) {
     if (sb.evento) setEvento(sb.evento)
     if (sb.esporte) setEsporte(sb.esporte)
-    const newTipo: "2-way" | "3-way" = sb.tipo === "3-way" ? "3-way" : "2-way"
-    setTipo(newTipo)
+    setNumLegs(sb.legs.length >= 3 ? 3 : 2)
 
     const allProfileBets = Object.values(profileBets).flat() as (ProfileBet & { bet?: { nome: string } })[]
     const newLegs = sb.legs.map(leg => {
@@ -288,9 +280,7 @@ export default function SurebetCalculator({ profiles, defaultProfileId, onSaved 
     if (event) setEvento(event)
     if (sport) setEsporte(sport)
 
-    // Set tipo based on number of legs
-    const newTipo: "2-way" | "3-way" = parsedLegs.length >= 3 ? "3-way" : "2-way"
-    setTipo(newTipo)
+    setNumLegs(parsedLegs.length >= 3 ? 3 : 2)
 
     // Match each leg's bookmaker name to a profile_bet
     const allProfileBets = Object.values(profileBets).flat() as (ProfileBet & { bet?: { nome: string } })[]
@@ -406,7 +396,8 @@ export default function SurebetCalculator({ profiles, defaultProfileId, onSaved 
       toast({ title: "Aposta salva com sucesso!" })
       setEvento("")
       setEsporte("")
-      setLegs(Array(numLegs).fill({ profileBetId: "", resultadoApostado: "", odd: "" }))
+      setNumLegs(2)
+      setLegs([{ profileBetId: "", resultadoApostado: "", odd: "" }, { profileBetId: "", resultadoApostado: "", odd: "" }])
       onSaved?.()
     } catch (err: unknown) {
       toast({ title: (err as Error)?.message ?? "Erro ao salvar aposta", variant: "destructive" })
@@ -639,7 +630,7 @@ export default function SurebetCalculator({ profiles, defaultProfileId, onSaved 
                 <Input
                   value={leg.resultadoApostado}
                   onChange={e => updateLeg(i, "resultadoApostado", e.target.value)}
-                  placeholder={tipo === "2-way" ? (i === 0 ? "Casa" : "Visitante") : ["Casa", "Empate", "Visitante"][i]}
+                  placeholder={numLegs === 2 ? (i === 0 ? "Casa" : "Visitante") : ["Casa", "Empate", "Visitante"][i]}
                 />
               </div>
               <div className="grid grid-cols-2 gap-3">
