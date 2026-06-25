@@ -332,7 +332,6 @@ export default function ApostasClient({ apostas: initialApostas, profiles }: Pro
                 <div className="flex items-center gap-2 flex-wrap mb-1 min-w-0">
                   <p className="font-medium text-[var(--text-primary)] truncate">{aposta.evento}</p>
                   {statusBadge(aposta.status)}
-                  <Badge variant="secondary">{aposta.tipo}</Badge>
                 </div>
                 <p className="text-xs text-[var(--text-secondary)] mb-2">
                   Perfil: {aposta.profile ? (aposta.profile.apelido || `${aposta.profile.nome} ${aposta.profile.sobrenome}`) : "—"} · {new Date(aposta.created_at).toLocaleDateString("pt-BR")}

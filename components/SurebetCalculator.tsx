@@ -456,7 +456,7 @@ export default function SurebetCalculator({ profiles, defaultProfileId, onSaved 
                       <div className="flex-1 min-w-0">
                         <p className="text-sm font-medium text-[var(--text-primary)] truncate">{sb.evento || "Evento desconhecido"}</p>
                         <p className="text-xs text-[var(--text-secondary)] mt-0.5">
-                          {sb.esporte} · {sb.tipo} · {sb.legs.length} casas
+                          {sb.esporte} · {sb.legs.length} casas
                           {sb.roi ? ` · ROI ${sb.roi.toFixed(1)}%` : ""}
                         </p>
                         <p className="text-xs text-[var(--text-muted)] mt-0.5 truncate">
@@ -593,18 +593,7 @@ export default function SurebetCalculator({ profiles, defaultProfileId, onSaved 
               <Label>Evento</Label>
               <Input value={evento} onChange={e => setEvento(e.target.value)} placeholder="Ex: Flamengo x Corinthians" />
             </div>
-            <div className="space-y-2">
-              <Label>Tipo</Label>
-              <Select value={tipo} onValueChange={(v: "2-way" | "3-way") => setTipo(v)}>
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="2-way">2-way (2 resultados)</SelectItem>
-                  <SelectItem value="3-way">3-way (3 resultados)</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
+
             <div className="space-y-2">
               <Label>Investimento Total (R$)</Label>
               <Input

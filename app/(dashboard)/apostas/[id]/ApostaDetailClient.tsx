@@ -309,17 +309,6 @@ export default function ApostaDetailClient({ aposta: initial }: { aposta: Aposta
           </CardContent>
         </Card>
 
-        <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center gap-2 mb-1">
-              <div className="p-1.5 bg-[var(--bg-elevated)] rounded-lg flex-shrink-0">
-                <Tag className="h-3.5 w-3.5 text-[var(--text-secondary)]" />
-              </div>
-              <p className="text-xs text-[var(--text-secondary)]">Tipo</p>
-            </div>
-            <p className="text-base font-bold text-[var(--text-primary)]">{aposta.tipo}</p>
-          </CardContent>
-        </Card>
       </div>
 
       {/* Legs */}
@@ -493,25 +482,7 @@ export default function ApostaDetailClient({ aposta: initial }: { aposta: Aposta
               <Label>Esporte</Label>
               <Input value={editEsporte} onChange={e => setEditEsporte(e.target.value)} placeholder="Ex: Futebol" />
             </div>
-            <div className="space-y-2">
-              <Label>Tipo</Label>
-              <div className="flex gap-2">
-                {(["2-way", "3-way"] as const).map(t => (
-                  <button
-                    key={t}
-                    type="button"
-                    onClick={() => setEditTipo(t)}
-                    className={`flex-1 h-10 rounded-xl border text-sm font-medium transition-colors ${
-                      editTipo === t
-                        ? "border-[#1e3a8a] bg-[#1e3a8a]/10 text-[#1e3a8a]"
-                        : "border-[var(--border)] text-[var(--text-secondary)] hover:bg-[var(--bg-elevated)]"
-                    }`}
-                  >
-                    {t}
-                  </button>
-                ))}
-              </div>
-            </div>
+
 
             <div className="space-y-3">
               <Label>Entradas</Label>
