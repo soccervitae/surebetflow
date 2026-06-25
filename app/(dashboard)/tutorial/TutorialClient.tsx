@@ -208,8 +208,8 @@ export default function TutorialClient() {
         </div>
       </div>
 
-      {/* Scrollable tabs */}
-      <div className="mb-6">
+      {/* Desktop: scrollable tabs */}
+      <div className="hidden md:block mb-6">
         <div className="flex overflow-x-auto scrollbar-hide border-b border-[var(--border)]">
           {SECTIONS.map(({ id, label, icon: Icon }) => (
             <button
@@ -228,8 +228,29 @@ export default function TutorialClient() {
         </div>
       </div>
 
+      {/* Mobile: section cards */}
+      <div className="md:hidden grid grid-cols-2 gap-3 mb-6">
+        {SECTIONS.map(({ id, label, icon: Icon }) => {
+          const isActive = active === id
+          return (
+            <button
+              key={id}
+              onClick={() => setActive(id)}
+              className={`flex flex-col items-center gap-2 p-4 rounded-xl border text-sm font-medium transition-all ${
+                isActive
+                  ? "border-[#1e3a8a]/40 bg-[#1e3a8a]/10 text-[var(--accent-text)]"
+                  : "border-[var(--border)] bg-[var(--bg-surface)] text-[var(--text-secondary)]"
+              }`}
+            >
+              <Icon className="w-5 h-5" />
+              <span>{label}</span>
+            </button>
+          )
+        })}
+      </div>
+
       <div>
-        {/* Content */}
+        {/* Content (shared mobile + desktop) */}
         <div className="space-y-8 overflow-hidden">
 
           {/* ── DASHBOARD ── */}
