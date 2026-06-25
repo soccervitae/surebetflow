@@ -217,8 +217,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             <span className="opacity-30">•</span>
             <span className="text-[var(--text-primary)] font-medium">{userName}</span>
             <span className="opacity-30">•</span>
-            <span className="text-xs font-semibold bg-[#1e3a8a]/20 text-[#1e3a8a] px-2 py-0.5 rounded border border-[#1e3a8a]/30">
-              APOSTADOR
+            <span className="text-xs text-[var(--text-secondary)]">
+              {new Date().toLocaleDateString("pt-BR", { weekday: "short", day: "2-digit", month: "short", year: "numeric" })}
             </span>
           </div>
           <div className="flex items-center gap-2">
