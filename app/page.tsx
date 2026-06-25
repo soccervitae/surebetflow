@@ -508,17 +508,76 @@ export default async function LandingPage() {
       </section>
 
       {/* Footer */}
-      <footer className="border-t border-white/5 py-8 bg-[#0f172a]">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+      <footer className="border-t border-white/5 bg-[#0a0f1e]">
+        {/* Desktop footer */}
+        <div className="hidden md:block max-w-6xl mx-auto px-6 pt-14 pb-8">
+          <div className="grid grid-cols-4 gap-10 mb-12">
+            {/* Brand */}
+            <div className="col-span-1 space-y-4">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src="https://gkkuttabavwxjuibmrnr.supabase.co/storage/v1/object/public/logos/surebetflow-horizontal-vazada-branca%20(1).png" alt="SurebetFlow" className="h-8 w-auto" />
+              <p className="text-sm text-gray-500 leading-relaxed">A plataforma completa para apostadores de arbitragem esportiva.</p>
+            </div>
+            {/* Plataforma */}
+            <div className="space-y-4">
+              <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Plataforma</p>
+              <ul className="space-y-2.5">
+                {[
+                  { label: "Dashboard", href: "/dashboard" },
+                  { label: "Perfis", href: "/perfis" },
+                  { label: "Calculadora", href: "/calculadora" },
+                  { label: "Apostas", href: "/apostas" },
+                  { label: "Financeiro", href: "/financeiro" },
+                ].map(({ label, href }) => (
+                  <li key={label}><Link href={href} className="text-sm text-gray-500 hover:text-white transition-colors">{label}</Link></li>
+                ))}
+              </ul>
+            </div>
+            {/* Conta */}
+            <div className="space-y-4">
+              <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Conta</p>
+              <ul className="space-y-2.5">
+                {[
+                  { label: "Entrar", href: "/login" },
+                  { label: "Cadastrar", href: "/cadastro" },
+                  { label: "Assinatura", href: "/assinatura" },
+                  { label: "Suporte", href: "/suporte" },
+                  { label: "Tutorial", href: "/tutorial" },
+                ].map(({ label, href }) => (
+                  <li key={label}><Link href={href} className="text-sm text-gray-500 hover:text-white transition-colors">{label}</Link></li>
+                ))}
+              </ul>
+            </div>
+            {/* Legal */}
+            <div className="space-y-4">
+              <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Legal</p>
+              <ul className="space-y-2.5">
+                {[
+                  { label: "Política de Privacidade", href: "/privacidade" },
+                  { label: "Termos de Uso", href: "/termos" },
+                ].map(({ label, href }) => (
+                  <li key={label}><Link href={href} className="text-sm text-gray-500 hover:text-white transition-colors">{label}</Link></li>
+                ))}
+              </ul>
+            </div>
+          </div>
+          <div className="border-t border-white/5 pt-6 flex items-center justify-between">
+            <p className="text-xs text-gray-600">© 2026 SurebetFlow. Todos os direitos reservados.</p>
+            <p className="text-xs text-gray-600">Feito para apostadores sérios 🇧🇷</p>
+          </div>
+        </div>
+
+        {/* Mobile footer */}
+        <div className="md:hidden max-w-6xl mx-auto px-4 py-8 flex flex-col items-center gap-4 text-center">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src="https://gkkuttabavwxjuibmrnr.supabase.co/storage/v1/object/public/logos/surebetflow-horizontal-vazada-branca%20(1).png" alt="SurebetFlow" className="h-8 w-auto" />
-          <p className="text-xs text-gray-600">© 2026 SurebetFlow. Todos os direitos reservados.</p>
-          <div className="flex gap-4">
+          <div className="flex flex-wrap justify-center gap-4">
             <Link href="/privacidade" className="text-xs text-gray-500 hover:text-white transition-colors">Privacidade</Link>
             <Link href="/termos" className="text-xs text-gray-500 hover:text-white transition-colors">Termos de Uso</Link>
             <Link href="/login" className="text-xs text-gray-500 hover:text-white transition-colors">Entrar</Link>
             <Link href="/cadastro" className="text-xs text-gray-500 hover:text-white transition-colors">Cadastrar</Link>
           </div>
+          <p className="text-xs text-gray-600">© 2026 SurebetFlow. Todos os direitos reservados.</p>
         </div>
       </footer>
 
