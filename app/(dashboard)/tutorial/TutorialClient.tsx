@@ -9,7 +9,7 @@ import {
   Search, CreditCard, Star, Zap,
   BarChart2, ChevronLeft, Circle, Bell, Sun,
   Filter, ArrowRight, QrCode, Activity, Hash,
-  Calendar, RefreshCw, Lock, MoreHorizontal, X, Moon,
+  Calendar, RefreshCw, Lock, MoreHorizontal, X,
 } from "lucide-react"
 
 const SECTIONS = [
@@ -266,24 +266,13 @@ function MockBoth({ url, activeNav, dark, mobileContent, children }: {
       <div className="hidden md:block">
         <MockShell url={url}>{children}</MockShell>
       </div>
-      {/* Theme badge */}
-      <div className="md:hidden flex justify-center">
-        <span className={`inline-flex items-center gap-1.5 text-[10px] font-medium px-2.5 py-1 rounded-full border ${
-          dark
-            ? "bg-gray-900/50 border-gray-700 text-gray-400"
-            : "bg-gray-100 border-gray-300 text-gray-500"
-        }`}>
-          {dark ? <Moon className="w-3 h-3" /> : <Sun className="w-3 h-3" />}
-          {dark ? "Modo escuro" : "Modo claro"}
-        </span>
-      </div>
     </div>
   )
 }
 
 /* ── SECTION CONTENT ── */
-function SectionContent({ id, sectionIndex }: { id: string; sectionIndex: number }) {
-  const dark = sectionIndex % 2 === 0
+function SectionContent({ id, sectionIndex: _ }: { id: string; sectionIndex: number }) {
+  const dark = true
   const cl = mc(dark)
 
   return (
