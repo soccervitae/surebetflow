@@ -13,9 +13,9 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet"
 import { formatCurrency } from "@/lib/utils"
 import { useToast } from "@/hooks/useToast"
-import { BookOpen, Filter, X, Plus } from "lucide-react"
+import { BookOpen, Filter, X, Plus, Calculator } from "lucide-react"
 import type { Aposta, ApostaLeg } from "@/lib/types"
-import NovaApostaForm from "./NovaApostaForm"
+import SurebetCalculator from "@/components/SurebetCalculator"
 
 interface Props {
   apostas: (Aposta & { profile?: { nome: string; sobrenome: string; apelido?: string | null } })[]
@@ -292,13 +292,23 @@ export default function ApostasClient({ apostas: initialApostas, profiles }: Pro
       <Sheet open={novaSheet} onOpenChange={setNovaSheet}>
         <SheetContent side="bottom" className="h-[92vh] flex flex-col p-0 rounded-t-2xl">
           <SheetHeader className="px-5 pt-5 pb-3 border-b border-[var(--border)] flex-shrink-0">
-            <SheetTitle>Nova aposta</SheetTitle>
+            <SheetTitle className="flex items-center gap-2">
+              <Calculator className="h-4 w-4 text-[var(--accent-text)]" />
+              Nova aposta
+            </SheetTitle>
           </SheetHeader>
           <div className="flex-1 overflow-y-auto px-5 py-4">
-            <NovaApostaForm
-              profiles={profiles}
-              onCreated={a => { setApostas(prev => [a, ...prev]); setNovaSheet(false) }}
-              onClose={() => setNovaSheet(false)}
+            <SurebetCalculator
+              profiles={profiles as any}
+              onSaved={async () => {
+                setNovaSheet(false)
+                const { data } = await supabase
+                  .from("apostas")
+                  .select("*, profile:profiles(nome, sobrenome, apelido), legs:aposta_legs(*, profile_bet:profile_bets(*, bet:bets(*)))")
+                  .in("profile_id", profiles.map(p => p.id))
+                  .order("created_at", { ascending: false })
+                if (data) setApostas(data as any)
+              }}
             />
           </div>
         </SheetContent>
@@ -306,14 +316,24 @@ export default function ApostasClient({ apostas: initialApostas, profiles }: Pro
 
       {/* Nova aposta — Modal desktop */}
       <Dialog open={novaModal} onOpenChange={setNovaModal}>
-        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>Nova aposta</DialogTitle>
+            <DialogTitle className="flex items-center gap-2">
+              <Calculator className="h-5 w-5 text-[var(--accent-text)]" />
+              Nova aposta
+            </DialogTitle>
           </DialogHeader>
-          <NovaApostaForm
-            profiles={profiles}
-            onCreated={a => { setApostas(prev => [a, ...prev]); setNovaModal(false) }}
-            onClose={() => setNovaModal(false)}
+          <SurebetCalculator
+            profiles={profiles as any}
+            onSaved={async () => {
+              setNovaModal(false)
+              const { data } = await supabase
+                .from("apostas")
+                .select("*, profile:profiles(nome, sobrenome, apelido), legs:aposta_legs(*, profile_bet:profile_bets(*, bet:bets(*)))")
+                .in("profile_id", profiles.map(p => p.id))
+                .order("created_at", { ascending: false })
+              if (data) setApostas(data as any)
+            }}
           />
         </DialogContent>
       </Dialog>
