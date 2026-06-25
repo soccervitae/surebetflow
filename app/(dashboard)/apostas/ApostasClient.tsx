@@ -325,7 +325,7 @@ export default function ApostasClient({ apostas: initialApostas, profiles }: Pro
                 <table className="w-full text-sm">
                   <thead>
                     <tr className="border-b border-[var(--border)]">
-                      {["Lucro", "Casa de aposta", "Data", "Evento", "Mercado", "Chance"].map(h => (
+                      {["Lucro", "Bets", "Data", "Evento", "Mercado", "Odds"].map(h => (
                         <th key={h} className="px-4 py-3 text-left text-xs font-semibold text-[var(--text-muted)] uppercase tracking-wide whitespace-nowrap first:pl-5 last:pr-5 last:text-right">
                           {h}
                         </th>
