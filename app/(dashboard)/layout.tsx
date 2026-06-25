@@ -20,6 +20,7 @@ const navItems = [
   { href: "/financeiro", icon: Wallet, label: "Financeiro" },
   { href: "/assinatura", icon: CreditCard, label: "Assinatura" },
   { href: "/suporte", icon: MessageCircle, label: "Suporte" },
+  { href: "/tutorial", icon: BookOpen, label: "Tutorial" },
   { href: "/configuracoes", icon: Settings, label: "Configurações" },
 ]
 
