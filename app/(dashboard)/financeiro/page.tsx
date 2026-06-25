@@ -4,12 +4,10 @@ import { useEffect, useState, useMemo } from "react"
 import { createClient } from "@/lib/supabase/client"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
 import { Badge } from "@/components/ui/badge"
 import { formatCurrency } from "@/lib/utils"
-import { Profile, ProfileBet, Bet } from "@/lib/types"
-import { Plus, Wallet, ArrowDownLeft, ArrowUpRight, DollarSign, SlidersHorizontal, X } from "lucide-react"
+import { Profile } from "@/lib/types"
+import { Wallet, ArrowDownLeft, ArrowUpRight, DollarSign, SlidersHorizontal, X } from "lucide-react"
 
 type Movimentacao = {
   id: string
@@ -27,9 +25,7 @@ type Periodo = "hoje" | "semana" | "mes" | "todos"
 
 export default function FinanceiroPage() {
   const [profiles, setProfiles] = useState<Profile[]>([])
-  const [profileBets, setProfileBets] = useState<(ProfileBet & { bet: Bet })[]>([])
   const [movimentacoes, setMovimentacoes] = useState<Movimentacao[]>([])
-  const [showForm, setShowForm] = useState(false)
   const [showFilter, setShowFilter] = useState(false)
 
   // Filters
@@ -38,15 +34,6 @@ export default function FinanceiroPage() {
   const [filterProfile, setFilterProfile] = useState("")
   const [filterBet, setFilterBet] = useState("")
   const [filterProfileBets, setFilterProfileBets] = useState<{ id: string; nome: string }[]>([])
-
-  // Form
-  const [formProfile, setFormProfile] = useState("")
-  const [formBet, setFormBet] = useState("")
-  const [formTipo, setFormTipo] = useState<"deposito" | "saque">("deposito")
-  const [formValor, setFormValor] = useState("")
-  const [formDescricao, setFormDescricao] = useState("")
-  const [saving, setSaving] = useState(false)
-  const [formError, setFormError] = useState("")
 
   async function load() {
     const supabase = createClient()
@@ -63,14 +50,6 @@ export default function FinanceiroPage() {
   }
 
   useEffect(() => { load() }, [])
-
-  useEffect(() => {
-    if (!formProfile) { setProfileBets([]); setFormBet(""); return }
-    const supabase = createClient()
-    supabase.from("profile_bets").select("*, bet:bets(*)").eq("profile_id", formProfile).then(({ data }) => {
-      setProfileBets((data ?? []) as (ProfileBet & { bet: Bet })[])
-    })
-  }, [formProfile])
 
   useEffect(() => {
     setFilterBet("")
@@ -92,48 +71,6 @@ export default function FinanceiroPage() {
       })
   }, [filterProfile])
 
-  function formatBRL(raw: string) {
-    const digits = raw.replace(/\D/g, "")
-    if (!digits) return ""
-    const num = parseInt(digits, 10) / 100
-    return num.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })
-  }
-
-  function parseBRL(formatted: string) {
-    return parseFloat(formatted.replace(/\./g, "").replace(",", ".")) || 0
-  }
-
-  async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault()
-    setFormError("")
-    const val = parseBRL(formValor)
-    if (isNaN(val) || val <= 0) { setFormError("Informe um valor válido."); return }
-    setSaving(true)
-    const supabase = createClient()
-
-    const { error } = await supabase.from("movimentacoes_financeiras").insert({
-      profile_id: formProfile,
-      profile_bet_id: formBet || null,
-      tipo: formTipo,
-      valor: val,
-      descricao: formDescricao.trim() || null,
-    })
-
-    if (error) { setFormError("Erro ao registrar movimentação."); setSaving(false); return }
-
-    if (formBet) {
-      const { data: pb } = await supabase.from("profile_bets").select("saldo").eq("id", formBet).single()
-      if (pb) {
-        const newSaldo = formTipo === "deposito" ? Number(pb.saldo) + val : Number(pb.saldo) - val
-        await supabase.from("profile_bets").update({ saldo: newSaldo }).eq("id", formBet)
-      }
-    }
-
-    setShowForm(false)
-    setFormProfile(""); setFormBet(""); setFormValor(""); setFormDescricao("")
-    load()
-    setSaving(false)
-  }
 
   // Unique bets across all movimentacoes
   const allBets = useMemo(() => {
@@ -213,76 +150,9 @@ export default function FinanceiroPage() {
             {showFilter ? <X className="w-4 h-4" /> : <SlidersHorizontal className="w-4 h-4" />}
             <span className="hidden sm:inline">Filtrar</span>
           </button>
-          <Button onClick={() => setShowForm(!showForm)} className="bg-[#1e3a8a] hover:bg-[#1e40af] text-white gap-2">
-            <Plus className="w-4 h-4" />
-            <span className="hidden sm:inline">Nova Movimentação</span>
-            <span className="sm:hidden">Nova</span>
-          </Button>
         </div>
       </div>
 
-      {/* Form */}
-      {showForm && (
-        <Card>
-          <CardHeader><CardTitle className="text-base">Registrar Movimentação</CardTitle></CardHeader>
-          <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label>Perfil *</Label>
-                  <select
-                    className="w-full h-10 px-3 rounded-xl border border-[var(--border)] bg-[var(--bg-surface)] text-[var(--text-primary)] text-sm"
-                    value={formProfile} onChange={e => setFormProfile(e.target.value)} required
-                  >
-                    <option value="">Selecione</option>
-                    {profiles.map(p => (
-                      <option key={p.id} value={p.id}>{p.apelido || `${p.nome} ${p.sobrenome}`}</option>
-                    ))}
-                  </select>
-                </div>
-                <div className="space-y-2">
-                  <Label>Bet (opcional)</Label>
-                  <select
-                    className="w-full h-10 px-3 rounded-xl border border-[var(--border)] bg-[var(--bg-surface)] text-[var(--text-primary)] text-sm"
-                    value={formBet} onChange={e => setFormBet(e.target.value)}
-                  >
-                    <option value="">Nenhuma</option>
-                    {profileBets.map(pb => <option key={pb.id} value={pb.id}>{pb.bet?.nome}</option>)}
-                  </select>
-                </div>
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label>Tipo *</Label>
-                  <div className="flex gap-2">
-                    {(["deposito", "saque"] as const).map(t => (
-                      <button key={t} type="button" onClick={() => setFormTipo(t)}
-                        className={`flex-1 h-10 rounded-xl border text-sm font-medium transition-colors ${formTipo === t ? "border-[#1e3a8a] bg-[#1e3a8a]/10 text-[#1e3a8a]" : "border-[var(--border)] text-[var(--text-secondary)]"}`}>
-                        {t === "deposito" ? "Depósito" : "Saque"}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-                <div className="space-y-2">
-                  <Label>Valor (R$) *</Label>
-                  <Input type="text" inputMode="numeric" value={formValor} onChange={e => setFormValor(formatBRL(e.target.value))} placeholder="0,00" required />
-                </div>
-              </div>
-              <div className="space-y-2">
-                <Label>Descrição (opcional)</Label>
-                <Input value={formDescricao} onChange={e => setFormDescricao(e.target.value)} placeholder="Ex: Depósito inicial via PIX" />
-              </div>
-              {formError && <p className="text-sm text-[#DC2626] bg-[#DC2626]/5 border border-[#DC2626]/20 rounded-lg px-3 py-2">{formError}</p>}
-              <div className="flex gap-2">
-                <Button type="submit" className="bg-[#1e3a8a] hover:bg-[#1e40af] text-white" disabled={saving}>
-                  {saving ? "Salvando..." : "Registrar"}
-                </Button>
-                <Button type="button" variant="outline" onClick={() => setShowForm(false)}>Cancelar</Button>
-              </div>
-            </form>
-          </CardContent>
-        </Card>
-      )}
 
       {/* Filtros — sempre visível no desktop, toggle no mobile */}
       <div className={`${showFilter ? "block" : "hidden"} md:block`}>
