@@ -317,97 +317,168 @@ export default function ApostasClient({ apostas: initialApostas, profiles }: Pro
           </CardContent>
         </Card>
       ) : (
-        <div className="space-y-3">
-          {filtered.map(aposta => {
-            const legs = (aposta as Aposta & { legs?: ApostaLeg[] }).legs ?? []
-            const greenLegId = aposta.status === "finalizada" && aposta.resultado_real != null
-              ? legs.find(l => Math.abs(l.stake * l.odd - aposta.investimento_total - aposta.resultado_real!) < 0.5)?.id ?? null
-              : null
-
-            return (
-            <Link key={aposta.id} href={`/apostas/${aposta.id}`}>
-            <Card className="hover:border-[#1e3a8a]/40 transition-colors cursor-pointer overflow-hidden">
-              <CardContent className="p-4">
-                {/* Linha 1: evento + badges */}
-                <div className="flex items-center gap-2 flex-wrap mb-1 min-w-0">
-                  <p className="font-medium text-[var(--text-primary)] truncate">{aposta.evento}</p>
-                  {statusBadge(aposta.status)}
-                </div>
-                <p className="text-xs text-[var(--text-secondary)] mb-2">
-                  Perfil: {aposta.profile ? (aposta.profile.apelido || `${aposta.profile.nome} ${aposta.profile.sobrenome}`) : "—"} · {new Date(aposta.created_at).toLocaleDateString("pt-BR")}
-                </p>
-
-                {/* Legs */}
-                {legs.length > 0 && (
-                  <div className="space-y-1.5 mb-3">
-                    {legs.map(leg => {
-                      const isGreen = greenLegId === leg.id
-                      const isRed = greenLegId !== null && greenLegId !== leg.id
-                      return (
-                        <div key={leg.id} className={`rounded-xl px-3 py-3 flex items-center gap-3 ${
-                          isGreen ? "bg-green-500/10" : isRed ? "bg-[#DC2626]/5" : "bg-[var(--bg-elevated)]"
-                        }`}>
-                          <div className="flex-1 min-w-0 space-y-1">
-                            <p className={`text-base font-bold leading-tight ${isGreen ? "text-green-600" : isRed ? "text-[#DC2626]" : "text-[var(--accent-text)]"}`}>
-                              {leg.profile_bet?.bet?.nome ?? "Casa"}
-                            </p>
-                            <p className="text-sm text-[var(--text-secondary)] leading-snug">{leg.resultado_apostado}</p>
-                            <p className="text-sm text-[var(--text-secondary)]">@{Number(leg.odd).toFixed(2)} · {formatCurrency(leg.stake)}</p>
-                          </div>
-                          {(isGreen || isRed) && (
-                            <span className={`px-2.5 py-1 rounded text-xs font-bold flex-shrink-0 ${
-                              isGreen ? "bg-green-600 text-white" : "bg-[#DC2626] text-white"
-                            }`}>
-                              {isGreen ? "GREEN" : "RED"}
-                            </span>
-                          )}
-                        </div>
-                      )
+        <>
+          {/* ── Desktop table ── */}
+          <div className="hidden md:block">
+            <Card>
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="border-b border-[var(--border)]">
+                      {["Lucro", "Casa de aposta", "Data", "Evento", "Mercado", "Chance"].map(h => (
+                        <th key={h} className="px-4 py-3 text-left text-xs font-semibold text-[var(--text-muted)] uppercase tracking-wide whitespace-nowrap first:pl-5 last:pr-5 last:text-right">
+                          {h}
+                        </th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {filtered.map(aposta => {
+                      const legs = (aposta as Aposta & { legs?: ApostaLeg[] }).legs ?? []
+                      return legs.map((leg, li) => (
+                        <tr
+                          key={`${aposta.id}-${leg.id}`}
+                          onClick={() => window.location.href = `/apostas/${aposta.id}`}
+                          className={`border-b border-[var(--border)] hover:bg-[var(--bg-elevated)] cursor-pointer transition-colors ${li === 0 ? "" : "bg-[var(--bg-base)]"}`}
+                        >
+                          {/* Lucro — only on first leg row */}
+                          <td className="px-4 py-3 pl-5 whitespace-nowrap">
+                            {li === 0 ? (
+                              <div>
+                                <p className={`font-bold text-base leading-tight ${
+                                  aposta.status === "finalizada"
+                                    ? (aposta.resultado_real ?? 0) >= 0 ? "text-green-500" : "text-[#DC2626]"
+                                    : "text-green-500"
+                                }`}>
+                                  {aposta.status === "finalizada"
+                                    ? formatCurrency(aposta.resultado_real ?? 0)
+                                    : formatCurrency(aposta.lucro_garantido)}
+                                </p>
+                                <p className="text-xs text-[var(--text-muted)]">{aposta.roi_percentual.toFixed(2)}%</p>
+                                {statusBadge(aposta.status)}
+                              </div>
+                            ) : null}
+                          </td>
+                          {/* Casa */}
+                          <td className="px-4 py-3 whitespace-nowrap">
+                            <p className="font-semibold text-[var(--text-primary)]">{leg.profile_bet?.bet?.nome ?? "—"}</p>
+                            <p className="text-xs text-[var(--text-muted)]">{aposta.esporte ?? ""}</p>
+                          </td>
+                          {/* Data */}
+                          <td className="px-4 py-3 whitespace-nowrap text-[var(--text-secondary)]">
+                            {li === 0 ? new Date(aposta.created_at).toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit" }) : ""}
+                          </td>
+                          {/* Evento */}
+                          <td className="px-4 py-3 max-w-[200px]">
+                            <p className="font-medium text-[var(--text-primary)] truncate">{li === 0 ? aposta.evento : ""}</p>
+                          </td>
+                          {/* Mercado */}
+                          <td className="px-4 py-3 max-w-[220px]">
+                            <p className="text-[var(--text-secondary)] leading-snug">{leg.resultado_apostado}</p>
+                          </td>
+                          {/* Chance */}
+                          <td className="px-4 py-3 pr-5 text-right whitespace-nowrap">
+                            <span className="font-bold text-[var(--text-primary)]">{Number(leg.odd).toFixed(3)}</span>
+                          </td>
+                        </tr>
+                      ))
                     })}
-                  </div>
-                )}
+                  </tbody>
+                </table>
+              </div>
+            </Card>
+          </div>
 
-                {/* Linha final: Investimento + Lucro */}
-                <div className="flex items-end justify-between gap-2 pt-2 border-t border-[var(--border)]">
-                  <div>
-                    <p className="text-xs text-[var(--text-muted)]">Investimento</p>
-                    <p className="text-sm font-bold text-[var(--text-primary)]">{formatCurrency(aposta.investimento_total)}</p>
+          {/* ── Mobile cards ── */}
+          <div className="md:hidden space-y-3">
+            {filtered.map(aposta => {
+              const legs = (aposta as Aposta & { legs?: ApostaLeg[] }).legs ?? []
+              const greenLegId = aposta.status === "finalizada" && aposta.resultado_real != null
+                ? legs.find(l => Math.abs(l.stake * l.odd - aposta.investimento_total - aposta.resultado_real!) < 0.5)?.id ?? null
+                : null
+
+              return (
+              <Link key={aposta.id} href={`/apostas/${aposta.id}`}>
+              <Card className="hover:border-[#1e3a8a]/40 transition-colors cursor-pointer overflow-hidden">
+                <CardContent className="p-4">
+                  <div className="flex items-center gap-2 flex-wrap mb-1 min-w-0">
+                    <p className="font-medium text-[var(--text-primary)] truncate">{aposta.evento}</p>
+                    {statusBadge(aposta.status)}
                   </div>
-                  {aposta.status !== "cancelada" && (
-                    <div className="text-right">
-                      <p className="text-xs text-[var(--text-muted)]">
-                        {aposta.status === "finalizada" ? "Lucro" : "Lucro esperado"}
-                      </p>
-                      {aposta.status === "finalizada" ? (
-                        <p className={`text-sm font-bold ${(aposta.resultado_real ?? 0) >= 0 ? "text-[var(--accent-text)]" : "text-[#DC2626]"}`}>
-                          {formatCurrency(aposta.resultado_real ?? 0)}
-                        </p>
-                      ) : (
-                        <>
-                          <p className="text-sm font-bold text-[#D97706]">{formatCurrency(aposta.lucro_garantido)}</p>
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            className="mt-2"
-                            onClick={e => {
-                              e.preventDefault()
-                              setFinalizarDialog(aposta)
-                              setResultadoReal(formatBRL((aposta.lucro_garantido * 100).toFixed(0)))
-                            }}
-                          >
-                            Finalizar
-                          </Button>
-                        </>
-                      )}
+                  <p className="text-xs text-[var(--text-secondary)] mb-2">
+                    Perfil: {aposta.profile ? (aposta.profile.apelido || `${aposta.profile.nome} ${aposta.profile.sobrenome}`) : "—"} · {new Date(aposta.created_at).toLocaleDateString("pt-BR")}
+                  </p>
+
+                  {legs.length > 0 && (
+                    <div className="space-y-1.5 mb-3">
+                      {legs.map(leg => {
+                        const isGreen = greenLegId === leg.id
+                        const isRed = greenLegId !== null && greenLegId !== leg.id
+                        return (
+                          <div key={leg.id} className={`rounded-xl px-3 py-3 flex items-center gap-3 ${
+                            isGreen ? "bg-green-500/10" : isRed ? "bg-[#DC2626]/5" : "bg-[var(--bg-elevated)]"
+                          }`}>
+                            <div className="flex-1 min-w-0 space-y-1">
+                              <p className={`text-base font-bold leading-tight ${isGreen ? "text-green-600" : isRed ? "text-[#DC2626]" : "text-[var(--accent-text)]"}`}>
+                                {leg.profile_bet?.bet?.nome ?? "Casa"}
+                              </p>
+                              <p className="text-sm text-[var(--text-secondary)] leading-snug">{leg.resultado_apostado}</p>
+                              <p className="text-sm text-[var(--text-secondary)]">@{Number(leg.odd).toFixed(2)} · {formatCurrency(leg.stake)}</p>
+                            </div>
+                            {(isGreen || isRed) && (
+                              <span className={`px-2.5 py-1 rounded text-xs font-bold flex-shrink-0 ${
+                                isGreen ? "bg-green-600 text-white" : "bg-[#DC2626] text-white"
+                              }`}>
+                                {isGreen ? "GREEN" : "RED"}
+                              </span>
+                            )}
+                          </div>
+                        )
+                      })}
                     </div>
                   )}
-                </div>
-              </CardContent>
-            </Card>
-            </Link>
-            )
-          })}
-        </div>
+
+                  <div className="flex items-end justify-between gap-2 pt-2 border-t border-[var(--border)]">
+                    <div>
+                      <p className="text-xs text-[var(--text-muted)]">Investimento</p>
+                      <p className="text-sm font-bold text-[var(--text-primary)]">{formatCurrency(aposta.investimento_total)}</p>
+                    </div>
+                    {aposta.status !== "cancelada" && (
+                      <div className="text-right">
+                        <p className="text-xs text-[var(--text-muted)]">
+                          {aposta.status === "finalizada" ? "Lucro" : "Lucro esperado"}
+                        </p>
+                        {aposta.status === "finalizada" ? (
+                          <p className={`text-sm font-bold ${(aposta.resultado_real ?? 0) >= 0 ? "text-[var(--accent-text)]" : "text-[#DC2626]"}`}>
+                            {formatCurrency(aposta.resultado_real ?? 0)}
+                          </p>
+                        ) : (
+                          <>
+                            <p className="text-sm font-bold text-[#D97706]">{formatCurrency(aposta.lucro_garantido)}</p>
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              className="mt-2"
+                              onClick={e => {
+                                e.preventDefault()
+                                setFinalizarDialog(aposta)
+                                setResultadoReal(formatBRL((aposta.lucro_garantido * 100).toFixed(0)))
+                              }}
+                            >
+                              Finalizar
+                            </Button>
+                          </>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+              </Link>
+              )
+            })}
+          </div>
+        </>
       )}
 
       {/* Nova aposta — Sheet mobile */}
