@@ -14,8 +14,19 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "
 import {
   Settings, Camera, Loader2, Shield, Monitor, Smartphone,
   MapPin, Clock, LogOut, Key, User, AlertTriangle, Sun, Moon,
-  FileText, Lock, ExternalLink
+  FileText, Lock, ExternalLink, CreditCard, CheckCircle, XCircle,
+  Calendar, RefreshCw, Star
 } from "lucide-react"
+
+interface Assinatura {
+  id: string
+  plan: string
+  status: string
+  current_period_end: string | null
+  cancel_at_period_end: boolean
+  stripe_subscription_id: string | null
+  created_at: string
+}
 
 interface GeoInfo {
   city: string
@@ -50,7 +61,7 @@ function parseBrowser(ua: string): string {
 export default function ConfiguracoesPage() {
   const router = useRouter()
   const { theme, toggle } = useTheme()
-  const [tab, setTab] = useState<"conta" | "configuracoes">("conta")
+  const [tab, setTab] = useState<"conta" | "configuracoes" | "assinatura">("conta")
 
   const [email, setEmail] = useState("")
   const [userId, setUserId] = useState("")
@@ -77,6 +88,8 @@ export default function ConfiguracoesPage() {
   const [uploading, setUploading] = useState(false)
   const [logoutAllOpen, setLogoutAllOpen] = useState(false)
   const [loggingOut, setLoggingOut] = useState(false)
+  const [assinatura, setAssinatura] = useState<Assinatura | null>(null)
+  const [loadingAssinatura, setLoadingAssinatura] = useState(false)
 
   const fileInputRef = useRef<HTMLInputElement>(null)
 
@@ -95,6 +108,17 @@ export default function ConfiguracoesPage() {
           setSobrenome(usuario.sobrenome ?? "")
           setDataNascimento(usuario.data_nascimento ?? "")
         }
+        // Load assinatura
+        setLoadingAssinatura(true)
+        const { data: ass } = await supabase
+          .from("assinaturas")
+          .select("*")
+          .eq("user_id", user.id)
+          .order("created_at", { ascending: false })
+          .limit(1)
+          .single()
+        setAssinatura(ass ?? null)
+        setLoadingAssinatura(false)
       }
     })
 
@@ -184,6 +208,7 @@ export default function ConfiguracoesPage() {
 
   const tabs = [
     { key: "conta" as const,         label: "Minha Conta",   icon: User },
+    { key: "assinatura" as const,    label: "Assinatura",    icon: CreditCard },
     { key: "configuracoes" as const,  label: "Configurações", icon: Settings },
   ]
 
@@ -331,6 +356,163 @@ export default function ConfiguracoesPage() {
               </form>
             </CardContent>
           </Card>
+        </>
+      )}
+
+      {/* ── ABA: ASSINATURA ── */}
+      {tab === "assinatura" && (
+        <>
+          {loadingAssinatura ? (
+            <Card>
+              <CardContent className="flex items-center justify-center py-12">
+                <Loader2 className="h-6 w-6 animate-spin text-[var(--text-muted)]" />
+              </CardContent>
+            </Card>
+          ) : !assinatura ? (
+            <Card>
+              <CardContent className="flex flex-col items-center justify-center py-12 gap-4">
+                <div className="w-12 h-12 rounded-full bg-[#1e3a8a]/10 flex items-center justify-center">
+                  <CreditCard className="h-6 w-6 text-[var(--accent-text)]" />
+                </div>
+                <div className="text-center">
+                  <p className="font-semibold text-[var(--text-primary)]">Nenhuma assinatura ativa</p>
+                  <p className="text-sm text-[var(--text-muted)] mt-1">Assine um plano para acessar todos os recursos.</p>
+                </div>
+                <Link
+                  href="/assinatura"
+                  className="px-5 py-2 rounded-xl bg-[#1e3a8a] hover:bg-[#1e40af] text-white text-sm font-medium transition-colors"
+                >
+                  Ver planos
+                </Link>
+              </CardContent>
+            </Card>
+          ) : (
+            <>
+              {/* Status card */}
+              <Card className={`border ${assinatura.status === "active" ? "border-green-500/30 bg-green-500/5" : "border-[var(--border)]"}`}>
+                <CardContent className="p-5">
+                  <div className="flex items-start justify-between gap-4">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-xl bg-[#1e3a8a]/10 flex items-center justify-center flex-shrink-0">
+                        <Star className="h-5 w-5 text-[var(--accent-text)]" />
+                      </div>
+                      <div>
+                        <p className="font-bold text-[var(--text-primary)] capitalize">
+                          Plano {assinatura.plan}
+                        </p>
+                        <p className="text-xs text-[var(--text-muted)] mt-0.5">
+                          {assinatura.cancel_at_period_end
+                            ? "Cancelamento agendado ao final do período"
+                            : "Renovação automática ativa"}
+                        </p>
+                      </div>
+                    </div>
+                    <span className={`flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold flex-shrink-0 ${
+                      assinatura.status === "active"
+                        ? "bg-green-500/15 text-green-600"
+                        : assinatura.status === "trialing"
+                        ? "bg-blue-500/15 text-blue-600"
+                        : assinatura.status === "past_due"
+                        ? "bg-yellow-500/15 text-yellow-600"
+                        : "bg-red-500/15 text-red-600"
+                    }`}>
+                      {assinatura.status === "active" && <CheckCircle className="h-3 w-3" />}
+                      {assinatura.status === "canceled" && <XCircle className="h-3 w-3" />}
+                      {{
+                        active: "Ativa",
+                        trialing: "Trial",
+                        past_due: "Pagamento pendente",
+                        canceled: "Cancelada",
+                        incomplete: "Incompleta",
+                      }[assinatura.status] ?? assinatura.status}
+                    </span>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Details */}
+              <Card>
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-base flex items-center gap-2">
+                    <CreditCard className="h-4 w-4" /> Detalhes da assinatura
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="divide-y divide-[var(--border)]">
+                  {[
+                    {
+                      icon: Star,
+                      label: "Plano",
+                      value: <span className="font-semibold capitalize">{assinatura.plan}</span>,
+                    },
+                    {
+                      icon: CheckCircle,
+                      label: "Status",
+                      value: (
+                        <span className={`font-medium ${
+                          assinatura.status === "active" ? "text-green-600"
+                          : assinatura.status === "past_due" ? "text-yellow-600"
+                          : "text-red-600"
+                        }`}>
+                          {{
+                            active: "Ativa",
+                            trialing: "Em avaliação",
+                            past_due: "Pagamento pendente",
+                            canceled: "Cancelada",
+                            incomplete: "Incompleta",
+                          }[assinatura.status] ?? assinatura.status}
+                        </span>
+                      ),
+                    },
+                    {
+                      icon: Calendar,
+                      label: assinatura.cancel_at_period_end ? "Expira em" : "Próxima cobrança",
+                      value: assinatura.current_period_end
+                        ? new Date(assinatura.current_period_end).toLocaleDateString("pt-BR", { day: "2-digit", month: "long", year: "numeric" })
+                        : "—",
+                    },
+                    {
+                      icon: RefreshCw,
+                      label: "Renovação automática",
+                      value: assinatura.cancel_at_period_end ? (
+                        <span className="text-red-500 font-medium">Desativada</span>
+                      ) : (
+                        <span className="text-green-600 font-medium">Ativada</span>
+                      ),
+                    },
+                    ...(assinatura.created_at ? [{
+                      icon: Clock,
+                      label: "Assinante desde",
+                      value: new Date(assinatura.created_at).toLocaleDateString("pt-BR", { day: "2-digit", month: "long", year: "numeric" }),
+                    }] : []),
+                  ].map(({ icon: Icon, label, value }) => (
+                    <div key={label} className="flex items-center justify-between py-3 first:pt-0 last:pb-0">
+                      <div className="flex items-center gap-2 text-sm text-[var(--text-secondary)]">
+                        <Icon className="h-3.5 w-3.5 flex-shrink-0" />
+                        {label}
+                      </div>
+                      <div className="text-sm text-[var(--text-primary)]">{value}</div>
+                    </div>
+                  ))}
+                </CardContent>
+              </Card>
+
+              <div className="flex gap-3">
+                <Link
+                  href="/assinatura"
+                  className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-[#1e3a8a] hover:bg-[#1e40af] text-white text-sm font-medium transition-colors"
+                >
+                  <CreditCard className="h-4 w-4" />
+                  Gerenciar assinatura
+                </Link>
+                <Link
+                  href="/suporte"
+                  className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl border border-[var(--border)] text-[var(--text-secondary)] hover:bg-[var(--bg-elevated)] text-sm font-medium transition-colors"
+                >
+                  Suporte
+                </Link>
+              </div>
+            </>
+          )}
         </>
       )}
 
