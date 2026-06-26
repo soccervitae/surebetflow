@@ -1,7 +1,6 @@
 "use client"
 
 import { useState, useRef } from "react"
-import { useMediaQuery } from "@/hooks/useMediaQuery"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { createClient } from "@/lib/supabase/client"
@@ -42,7 +41,8 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
   const [togglingAtivo, setTogglingAtivo] = useState(false)
   const [confirmAtivoOpen, setConfirmAtivoOpen] = useState(false)
   const [currentApostas, setCurrentApostas] = useState(apostas)
-  const [showCalculadora, setShowCalculadora] = useState(false)
+  const [showCalculadoraSheet, setShowCalculadoraSheet] = useState(false)
+  const [showCalculadoraModal, setShowCalculadoraModal] = useState(false)
   const [minBetsAlertOpen, setMinBetsAlertOpen] = useState(false)
   const [finalizarDialog, setFinalizarDialog] = useState<Aposta | null>(null)
   const [periodoFiltro, setPeriodoFiltro] = useState<"dia" | "semana" | "mes" | "ano">("dia")
@@ -64,7 +64,6 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
   const [finFormValor, setFinFormValor] = useState("")
   const [finFormDescricao, setFinFormDescricao] = useState("")
   const [finSaving, setFinSaving] = useState(false)
-  const isMobile = !useMediaQuery("(min-width: 768px)")
   const { toast } = useToast()
   const router = useRouter()
 
@@ -329,6 +328,7 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
           </div>
         </div>
         <div className="flex items-center gap-2 flex-wrap">
+          {/* Mobile: abre Sheet */}
           <Button
             onClick={async () => {
               const { data } = await createClient()
@@ -338,11 +338,30 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
               if (!data || data.length < 2) {
                 setMinBetsAlertOpen(true)
               } else {
-                setShowCalculadora(true)
+                setShowCalculadoraSheet(true)
               }
             }}
             size="sm"
-            className="flex-1 sm:flex-none"
+            className="md:hidden flex-1 sm:flex-none"
+          >
+            <Calculator className="h-4 w-4 mr-2" />
+            Nova Aposta
+          </Button>
+          {/* Desktop: abre Dialog */}
+          <Button
+            onClick={async () => {
+              const { data } = await createClient()
+                .from("profile_bets")
+                .select("id")
+                .eq("profile_id", currentProfile.id)
+              if (!data || data.length < 2) {
+                setMinBetsAlertOpen(true)
+              } else {
+                setShowCalculadoraModal(true)
+              }
+            }}
+            size="sm"
+            className="hidden md:flex flex-1 sm:flex-none"
           >
             <Calculator className="h-4 w-4 mr-2" />
             Nova Aposta
@@ -902,56 +921,29 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
         </DialogContent>
       </Dialog>
 
-      {/* Calculadora — Sheet mobile / Dialog desktop */}
-      {isMobile ? (
-        <Sheet open={showCalculadora} onOpenChange={setShowCalculadora}>
-          <SheetContent
-            side="bottom"
-            className="h-[70vh] flex flex-col p-0 rounded-t-2xl"
-            onTouchStart={e => { (e.currentTarget as any)._swipeY = e.touches[0].clientY }}
-            onTouchEnd={e => {
-              const startY = (e.currentTarget as any)._swipeY
-              if (startY !== undefined && e.changedTouches[0].clientY - startY > 80) setShowCalculadora(false)
-            }}
-          >
-            <SheetHeader className="px-5 pt-5 pb-3 border-b border-[var(--border)] flex-shrink-0">
-              <SheetTitle className="flex items-center gap-2">
-                <Calculator className="h-4 w-4 text-[var(--accent-text)]" />
-                Nova Aposta — {currentProfile.apelido ?? `${currentProfile.nome} ${currentProfile.sobrenome}`}
-              </SheetTitle>
-            </SheetHeader>
-            <div className="flex-1 overflow-y-auto px-5 py-4">
-              <SurebetCalculator
-                profiles={[currentProfile]}
-                defaultProfileId={currentProfile.id}
-                onSaved={async () => {
-                  setShowCalculadora(false)
-                  const supabase = createClient()
-                  const { data } = await supabase
-                    .from("apostas")
-                    .select("*, legs:aposta_legs(*, profile_bet:profile_bets(*, bet:bets(*)))")
-                    .eq("profile_id", currentProfile.id)
-                    .order("created_at", { ascending: false })
-                  if (data) setCurrentApostas(data)
-                }}
-              />
-            </div>
-          </SheetContent>
-        </Sheet>
-      ) : (
-        <Dialog open={showCalculadora} onOpenChange={setShowCalculadora}>
-          <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
-            <DialogHeader>
-              <DialogTitle className="flex items-center gap-2">
-                <Calculator className="h-5 w-5 text-[var(--accent-text)]" />
-                Nova Aposta — {currentProfile.apelido ?? `${currentProfile.nome} ${currentProfile.sobrenome}`}
-              </DialogTitle>
-            </DialogHeader>
+      {/* Calculadora — Sheet mobile */}
+      <Sheet open={showCalculadoraSheet} onOpenChange={setShowCalculadoraSheet}>
+        <SheetContent
+          side="bottom"
+          className="h-[70vh] flex flex-col p-0 rounded-t-2xl"
+          onTouchStart={e => { (e.currentTarget as any)._swipeY = e.touches[0].clientY }}
+          onTouchEnd={e => {
+            const startY = (e.currentTarget as any)._swipeY
+            if (startY !== undefined && e.changedTouches[0].clientY - startY > 80) setShowCalculadoraSheet(false)
+          }}
+        >
+          <SheetHeader className="px-5 pt-5 pb-3 border-b border-[var(--border)] flex-shrink-0">
+            <SheetTitle className="flex items-center gap-2">
+              <Calculator className="h-4 w-4 text-[var(--accent-text)]" />
+              Nova Aposta — {currentProfile.apelido ?? `${currentProfile.nome} ${currentProfile.sobrenome}`}
+            </SheetTitle>
+          </SheetHeader>
+          <div className="flex-1 overflow-y-auto px-5 py-4">
             <SurebetCalculator
               profiles={[currentProfile]}
               defaultProfileId={currentProfile.id}
               onSaved={async () => {
-                setShowCalculadora(false)
+                setShowCalculadoraSheet(false)
                 const supabase = createClient()
                 const { data } = await supabase
                   .from("apostas")
@@ -961,9 +953,35 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
                 if (data) setCurrentApostas(data)
               }}
             />
-          </DialogContent>
-        </Dialog>
-      )}
+          </div>
+        </SheetContent>
+      </Sheet>
+
+      {/* Calculadora — Dialog desktop */}
+      <Dialog open={showCalculadoraModal} onOpenChange={setShowCalculadoraModal}>
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Calculator className="h-5 w-5 text-[var(--accent-text)]" />
+              Nova Aposta — {currentProfile.apelido ?? `${currentProfile.nome} ${currentProfile.sobrenome}`}
+            </DialogTitle>
+          </DialogHeader>
+          <SurebetCalculator
+            profiles={[currentProfile]}
+            defaultProfileId={currentProfile.id}
+            onSaved={async () => {
+              setShowCalculadoraModal(false)
+              const supabase = createClient()
+              const { data } = await supabase
+                .from("apostas")
+                .select("*, legs:aposta_legs(*, profile_bet:profile_bets(*, bet:bets(*)))")
+                .eq("profile_id", currentProfile.id)
+                .order("created_at", { ascending: false })
+              if (data) setCurrentApostas(data)
+            }}
+          />
+        </DialogContent>
+      </Dialog>
 
       {/* Finalizar Dialog */}
       <Dialog open={!!finalizarDialog} onOpenChange={open => !open && setFinalizarDialog(null)}>
