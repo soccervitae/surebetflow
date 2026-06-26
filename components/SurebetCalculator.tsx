@@ -21,6 +21,7 @@ interface Leg {
 interface Props {
   profiles: Profile[]
   defaultProfileId?: string
+  profileName?: string
   onSaved?: () => void
 }
 
@@ -123,7 +124,7 @@ function parseSurebetText(text: string): { event: string; sport: string; legs: P
   return { event, sport, legs: parsedLegs }
 }
 
-export default function SurebetCalculator({ profiles, defaultProfileId, onSaved }: Props) {
+export default function SurebetCalculator({ profiles, defaultProfileId, profileName, onSaved }: Props) {
   const filteredProfiles = defaultProfileId ? profiles.filter(p => p.id === defaultProfileId) : profiles
   const [numLegs, setNumLegs] = useState(2)
   const tipo = numLegs >= 3 ? "3-way" : "2-way"
@@ -413,6 +414,15 @@ export default function SurebetCalculator({ profiles, defaultProfileId, onSaved 
 
   return (
     <div className="space-y-4">
+
+      {/* Profile name banner */}
+      {profileName && (
+        <div className="flex items-center gap-2 px-4 py-3 rounded-xl bg-[#1e3a8a]/10 border border-[#1e3a8a]/30">
+          <div className="w-2 h-2 rounded-full bg-[#4d82d6] flex-shrink-0" />
+          <span className="text-xs text-[var(--text-secondary)] uppercase tracking-wide">Perfil</span>
+          <span className="font-bold text-[var(--text-primary)] text-sm">{profileName}</span>
+        </div>
+      )}
 
       {/* AI Import block */}
       <Card className="border-dashed border-[#1e3a8a]/40 bg-[#1e3a8a]/5">

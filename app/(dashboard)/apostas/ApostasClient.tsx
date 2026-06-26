@@ -44,6 +44,10 @@ export default function ApostasClient({ apostas: initialApostas, profiles }: Pro
   const [showFilter, setShowFilter] = useState(false)
   const [novaSheet, setNovaSheet] = useState(false)   // mobile
   const [novaModal, setNovaModal] = useState(false)   // desktop
+  const [selectProfileSheet, setSelectProfileSheet] = useState(false)   // mobile profile picker
+  const [selectProfileModal, setSelectProfileModal] = useState(false)   // desktop profile picker
+  const [selectedProfileId, setSelectedProfileId] = useState<string>("")
+  const [selectedProfileName, setSelectedProfileName] = useState<string>("")
   const [resultadoReal, setResultadoReal] = useState("")
   const [finalizando, setFinalizando] = useState(false)
   const [deletando, setDeletando] = useState(false)
@@ -154,14 +158,14 @@ export default function ApostasClient({ apostas: initialApostas, profiles }: Pro
         </div>
         <div className="flex items-center gap-2">
           <button
-            onClick={() => setNovaSheet(true)}
+            onClick={() => { setSelectedProfileId(""); setSelectedProfileName(""); setSelectProfileSheet(true) }}
             className="md:hidden flex items-center gap-1.5 px-3 py-2 rounded-xl bg-[#1e3a8a] text-white text-sm font-medium"
           >
             <Plus className="h-4 w-4" />
             Nova
           </button>
           <button
-            onClick={() => setNovaModal(true)}
+            onClick={() => { setSelectedProfileId(""); setSelectedProfileName(""); setSelectProfileModal(true) }}
             className="hidden md:flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#1e3a8a] hover:bg-[#1e40af] text-white text-sm font-medium transition-colors"
           >
             <Plus className="h-4 w-4" />
@@ -489,6 +493,62 @@ export default function ApostasClient({ apostas: initialApostas, profiles }: Pro
         </>
       )}
 
+      {/* Profile picker — Sheet mobile */}
+      <Sheet open={selectProfileSheet} onOpenChange={setSelectProfileSheet}>
+        <SheetContent side="bottom" className="h-auto flex flex-col p-0 rounded-t-2xl">
+          <SheetHeader className="px-5 pt-5 pb-3 border-b border-[var(--border)] flex-shrink-0">
+            <SheetTitle>Escolha o perfil</SheetTitle>
+          </SheetHeader>
+          <div className="px-5 py-4 space-y-2">
+            {profiles.map(p => {
+              const name = p.apelido || `${p.nome} ${p.sobrenome}`
+              return (
+                <button
+                  key={p.id}
+                  onClick={() => {
+                    setSelectedProfileId(p.id)
+                    setSelectedProfileName(name)
+                    setSelectProfileSheet(false)
+                    setNovaSheet(true)
+                  }}
+                  className="w-full text-left px-4 py-3 rounded-xl border border-[var(--border)] hover:border-[#4d82d6] hover:bg-[#1e3a8a]/5 transition-colors"
+                >
+                  <span className="font-semibold text-[var(--text-primary)] text-sm">{name}</span>
+                </button>
+              )
+            })}
+          </div>
+        </SheetContent>
+      </Sheet>
+
+      {/* Profile picker — Modal desktop */}
+      <Dialog open={selectProfileModal} onOpenChange={setSelectProfileModal}>
+        <DialogContent className="max-w-sm">
+          <DialogHeader>
+            <DialogTitle>Escolha o perfil</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-2 mt-2">
+            {profiles.map(p => {
+              const name = p.apelido || `${p.nome} ${p.sobrenome}`
+              return (
+                <button
+                  key={p.id}
+                  onClick={() => {
+                    setSelectedProfileId(p.id)
+                    setSelectedProfileName(name)
+                    setSelectProfileModal(false)
+                    setNovaModal(true)
+                  }}
+                  className="w-full text-left px-4 py-3 rounded-xl border border-[var(--border)] hover:border-[#4d82d6] hover:bg-[#1e3a8a]/5 transition-colors"
+                >
+                  <span className="font-semibold text-[var(--text-primary)] text-sm">{name}</span>
+                </button>
+              )
+            })}
+          </div>
+        </DialogContent>
+      </Dialog>
+
       {/* Nova aposta — Sheet mobile */}
       <Sheet open={novaSheet} onOpenChange={setNovaSheet}>
         <SheetContent
@@ -509,6 +569,8 @@ export default function ApostasClient({ apostas: initialApostas, profiles }: Pro
           <div className="flex-1 overflow-y-auto px-5 py-4">
             <SurebetCalculator
               profiles={profiles as any}
+              defaultProfileId={selectedProfileId || undefined}
+              profileName={selectedProfileName || undefined}
               onSaved={async () => {
                 setNovaSheet(false)
                 const { data } = await supabase
@@ -534,6 +596,8 @@ export default function ApostasClient({ apostas: initialApostas, profiles }: Pro
           </DialogHeader>
           <SurebetCalculator
             profiles={profiles as any}
+            defaultProfileId={selectedProfileId || undefined}
+            profileName={selectedProfileName || undefined}
             onSaved={async () => {
               setNovaModal(false)
               const { data } = await supabase

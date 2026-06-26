@@ -942,6 +942,7 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
             <SurebetCalculator
               profiles={[currentProfile]}
               defaultProfileId={currentProfile.id}
+              profileName={currentProfile.apelido ?? `${currentProfile.nome} ${currentProfile.sobrenome}`}
               onSaved={async () => {
                 setShowCalculadoraSheet(false)
                 const supabase = createClient()
@@ -969,6 +970,7 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
           <SurebetCalculator
             profiles={[currentProfile]}
             defaultProfileId={currentProfile.id}
+            profileName={currentProfile.apelido ?? `${currentProfile.nome} ${currentProfile.sobrenome}`}
             onSaved={async () => {
               setShowCalculadoraModal(false)
               const supabase = createClient()
