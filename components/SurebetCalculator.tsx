@@ -9,7 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { formatCurrency } from "@/lib/utils"
 import { useToast } from "@/hooks/useToast"
-import { Calculator, Check, X, Loader2, ClipboardPaste, Sparkles, ImageIcon, ChevronLeft, ChevronRight } from "lucide-react"
+import { Calculator, Check, X, Loader2, ClipboardPaste, Sparkles, ImageIcon, ChevronLeft, ChevronRight, Plus } from "lucide-react"
 import type { Profile, ProfileBet } from "@/lib/types"
 
 interface Leg {
@@ -611,6 +611,30 @@ export default function SurebetCalculator({ profiles, defaultProfileId, onSaved 
       </Card>
 
       {/* Legs */}
+      <div className="flex items-center justify-between">
+        <p className="text-sm font-medium text-[var(--text-secondary)]">
+          {numLegs === 2 ? "2 apostas (2-way)" : "3 apostas (3-way)"}
+        </p>
+        {numLegs === 2 ? (
+          <button
+            type="button"
+            onClick={() => setNumLegs(3)}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-dashed border-[#1e3a8a]/50 text-[var(--accent-text)] text-xs font-medium hover:bg-[#1e3a8a]/10 transition-colors"
+          >
+            <Plus className="h-3.5 w-3.5" />
+            Adicionar 3ª aposta
+          </button>
+        ) : (
+          <button
+            type="button"
+            onClick={() => setNumLegs(2)}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-dashed border-[#DC2626]/40 text-[#DC2626] text-xs font-medium hover:bg-[#DC2626]/5 transition-colors"
+          >
+            <X className="h-3.5 w-3.5" />
+            Remover 3ª aposta
+          </button>
+        )}
+      </div>
       <div className="space-y-3">
         {legs.slice(0, numLegs).map((leg, i) => (
           <Card key={i}>
