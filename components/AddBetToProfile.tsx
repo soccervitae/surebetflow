@@ -108,8 +108,7 @@ export default function AddBetToProfile({ profileId }: Props) {
         profile_id: profileId,
         bet_id: selectedBet,
         email,
-        senha_encrypted: senha,
-        senha_nonce: "",
+        senha_texto: senha,
         saldo: 0,
       })
       if (error) throw new Error(error.message)
@@ -154,15 +153,14 @@ export default function AddBetToProfile({ profileId }: Props) {
     setEditSaving(true)
     const updates: Record<string, string> = { email: editEmail.trim() }
     if (editSenha.trim()) {
-      updates.senha_encrypted = editSenha.trim()
-      updates.senha_nonce = ""
+      updates.senha_texto = editSenha.trim()
     }
     const { error } = await supabase.from("profile_bets").update(updates).eq("id", editDialog.id)
     if (error) {
       toast({ title: "Erro ao salvar", variant: "destructive" })
     } else {
       setProfileBets(prev => prev.map(pb => pb.id === editDialog.id
-        ? { ...pb, email: editEmail.trim(), senha_encrypted: editSenha.trim() ? editSenha.trim() as unknown as Uint8Array : pb.senha_encrypted }
+        ? { ...pb, email: editEmail.trim(), senha_texto: editSenha.trim() || (pb as any).senha_texto }
         : pb
       ))
       toast({ title: "Dados atualizados!" })
@@ -610,13 +608,7 @@ export default function AddBetToProfile({ profileId }: Props) {
                       <div className="flex items-center gap-2">
                         <p className="text-sm text-[var(--text-primary)] font-mono flex-1">
                           {revealedPasswords[pb.id]
-                            ? (() => {
-                                const raw = pb.senha_encrypted as unknown as { type?: string; data?: number[] } | string | null
-                                if (!raw) return "—"
-                                if (typeof raw === "string") return raw
-                                if (raw.data) return String.fromCharCode(...raw.data)
-                                return "—"
-                              })()
+                            ? ((pb as any).senha_texto || "—")
                             : "••••••••"}
                         </p>
                         <button
