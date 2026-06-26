@@ -350,7 +350,7 @@ export default function AddBetToProfile({ profileId }: Props) {
                     <SelectContent>
                       <SelectItem value="deposito">Depósito</SelectItem>
                       <SelectItem value="saque">Saque</SelectItem>
-                      <SelectItem value="lucro">Lucro externo</SelectItem>
+                      <SelectItem value="lucro">Lucro</SelectItem>
                       <SelectItem value="perda">Perda</SelectItem>
                       <SelectItem value="bonus">Bônus</SelectItem>
                     </SelectContent>
@@ -368,7 +368,7 @@ export default function AddBetToProfile({ profileId }: Props) {
               )}
               {movTipo === "lucro" && (
                 <p className="text-xs text-green-600 bg-green-500/10 border border-green-500/20 rounded-lg px-3 py-2">
-                  Lucro externo será somado ao saldo da bet.
+                  Lucro será somado ao saldo da bet.
                 </p>
               )}
               {movTipo === "perda" && (
@@ -404,7 +404,7 @@ export default function AddBetToProfile({ profileId }: Props) {
                     <SelectContent>
                       <SelectItem value="deposito">Depósito</SelectItem>
                       <SelectItem value="saque">Saque</SelectItem>
-                      <SelectItem value="lucro">Lucro externo</SelectItem>
+                      <SelectItem value="lucro">Lucro</SelectItem>
                       <SelectItem value="perda">Perda</SelectItem>
                       <SelectItem value="bonus">Bônus</SelectItem>
                     </SelectContent>
@@ -422,7 +422,7 @@ export default function AddBetToProfile({ profileId }: Props) {
               )}
               {movTipo === "lucro" && (
                 <p className="text-xs text-green-600 bg-green-500/10 border border-green-500/20 rounded-lg px-3 py-2">
-                  Lucro externo será somado ao saldo da bet.
+                  Lucro será somado ao saldo da bet.
                 </p>
               )}
               {movTipo === "perda" && (
