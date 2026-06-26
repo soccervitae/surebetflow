@@ -702,6 +702,14 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
                       onChange={e => setFinFormValor(formatBRL(e.target.value))} />
                   </div>
                 </div>
+                {finFormTipo === "bonus" && (
+                  <div className="flex items-start gap-2.5 rounded-xl bg-purple-500/10 border border-purple-500/20 px-4 py-3">
+                    <Gift className="h-4 w-4 text-purple-400 shrink-0 mt-0.5" />
+                    <p className="text-xs text-purple-300 leading-relaxed">
+                      O valor do bônus é registrado <strong>separadamente</strong> do saldo real. Ele aparece como <span className="font-semibold">Saldo Bônus</span> na casa de apostas e não entra no cálculo do saldo líquido.
+                    </p>
+                  </div>
+                )}
                 {profileBetsFinanceiro.length > 0 && (
                   <div className="space-y-1.5">
                     <Label>Bet (opcional)</Label>
