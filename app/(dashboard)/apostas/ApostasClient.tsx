@@ -319,84 +319,73 @@ export default function ApostasClient({ apostas: initialApostas, profiles }: Pro
       ) : (
         <>
           {/* ── Desktop table ── */}
-          <div className="hidden md:block">
-            <Card>
-              <div className="overflow-x-auto">
-                <table className="w-full text-sm">
-                  <thead>
-                    <tr className="border-b border-[var(--border)]">
-                      {["Lucro", "Bets", "Data", "Evento", "Mercado", "Odds"].map(h => (
-                        <th key={h} className="px-4 py-3 text-left text-xs font-semibold text-[var(--text-muted)] uppercase tracking-wide whitespace-nowrap first:pl-5 last:pr-5 last:text-right">
-                          {h}
-                        </th>
-                      ))}
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {filtered.map(aposta => {
-                      const legs = (aposta as Aposta & { legs?: ApostaLeg[] }).legs ?? []
-                      return legs.map((leg, li) => (
-                        <tr
-                          key={`${aposta.id}-${leg.id}`}
-                          onClick={() => window.location.href = `/apostas/${aposta.id}`}
-                          className={`border-b border-[var(--border)] hover:bg-[var(--bg-elevated)] cursor-pointer transition-colors ${li === 0 ? "" : "bg-[var(--bg-base)]"}`}
-                        >
-                          {/* Lucro — only on first leg row */}
-                          <td className="px-4 py-3 pl-5 whitespace-nowrap">
-                            {li === 0 ? (
-                              <div>
-                                <p className={`font-bold text-base leading-tight ${
-                                  aposta.status === "finalizada"
-                                    ? (aposta.resultado_real ?? 0) >= 0 ? "text-green-500" : "text-[#DC2626]"
-                                    : "text-green-500"
-                                }`}>
-                                  {aposta.status === "finalizada"
-                                    ? formatCurrency(aposta.resultado_real ?? 0)
-                                    : formatCurrency(aposta.lucro_garantido)}
-                                </p>
-                                <p className="text-xs text-[var(--text-muted)]">{aposta.roi_percentual.toFixed(2)}%</p>
-                                {statusBadge(aposta.status)}
-                              </div>
-                            ) : null}
-                          </td>
-                          {/* Casa */}
-                          <td className="px-4 py-3 whitespace-nowrap">
-                            <p className="font-semibold text-[var(--text-primary)]">{leg.profile_bet?.bet?.nome ?? "—"}</p>
-                            <p className="text-xs text-[var(--text-muted)]">{aposta.esporte ?? ""}</p>
-                          </td>
-                          {/* Data */}
-                          <td className="px-4 py-3 whitespace-nowrap text-[var(--text-secondary)]">
-                            {li === 0 ? (() => {
-                              const d = aposta.data_evento ? new Date(aposta.data_evento) : new Date(aposta.created_at)
-                              return (
-                                <div>
-                                  <p>{d.toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit" })}</p>
-                                  {aposta.data_evento && (
-                                    <p className="text-xs text-[var(--text-muted)]">{d.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" })}</p>
-                                  )}
-                                </div>
-                              )
-                            })() : ""}
-                          </td>
-                          {/* Evento */}
-                          <td className="px-4 py-3 max-w-[200px]">
-                            <p className="font-medium text-[var(--text-primary)] truncate">{li === 0 ? aposta.evento : ""}</p>
-                          </td>
-                          {/* Mercado */}
-                          <td className="px-4 py-3 max-w-[220px]">
-                            <p className="text-[var(--text-secondary)] leading-snug">{leg.resultado_apostado}</p>
-                          </td>
-                          {/* Chance */}
-                          <td className="px-4 py-3 pr-5 text-right whitespace-nowrap">
-                            <span className="font-bold text-[var(--text-primary)]">{Number(leg.odd).toFixed(3)}</span>
-                          </td>
-                        </tr>
-                      ))
+          <div className="hidden md:block space-y-3">
+            {filtered.map(aposta => {
+              const legs = (aposta as Aposta & { legs?: ApostaLeg[] }).legs ?? []
+              const d = aposta.data_evento ? new Date(aposta.data_evento) : new Date(aposta.created_at)
+              const dataStr = d.toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit" })
+              const horaStr = aposta.data_evento ? d.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" }) : null
+              const isFinished = aposta.status === "finalizada" && aposta.resultado_real != null
+
+              return (
+                <Card
+                  key={aposta.id}
+                  className="overflow-hidden cursor-pointer hover:border-[#1e3a8a]/40 transition-colors"
+                  onClick={() => window.location.href = `/apostas/${aposta.id}`}
+                >
+                  {/* Header da aposta */}
+                  <div className="flex items-center justify-between px-5 py-3 border-b border-[var(--border)] bg-[var(--bg-elevated)]">
+                    <div className="flex items-center gap-3 min-w-0">
+                      <p className="font-semibold text-[var(--text-primary)] truncate">{aposta.evento}</p>
+                      {aposta.esporte && <span className="text-xs text-[var(--text-muted)] flex-shrink-0">{aposta.esporte}</span>}
+                    </div>
+                    <div className="flex items-center gap-3 flex-shrink-0">
+                      <span className="text-xs text-[var(--text-secondary)]">{dataStr}{horaStr ? ` · ${horaStr}` : ""}</span>
+                      {statusBadge(aposta.status)}
+                      <span className={`font-bold text-base ${
+                        isFinished
+                          ? (aposta.resultado_real ?? 0) >= 0 ? "text-green-500" : "text-[#DC2626]"
+                          : "text-green-500"
+                      }`}>
+                        {isFinished ? formatCurrency(aposta.resultado_real ?? 0) : formatCurrency(aposta.lucro_garantido)}
+                      </span>
+                      <span className="text-xs text-[var(--text-muted)]">{aposta.roi_percentual.toFixed(2)}%</span>
+                    </div>
+                  </div>
+
+                  {/* Legs */}
+                  <div className="divide-y divide-[var(--border)]">
+                    {legs.map(leg => {
+                      const isGreen = isFinished && Math.abs(leg.stake * leg.odd - aposta.investimento_total - (aposta.resultado_real ?? 0)) < 1.5
+                      const isRed = isFinished && !isGreen
+                      return (
+                        <div key={leg.id} className={`flex items-center gap-4 px-5 py-3 ${isGreen ? "bg-green-500/5" : isRed ? "bg-[#DC2626]/5" : ""}`}>
+                          <div className="w-36 flex-shrink-0">
+                            <p className="font-semibold text-[var(--text-primary)] text-sm">{leg.profile_bet?.bet?.nome ?? "—"}</p>
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm text-[var(--text-secondary)] truncate">{leg.resultado_apostado}</p>
+                          </div>
+                          <div className="text-right flex-shrink-0 w-28">
+                            <p className="text-xs text-[var(--text-muted)]">Stake</p>
+                            <p className="text-sm font-semibold text-[var(--text-primary)]">{formatCurrency(leg.stake)}</p>
+                          </div>
+                          <div className="text-right flex-shrink-0 w-20">
+                            <p className="text-xs text-[var(--text-muted)]">Odd</p>
+                            <p className="text-sm font-bold text-[var(--text-primary)]">{Number(leg.odd).toFixed(3)}</p>
+                          </div>
+                          {isFinished && (
+                            <span className={`px-2.5 py-1 rounded text-xs font-bold w-14 text-center flex-shrink-0 ${isGreen ? "bg-green-600 text-white" : "bg-[#DC2626] text-white"}`}>
+                              {isGreen ? "GREEN" : "RED"}
+                            </span>
+                          )}
+                        </div>
+                      )
                     })}
-                  </tbody>
-                </table>
-              </div>
-            </Card>
+                  </div>
+                </Card>
+              )
+            })}
           </div>
 
           {/* ── Mobile cards ── */}
@@ -415,15 +404,18 @@ export default function ApostasClient({ apostas: initialApostas, profiles }: Pro
                     <p className="font-medium text-[var(--text-primary)] truncate">{aposta.evento}</p>
                     {statusBadge(aposta.status)}
                   </div>
-                  <p className="text-xs text-[var(--text-secondary)] mb-2">
-                    Perfil: {aposta.profile ? (aposta.profile.apelido || `${aposta.profile.nome} ${aposta.profile.sobrenome}`) : "—"} · {new Date(aposta.created_at).toLocaleDateString("pt-BR")}
+                  <p className="text-xs text-[var(--text-secondary)] mb-1">
+                    Perfil: {aposta.profile ? (aposta.profile.apelido || `${aposta.profile.nome} ${aposta.profile.sobrenome}`) : "—"}
                   </p>
-                  {aposta.data_evento && (
-                    <p className="text-xs text-[var(--text-muted)] mb-2 flex items-center gap-1">
-                      <CalendarIcon className="h-3 w-3" />
-                      Evento: {new Date(aposta.data_evento).toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit", year: "numeric" })} às {new Date(aposta.data_evento).toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" })}
-                    </p>
-                  )}
+                  <p className="text-xs text-[var(--text-muted)] mb-3 flex items-center gap-1">
+                    <CalendarIcon className="h-3 w-3" />
+                    {(() => {
+                      const d = aposta.data_evento ? new Date(aposta.data_evento) : new Date(aposta.created_at)
+                      const dateStr = d.toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit", year: "numeric" })
+                      const timeStr = aposta.data_evento ? ` às ${d.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" })}` : ""
+                      return dateStr + timeStr
+                    })()}
+                  </p>
 
                   {legs.length > 0 && (
                     <div className="space-y-1.5 mb-3">
