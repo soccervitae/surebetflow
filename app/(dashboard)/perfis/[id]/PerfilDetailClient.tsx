@@ -53,13 +53,13 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
   const [movLoaded, setMovLoaded] = useState(false)
   const [profileBetsFinanceiro, setProfileBetsFinanceiro] = useState<(ProfileBet & { bet?: { id: string; nome: string } })[]>([])
   const [finPeriodo, setFinPeriodo] = useState<"hoje" | "semana" | "mes" | "todos">("mes")
-  const [finTipo, setFinTipo] = useState<"todos" | "deposito" | "saque" | "bonus">("todos")
+  const [finTipo, setFinTipo] = useState<"todos" | "deposito" | "saque" | "bonus" | "lucro">("todos")
   const [finCasa, setFinCasa] = useState("todos")
   const [bonusEntries, setBonusEntries] = useState<{ id: string; profile_bet_id: string | null; valor: number; descricao: string | null; created_at: string; _tipo: "bonus" }[]>([])
   const [finShowForm, setFinShowForm] = useState(false)
   const [finShowFilter, setFinShowFilter] = useState(false)
   const [finFormBet, setFinFormBet] = useState("")
-  const [finFormTipo, setFinFormTipo] = useState<"deposito" | "saque" | "bonus">("deposito")
+  const [finFormTipo, setFinFormTipo] = useState<"deposito" | "saque" | "bonus" | "lucro">("deposito")
   const [finFormValor, setFinFormValor] = useState("")
   const [finFormDescricao, setFinFormDescricao] = useState("")
   const [finSaving, setFinSaving] = useState(false)
@@ -196,12 +196,12 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
           .from("movimentacoes_financeiras")
           .select("tipo, valor")
           .eq("profile_bet_id", finFormBet)
-        const saldoReal = (movs ?? []).reduce((acc, m) => acc + (m.tipo === "deposito" ? m.valor : -m.valor), 0)
+        const saldoReal = (movs ?? []).reduce((acc, m) => acc + (m.tipo === "deposito" || m.tipo === "lucro" ? m.valor : -m.valor), 0)
         await supabase.from("profile_bets").update({ saldo: saldoReal }).eq("id", finFormBet)
       }
     }
 
-    toast({ title: finFormTipo === "bonus" ? "Bônus registrado!" : "Movimentação registrada!" })
+    toast({ title: finFormTipo === "bonus" ? "Bônus registrado!" : finFormTipo === "lucro" ? "Lucro registrado!" : "Movimentação registrada!" })
     setFinShowForm(false)
     setFinFormBet("")
     setFinFormTipo("deposito")
@@ -632,7 +632,7 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
           {/* Mobile: toggle button */}
           <div className="flex md:hidden items-center justify-between">
             <span className="text-xs text-[var(--text-secondary)]">
-              {finPeriodo === "hoje" ? "Hoje" : finPeriodo === "semana" ? "Semana" : finPeriodo === "mes" ? "Mês" : "Todos"} · {finTipo === "todos" ? "Todos" : finTipo === "deposito" ? "Depósito" : finTipo === "saque" ? "Saque" : "Bônus"}
+              {finPeriodo === "hoje" ? "Hoje" : finPeriodo === "semana" ? "Semana" : finPeriodo === "mes" ? "Mês" : "Todos"} · {finTipo === "todos" ? "Todos" : finTipo === "deposito" ? "Depósito" : finTipo === "saque" ? "Saque" : finTipo === "bonus" ? "Bônus" : "Lucro"}
             </span>
             <button
               onClick={() => setFinShowFilter(v => !v)}
@@ -653,16 +653,17 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
                 </button>
               ))}
             </div>
-            <div className="flex gap-1">
-              {(["todos", "deposito", "saque", "bonus"] as const).map(t => (
+            <div className="flex gap-1 flex-wrap">
+              {(["todos", "deposito", "saque", "lucro", "bonus"] as const).map(t => (
                 <button key={t} onClick={() => setFinTipo(t)}
                   className={`px-3 py-1 rounded-lg text-xs font-medium border transition-colors ${finTipo === t
                     ? t === "deposito" ? "bg-[#1e3a8a] text-white border-[#1e3a8a]"
                       : t === "saque" ? "bg-[#DC2626] text-white border-[#DC2626]"
                       : t === "bonus" ? "bg-purple-600 text-white border-purple-600"
+                      : t === "lucro" ? "bg-green-600 text-white border-green-600"
                       : "bg-[var(--bg-surface)] text-[var(--text-primary)] border-[var(--border)]"
                     : "bg-transparent text-[var(--text-secondary)] border-[var(--border)] hover:text-[var(--text-primary)]"}`}>
-                  {t === "todos" ? "Todos" : t === "deposito" ? "Depósito" : t === "saque" ? "Saque" : "Bônus"}
+                  {t === "todos" ? "Todos" : t === "deposito" ? "Depósito" : t === "saque" ? "Saque" : t === "lucro" ? "Lucro" : "Bônus"}
                 </button>
               ))}
             </div>
@@ -687,11 +688,12 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
                 <div className="grid grid-cols-2 gap-3">
                   <div className="space-y-1.5">
                     <Label>Tipo</Label>
-                    <Select value={finFormTipo} onValueChange={v => setFinFormTipo(v as "deposito" | "saque" | "bonus")}>
+                    <Select value={finFormTipo} onValueChange={v => setFinFormTipo(v as "deposito" | "saque" | "bonus" | "lucro")}>
                       <SelectTrigger><SelectValue /></SelectTrigger>
                       <SelectContent>
                         <SelectItem value="deposito">Depósito</SelectItem>
                         <SelectItem value="saque">Saque</SelectItem>
+                        <SelectItem value="lucro">Lucro externo</SelectItem>
                         <SelectItem value="bonus">Bônus</SelectItem>
                       </SelectContent>
                     </Select>
@@ -702,6 +704,14 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
                       onChange={e => setFinFormValor(formatBRL(e.target.value))} />
                   </div>
                 </div>
+                {finFormTipo === "lucro" && (
+                  <div className="flex items-start gap-2.5 rounded-xl bg-green-500/10 border border-green-500/20 px-4 py-3">
+                    <TrendingUp className="h-4 w-4 text-green-400 shrink-0 mt-0.5" />
+                    <p className="text-xs text-green-300 leading-relaxed">
+                      Registre lucros que <strong>não vieram de surebets</strong> — value bets, promoções, cashbacks ou qualquer outro ganho. O valor é somado ao saldo da casa selecionada.
+                    </p>
+                  </div>
+                )}
                 {finFormTipo === "bonus" && (
                   <div className="flex items-start gap-2.5 rounded-xl bg-purple-500/10 border border-purple-500/20 px-4 py-3">
                     <Gift className="h-4 w-4 text-purple-400 shrink-0 mt-0.5" />
@@ -773,9 +783,15 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
                 <Card key={m.id}>
                   <CardContent className="p-4">
                     <div className="flex items-center gap-3">
-                      <div className={`p-2 rounded-lg ${m.tipo === "deposito" ? "bg-[#1e3a8a]/10" : "bg-[#DC2626]/10"}`}>
+                      <div className={`p-2 rounded-lg ${
+                        m.tipo === "deposito" ? "bg-[#1e3a8a]/10"
+                        : m.tipo === "lucro" ? "bg-green-500/10"
+                        : "bg-[#DC2626]/10"
+                      }`}>
                         {m.tipo === "deposito"
                           ? <ArrowDownCircle className="h-4 w-4 text-[var(--accent-text)]" />
+                          : m.tipo === "lucro"
+                          ? <TrendingUp className="h-4 w-4 text-green-500" />
                           : <ArrowUpCircle className="h-4 w-4 text-[#DC2626]" />}
                       </div>
                       <div className="flex-1 min-w-0">
@@ -785,12 +801,16 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
                           </p>
                         )}
                         <p className="text-sm font-medium text-[var(--text-primary)]">
-                          {m.tipo === "deposito" ? "Depósito" : "Saque"}
+                          {m.tipo === "deposito" ? "Depósito" : m.tipo === "lucro" ? "Lucro externo" : "Saque"}
                         </p>
                         {m.descricao && <p className="text-xs text-[var(--text-muted)] truncate">{m.descricao}</p>}
                         <p className="text-xs text-[var(--text-secondary)]">{new Date(m.created_at).toLocaleDateString("pt-BR")}</p>
                       </div>
-                      <p className={`text-sm font-bold ${m.tipo === "deposito" ? "text-[var(--accent-text)]" : "text-[#DC2626]"}`}>
+                      <p className={`text-sm font-bold ${
+                        m.tipo === "saque" ? "text-[#DC2626]"
+                        : m.tipo === "lucro" ? "text-green-500"
+                        : "text-[var(--accent-text)]"
+                      }`}>
                         {m.tipo === "saque" ? "-" : "+"}{formatCurrency(m.valor)}
                       </p>
                     </div>
