@@ -611,43 +611,46 @@ export default function SurebetCalculator({ profiles, defaultProfileId, onSaved 
       </Card>
 
       {/* Legs */}
-      <div className={`grid gap-4 ${numLegs === 3 ? "md:grid-cols-3" : "md:grid-cols-2"}`}>
+      <div className="space-y-3">
         {legs.slice(0, numLegs).map((leg, i) => (
           <Card key={i}>
-            <CardHeader className="pb-3">
-              <CardTitle className="text-base">Aposta {i + 1}</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              <div className="space-y-2">
-                <Label>Casa de Apostas</Label>
-                <Select value={leg.profileBetId} onValueChange={v => updateLeg(i, "profileBetId", v)}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Selecionar conta..." />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {filteredProfiles.map(profile => {
-                      const bets = profileBets[profile.id] ?? []
-                      if (bets.length === 0) return null
-                      return bets.map(pb => (
-                        <SelectItem key={pb.id} value={pb.id}>
-                          {profile.apelido || `${profile.nome} ${profile.sobrenome}`} — {(pb as ProfileBet & { bet?: { nome: string } }).bet?.nome ?? "Casa"}
-                        </SelectItem>
-                      ))
-                    })}
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="space-y-2">
-                <Label>Resultado Apostado</Label>
-                <Input
-                  value={leg.resultadoApostado}
-                  onChange={e => updateLeg(i, "resultadoApostado", e.target.value)}
-                  placeholder={numLegs === 2 ? (i === 0 ? "Casa" : "Visitante") : ["Casa", "Empate", "Visitante"][i]}
-                />
-              </div>
-              <div className="grid grid-cols-2 gap-3">
-                <div className="space-y-2">
-                  <Label>Odd</Label>
+            <CardContent className="p-4">
+              {/* Label row */}
+              <p className="text-sm font-semibold text-[var(--text-primary)] mb-3">Aposta {i + 1}</p>
+
+              {/* Mobile: stacked; Desktop: horizontal 4 cols */}
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
+                <div className="space-y-1.5 md:col-span-1">
+                  <Label className="text-xs">Casa de Apostas</Label>
+                  <Select value={leg.profileBetId} onValueChange={v => updateLeg(i, "profileBetId", v)}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Selecionar conta..." />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {filteredProfiles.map(profile => {
+                        const bets = profileBets[profile.id] ?? []
+                        if (bets.length === 0) return null
+                        return bets.map(pb => (
+                          <SelectItem key={pb.id} value={pb.id}>
+                            {profile.apelido || `${profile.nome} ${profile.sobrenome}`} — {(pb as ProfileBet & { bet?: { nome: string } }).bet?.nome ?? "Casa"}
+                          </SelectItem>
+                        ))
+                      })}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="space-y-1.5 md:col-span-1">
+                  <Label className="text-xs">Resultado Apostado</Label>
+                  <Input
+                    value={leg.resultadoApostado}
+                    onChange={e => updateLeg(i, "resultadoApostado", e.target.value)}
+                    placeholder={numLegs === 2 ? (i === 0 ? "Casa" : "Visitante") : ["Casa", "Empate", "Visitante"][i]}
+                  />
+                </div>
+
+                <div className="space-y-1.5">
+                  <Label className="text-xs">Odd</Label>
                   <Input
                     type="number"
                     min="1.01"
@@ -657,8 +660,16 @@ export default function SurebetCalculator({ profiles, defaultProfileId, onSaved 
                     placeholder="2.10"
                   />
                 </div>
-                <div className="space-y-2">
-                  <Label>Stake (R$)</Label>
+
+                <div className="space-y-1.5">
+                  <Label className="text-xs">
+                    Stake (R$)
+                    {leg.odd && parseFloat(leg.odd) > 1 && (
+                      <span className="ml-2 text-[var(--text-muted)] font-normal">
+                        {((1 / parseFloat(leg.odd)) * 100).toFixed(1)}% prob.
+                      </span>
+                    )}
+                  </Label>
                   <Input
                     inputMode="numeric"
                     value={stakes[i] > 0 ? stakes[i].toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : ""}
@@ -671,7 +682,6 @@ export default function SurebetCalculator({ profiles, defaultProfileId, onSaved 
                       setUserStakes(prev => {
                         const next = [...prev]
                         next[i] = newStake
-                        // distribute remaining among other legs proportionally by implied prob
                         const otherIndices = Array.from({ length: numLegs }, (_, k) => k).filter(k => k !== i)
                         const otherSumProbs = otherIndices.reduce((s, k) => s + (impliedProbs[k] || 0), 0)
                         if (otherIndices.length === 1) {
@@ -689,12 +699,6 @@ export default function SurebetCalculator({ profiles, defaultProfileId, onSaved 
                   />
                 </div>
               </div>
-              {leg.odd && parseFloat(leg.odd) > 1 && (
-                <div className="flex items-center justify-between text-xs bg-[var(--bg-elevated)] rounded-lg px-3 py-2">
-                  <span className="text-[var(--text-secondary)]">Prob. implícita:</span>
-                  <span className="font-medium text-[var(--text-primary)]">{((1 / parseFloat(leg.odd)) * 100).toFixed(1)}%</span>
-                </div>
-              )}
             </CardContent>
           </Card>
         ))}
