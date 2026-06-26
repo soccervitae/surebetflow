@@ -14,7 +14,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet"
 import {
   Settings, Camera, Loader2, Shield, Monitor, Smartphone,
-  MapPin, Clock, LogOut, Key, User, AlertTriangle, Sun, Moon,
+  Clock, LogOut, Key, User, AlertTriangle, Sun, Moon,
   FileText, Lock, ExternalLink, CreditCard, CheckCircle, XCircle,
   Calendar, RefreshCw, Star, Pencil
 } from "lucide-react"
@@ -29,11 +29,12 @@ interface Assinatura {
   created_at: string
 }
 
-interface GeoInfo {
-  city: string
-  region: string
-  country_name: string
-  ip: string
+interface SessionInfo {
+  id: string
+  created_at: string
+  updated_at: string
+  user_agent?: string
+  ip?: string
 }
 
 function parseDevice(ua: string): { nome: string; icone: "monitor" | "smartphone" } {
@@ -69,10 +70,12 @@ export default function ConfiguracoesPage() {
   const [avatarUrl, setAvatarUrl] = useState("")
   const [lastSignIn, setLastSignIn] = useState<string | null>(null)
   const [createdAt, setCreatedAt] = useState<string | null>(null)
-  const [geo, setGeo] = useState<GeoInfo | null>(null)
-  const [loadingGeo, setLoadingGeo] = useState(true)
   const [device, setDevice] = useState<{ nome: string; icone: "monitor" | "smartphone" } | null>(null)
   const [browser, setBrowser] = useState("")
+  const [sessions, setSessions] = useState<SessionInfo[]>([])
+  const [loadingSessions, setLoadingSessions] = useState(true)
+  const [removingSession, setRemovingSession] = useState<string | null>(null)
+  const [currentSessionId, setCurrentSessionId] = useState<string | null>(null)
 
   const [newPassword, setNewPassword] = useState("")
   const [confirmPassword, setConfirmPassword] = useState("")
@@ -129,11 +132,18 @@ export default function ConfiguracoesPage() {
     setDevice(parseDevice(ua))
     setBrowser(parseBrowser(ua))
 
-    fetch("https://ipapi.co/json/")
+    // Load sessions + current session id
+    const supabase2 = createClient()
+    supabase2.auth.getSession().then(({ data }) => {
+      setCurrentSessionId((data.session as any)?.id ?? null)
+    })
+
+    setLoadingSessions(true)
+    fetch("/api/auth/sessions")
       .then(r => r.json())
-      .then((data: GeoInfo) => setGeo(data))
-      .catch(() => setGeo(null))
-      .finally(() => setLoadingGeo(false))
+      .then(d => setSessions(d.sessions ?? []))
+      .catch(() => setSessions([]))
+      .finally(() => setLoadingSessions(false))
   }, [])
 
   async function handlePhotoUpload(e: React.ChangeEvent<HTMLInputElement>) {
@@ -189,6 +199,17 @@ export default function ConfiguracoesPage() {
     setNewPassword("")
     setConfirmPassword("")
     setSavingPassword(false)
+  }
+
+  async function handleRevokeSession(sessionId: string) {
+    setRemovingSession(sessionId)
+    await fetch("/api/auth/sessions", {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ sessionId }),
+    })
+    setSessions(prev => prev.filter(s => s.id !== sessionId))
+    setRemovingSession(null)
   }
 
   async function handleLogoutAll() {
@@ -567,10 +588,11 @@ export default function ConfiguracoesPage() {
           <Card>
             <CardHeader className="pb-3">
               <CardTitle className="text-base flex items-center gap-2">
-                <Monitor className="h-4 w-4" /> Sessão atual
+                <Monitor className="h-4 w-4" /> Dispositivos conectados
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
+              {/* Sessão atual */}
               <div className="flex items-center gap-3 p-3 rounded-xl bg-[var(--bg-muted)] border border-[var(--border)]">
                 <div className="p-2 rounded-lg bg-[#1e3a8a]/10">
                   <DeviceIcon className="h-5 w-5 text-[var(--accent-text)]" />
@@ -582,27 +604,63 @@ export default function ConfiguracoesPage() {
                     </p>
                     <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-xs bg-green-500/10 text-green-600 font-medium">
                       <span className="w-1.5 h-1.5 rounded-full bg-green-500" />
-                      Ativa agora
+                      Este dispositivo
                     </span>
                   </div>
-                  <div className="flex items-center gap-3 mt-1 flex-wrap">
-                    {loadingGeo ? (
-                      <span className="text-xs text-[var(--text-muted)]">Detectando localização...</span>
-                    ) : geo ? (
-                      <span className="flex items-center gap-1 text-xs text-[var(--text-secondary)]">
-                        <MapPin className="w-3 h-3" />
-                        {geo.city}, {geo.region} — {geo.country_name} ({geo.ip})
-                      </span>
-                    ) : (
-                      <span className="text-xs text-[var(--text-muted)]">Localização não disponível</span>
-                    )}
-                    <span className="flex items-center gap-1 text-xs text-[var(--text-secondary)]">
-                      <Clock className="w-3 h-3" />
-                      Último acesso: {formatDate(lastSignIn)}
-                    </span>
-                  </div>
+                  <span className="flex items-center gap-1 text-xs text-[var(--text-secondary)] mt-1">
+                    <Clock className="w-3 h-3" />
+                    Último acesso: {formatDate(lastSignIn)}
+                  </span>
                 </div>
               </div>
+
+              {/* Outros dispositivos */}
+              {loadingSessions ? (
+                <div className="flex items-center gap-2 py-2 text-xs text-[var(--text-muted)]">
+                  <Loader2 className="w-3.5 h-3.5 animate-spin" /> Verificando outros dispositivos...
+                </div>
+              ) : sessions.filter(s => s.id !== currentSessionId).length > 0 ? (
+                <>
+                  <p className="text-xs font-semibold text-[var(--text-muted)] uppercase tracking-wider pt-1">
+                    Outras sessões ativas
+                  </p>
+                  {sessions
+                    .filter(s => s.id !== currentSessionId)
+                    .map(s => {
+                      const ua = s.user_agent ?? ""
+                      const dev = parseDevice(ua)
+                      const brw = parseBrowser(ua)
+                      const OtherIcon = dev.icone === "smartphone" ? Smartphone : Monitor
+                      return (
+                        <div key={s.id} className="flex items-center gap-3 p-3 rounded-xl bg-[var(--bg-muted)] border border-[var(--border)]">
+                          <div className="p-2 rounded-lg bg-[var(--bg-elevated)]">
+                            <OtherIcon className="h-5 w-5 text-[var(--text-secondary)]" />
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm font-medium text-[var(--text-primary)]">
+                              {dev.nome} · {brw}
+                            </p>
+                            <span className="flex items-center gap-1 text-xs text-[var(--text-secondary)] mt-0.5">
+                              <Clock className="w-3 h-3" />
+                              Último acesso: {formatDate(s.updated_at)}
+                            </span>
+                          </div>
+                          <button
+                            onClick={() => handleRevokeSession(s.id)}
+                            disabled={removingSession === s.id}
+                            className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-medium text-[#DC2626] border border-[#DC2626]/30 hover:bg-[#DC2626]/5 transition-colors disabled:opacity-50"
+                          >
+                            {removingSession === s.id ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <LogOut className="w-3.5 h-3.5" />}
+                            Revogar
+                          </button>
+                        </div>
+                      )
+                    })}
+                </>
+              ) : !loadingSessions && sessions.length > 0 ? (
+                <p className="text-xs text-[var(--text-muted)] py-1">Nenhuma outra sessão ativa encontrada.</p>
+              ) : null}
+
               <Button
                 variant="outline"
                 size="sm"

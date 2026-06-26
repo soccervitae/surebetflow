@@ -597,7 +597,6 @@ export default function AddBetToProfile({ profileId }: Props) {
                         onClick={() => {
                           setEditEmail(pb.email ?? "")
                           setEditSenha("")
-                          setEditShowSenha(false)
                           setEditDialog(pb)
                           setMenuOpenId(null)
                         }}
