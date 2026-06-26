@@ -30,7 +30,6 @@ export default function AddBetToProfile({ profileId }: Props) {
   const [selectedBet, setSelectedBet] = useState("")
   const [email, setEmail] = useState("")
   const [senha, setSenha] = useState("")
-  const [showSenha, setShowSenha] = useState(true)
   const [loading, setLoading] = useState(false)
   const [revealedPasswords, setRevealedPasswords] = useState<Record<string, boolean>>({})
   const [betSearch, setBetSearch] = useState("")
@@ -50,7 +49,6 @@ export default function AddBetToProfile({ profileId }: Props) {
   const [editDialog, setEditDialog] = useState<ProfileBetWithBet | null>(null)
   const [editEmail, setEditEmail] = useState("")
   const [editSenha, setEditSenha] = useState("")
-  const [editShowSenha, setEditShowSenha] = useState(false)
   const [editSaving, setEditSaving] = useState(false)
 
   const { toast } = useToast()
@@ -313,21 +311,12 @@ export default function AddBetToProfile({ profileId }: Props) {
                 <Label className="text-xs">Senha da conta *</Label>
                 <div className="relative">
                   <Input
-                    type={showSenha ? "text" : "password"}
+                    type="text"
                     value={senha}
                     onChange={e => setSenha(e.target.value)}
                     placeholder="Senha da conta"
-                    className="pr-10"
                     autoComplete="off"
                   />
-                  <button
-                    type="button"
-                    onClick={() => setShowSenha(v => !v)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors"
-                    tabIndex={-1}
-                  >
-                    {showSenha ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                  </button>
                 </div>
               </div>
             </div>
@@ -437,19 +426,11 @@ export default function AddBetToProfile({ profileId }: Props) {
               <Label>Nova senha <span className="text-[var(--text-muted)] font-normal">(deixe em branco para não alterar)</span></Label>
               <div className="relative">
                 <Input
-                  type={editShowSenha ? "text" : "password"}
+                  type="text"
                   value={editSenha}
                   onChange={e => setEditSenha(e.target.value)}
                   placeholder="••••••••"
-                  className="pr-10"
                 />
-                <button
-                  type="button"
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)] hover:text-[var(--text-primary)]"
-                  onClick={() => setEditShowSenha(v => !v)}
-                >
-                  {editShowSenha ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                </button>
               </div>
             </div>
           </div>
