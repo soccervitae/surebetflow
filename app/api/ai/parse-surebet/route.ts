@@ -73,7 +73,7 @@ Regras:
     }
 
     const message = await client.messages.create({
-      model: "claude-haiku-4-5",
+      model: "claude-haiku-4-5-20251001",
       max_tokens: 2048,
       system: systemPrompt,
       messages: [{ role: "user", content }],
@@ -86,10 +86,9 @@ Regras:
     const parsed = JSON.parse(jsonMatch[0])
     return NextResponse.json(parsed)
   } catch (err: unknown) {
-    console.error("parse-surebet error:", err)
-    return NextResponse.json(
-      { error: (err as Error)?.message ?? "Erro ao processar" },
-      { status: 500 }
-    )
+    const e = err as any
+    console.error("parse-surebet error:", e)
+    const message = e?.message ?? e?.error?.message ?? JSON.stringify(e) ?? "Erro ao processar"
+    return NextResponse.json({ error: message }, { status: 500 })
   }
 }
