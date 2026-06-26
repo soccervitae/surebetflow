@@ -656,7 +656,7 @@ export default function SurebetCalculator({ profiles, defaultProfileId, onSaved 
                         if (bets.length === 0) return null
                         return bets.map(pb => (
                           <SelectItem key={pb.id} value={pb.id}>
-                            {profile.apelido || `${profile.nome} ${profile.sobrenome}`} — {(pb as ProfileBet & { bet?: { nome: string } }).bet?.nome ?? "Casa"}
+                            {(pb as ProfileBet & { bet?: { nome: string } }).bet?.nome ?? "Casa"}
                           </SelectItem>
                         ))
                       })}
