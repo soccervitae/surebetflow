@@ -257,6 +257,17 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           >
             {isDark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
           </button>
+          <Link
+            href="/suporte"
+            className="relative w-8 h-8 flex items-center justify-center rounded-lg text-[var(--text-secondary)]"
+          >
+            <Bell className="w-4 h-4" />
+            {unread > 0 && (
+              <span className="absolute top-1 right-1 min-w-[16px] h-4 px-0.5 flex items-center justify-center rounded-full bg-red-500 text-white text-[9px] font-bold leading-none">
+                {unread > 99 ? "99+" : unread}
+              </span>
+            )}
+          </Link>
           <Link href="/configuracoes" className="w-7 h-7 bg-[#1e3a8a] rounded-full flex items-center justify-center text-white text-xs font-bold">
             {userInitials}
           </Link>
