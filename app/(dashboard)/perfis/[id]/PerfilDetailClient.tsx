@@ -146,8 +146,12 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
 
   const totalDepositos = finFiltered.filter(m => m.tipo === "deposito").reduce((s, m) => s + m.valor, 0)
   const totalSaques = finFiltered.filter(m => m.tipo === "saque").reduce((s, m) => s + m.valor, 0)
-  const totalBonus = (finTipo === "todos" || finTipo === "bonus") ? bonusFiltered.reduce((s, b) => s + b.valor, 0) : 0
-  const saldoLiquido = totalDepositos - totalSaques
+  const totalLucro = finFiltered.filter(m => m.tipo === "lucro").reduce((s, m) => s + m.valor, 0)
+  const totalPerda = finFiltered.filter(m => m.tipo === "perda").reduce((s, m) => s + m.valor, 0)
+  const totalBonusMov = finFiltered.filter(m => m.tipo === "bonus").reduce((s, m) => s + m.valor, 0)
+  const totalBonusTabela = (finTipo === "todos" || finTipo === "bonus") ? bonusFiltered.reduce((s, b) => s + b.valor, 0) : 0
+  const totalBonus = totalBonusMov + totalBonusTabela
+  const saldoLiquido = totalDepositos + totalLucro - totalSaques - totalPerda
 
   async function handleFinSave() {
     const valor = parseBRL(finFormValor)
@@ -606,12 +610,14 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
         {/* Financeiro Tab */}
         <TabsContent value="financeiro" className="space-y-4">
           {/* Summary cards */}
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+          <div className="grid grid-cols-2 lg:grid-cols-3 gap-3">
             {[
-              { label: "Depositado",   value: formatCurrency(totalDepositos), icon: ArrowDownLeft,  bg: "bg-[#1e3a8a]/10",  color: "text-[var(--accent-text)]" },
-              { label: "Sacado",       value: formatCurrency(totalSaques),    icon: ArrowUpRight,   bg: "bg-[#DC2626]/10",  color: "text-[#DC2626]" },
-              { label: "Saldo Líquido",value: formatCurrency(saldoLiquido),   icon: Wallet,         bg: saldoLiquido >= 0 ? "bg-[#1e3a8a]/10" : "bg-[#DC2626]/10", color: saldoLiquido >= 0 ? "text-[var(--accent-text)]" : "text-[#DC2626]" },
-              { label: "Total Bônus",  value: formatCurrency(totalBonus),     icon: Gift,           bg: "bg-purple-500/10", color: "text-purple-500" },
+              { label: "Depositado",    value: formatCurrency(totalDepositos), icon: ArrowDownLeft,  bg: "bg-[#1e3a8a]/10",  color: "text-[var(--accent-text)]" },
+              { label: "Sacado",        value: formatCurrency(totalSaques),    icon: ArrowUpRight,   bg: "bg-[#DC2626]/10",  color: "text-[#DC2626]" },
+              { label: "Saldo Líquido", value: formatCurrency(saldoLiquido),   icon: Wallet,         bg: saldoLiquido >= 0 ? "bg-[#1e3a8a]/10" : "bg-[#DC2626]/10", color: saldoLiquido >= 0 ? "text-[var(--accent-text)]" : "text-[#DC2626]" },
+              { label: "Lucro",         value: formatCurrency(totalLucro),     icon: TrendingUp,     bg: "bg-green-500/10",  color: "text-green-600" },
+              { label: "Perda",         value: formatCurrency(totalPerda),     icon: ArrowDownCircle,bg: "bg-orange-500/10", color: "text-orange-500" },
+              { label: "Total Bônus",   value: formatCurrency(totalBonus),     icon: Gift,           bg: "bg-purple-500/10", color: "text-purple-500" },
             ].map(({ label, value, icon: Icon, bg, color }) => (
               <Card key={label} className="overflow-hidden">
                 <CardContent className="p-4">

@@ -71,7 +71,7 @@ export interface MovimentacaoFinanceira {
   id: string
   profile_id: string
   profile_bet_id?: string | null
-  tipo: 'deposito' | 'saque' | 'lucro' | 'perda'
+  tipo: 'deposito' | 'saque' | 'lucro' | 'perda' | 'bonus'
   valor: number
   descricao?: string | null
   created_at: string
