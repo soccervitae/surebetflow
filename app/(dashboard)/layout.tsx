@@ -279,7 +279,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               href={href}
               className={cn(
                 "flex-1 flex flex-col items-center py-2 text-xs gap-1",
-                active ? "text-[#1e3a8a]" : "text-[var(--text-secondary)]"
+                active ? "text-[#4d82d6]" : "text-[var(--text-secondary)]"
               )}
             >
               <Icon className="w-5 h-5" />
