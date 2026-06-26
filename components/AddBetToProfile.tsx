@@ -41,7 +41,7 @@ export default function AddBetToProfile({ profileId }: Props) {
   const [togglingAtivo, setTogglingAtivo] = useState(false)
   // Movimentação
   const [movDialog, setMovDialog] = useState<ProfileBetWithBet | null>(null)
-  const [movTipo, setMovTipo] = useState<"deposito" | "saque">("deposito")
+  const [movTipo, setMovTipo] = useState<"deposito" | "saque" | "bonus" | "lucro" | "perda">("deposito")
   const [movValor, setMovValor] = useState("")
   const [movDescricao, setMovDescricao] = useState("")
   const [movSaving, setMovSaving] = useState(false)
@@ -209,7 +209,11 @@ export default function AddBetToProfile({ profileId }: Props) {
         .from("movimentacoes_financeiras")
         .select("tipo, valor")
         .eq("profile_bet_id", movDialog.id)
-      const saldoReal = (movs ?? []).reduce((acc, m) => acc + (m.tipo === "deposito" ? m.valor : -m.valor), 0)
+      const saldoReal = (movs ?? []).reduce((acc, m) => {
+        if (m.tipo === "deposito" || m.tipo === "lucro") return acc + m.valor
+        if (m.tipo === "saque" || m.tipo === "perda") return acc - m.valor
+        return acc // bonus: não afeta saldo real
+      }, 0)
       await supabase.from("profile_bets").update({ saldo: saldoReal }).eq("id", movDialog.id)
       setProfileBets(prev => prev.map(pb => pb.id === movDialog.id ? { ...pb, saldo: saldoReal } : pb))
       toast({ title: "Movimentação registrada!" })
@@ -341,11 +345,14 @@ export default function AddBetToProfile({ profileId }: Props) {
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1.5">
                   <Label>Tipo</Label>
-                  <Select value={movTipo} onValueChange={v => setMovTipo(v as "deposito" | "saque")}>
+                  <Select value={movTipo} onValueChange={v => setMovTipo(v as "deposito" | "saque" | "bonus" | "lucro" | "perda")}>
                     <SelectTrigger><SelectValue /></SelectTrigger>
                     <SelectContent>
                       <SelectItem value="deposito">Depósito</SelectItem>
                       <SelectItem value="saque">Saque</SelectItem>
+                      <SelectItem value="lucro">Lucro externo</SelectItem>
+                      <SelectItem value="perda">Perda</SelectItem>
+                      <SelectItem value="bonus">Bônus</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -354,6 +361,21 @@ export default function AddBetToProfile({ profileId }: Props) {
                   <Input placeholder="0,00" value={movValor} onChange={e => setMovValor(formatBRL(e.target.value))} inputMode="numeric" />
                 </div>
               </div>
+              {movTipo === "bonus" && (
+                <p className="text-xs text-purple-500 bg-purple-500/10 border border-purple-500/20 rounded-lg px-3 py-2">
+                  O valor do bônus é registrado separadamente e não entra no saldo real da conta.
+                </p>
+              )}
+              {movTipo === "lucro" && (
+                <p className="text-xs text-green-600 bg-green-500/10 border border-green-500/20 rounded-lg px-3 py-2">
+                  Lucro externo será somado ao saldo da bet.
+                </p>
+              )}
+              {movTipo === "perda" && (
+                <p className="text-xs text-orange-500 bg-orange-500/10 border border-orange-500/20 rounded-lg px-3 py-2">
+                  O valor da perda será subtraído do saldo da bet.
+                </p>
+              )}
               <div className="space-y-1.5">
                 <Label>Descrição (opcional)</Label>
                 <Input placeholder="Ex: Depósito inicial" value={movDescricao} onChange={e => setMovDescricao(e.target.value)} />
@@ -377,11 +399,14 @@ export default function AddBetToProfile({ profileId }: Props) {
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1.5">
                   <Label>Tipo</Label>
-                  <Select value={movTipo} onValueChange={v => setMovTipo(v as "deposito" | "saque")}>
+                  <Select value={movTipo} onValueChange={v => setMovTipo(v as "deposito" | "saque" | "bonus" | "lucro" | "perda")}>
                     <SelectTrigger><SelectValue /></SelectTrigger>
                     <SelectContent>
                       <SelectItem value="deposito">Depósito</SelectItem>
                       <SelectItem value="saque">Saque</SelectItem>
+                      <SelectItem value="lucro">Lucro externo</SelectItem>
+                      <SelectItem value="perda">Perda</SelectItem>
+                      <SelectItem value="bonus">Bônus</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -390,6 +415,21 @@ export default function AddBetToProfile({ profileId }: Props) {
                   <Input placeholder="0,00" value={movValor} onChange={e => setMovValor(formatBRL(e.target.value))} />
                 </div>
               </div>
+              {movTipo === "bonus" && (
+                <p className="text-xs text-purple-500 bg-purple-500/10 border border-purple-500/20 rounded-lg px-3 py-2">
+                  O valor do bônus é registrado separadamente e não entra no saldo real da conta.
+                </p>
+              )}
+              {movTipo === "lucro" && (
+                <p className="text-xs text-green-600 bg-green-500/10 border border-green-500/20 rounded-lg px-3 py-2">
+                  Lucro externo será somado ao saldo da bet.
+                </p>
+              )}
+              {movTipo === "perda" && (
+                <p className="text-xs text-orange-500 bg-orange-500/10 border border-orange-500/20 rounded-lg px-3 py-2">
+                  O valor da perda será subtraído do saldo da bet.
+                </p>
+              )}
               <div className="space-y-1.5">
                 <Label>Descrição (opcional)</Label>
                 <Input placeholder="Ex: Depósito inicial" value={movDescricao} onChange={e => setMovDescricao(e.target.value)} />
