@@ -594,10 +594,6 @@ export default function SurebetCalculator({ profiles, defaultProfileId, onSaved 
               <Input type="date" value={dataEvento} onChange={e => setDataEvento(e.target.value)} />
             </div>
             <div className="space-y-2">
-              <Label>Hora do evento</Label>
-              <Input type="time" value={horaEvento} onChange={e => setHoraEvento(e.target.value)} />
-            </div>
-            <div className="space-y-2">
               <Label>Investimento Total (R$)</Label>
               <Input
                 inputMode="numeric"
