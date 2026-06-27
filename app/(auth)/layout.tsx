@@ -9,14 +9,14 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
       <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
         <div className="w-full max-w-md">
           <div className="text-center mb-8">
-            <Link href="/" className="inline-flex flex-col items-center gap-3">
+            <Link href="/" className="inline-flex items-center gap-3">
               <Image
                 src="/icons/surebetflow-icone-app.png"
                 alt="SurebetFlow"
-                width={64}
-                height={64}
+                width={48}
+                height={48}
                 priority
-                className="rounded-2xl shadow-md"
+                className="rounded-xl shadow-md"
               />
               <span className="text-2xl font-bold text-gray-900 tracking-tight">SurebetFlow</span>
             </Link>
