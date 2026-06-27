@@ -1,5 +1,11 @@
+import type { Metadata } from "next"
 import { createClient } from "@/lib/supabase/server"
 import PerfisClient from "./PerfisClient"
+
+export const metadata: Metadata = {
+  title: "Perfis",
+  description: "Organize suas apostas por perfil. Crie perfis separados por estratégia ou banca e acompanhe o desempenho individual de cada um.",
+}
 
 export default async function PerfisPage() {
   const supabase = await createClient()

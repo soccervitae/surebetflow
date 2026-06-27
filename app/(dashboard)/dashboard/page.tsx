@@ -1,6 +1,12 @@
+import type { Metadata } from "next"
 import { redirect } from "next/navigation"
 import { createClient } from "@/lib/supabase/server"
 import HomeDashboard from "../HomeDashboard"
+
+export const metadata: Metadata = {
+  title: "Dashboard",
+  description: "Visão geral da sua banca: saldo total, lucro realizado, lucro pendente e ROI consolidado de todos os seus perfis de apostas.",
+}
 
 const ADMIN_EMAILS = (process.env.ADMIN_EMAILS ?? "").split(",").map(e => e.trim()).filter(Boolean)
 

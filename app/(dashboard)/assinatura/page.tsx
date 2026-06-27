@@ -1,7 +1,13 @@
+import type { Metadata } from "next"
 import { Suspense } from "react"
 import { createClient } from "@/lib/supabase/server"
 import { redirect } from "next/navigation"
 import AssinaturaClient from "./AssinaturaClient"
+
+export const metadata: Metadata = {
+  title: "Assinatura",
+  description: "Gerencie seu plano SurebetFlow. Assine, atualize a forma de pagamento e acompanhe o status da sua assinatura.",
+}
 
 export default async function AssinaturaPage() {
   const supabase = await createClient()

@@ -1,6 +1,12 @@
+import type { Metadata } from "next"
 import { createClient } from "@/lib/supabase/server"
 import { redirect } from "next/navigation"
 import SuporteClient from "./SuporteClient"
+
+export const metadata: Metadata = {
+  title: "Suporte",
+  description: "Abra tickets de suporte, envie dúvidas, sugestões ou críticas. Nossa equipe responde em até 24 horas úteis.",
+}
 
 export default async function SuportePage() {
   const supabase = await createClient()

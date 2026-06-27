@@ -1,6 +1,12 @@
+import type { Metadata } from "next"
 import { redirect } from "next/navigation"
 import { createClient } from "@/lib/supabase/server"
 import ApostasClient from "./ApostasClient"
+
+export const metadata: Metadata = {
+  title: "Apostas",
+  description: "Registre, acompanhe e gerencie todas as suas apostas de arbitragem em um só lugar. Filtre por status, perfil e resultado.",
+}
 
 export default async function ApostasPage() {
   const supabase = await createClient()
