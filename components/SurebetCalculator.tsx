@@ -147,6 +147,7 @@ export default function SurebetCalculator({ profiles, defaultProfileId, profileN
   const [aiSelectedIdx, setAiSelectedIdx] = useState(0)
   const imageInputRef = useRef<HTMLInputElement>(null)
   const [userStakes, setUserStakes] = useState<(number | null)[]>([null, null, null])
+  const [roundStakes, setRoundStakes] = useState(false)
   const { toast } = useToast()
   const supabase = createClient()
 
@@ -331,7 +332,10 @@ export default function SurebetCalculator({ profiles, defaultProfileId, profileN
     ? impliedProbs.map(p => parseFloat(((p / sumProbs) * investment).toFixed(2)))
     : odds.map(() => 0)
 
-  const stakes = computedStakes.map((computed, i) => userStakes[i] ?? computed)
+  const stakes = computedStakes.map((computed, i) => {
+    const raw = userStakes[i] ?? computed
+    return roundStakes ? Math.round(raw) : raw
+  })
 
   const guaranteedReturn = isArbitrage && stakes.length > 0 && odds[0] > 0
     ? stakes[0] * odds[0]
@@ -732,6 +736,22 @@ export default function SurebetCalculator({ profiles, defaultProfileId, profileN
           </Card>
         ))}
       </div>
+
+      {/* Round stakes toggle */}
+      <button
+        type="button"
+        onClick={() => setRoundStakes(v => !v)}
+        className={`flex items-center gap-3 w-full px-4 py-3 rounded-xl border transition-colors text-sm ${
+          roundStakes
+            ? "border-[#1e3a8a]/40 bg-[#1e3a8a]/8 text-[var(--text-primary)]"
+            : "border-[var(--border)] text-[var(--text-secondary)]"
+        }`}
+      >
+        <div className={`w-9 h-5 rounded-full flex items-center transition-colors flex-shrink-0 ${roundStakes ? "bg-[#1e3a8a]" : "bg-[var(--bg-elevated)]"}`}>
+          <div className={`w-4 h-4 bg-white rounded-full shadow transition-transform mx-0.5 ${roundStakes ? "translate-x-4" : "translate-x-0"}`} />
+        </div>
+        <span className="font-medium">Arredondar stakes (sem centavos)</span>
+      </button>
 
       {/* Result */}
       <Card className={isArbitrage ? "border-[#1e3a8a]/30" : "border-[#DC2626]/30"}>
