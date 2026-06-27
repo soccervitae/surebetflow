@@ -10,7 +10,7 @@ import {
   Search, CreditCard, Star, Zap,
   BarChart2, ChevronLeft, Circle, Bell, Sun,
   Filter, ArrowRight, Activity, Hash,
-  Calendar, RefreshCw, X,
+  Calendar, RefreshCw, X, ClipboardList,
 } from "lucide-react"
 
 const SECTIONS = [
@@ -78,8 +78,8 @@ function IPhone15Frame({ dark, children }: { dark: boolean; children: React.Reac
   )
 }
 
-/* ── Real iframe inside iPhone 15 frame ── */
-function IFramePhone({ href }: { href: string }) {
+/* ── Static phone mockup (replaces iframe to avoid auth redirects) ── */
+function MockPhone({ children }: { children: React.ReactNode }) {
   const { theme } = useTheme()
   const dark = theme === "dark"
   const innerW = 246
@@ -93,15 +93,35 @@ function IFramePhone({ href }: { href: string }) {
         height: IFRAME_H,
         transform: `scale(${scale})`,
         transformOrigin: "top left",
+        background: dark ? "#0b1220" : "#f8fafc",
+        overflow: "hidden",
       }}>
-        <iframe
-          src={href}
-          width={IFRAME_W}
-          height={IFRAME_H}
-          className="border-0"
-          sandbox="allow-same-origin allow-scripts allow-forms"
-          title={href}
-        />
+        {/* Mobile top bar */}
+        <div className="flex items-center justify-between px-4 bg-[#0b1631] border-b border-white/5" style={{ height: 52, paddingTop: 24 }}>
+          <span className="text-white font-bold text-[11px]">SurebetFlow</span>
+          <div className="flex items-center gap-2">
+            <div className="w-5 h-5 bg-[#1e3a8a] rounded-full flex items-center justify-center text-white text-[7px] font-bold">JS</div>
+          </div>
+        </div>
+        {/* Content */}
+        <div className="overflow-hidden px-3 pt-3" style={{ height: IFRAME_H - 52 - 56 }}>
+          {children}
+        </div>
+        {/* Mobile bottom nav */}
+        <div className="absolute bottom-0 left-0 right-0 bg-[#0b1631] border-t border-white/5 flex items-center" style={{ height: 56 }}>
+          {[
+            { icon: Home, label: "Dashboard" },
+            { icon: Users, label: "Perfis" },
+            { icon: ClipboardList, label: "Apostas" },
+            { icon: Wallet, label: "Financeiro" },
+            { icon: BookOpen, label: "Tutorial" },
+          ].map(({ icon: Icon, label }, i) => (
+            <div key={label} className={`flex-1 flex flex-col items-center gap-0.5 py-2 ${i === 0 ? "text-[#4d82d6]" : "text-white/40"}`}>
+              <Icon className="w-4 h-4" />
+              <span className="text-[6px]">{label}</span>
+            </div>
+          ))}
+        </div>
       </div>
     </IPhone15Frame>
   )
@@ -181,15 +201,15 @@ function MockShell({ url, children }: { url: string; children: React.ReactNode }
   )
 }
 
-function MockBoth({ url, mobileHref, children }: {
-  url: string; mobileHref: string;
+function MockBoth({ url, children }: {
+  url: string;
   children: React.ReactNode
 }) {
   return (
     <div className="space-y-4">
-      {/* Mobile: real iframe in iPhone 15 frame */}
+      {/* Mobile: static mockup in iPhone 15 frame */}
       <div className="md:hidden flex justify-center py-2">
-        <IFramePhone href={mobileHref} />
+        <MockPhone>{children}</MockPhone>
       </div>
       {/* Desktop: browser mockup */}
       <div className="hidden md:block">
@@ -212,7 +232,7 @@ function SectionContent({ id, sectionIndex: _ }: { id: string; sectionIndex: num
             <p className="text-sm text-[var(--text-secondary)]">Visão consolidada de todos os seus perfis e apostas.</p>
           </div>
 
-          <MockBoth url="/dashboard" mobileHref="/dashboard">
+          <MockBoth url="/dashboard">
             <p className="text-[10px] font-bold text-white mb-3">Painel Geral 📊</p>
             <div className="grid grid-cols-4 gap-2 mb-3">
               {[
@@ -285,7 +305,7 @@ function SectionContent({ id, sectionIndex: _ }: { id: string; sectionIndex: num
             <p className="text-sm text-[var(--text-secondary)]">Organize suas apostas separando diferentes estratégias ou bancas.</p>
           </div>
 
-          <MockBoth url="/perfis" mobileHref="/perfis">
+          <MockBoth url="/perfis">
             <div className="flex items-center justify-between mb-3">
               <p className="text-[11px] font-bold text-white">Perfis</p>
               <div className="flex items-center gap-1 bg-[#1e3a8a] px-2 py-1 rounded-lg">
@@ -338,7 +358,7 @@ function SectionContent({ id, sectionIndex: _ }: { id: string; sectionIndex: num
             <p className="text-sm text-[var(--text-secondary)]">Calcule apostas 2-way e 3-way para garantir lucro independente do resultado.</p>
           </div>
 
-          <MockBoth url="/calculadora" mobileHref="/dashboard">
+          <MockBoth url="/calculadora">
             <p className="text-[10px] font-bold text-white mb-1">Calculadora de Surebet</p>
             <div className="grid grid-cols-2 gap-2 mb-2">
               {["Resultado 1 — Casa A","Resultado 2 — Casa B"].map((label,i)=>(
@@ -386,7 +406,7 @@ function SectionContent({ id, sectionIndex: _ }: { id: string; sectionIndex: num
             <p className="text-sm text-[var(--text-secondary)]">Registre e acompanhe todas as suas apostas em um só lugar.</p>
           </div>
 
-          <MockBoth url="/apostas" mobileHref="/apostas">
+          <MockBoth url="/apostas">
             <div className="flex items-center justify-between mb-3">
               <p className="text-[11px] font-bold text-white">Apostas</p>
               <div className="flex items-center gap-1">
@@ -453,7 +473,7 @@ function SectionContent({ id, sectionIndex: _ }: { id: string; sectionIndex: num
             <p className="text-sm text-[var(--text-secondary)]">Análise detalhada do seu desempenho financeiro.</p>
           </div>
 
-          <MockBoth url="/financeiro" mobileHref="/financeiro">
+          <MockBoth url="/financeiro">
             <p className="text-[10px] font-bold text-white mb-3">Financeiro</p>
             <div className="grid grid-cols-4 gap-1.5 mb-3">
               {[
@@ -517,7 +537,7 @@ function SectionContent({ id, sectionIndex: _ }: { id: string; sectionIndex: num
             <p className="text-sm text-[var(--text-secondary)]">Gerencie seu plano e forma de pagamento.</p>
           </div>
 
-          <MockBoth url="/assinatura" mobileHref="/assinatura">
+          <MockBoth url="/assinatura">
             <div className="flex items-center gap-2 mb-3">
               <div className="w-6 h-6 bg-[#1e3a8a]/10 rounded-lg flex items-center justify-center">
                 <CreditCard className="w-3 h-3 text-[var(--accent-text)]" />
@@ -577,7 +597,7 @@ function SectionContent({ id, sectionIndex: _ }: { id: string; sectionIndex: num
             <p className="text-sm text-[var(--text-secondary)]">Personalize sua conta e preferências.</p>
           </div>
 
-          <MockBoth url="/configuracoes" mobileHref="/configuracoes">
+          <MockBoth url="/configuracoes">
             <p className="text-[10px] font-bold text-white mb-3">Minha Conta</p>
             <div className="space-y-1.5">
               {[
@@ -628,7 +648,7 @@ function SectionContent({ id, sectionIndex: _ }: { id: string; sectionIndex: num
             <p className="text-sm text-[var(--text-secondary)]">Abra tickets e acompanhe o atendimento da nossa equipe.</p>
           </div>
 
-          <MockBoth url="/suporte" mobileHref="/suporte">
+          <MockBoth url="/suporte">
             <div className="flex items-center justify-between mb-3">
               <p className="text-[11px] font-bold text-white">Suporte</p>
               <div className="flex items-center gap-1 bg-[#1e3a8a] px-2 py-1 rounded-lg">
