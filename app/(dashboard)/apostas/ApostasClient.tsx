@@ -13,7 +13,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet"
 import { formatCurrency } from "@/lib/utils"
 import { useToast } from "@/hooks/useToast"
-import { BookOpen, Filter, X, Plus, Calculator, CalendarIcon, ChevronDown, AlertTriangle } from "lucide-react"
+import { BookOpen, Filter, X, Plus, Calculator, CalendarIcon, ChevronDown, AlertTriangle, Download } from "lucide-react"
 import type { Aposta, ApostaLeg } from "@/lib/types"
 import SurebetCalculator from "@/components/SurebetCalculator"
 
@@ -40,6 +40,9 @@ export default function ApostasClient({ apostas: initialApostas, profiles, betCo
   const [filterCustomDate, setFilterCustomDate] = useState("")
   const [filterCustomFrom, setFilterCustomFrom] = useState("")
   const [filterCustomTo, setFilterCustomTo] = useState("")
+  const [filterEsporte, setFilterEsporte] = useState("")
+  const [filterCompeticao, setFilterCompeticao] = useState("")
+  const [sortBy, setSortBy] = useState<"data_desc" | "data_asc" | "valor_desc" | "roi_desc">("data_desc")
   const [finalizarDialog, setFinalizarDialog] = useState<Aposta | null>(null)
   const [deletarDialog, setDeletarDialog] = useState<Aposta | null>(null)
   const [showFilter, setShowFilter] = useState(false)
@@ -126,8 +129,40 @@ export default function ApostasClient({ apostas: initialApostas, profiles, betCo
     const created = new Date(a.created_at)
     if (from && created < from) return false
     if (to && created > to) return false
+    if (filterEsporte && !(a.esporte ?? "").toLowerCase().includes(filterEsporte.toLowerCase())) return false
+    if (filterCompeticao && !(a.competicao ?? "").toLowerCase().includes(filterCompeticao.toLowerCase())) return false
     return true
+  }).sort((a, b) => {
+    if (sortBy === "data_asc") return new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
+    if (sortBy === "valor_desc") return b.investimento_total - a.investimento_total
+    if (sortBy === "roi_desc") return b.roi_percentual - a.roi_percentual
+    // data_desc (default)
+    return new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
   })
+
+  function exportCSV() {
+    const headers = ["Evento", "Competição", "Esporte", "Tipo", "Investimento", "Lucro Esperado", "ROI%", "Status", "Resultado Real", "Data"]
+    const rows = filtered.map(a => [
+      a.evento,
+      a.competicao ?? "",
+      a.esporte ?? "",
+      a.tipo,
+      a.investimento_total.toFixed(2),
+      a.lucro_garantido.toFixed(2),
+      a.roi_percentual.toFixed(2),
+      a.status,
+      a.resultado_real != null ? a.resultado_real.toFixed(2) : "",
+      new Date(a.created_at).toLocaleDateString("pt-BR"),
+    ])
+    const csv = [headers, ...rows].map(row => row.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(";")).join("\n")
+    const blob = new Blob(["﻿" + csv], { type: "text/csv;charset=utf-8;" })
+    const url = URL.createObjectURL(blob)
+    const link = document.createElement("a")
+    link.href = url
+    link.download = `apostas_${new Date().toISOString().slice(0, 10)}.csv`
+    link.click()
+    URL.revokeObjectURL(url)
+  }
 
   async function handleFinalizar() {
     if (!finalizarDialog) return
@@ -213,6 +248,13 @@ export default function ApostasClient({ apostas: initialApostas, profiles, betCo
             <Plus className="h-4 w-4" />
             Nova aposta
           </button>
+          <button
+            onClick={exportCSV}
+            className="hidden md:flex items-center gap-1.5 px-4 py-2 rounded-xl border border-[var(--border)] hover:bg-[var(--bg-elevated)] text-[var(--text-primary)] text-sm font-medium transition-colors"
+          >
+            <Download className="h-4 w-4" />
+            Exportar CSV
+          </button>
         </div>
       </div>
 
@@ -252,6 +294,42 @@ export default function ApostasClient({ apostas: initialApostas, profiles, betCo
                 </SelectContent>
               </Select>
             </div>
+          </div>
+
+          {/* Esporte + Competição */}
+          <div className="grid grid-cols-2 gap-3">
+            <div className="space-y-1.5">
+              <Label className="text-xs">Esporte</Label>
+              <Input
+                value={filterEsporte}
+                onChange={e => setFilterEsporte(e.target.value)}
+                placeholder="ex: Futebol"
+                className="text-xs h-9"
+              />
+            </div>
+            <div className="space-y-1.5">
+              <Label className="text-xs">Competição</Label>
+              <Input
+                value={filterCompeticao}
+                onChange={e => setFilterCompeticao(e.target.value)}
+                placeholder="ex: Champions League"
+                className="text-xs h-9"
+              />
+            </div>
+          </div>
+
+          {/* Ordenação */}
+          <div className="space-y-1.5">
+            <Label className="text-xs">Ordenar por</Label>
+            <Select value={sortBy} onValueChange={v => setSortBy(v as typeof sortBy)}>
+              <SelectTrigger className="text-xs h-9"><SelectValue /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="data_desc">Data (mais recente)</SelectItem>
+                <SelectItem value="data_asc">Data (mais antigo)</SelectItem>
+                <SelectItem value="valor_desc">Maior investimento</SelectItem>
+                <SelectItem value="roi_desc">Maior ROI</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
 
           {/* Period pills */}
@@ -342,9 +420,9 @@ export default function ApostasClient({ apostas: initialApostas, profiles, betCo
             )}
           </div>
 
-          {(filterStatus !== "todos" || filterProfile !== "todos" || filterPeriod !== "todos") && (
+          {(filterStatus !== "todos" || filterProfile !== "todos" || filterPeriod !== "todos" || filterEsporte || filterCompeticao) && (
             <button
-              onClick={() => { setFilterStatus("todos"); setFilterProfile("todos"); setFilterPeriod("todos"); setFilterCustomDate(""); setFilterCustomFrom(""); setFilterCustomTo("") }}
+              onClick={() => { setFilterStatus("todos"); setFilterProfile("todos"); setFilterPeriod("todos"); setFilterCustomDate(""); setFilterCustomFrom(""); setFilterCustomTo(""); setFilterEsporte(""); setFilterCompeticao("") }}
               className="text-xs text-[var(--text-secondary)] hover:text-[var(--text-primary)] flex items-center gap-1 transition-colors"
             >
               <X className="h-3 w-3" />
