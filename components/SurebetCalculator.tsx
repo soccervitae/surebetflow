@@ -131,7 +131,7 @@ export default function SurebetCalculator({ profiles, defaultProfileId, profileN
   const [evento, setEvento] = useState("")
   const [esporte, setEsporte] = useState("")
   const [competicao, setCompeticao] = useState("")
-  const [dataEvento, setDataEvento] = useState("")
+  const [dataEvento, setDataEvento] = useState("") // DD/MM/AAAA display format
   const [horaEvento, setHoraEvento] = useState("")
   const [investimentoTotal, setInvestimentoTotal] = useState("")
   const [profileBets, setProfileBets] = useState<Record<string, ProfileBet[]>>({})
@@ -381,7 +381,13 @@ export default function SurebetCalculator({ profiles, defaultProfileId, profileN
           esporte: esporte.trim() || null,
           competicao: competicao.trim() || null,
           tipo,
-          data_evento: dataEvento ? `${dataEvento}${horaEvento ? `T${horaEvento}:00` : "T00:00:00"}` : null,
+          data_evento: (() => {
+            if (!dataEvento) return null
+            const [d, m, y] = dataEvento.split("/")
+            if (!d || !m || !y || y.length < 4) return null
+            const iso = `${y}-${m.padStart(2,"0")}-${d.padStart(2,"0")}`
+            return `${iso}${horaEvento ? `T${horaEvento}:00` : "T00:00:00"}`
+          })(),
           investimento_total: investment,
           lucro_garantido: parseFloat(lucroGarantido.toFixed(2)),
           roi_percentual: parseFloat(roi.toFixed(4)),
@@ -611,7 +617,19 @@ export default function SurebetCalculator({ profiles, defaultProfileId, profileN
             </div>
             <div className="space-y-2 col-span-1">
               <Label>Data do evento</Label>
-              <Input type="date" value={dataEvento} onChange={e => setDataEvento(e.target.value)} />
+              <Input
+                inputMode="numeric"
+                placeholder="DD/MM/AAAA"
+                value={dataEvento}
+                maxLength={10}
+                onChange={e => {
+                  const digits = e.target.value.replace(/\D/g, "").slice(0, 8)
+                  let masked = digits
+                  if (digits.length > 2) masked = digits.slice(0, 2) + "/" + digits.slice(2)
+                  if (digits.length > 4) masked = digits.slice(0, 2) + "/" + digits.slice(2, 4) + "/" + digits.slice(4)
+                  setDataEvento(masked)
+                }}
+              />
             </div>
             <div className="space-y-2 col-span-2 md:col-span-1">
               <Label>Investimento Total (R$)</Label>
