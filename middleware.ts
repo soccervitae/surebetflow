@@ -39,7 +39,11 @@ export async function middleware(request: NextRequest) {
   if (!user && !isPublicRoute) return redirect(request, '/login')
 
   // Authenticated user trying to access login/cadastro
-  if (user && (pathname === '/login' || pathname === '/cadastro')) return redirect(request, '/dashboard')
+  if (user && (pathname === '/login' || pathname === '/cadastro')) {
+    const adminEmails = (process.env.ADMIN_EMAILS ?? "").split(",").map(e => e.trim()).filter(Boolean)
+    const isAdmin = adminEmails.includes(user.email ?? "")
+    return redirect(request, isAdmin ? '/admin' : '/dashboard')
+  }
 
   // Check email verification for protected routes
   if (user && !isPublicRoute && !pathname.startsWith('/admin')) {

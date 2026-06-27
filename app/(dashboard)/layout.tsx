@@ -62,6 +62,14 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         setUserInitials(email.charAt(0).toUpperCase())
       }
 
+      // Admins skip subscription checks and go straight to /admin
+      const adminRes = await fetch("/api/auth/is-admin")
+      const { isAdmin } = await adminRes.json()
+      if (isAdmin) {
+        router.push("/admin")
+        return
+      }
+
       const { data: subData } = await supabase
         .from("subscriptions")
         .select("plan, status")
