@@ -20,6 +20,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { DollarSign, TrendingUp, Clock, ArrowUpRight, Pencil, Calculator, ArrowDownCircle, ArrowUpCircle, Gift, ArrowDownLeft, Wallet, SlidersHorizontal, X } from "lucide-react"
 import SurebetCalculator from "@/components/SurebetCalculator"
 import type { Profile, ProfileDashboard, Aposta, MovimentacaoFinanceira, ProfileBet } from "@/lib/types"
+import {
+  LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip,
+  ResponsiveContainer, ReferenceLine
+} from "recharts"
 
 interface Props {
   profile: Profile
@@ -873,6 +877,132 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
               </DialogFooter>
             </DialogContent>
           </Dialog>
+
+          {/* Charts: evolução do saldo + lucro/perda por mês */}
+          {movLoaded && movimentacoes.length > 0 && (() => {
+            // Build cumulative balance over time (all movimentacoes, sorted ascending)
+            const sorted = [...movimentacoes].sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime())
+            let saldo = 0
+            const balanceData = sorted.map(m => {
+              if (m.tipo === "deposito" || m.tipo === "lucro") saldo += m.valor
+              else if (m.tipo === "saque" || m.tipo === "perda") saldo -= m.valor
+              return {
+                data: new Date(m.created_at).toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit" }),
+                saldo: parseFloat(saldo.toFixed(2)),
+              }
+            })
+
+            // Monthly profit/loss
+            const monthlyMap: Record<string, number> = {}
+            for (const m of sorted) {
+              const key = new Date(m.created_at).toLocaleDateString("pt-BR", { month: "short", year: "2-digit" })
+              if (!monthlyMap[key]) monthlyMap[key] = 0
+              if (m.tipo === "lucro") monthlyMap[key] += m.valor
+              else if (m.tipo === "perda") monthlyMap[key] -= m.valor
+            }
+            const monthlyData = Object.entries(monthlyMap).map(([mes, lucro]) => ({ mes, lucro: parseFloat(lucro.toFixed(2)) }))
+
+            return (
+              <div className="space-y-4">
+                {/* Evolução do saldo */}
+                <Card>
+                  <CardContent className="p-4">
+                    <p className="text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wide mb-3">Evolução do Saldo</p>
+                    <ResponsiveContainer width="100%" height={180}>
+                      <LineChart data={balanceData} margin={{ top: 4, right: 8, bottom: 0, left: 0 }}>
+                        <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
+                        <XAxis dataKey="data" tick={{ fontSize: 10, fill: "var(--text-secondary)" }} interval="preserveStartEnd" />
+                        <YAxis tick={{ fontSize: 10, fill: "var(--text-secondary)" }} tickFormatter={v => `R$${v}`} width={60} />
+                        <Tooltip
+                          formatter={(value: unknown) => [formatCurrency(Number(value ?? 0)), "Saldo"]}
+                          contentStyle={{ background: "var(--bg-surface)", border: "1px solid var(--border)", borderRadius: 8, fontSize: 12 }}
+                        />
+                        <ReferenceLine y={0} stroke="#DC2626" strokeDasharray="3 3" />
+                        <Line
+                          type="monotone" dataKey="saldo" stroke="#1e3a8a" strokeWidth={2}
+                          dot={false} activeDot={{ r: 4 }}
+                        />
+                      </LineChart>
+                    </ResponsiveContainer>
+                  </CardContent>
+                </Card>
+
+                {/* Lucro/Perda por mês */}
+                {monthlyData.length > 0 && (
+                  <Card>
+                    <CardContent className="p-4">
+                      <p className="text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wide mb-3">Lucro / Perda por Mês</p>
+                      <ResponsiveContainer width="100%" height={160}>
+                        <BarChart data={monthlyData} margin={{ top: 4, right: 8, bottom: 0, left: 0 }}>
+                          <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
+                          <XAxis dataKey="mes" tick={{ fontSize: 10, fill: "var(--text-secondary)" }} />
+                          <YAxis tick={{ fontSize: 10, fill: "var(--text-secondary)" }} tickFormatter={v => `R$${v}`} width={60} />
+                          <Tooltip
+                            formatter={(value: unknown) => [formatCurrency(Number(value ?? 0)), "Lucro"]}
+                            contentStyle={{ background: "var(--bg-surface)", border: "1px solid var(--border)", borderRadius: 8, fontSize: 12 }}
+                          />
+                          <ReferenceLine y={0} stroke="var(--border)" />
+                          <Bar dataKey="lucro" radius={[4, 4, 0, 0]}
+                            fill="#1e3a8a"
+                            label={false}
+                          />
+                        </BarChart>
+                      </ResponsiveContainer>
+                    </CardContent>
+                  </Card>
+                )}
+              </div>
+            )
+          })()}
+
+          {/* Desempenho por casa */}
+          {movLoaded && profileBetsFinanceiro.length > 0 && (() => {
+            const casaStats = profileBetsFinanceiro.map(pb => {
+              const movs = movimentacoes.filter(m => m.profile_bet_id === pb.id)
+              const depositado = movs.filter(m => m.tipo === "deposito").reduce((s, m) => s + m.valor, 0)
+              const sacado = movs.filter(m => m.tipo === "saque").reduce((s, m) => s + m.valor, 0)
+              const lucro = movs.filter(m => m.tipo === "lucro").reduce((s, m) => s + m.valor, 0)
+              const perda = movs.filter(m => m.tipo === "perda").reduce((s, m) => s + m.valor, 0)
+              const liquido = depositado + lucro - sacado - perda
+              return { pb, depositado, sacado, lucro, perda, liquido, saldoAtual: pb.saldo ?? 0 }
+            })
+            const maxSaldo = Math.max(...casaStats.map(c => Math.abs(c.saldoAtual)), 1)
+
+            return (
+              <Card>
+                <CardContent className="p-4">
+                  <p className="text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wide mb-3">Desempenho por Casa</p>
+                  <div className="space-y-3">
+                    {casaStats.map(({ pb, depositado, sacado, liquido, saldoAtual }) => {
+                      const pct = Math.min(100, (Math.abs(saldoAtual) / maxSaldo) * 100)
+                      const isPositive = saldoAtual >= 0
+                      return (
+                        <div key={pb.id} className="space-y-1.5">
+                          <div className="flex items-center justify-between gap-2">
+                            <p className="text-sm font-semibold text-[var(--text-primary)] truncate">{pb.bet?.nome ?? pb.id}</p>
+                            <p className={`text-sm font-bold flex-shrink-0 ${isPositive ? "text-[var(--accent-text)]" : "text-[#DC2626]"}`}>
+                              {formatCurrency(saldoAtual)}
+                            </p>
+                          </div>
+                          <div className="w-full h-1.5 bg-[var(--bg-elevated)] rounded-full overflow-hidden">
+                            <div
+                              className={`h-full rounded-full transition-all ${isPositive ? "bg-[#1e3a8a]" : "bg-[#DC2626]"}`}
+                              style={{ width: `${pct}%` }}
+                            />
+                          </div>
+                          <div className="flex gap-3 text-xs text-[var(--text-secondary)]">
+                            <span>Dep: <span className="text-[var(--accent-text)]">{formatCurrency(depositado)}</span></span>
+                            <span>Saques: <span className="text-[#DC2626]">{formatCurrency(sacado)}</span></span>
+                            <span>Líquido: <span className={liquido >= 0 ? "text-green-500" : "text-orange-500"}>{formatCurrency(liquido)}</span></span>
+                          </div>
+                        </div>
+                      )
+                    })}
+                  </div>
+                </CardContent>
+              </Card>
+            )
+          })()}
 
           {/* List */}
           {!movLoaded ? (

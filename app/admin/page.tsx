@@ -10,12 +10,20 @@ export default async function AdminDashboardPage() {
     { data: apostas },
     { data: movimentacoes },
     { data: profileBets },
+    { data: subscriptions },
   ] = await Promise.all([
     supabase.from("profiles").select("id, user_id, nome, sobrenome, apelido, email, ativo, created_at"),
     supabase.from("apostas").select("id, profile_id, investimento_total, lucro_garantido, resultado_real, status, created_at"),
     supabase.from("movimentacoes_financeiras").select("profile_id, tipo, valor"),
     supabase.from("profile_bets").select("profile_id, saldo, ativo"),
+    supabase.from("subscriptions").select("user_id, stripe_customer_id"),
   ])
+
+  // Map user_id -> has stripe_customer_id
+  const stripeMap = new Map<string, boolean>()
+  for (const s of subscriptions ?? []) {
+    if (s.stripe_customer_id) stripeMap.set(s.user_id, true)
+  }
 
   // aggregate per profile
   type ProfileRow = {
@@ -37,6 +45,7 @@ export default async function AdminDashboardPage() {
     totalSaques: number
     saldoTotal: number
     betsCount: number
+    hasStripe: boolean
   }
 
   const profileMap = new Map<string, ProfileRow>()
@@ -53,6 +62,7 @@ export default async function AdminDashboardPage() {
       totalSaques: 0,
       saldoTotal: 0,
       betsCount: 0,
+      hasStripe: stripeMap.get(p.user_id) ?? false,
     })
   }
 
@@ -135,6 +145,7 @@ export default async function AdminDashboardPage() {
               <thead>
                 <tr className="border-b border-gray-800 text-gray-400 text-xs uppercase tracking-wide">
                   <th className="text-left px-4 py-3">Perfil</th>
+                  <th className="text-center px-3 py-3">Stripe</th>
                   <th className="text-center px-3 py-3">Status</th>
                   <th className="text-right px-3 py-3">Apostas</th>
                   <th className="text-right px-3 py-3">Pendentes</th>
@@ -149,7 +160,7 @@ export default async function AdminDashboardPage() {
               <tbody>
                 {allProfiles.length === 0 && (
                   <tr>
-                    <td colSpan={10} className="text-center py-12 text-gray-500">Nenhum perfil cadastrado</td>
+                    <td colSpan={11} className="text-center py-12 text-gray-500">Nenhum perfil cadastrado</td>
                   </tr>
                 )}
                 {allProfiles.map((p, i) => (
@@ -159,6 +170,13 @@ export default async function AdminDashboardPage() {
                         <p className="font-medium text-white">{p.apelido || `${p.nome} ${p.sobrenome}`}</p>
                         {p.email && <p className="text-xs text-gray-500">{p.email}</p>}
                       </div>
+                    </td>
+                    <td className="px-3 py-3 text-center">
+                      <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${
+                        p.hasStripe ? "bg-green-500/10 text-green-400" : "bg-gray-500/10 text-gray-400"
+                      }`}>
+                        {p.hasStripe ? "Stripe ativo" : "Sem Stripe"}
+                      </span>
                     </td>
                     <td className="px-3 py-3 text-center">
                       <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium ${
@@ -187,6 +205,7 @@ export default async function AdminDashboardPage() {
                 <tfoot>
                   <tr className="border-t border-gray-700 bg-gray-800/50 text-xs font-semibold">
                     <td className="px-4 py-3 text-gray-400 uppercase tracking-wide">Total</td>
+                    <td className="px-3 py-3" />
                     <td className="px-3 py-3" />
                     <td className="px-3 py-3 text-right text-white">{totalApostas}</td>
                     <td className="px-3 py-3 text-right text-yellow-400">{allProfiles.reduce((s, p) => s + p.apostasPendentes, 0)}</td>

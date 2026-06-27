@@ -84,6 +84,23 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         .on("postgres_changes", { event: "*", schema: "public", table: "ticket_mensagens" }, fetchUnread)
         .subscribe()
 
+      // Redirect to onboarding if no profiles and first time
+      if (!pathname.startsWith("/onboarding")) {
+        const alreadyOnboarded = typeof window !== "undefined" && localStorage.getItem("onboarding_done") === "1"
+        if (!alreadyOnboarded) {
+          const { count } = await supabase
+            .from("profiles")
+            .select("id", { count: "exact", head: true })
+            .eq("user_id", user.id)
+          if ((count ?? 0) === 0) {
+            router.push("/onboarding")
+            return
+          } else {
+            localStorage.setItem("onboarding_done", "1")
+          }
+        }
+      }
+
       setReady(true)
       return () => { supabase.removeChannel(channel) }
     })
