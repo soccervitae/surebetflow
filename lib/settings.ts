@@ -44,3 +44,18 @@ export async function getResendApiKey(): Promise<string> {
   const settings = await getSettings()
   return settings["resend_api_key"] ?? process.env.RESEND_API_KEY ?? ""
 }
+
+export async function getStripeSecretKey(): Promise<string> {
+  const settings = await getSettings()
+  return settings["stripe_secret_key"] ?? process.env.STRIPE_SECRET_KEY ?? ""
+}
+
+export async function getStripePriceId(plan = "pro"): Promise<string> {
+  const settings = await getSettings()
+  return settings[`stripe_price_${plan}`] ?? process.env.STRIPE_PRICE_PRO ?? ""
+}
+
+export async function getStripeWebhookSecret(): Promise<string> {
+  const settings = await getSettings()
+  return settings["stripe_webhook_secret"] ?? process.env.STRIPE_WEBHOOK_SECRET ?? ""
+}

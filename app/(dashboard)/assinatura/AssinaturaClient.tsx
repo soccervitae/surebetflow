@@ -1,8 +1,9 @@
 "use client"
 
+import { useState } from "react"
 import { useSearchParams } from "next/navigation"
 import Link from "next/link"
-import { CreditCard, CheckCircle, Star, AlertCircle, Clock, RefreshCw, Calendar, Hash, Activity } from "lucide-react"
+import { CreditCard, CheckCircle, Star, AlertCircle, Clock, RefreshCw, Calendar, Hash, Activity, Loader2, ExternalLink } from "lucide-react"
 
 type Subscription = {
   status: string
@@ -34,6 +35,15 @@ export default function AssinaturaClient({ subscription }: { subscription: Subsc
   const searchParams = useSearchParams()
   const success = searchParams.get("success")
   const canceled = searchParams.get("canceled")
+  const [portalLoading, setPortalLoading] = useState(false)
+
+  async function openPortal() {
+    setPortalLoading(true)
+    const res = await fetch("/api/stripe/portal", { method: "POST" })
+    const data = await res.json()
+    if (data.url) window.location.href = data.url
+    else setPortalLoading(false)
+  }
 
   const isActive = subscription?.status === "active" || subscription?.status === "trialing"
   const statusInfo = STATUS_INFO[subscription?.status ?? "inactive"]
@@ -121,13 +131,16 @@ export default function AssinaturaClient({ subscription }: { subscription: Subsc
         </ul>
 
         {isActive ? (
-          <Link
-            href="/assinatura/checkout"
-            className="inline-flex items-center gap-2 text-sm font-semibold bg-[#1e3a8a] hover:bg-[#1e40af] text-white px-4 py-2.5 rounded-xl transition-colors"
+          <button
+            onClick={openPortal}
+            disabled={portalLoading}
+            className="inline-flex items-center gap-2 text-sm font-semibold bg-[#1e3a8a] hover:bg-[#1e40af] disabled:opacity-60 text-white px-4 py-2.5 rounded-xl transition-colors"
           >
-            <RefreshCw className="w-4 h-4" />
-            Atualizar pagamento
-          </Link>
+            {portalLoading
+              ? <><Loader2 className="w-4 h-4 animate-spin" /> Abrindo portal...</>
+              : <><ExternalLink className="w-4 h-4" /> Gerenciar assinatura</>
+            }
+          </button>
         ) : (
           <Link
             href="/assinatura/checkout"
@@ -160,7 +173,7 @@ export default function AssinaturaClient({ subscription }: { subscription: Subsc
 
       {!isActive && (
         <p className="text-xs text-center text-[var(--text-muted)]">
-          Pagamento via cartão de crédito · Cancele quando quiser
+          Pagamento via cartão de crédito · Stripe · Cancele quando quiser
         </p>
       )}
     </div>
