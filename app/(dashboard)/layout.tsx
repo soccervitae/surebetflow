@@ -36,6 +36,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const [confirmLogout, setConfirmLogout] = useState(false)
   const [unread, setUnread] = useState(0)
   const [userId, setUserId] = useState("")
+  const [planName, setPlanName] = useState<string | null>(null)
 
   useEffect(() => {
     const supabase = createClient()
@@ -56,6 +57,16 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       } else {
         setUserName(email)
         setUserInitials(email.charAt(0).toUpperCase())
+      }
+
+      const { data: subData } = await supabase
+        .from("subscriptions")
+        .select("plan, status")
+        .eq("user_id", user.id)
+        .single()
+      if (subData?.status === "active" || subData?.status === "trialing") {
+        const names: Record<string, string> = { trader: "Trader", trader_pro: "Trader Pro", pro: "Pro" }
+        setPlanName(names[subData.plan ?? ""] ?? subData.plan)
       }
 
       async function fetchUnread() {
@@ -178,7 +189,10 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             {!collapsed && (
               <div className="flex-1 min-w-0">
                 <p className="text-xs font-medium text-white truncate">{userName}</p>
-                <p className="text-[10px] text-[#5b7ec9] font-semibold">APOSTADOR</p>
+                {planName
+                  ? <p className="text-[10px] text-[#5b7ec9] font-semibold uppercase">{planName}</p>
+                  : <p className="text-[10px] text-white/30 font-semibold">SEM PLANO</p>
+                }
               </div>
             )}
           </div>
@@ -224,6 +238,14 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             <span className="text-xs text-[var(--text-secondary)]">
               {new Date().toLocaleDateString("pt-BR", { weekday: "short", day: "2-digit", month: "short", year: "numeric" })}
             </span>
+            {planName && (
+              <>
+                <span className="opacity-30">•</span>
+                <Link href="/assinatura" className="text-xs font-semibold text-[#5b7ec9] hover:text-[#93c5fd] transition-colors">
+                  {planName}
+                </Link>
+              </>
+            )}
           </div>
           <div className="flex items-center gap-2">
             {/* Theme toggle */}
