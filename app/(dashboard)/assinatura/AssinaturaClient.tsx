@@ -65,10 +65,19 @@ export default function AssinaturaClient({ subscription }: { subscription: Subsc
 
   async function openPortal() {
     setPortalLoading(true)
-    const res = await fetch("/api/stripe/portal", { method: "POST" })
-    const data = await res.json()
-    if (data.url) window.location.href = data.url
-    else setPortalLoading(false)
+    try {
+      const res = await fetch("/api/stripe/portal", { method: "POST" })
+      const data = await res.json()
+      if (data.url) {
+        window.location.href = data.url
+      } else {
+        alert(data.error ?? "Erro ao abrir portal. Verifique se o portal do cliente está ativado no Stripe Dashboard.")
+        setPortalLoading(false)
+      }
+    } catch {
+      alert("Erro ao conectar com o servidor. Tente novamente.")
+      setPortalLoading(false)
+    }
   }
 
   const isActive = subscription?.status === "active" || subscription?.status === "trialing"
