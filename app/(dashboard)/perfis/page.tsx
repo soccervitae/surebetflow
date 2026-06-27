@@ -11,5 +11,24 @@ export default async function PerfisPage() {
     .eq("user_id", user!.id)
     .order("created_at", { ascending: false })
 
-  return <PerfisClient profiles={profiles ?? []} userId={user!.id} />
+  const { data: subData } = await supabase
+    .from("subscriptions")
+    .select("plan, status")
+    .eq("user_id", user!.id)
+    .single()
+
+  const plan = (subData?.status === "active" || subData?.status === "trialing") ? (subData?.plan ?? "") : ""
+  const planLimits: Record<string, number> = { trader_pro: 20, trader: 5, pro: 5 }
+  const planLimit = planLimits[plan] ?? 5
+
+  const currentProfiles = profiles ?? []
+
+  return (
+    <PerfisClient
+      profiles={currentProfiles}
+      userId={user!.id}
+      planLimit={planLimit}
+      currentCount={currentProfiles.length}
+    />
+  )
 }

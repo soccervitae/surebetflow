@@ -14,12 +14,16 @@ import type { Profile } from "@/lib/types"
 interface Props {
   profiles: Profile[]
   userId: string
+  planLimit: number
+  currentCount: number
 }
 
-export default function PerfisClient({ profiles: initialProfiles, userId }: Props) {
+export default function PerfisClient({ profiles: initialProfiles, userId, planLimit, currentCount }: Props) {
   const [profiles, setProfiles] = useState(initialProfiles)
   const [showCreate, setShowCreate] = useState(false)
   const { toast } = useToast()
+
+  const atLimit = profiles.length >= planLimit
 
   function handleCreated(profile: Profile) {
     setProfiles(prev => [profile, ...prev])
@@ -34,11 +38,21 @@ export default function PerfisClient({ profiles: initialProfiles, userId }: Prop
           <h1 className="text-2xl font-bold text-[var(--text-primary)]">Perfis</h1>
           <p className="text-[var(--text-secondary)] text-sm mt-1">Gerencie seus perfis de apostador</p>
         </div>
-        <Button onClick={() => setShowCreate(true)}>
-          <Plus className="h-4 w-4 mr-2" />
-          <span className="hidden sm:inline">Novo perfil</span>
-          <span className="sm:hidden">Novo</span>
-        </Button>
+        <div className="flex flex-col items-end gap-1">
+          <Button onClick={() => !atLimit && setShowCreate(true)} disabled={atLimit}>
+            <Plus className="h-4 w-4 mr-2" />
+            <span className="hidden sm:inline">Novo perfil</span>
+            <span className="sm:hidden">Novo</span>
+          </Button>
+          {atLimit && (
+            <p className="text-xs text-amber-600 text-right max-w-[220px]">
+              Limite do plano atingido ({profiles.length}/{planLimit} perfis).{" "}
+              <Link href="/assinatura" className="underline font-medium hover:text-amber-700">
+                Faça upgrade para Trader Pro.
+              </Link>
+            </p>
+          )}
+        </div>
       </div>
 
       {profiles.length === 0 ? (
