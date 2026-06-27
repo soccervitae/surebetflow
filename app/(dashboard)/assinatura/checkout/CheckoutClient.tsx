@@ -60,8 +60,8 @@ export default function CheckoutClient() {
       } else {
         window.location.href = data.url
       }
-    } catch {
-      setError("Erro ao iniciar pagamento. Tente novamente.")
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Erro ao iniciar pagamento. Tente novamente.")
       setLoading(false)
     }
   }
