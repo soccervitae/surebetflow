@@ -98,6 +98,7 @@ export default function ConfiguracoesPage() {
   const [loadingAssinatura, setLoadingAssinatura] = useState(false)
   const [portalLoading, setPortalLoading] = useState(false)
   const [migrateLoading, setMigrateLoading] = useState(false)
+  const [portalError, setPortalError] = useState("")
 
   const fileInputRef = useRef<HTMLInputElement>(null)
 
@@ -195,17 +196,18 @@ export default function ConfiguracoesPage() {
 
   async function openPortal() {
     setPortalLoading(true)
+    setPortalError("")
     try {
       const res = await fetch("/api/stripe/portal", { method: "POST" })
       const data = await res.json()
       if (data.url) {
         window.location.href = data.url
       } else {
-        alert(data.error ?? "Erro ao abrir portal. Verifique se o portal do cliente está ativado no Stripe Dashboard.")
+        setPortalError(data.error ?? "Erro ao abrir portal. Ative o Customer Portal no Stripe Dashboard → Settings → Billing → Customer portal.")
         setPortalLoading(false)
       }
     } catch {
-      alert("Erro ao conectar com o servidor. Tente novamente.")
+      setPortalError("Erro ao conectar com o servidor. Tente novamente.")
       setPortalLoading(false)
     }
   }
@@ -550,6 +552,9 @@ export default function ConfiguracoesPage() {
                           {portalLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <RefreshCw className="h-4 w-4" />}
                           {portalLoading ? "Abrindo portal..." : "Renovar / Gerenciar assinatura"}
                         </button>
+                        {portalError && (
+                          <p className="text-xs text-red-500 bg-red-500/10 border border-red-500/20 rounded-xl px-4 py-3">{portalError}</p>
+                        )}
 
                         {/* Migrate plan */}
                         <Card>
