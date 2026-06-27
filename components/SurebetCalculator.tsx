@@ -587,6 +587,14 @@ export default function SurebetCalculator({ profiles, defaultProfileId, profileN
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
             <div className="space-y-2">
+              <Label>Evento</Label>
+              <Input value={evento} onChange={e => setEvento(e.target.value)} placeholder="Ex: Brasil x Espanha" />
+            </div>
+            <div className="space-y-2">
+              <Label>Competição</Label>
+              <Input value={competicao} onChange={e => setCompeticao(e.target.value)} placeholder="Ex: Copa do Mundo" />
+            </div>
+            <div className="space-y-2">
               <Label>Esporte</Label>
               <select
                 value={esporte}
@@ -600,14 +608,6 @@ export default function SurebetCalculator({ profiles, defaultProfileId, profileN
                   "Boxe", "Ciclismo", "Fórmula 1", "Outros",
                 ].map(s => <option key={s} value={s}>{s}</option>)}
               </select>
-            </div>
-            <div className="space-y-2">
-              <Label>Evento</Label>
-              <Input value={evento} onChange={e => setEvento(e.target.value)} placeholder="Ex: Brasil x Espanha" />
-            </div>
-            <div className="space-y-2">
-              <Label>Competição</Label>
-              <Input value={competicao} onChange={e => setCompeticao(e.target.value)} placeholder="Ex: Copa do Mundo" />
             </div>
             <div className="space-y-2">
               <Label>Data do evento</Label>
