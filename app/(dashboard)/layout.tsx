@@ -90,7 +90,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         .subscribe()
 
       // Pages allowed without an active plan
-      const ALLOWED_WITHOUT_PLAN = ["/assinatura", "/configuracoes", "/suporte", "/tutorial", "/bem-vindo"]
+      const ALLOWED_WITHOUT_PLAN = ["/assinatura", "/configuracoes", "/tutorial", "/bem-vindo"]
       const isAllowedWithoutPlan = ALLOWED_WITHOUT_PLAN.some(p => pathname.startsWith(p))
 
       // Redirect brand new users (no subscription record) to /bem-vindo
@@ -172,7 +172,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           {navItems.map(({ href, icon: Icon, label }) => {
             const active = pathname === href || (href !== "/" && pathname.startsWith(href))
             const isSuporteLink = href === "/suporte"
-            const ALLOWED_WITHOUT_PLAN_NAV = ["/tutorial", "/configuracoes", "/suporte", "/assinatura", "/bem-vindo"]
+            const ALLOWED_WITHOUT_PLAN_NAV = ["/tutorial", "/configuracoes", "/assinatura", "/bem-vindo"]
             const isLocked = !hasActivePlan && !ALLOWED_WITHOUT_PLAN_NAV.some(p => href.startsWith(p))
 
             if (isLocked) {
@@ -369,7 +369,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           { href: "/tutorial",   icon: BookOpen,      label: "Tutorial" },
         ] as { href: string; icon: React.ElementType; label: string }[]).map(({ href, icon: Icon, label }) => {
           const active = pathname === href || (href !== "/" && pathname.startsWith(href))
-          const ALLOWED_WITHOUT_PLAN_MOB = ["/tutorial", "/configuracoes", "/suporte", "/assinatura", "/bem-vindo"]
+          const ALLOWED_WITHOUT_PLAN_MOB = ["/tutorial", "/configuracoes", "/assinatura", "/bem-vindo"]
           const isLockedMob = !hasActivePlan && !ALLOWED_WITHOUT_PLAN_MOB.some(p => href.startsWith(p))
 
           if (isLockedMob) {
