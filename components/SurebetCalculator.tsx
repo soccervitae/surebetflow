@@ -701,9 +701,8 @@ export default function SurebetCalculator({ profiles, defaultProfileId, profileN
                     )}
                   </Label>
                   <Input
-                    inputMode="numeric"
+                    inputMode="decimal"
                     value={stakes[i] > 0 ? stakes[i].toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : ""}
-                    readOnly={!isArbitrage}
                     placeholder="0,00"
                     onChange={e => {
                       const newStake = parseBRL(formatBRL(e.target.value))
