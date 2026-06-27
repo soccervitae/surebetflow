@@ -94,6 +94,7 @@ export interface ProfileDashboard {
   total_apostas: number
   apostas_finalizadas: number
   roi_percentual: number
+  bonus_total: number
 }
 
 export interface DashboardGeral {

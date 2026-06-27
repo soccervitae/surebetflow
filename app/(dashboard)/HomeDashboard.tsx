@@ -4,7 +4,7 @@ import Link from "next/link"
 import { formatCurrency } from "@/lib/utils"
 import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
-import { AlertTriangle, DollarSign, TrendingUp, Clock, ArrowUpRight, Users, ClipboardList, Wallet, ChevronRight } from "lucide-react"
+import { AlertTriangle, DollarSign, TrendingUp, Clock, ArrowUpRight, Users, ClipboardList, Wallet, ChevronRight, Gift } from "lucide-react"
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts"
 import type { DashboardGeral, ProfileDashboard, Aposta } from "@/lib/types"
 
@@ -220,21 +220,57 @@ export default function HomeDashboard({ dashboard, profiles, recentApostas, apos
               Ver todos <ChevronRight className="w-3 h-3" />
             </Link>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
             {profiles.map(p => (
               <Link
                 key={p.profile_id}
                 href={`/perfis/${p.profile_id}`}
-                className="flex items-center gap-3 p-3 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-muted)] hover:border-[#1e3a8a]/40 hover:bg-[#1e3a8a]/5 transition-all"
+                className="flex flex-col gap-3 p-4 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-muted)] hover:border-[#1e3a8a]/40 hover:bg-[#1e3a8a]/5 transition-all"
               >
-                <Avatar className="h-9 w-9 flex-shrink-0">
-                  <AvatarFallback className="bg-[#1e3a8a]/20 text-[var(--accent-text)] text-sm font-bold">
-                    {p.nome.charAt(0)}{p.sobrenome.charAt(0)}
-                  </AvatarFallback>
-                </Avatar>
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-[var(--text-primary)] truncate">{p.apelido ?? `${p.nome} ${p.sobrenome}`}</p>
-                  <p className="text-xs text-[var(--accent-text)] font-semibold">{formatCurrency(p.saldo_total)}</p>
+                {/* Header do perfil */}
+                <div className="flex items-center gap-3">
+                  <Avatar className="h-9 w-9 flex-shrink-0">
+                    <AvatarFallback className="bg-[#1e3a8a]/20 text-[var(--accent-text)] text-sm font-bold">
+                      {p.nome.charAt(0)}{p.sobrenome.charAt(0)}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-semibold text-[var(--text-primary)] truncate">{p.apelido ?? `${p.nome} ${p.sobrenome}`}</p>
+                    <p className="text-xs text-[var(--text-secondary)]">{p.total_apostas} aposta{p.total_apostas !== 1 ? "s" : ""}</p>
+                  </div>
+                  <span className="text-sm font-bold text-[#3b82f6]">{formatCurrency(p.saldo_total)}</span>
+                </div>
+
+                {/* Métricas */}
+                <div className="grid grid-cols-2 gap-2">
+                  <div className="rounded-lg bg-[var(--bg-surface)] border border-[var(--border-subtle)] px-3 py-2">
+                    <p className="text-[10px] text-[var(--text-muted)] uppercase tracking-wide flex items-center gap-1">
+                      <TrendingUp className="w-3 h-3" /> Lucro
+                    </p>
+                    <p className={`text-sm font-bold mt-0.5 ${p.lucro_realizado >= 0 ? "text-green-500" : "text-red-400"}`}>
+                      {formatCurrency(p.lucro_realizado)}
+                    </p>
+                  </div>
+                  <div className="rounded-lg bg-[var(--bg-surface)] border border-[var(--border-subtle)] px-3 py-2">
+                    <p className="text-[10px] text-[var(--text-muted)] uppercase tracking-wide flex items-center gap-1">
+                      <Clock className="w-3 h-3" /> Pendente
+                    </p>
+                    <p className="text-sm font-bold mt-0.5 text-yellow-500">{formatCurrency(p.lucro_pendente)}</p>
+                  </div>
+                  <div className="rounded-lg bg-[var(--bg-surface)] border border-[var(--border-subtle)] px-3 py-2">
+                    <p className="text-[10px] text-[var(--text-muted)] uppercase tracking-wide flex items-center gap-1">
+                      <ArrowUpRight className="w-3 h-3" /> ROI
+                    </p>
+                    <p className={`text-sm font-bold mt-0.5 ${p.roi_percentual >= 0 ? "text-[#a855f7]" : "text-red-400"}`}>
+                      {p.roi_percentual.toFixed(2)}%
+                    </p>
+                  </div>
+                  <div className="rounded-lg bg-[var(--bg-surface)] border border-[var(--border-subtle)] px-3 py-2">
+                    <p className="text-[10px] text-[var(--text-muted)] uppercase tracking-wide flex items-center gap-1">
+                      <Gift className="w-3 h-3" /> Bônus
+                    </p>
+                    <p className="text-sm font-bold mt-0.5 text-[#f97316]">{formatCurrency(p.bonus_total)}</p>
+                  </div>
                 </div>
               </Link>
             ))}
