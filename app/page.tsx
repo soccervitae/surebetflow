@@ -22,7 +22,8 @@ export default async function LandingPage() {
     url: "https://www.surebetflow.bet",
     description: "Plataforma completa para apostadores de arbitragem esportiva. Calcule surebets, gerencie perfis e controle finanças com segurança total.",
     offers: [
-      { "@type": "Offer", price: "99.00", priceCurrency: "BRL", name: "Plano Pro" },
+      { "@type": "Offer", price: "99.00", priceCurrency: "BRL", name: "Trader" },
+      { "@type": "Offer", price: "179.00", priceCurrency: "BRL", name: "Trader Pro" },
     ],
     aggregateRating: {
       "@type": "AggregateRating",
@@ -402,7 +403,7 @@ export default async function LandingPage() {
             {/* Plano Pro */}
             <div className="bg-[#0f172a] border border-white/10 rounded-2xl p-8 text-left relative flex flex-col">
               <div className="mb-4">
-                <span className="bg-white/10 text-white text-xs font-bold px-3 py-1 rounded-full">PLANO PRO</span>
+                <span className="bg-white/10 text-white text-xs font-bold px-3 py-1 rounded-full">TRADER</span>
               </div>
               <p className="text-gray-400 text-sm mb-2">Para apostadores individuais</p>
               <div className="flex items-end gap-1 mb-1">
@@ -438,13 +439,13 @@ export default async function LandingPage() {
                 <span className="bg-[#1e3a8a] text-white text-xs font-bold px-3 py-1 rounded-full">MAIS POPULAR</span>
               </div>
               <div className="mb-4">
-                <span className="bg-[#1e3a8a]/20 text-[#93c5fd] text-xs font-bold px-3 py-1 rounded-full border border-[#1e3a8a]/40">PLANO PRO MAX</span>
+                <span className="bg-[#1e3a8a]/20 text-[#93c5fd] text-xs font-bold px-3 py-1 rounded-full border border-[#1e3a8a]/40">TRADER PRO</span>
               </div>
               <p className="text-gray-400 text-sm mb-2">Para grupos e operações maiores</p>
               <div className="flex items-end gap-1 mb-1">
                 <span className="text-gray-500 text-lg font-medium">R$</span>
                 <span className="text-5xl font-extrabold text-white">179</span>
-                <span className="text-gray-500 text-lg font-medium mb-1">,90/mês</span>
+                <span className="text-gray-500 text-lg font-medium mb-1">,00/mês</span>
               </div>
               <p className="text-xs text-gray-500 mb-6">Cancele quando quiser, sem fidelidade</p>
               <ul className="space-y-3 text-sm mb-8 flex-1">
