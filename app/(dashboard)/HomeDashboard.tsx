@@ -4,7 +4,7 @@ import Link from "next/link"
 import { formatCurrency } from "@/lib/utils"
 import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
-import { DollarSign, TrendingUp, Clock, ArrowUpRight, Users, ClipboardList, Wallet, ChevronRight } from "lucide-react"
+import { AlertTriangle, DollarSign, TrendingUp, Clock, ArrowUpRight, Users, ClipboardList, Wallet, ChevronRight } from "lucide-react"
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts"
 import type { DashboardGeral, ProfileDashboard, Aposta } from "@/lib/types"
 
@@ -13,6 +13,7 @@ interface Props {
   profiles: ProfileDashboard[]
   recentApostas: (Aposta & { profile?: { nome: string; sobrenome: string; apelido?: string | null } })[]
   apostasFinalizadas: { lucro_garantido: number; resultado_real?: number | null; finalizada_at?: string | null }[]
+  apostasPendentesAntigas?: number
 }
 
 function statusBadge(status: string) {
@@ -29,7 +30,7 @@ const quickActions = [
   { href: "/financeiro", icon: Wallet, label: "Financeiro", sub: "Movimentar", color: "text-[#f97316]", bg: "bg-[#f97316]/10 border-[#f97316]/20" },
 ]
 
-export default function HomeDashboard({ dashboard, profiles, recentApostas, apostasFinalizadas }: Props) {
+export default function HomeDashboard({ dashboard, profiles, recentApostas, apostasFinalizadas, apostasPendentesAntigas = 0 }: Props) {
   let cumulative = 0
   const chartData = apostasFinalizadas.map(a => {
     cumulative += a.resultado_real ?? a.lucro_garantido
@@ -55,6 +56,27 @@ export default function HomeDashboard({ dashboard, profiles, recentApostas, apos
         <h1 className="text-2xl font-bold text-[var(--text-primary)]">Painel Geral</h1>
         <p className="text-[var(--text-secondary)] text-sm mt-1">Visão consolidada de todos os seus perfis</p>
       </div>
+
+      {/* Pending bets alert banner */}
+      {apostasPendentesAntigas > 0 && (
+        <div className="flex items-start gap-3 rounded-xl border border-yellow-500/40 bg-yellow-500/10 p-4">
+          <AlertTriangle className="h-5 w-5 text-yellow-500 flex-shrink-0 mt-0.5" />
+          <div className="flex-1 min-w-0">
+            <p className="text-sm font-semibold text-yellow-600 dark:text-yellow-400">
+              Você tem {apostasPendentesAntigas} aposta{apostasPendentesAntigas > 1 ? "s" : ""} pendente{apostasPendentesAntigas > 1 ? "s" : ""} há mais de 3 dias.
+            </p>
+            <p className="text-xs text-yellow-600/80 dark:text-yellow-400/80 mt-0.5">
+              Finalize-as para atualizar seu saldo.
+            </p>
+          </div>
+          <Link
+            href="/apostas?status=pendente"
+            className="flex-shrink-0 text-xs font-medium text-yellow-700 dark:text-yellow-300 underline underline-offset-2 hover:opacity-80 transition-opacity"
+          >
+            Ver pendentes
+          </Link>
+        </div>
+      )}
 
       {/* Stats */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
