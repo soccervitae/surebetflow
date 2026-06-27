@@ -2,7 +2,7 @@
   "name": "SurebetFlow",
   "short_name": "SurebetFlow",
   "description": "Calculadora e gerenciador de surebet para apostadores profissionais",
-  "start_url": "/dashboard",
+  "start_url": "/login",
   "scope": "/",
   "display": "standalone",
   "display_override": ["window-controls-overlay", "standalone", "minimal-ui"],
