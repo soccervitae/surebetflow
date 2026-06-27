@@ -132,7 +132,7 @@ export default function SurebetCalculator({ profiles, defaultProfileId, profileN
   const [esporte, setEsporte] = useState("")
   const [dataEvento, setDataEvento] = useState("")
   const [horaEvento, setHoraEvento] = useState("")
-  const [investimentoTotal, setInvestimentoTotal] = useState("100,00")
+  const [investimentoTotal, setInvestimentoTotal] = useState("")
   const [profileBets, setProfileBets] = useState<Record<string, ProfileBet[]>>({})
   const [saving, setSaving] = useState(false)
   const [legs, setLegs] = useState<Leg[]>([
