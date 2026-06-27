@@ -13,6 +13,7 @@ import {
 import Logo, { LogoIcon } from "@/components/Logo"
 import Image from "next/image"
 import { cn } from "@/lib/utils"
+import RealtimeProvider from "@/components/RealtimeProvider"
 
 const navItems = [
   { href: "/dashboard", icon: Home, label: "Dashboard" },
@@ -34,11 +35,13 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const [userInitials, setUserInitials] = useState("")
   const [confirmLogout, setConfirmLogout] = useState(false)
   const [unread, setUnread] = useState(0)
+  const [userId, setUserId] = useState("")
 
   useEffect(() => {
     const supabase = createClient()
     supabase.auth.getUser().then(async ({ data: { user } }) => {
       if (!user) { router.push("/login"); return }
+      setUserId(user.id)
       const { data: usuario } = await supabase
         .from("usuarios")
         .select("nome, sobrenome")
@@ -299,6 +302,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           )
         })}
       </nav>
+
+      {/* Global realtime sync across devices */}
+      {userId && <RealtimeProvider userId={userId} />}
 
       {/* Logout confirmation dialog */}
       {confirmLogout && (

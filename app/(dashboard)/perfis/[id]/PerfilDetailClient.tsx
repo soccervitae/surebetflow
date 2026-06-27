@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useRef } from "react"
+import { useState, useRef, useEffect } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { createClient } from "@/lib/supabase/client"
@@ -66,6 +66,71 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
   const [finSaving, setFinSaving] = useState(false)
   const { toast } = useToast()
   const router = useRouter()
+
+  // Real-time subscriptions: sync profile, apostas and movimentacoes across devices
+  useEffect(() => {
+    const supabase = createClient()
+
+    async function refetchApostas() {
+      const { data } = await supabase
+        .from("apostas")
+        .select("*, legs:aposta_legs(*, profile_bet:profile_bets(*, bet:bets(*)))")
+        .eq("profile_id", currentProfile.id)
+        .order("created_at", { ascending: false })
+      if (data) setCurrentApostas(data)
+    }
+
+    async function refetchMovimentacoes() {
+      const { data } = await supabase
+        .from("movimentacoes_financeiras")
+        .select("*")
+        .eq("profile_id", currentProfile.id)
+        .order("created_at", { ascending: false })
+      if (data) setMovimentacoes(data as any)
+    }
+
+    const channel = supabase
+      .channel(`perfil-detail-${currentProfile.id}`)
+      .on("postgres_changes", {
+        event: "UPDATE",
+        schema: "public",
+        table: "profiles",
+        filter: `id=eq.${currentProfile.id}`,
+      }, (payload) => {
+        setCurrentProfile(prev => ({ ...prev, ...payload.new }))
+      })
+      .on("postgres_changes", {
+        event: "*",
+        schema: "public",
+        table: "apostas",
+        filter: `profile_id=eq.${currentProfile.id}`,
+      }, refetchApostas)
+      .on("postgres_changes", {
+        event: "*",
+        schema: "public",
+        table: "aposta_legs",
+      }, refetchApostas)
+      .on("postgres_changes", {
+        event: "*",
+        schema: "public",
+        table: "movimentacoes_financeiras",
+        filter: `profile_id=eq.${currentProfile.id}`,
+      }, refetchMovimentacoes)
+      .on("postgres_changes", {
+        event: "*",
+        schema: "public",
+        table: "bonus",
+      }, async () => {
+        const { data } = await supabase
+          .from("bonus")
+          .select("*")
+          .eq("profile_id", currentProfile.id)
+        if (data) setBonusEntries(data.map((b: any) => ({ ...b, _tipo: "bonus" as const })))
+      })
+      .subscribe()
+
+    return () => { supabase.removeChannel(channel) }
+  }, [currentProfile.id])
 
   function formatBRL(raw: string) {
     const digits = raw.replace(/\D/g, "")

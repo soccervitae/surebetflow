@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useRef } from "react"
+import { useState, useRef, useEffect } from "react"
 import Link from "next/link"
 import { createClient } from "@/lib/supabase/client"
 import { Card, CardContent } from "@/components/ui/card"
@@ -53,6 +53,29 @@ export default function ApostasClient({ apostas: initialApostas, profiles }: Pro
   const [deletando, setDeletando] = useState(false)
   const { toast } = useToast()
   const supabase = createClient()
+
+  // Real-time: sync apostas list across devices
+  useEffect(() => {
+    const client = createClient()
+    const profileIds = profiles.map(p => p.id)
+
+    async function refetch() {
+      const { data } = await client
+        .from("apostas")
+        .select("*, profile:profiles(nome, sobrenome, apelido), legs:aposta_legs(*, profile_bet:profile_bets(*, bet:bets(*)))")
+        .in("profile_id", profileIds)
+        .order("created_at", { ascending: false })
+      if (data) setApostas(data as any)
+    }
+
+    const channel = client
+      .channel("apostas-global-sync")
+      .on("postgres_changes", { event: "*", schema: "public", table: "apostas" }, refetch)
+      .on("postgres_changes", { event: "*", schema: "public", table: "aposta_legs" }, refetch)
+      .subscribe()
+
+    return () => { client.removeChannel(channel) }
+  }, [])
 
   function formatBRL(raw: string) {
     const digits = raw.replace(/\D/g, "")
