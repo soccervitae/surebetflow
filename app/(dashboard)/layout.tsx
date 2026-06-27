@@ -332,13 +332,13 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         </header>
 
         {/* Main */}
-        <main className="flex-1 p-4 md:p-6 pt-[72px] md:pt-4 pb-24 md:pb-6">
+        <main className="flex-1 p-4 md:p-6 md:pt-4 md:pb-6" style={{ paddingTop: "calc(56px + env(safe-area-inset-top) + 1rem)", paddingBottom: "calc(96px + env(safe-area-inset-bottom))" }}>
           {children}
         </main>
       </div>
 
       {/* Top header mobile */}
-      <header className="md:hidden fixed top-0 left-0 right-0 bg-[var(--bg-surface)] border-b border-[var(--border)] z-20 flex items-center justify-between px-4 h-14">
+      <header className="md:hidden fixed top-0 left-0 right-0 bg-[var(--bg-surface)] border-b border-[var(--border)] z-20 flex items-center justify-between px-4" style={{ paddingTop: "env(safe-area-inset-top)", height: "calc(56px + env(safe-area-inset-top))" }}>
         <Logo size="sm" />
         <div className="flex items-center gap-2">
           <button
@@ -375,7 +375,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       </header>
 
       {/* Bottom nav mobile */}
-      <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-[var(--bg-surface)] border-t border-[var(--border)] z-20 flex">
+      <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-[var(--bg-surface)] border-t border-[var(--border)] z-20 flex" style={{ paddingBottom: "env(safe-area-inset-bottom)" }}>
         {([
           { href: "/dashboard",  icon: Home,          label: "Dashboard" },
           { href: "/perfis",     icon: Users,         label: "Perfis" },
