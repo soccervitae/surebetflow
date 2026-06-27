@@ -92,13 +92,13 @@ function VerificarEmailContent() {
         }
       </div>
 
-      <h2 className="text-xl font-bold text-white mb-1 text-center">
+      <h2 className="text-xl font-bold text-gray-900 mb-1 text-center">
         {success ? "Email verificado!" : "Verifique seu e-mail"}
       </h2>
       <p className="text-gray-500 text-sm mb-6 text-center leading-relaxed">
         {success
           ? "Redirecionando..."
-          : <>Enviamos um código de 6 dígitos para <strong className="text-gray-300">{email || "seu e-mail"}</strong></>
+          : <>Enviamos um código de 6 dígitos para <strong className="text-gray-700">{email || "seu e-mail"}</strong></>
         }
       </p>
 
@@ -117,7 +117,7 @@ function VerificarEmailContent() {
                 onKeyDown={e => handleKeyDown(i, e)}
                 disabled={loading}
                 className={`w-12 h-14 text-center text-xl font-bold rounded-xl border transition-colors focus:outline-none
-                  ${digit ? "bg-[#1e3a8a]/20 border-[#1e3a8a] text-white" : "bg-[#0a0a0a] border-white/10 text-white"}
+                  ${digit ? "bg-[#1e3a8a]/10 border-[#1e3a8a] text-[#1e3a8a]" : "bg-white border-gray-300 text-gray-900"}
                   ${error ? "border-red-500/50" : ""}
                   focus:border-[#1e3a8a] disabled:opacity-50`}
               />
@@ -125,7 +125,7 @@ function VerificarEmailContent() {
           </div>
 
           {error && (
-            <p className="text-sm text-red-400 bg-red-500/5 border border-red-500/20 rounded-xl px-4 py-3 mb-4 text-center">
+            <p className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-xl px-4 py-3 mb-4 text-center">
               {error}
             </p>
           )}
@@ -137,7 +137,7 @@ function VerificarEmailContent() {
           <div className="text-center">
             {countdown > 0 ? (
               <p className="text-sm text-gray-500">
-                Reenviar código em <span className="text-gray-300 font-medium">{countdown}s</span>
+                Reenviar código em <span className="text-gray-700 font-medium">{countdown}s</span>
               </p>
             ) : (
               <button

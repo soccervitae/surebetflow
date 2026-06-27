@@ -43,7 +43,6 @@ export default function CadastroPage() {
       return
     }
 
-    // Send verification code via Resend
     await fetch("/api/auth/send-code", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -53,15 +52,15 @@ export default function CadastroPage() {
     router.push(`/verificar-email?email=${encodeURIComponent(email)}&nome=${encodeURIComponent(nome.trim())}`)
   }
 
-  const inputClass = "w-full bg-[#0a0a0a] border border-white/10 rounded-xl px-4 py-3 text-white placeholder-gray-600 text-sm focus:outline-none focus:border-[#1e3a8a]/50 transition-colors"
+  const inputClass = "w-full bg-white border border-gray-300 rounded-xl px-4 py-3 text-gray-900 placeholder-gray-400 text-sm focus:outline-none focus:border-[#1e3a8a] focus:ring-1 focus:ring-[#1e3a8a]/20 transition-colors"
 
   return (
     <>
-      <h2 className="text-xl font-bold text-white mb-1">Criar sua conta</h2>
+      <h2 className="text-xl font-bold text-gray-900 mb-1">Criar sua conta</h2>
       <p className="text-gray-500 text-sm mb-6">Preencha os dados abaixo para começar</p>
       <form onSubmit={handleSubmit} className="space-y-4">
         <div className="space-y-1.5">
-          <label htmlFor="nome" className="text-sm font-medium text-gray-300">Nome completo</label>
+          <label htmlFor="nome" className="text-sm font-medium text-gray-700">Nome completo</label>
           <input
             id="nome"
             type="text"
@@ -74,7 +73,7 @@ export default function CadastroPage() {
           />
         </div>
         <div className="space-y-1.5">
-          <label htmlFor="email" className="text-sm font-medium text-gray-300">E-mail</label>
+          <label htmlFor="email" className="text-sm font-medium text-gray-700">E-mail</label>
           <input
             id="email"
             type="email"
@@ -87,7 +86,7 @@ export default function CadastroPage() {
           />
         </div>
         <div className="space-y-1.5">
-          <label htmlFor="password" className="text-sm font-medium text-gray-300">Senha</label>
+          <label htmlFor="password" className="text-sm font-medium text-gray-700">Senha</label>
           <div className="relative">
             <input
               id="password"
@@ -99,13 +98,13 @@ export default function CadastroPage() {
               autoComplete="new-password"
               className={`${inputClass} pr-10`}
             />
-            <button type="button" onClick={() => setShowPassword(v => !v)} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-300 transition-colors" tabIndex={-1}>
+            <button type="button" onClick={() => setShowPassword(v => !v)} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors" tabIndex={-1}>
               {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
             </button>
           </div>
         </div>
         <div className="space-y-1.5">
-          <label htmlFor="confirmPassword" className="text-sm font-medium text-gray-300">Confirmar senha</label>
+          <label htmlFor="confirmPassword" className="text-sm font-medium text-gray-700">Confirmar senha</label>
           <div className="relative">
             <input
               id="confirmPassword"
@@ -117,13 +116,13 @@ export default function CadastroPage() {
               autoComplete="new-password"
               className={`${inputClass} pr-10`}
             />
-            <button type="button" onClick={() => setShowConfirmPassword(v => !v)} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-300 transition-colors" tabIndex={-1}>
+            <button type="button" onClick={() => setShowConfirmPassword(v => !v)} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors" tabIndex={-1}>
               {showConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
             </button>
           </div>
         </div>
         {error && (
-          <p className="text-sm text-red-400 bg-red-500/5 border border-red-500/20 rounded-xl px-4 py-3">
+          <p className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-xl px-4 py-3">
             {error}
           </p>
         )}
@@ -137,7 +136,7 @@ export default function CadastroPage() {
       </form>
       <p className="text-center text-sm text-gray-500 mt-6">
         Já tem uma conta?{" "}
-        <Link href="/login" className="text-[var(--accent-text)] font-medium hover:underline">
+        <Link href="/login" className="text-[#1e3a8a] font-medium hover:underline">
           Fazer login
         </Link>
       </p>
