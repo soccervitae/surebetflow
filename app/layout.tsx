@@ -1,15 +1,28 @@
-import type { Metadata } from "next"
+import type { Metadata, Viewport } from "next"
 import { Inter, Space_Grotesk, JetBrains_Mono } from "next/font/google"
 import "./globals.css"
 import { Toaster } from "@/components/ui/toaster"
 import { ThemeProvider } from "@/components/ThemeProvider"
 import CookieBanner from "@/components/CookieBanner"
+import PWAProvider from "@/components/PWAProvider"
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" })
 const spaceGrotesk = Space_Grotesk({ subsets: ["latin"], variable: "--font-display", weight: ["400","500","600","700"] })
 const jetbrainsMono = JetBrains_Mono({ subsets: ["latin"], variable: "--font-mono", weight: ["400","500","700"] })
 
 const BASE_URL = "https://www.surebetflow.bet"
+
+export const viewport: Viewport = {
+  themeColor: [
+    { media: "(prefers-color-scheme: dark)",  color: "#1e3a8a" },
+    { media: "(prefers-color-scheme: light)", color: "#1e3a8a" },
+  ],
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
+  viewportFit: "cover",
+}
 
 export const metadata: Metadata = {
   metadataBase: new URL(BASE_URL),
@@ -39,6 +52,7 @@ export const metadata: Metadata = {
     follow: true,
     googleBot: { index: true, follow: true, "max-image-preview": "large" },
   },
+  manifest: "/manifest.json",
   openGraph: {
     type: "website",
     locale: "pt_BR",
@@ -65,16 +79,29 @@ export const metadata: Metadata = {
   },
   icons: {
     icon: [
-      { url: "/favicon.ico", sizes: "any" },
-      { url: "/favicon.svg", type: "image/svg+xml" },
-      { url: "/icon.png", type: "image/png", sizes: "32x32" },
+      { url: "/icons/favicon-32x32.png", sizes: "32x32", type: "image/png" },
+      { url: "/icons/icon-192x192.png",  sizes: "192x192", type: "image/png" },
     ],
     apple: [
-      { url: "/apple-icon.png", type: "image/png", sizes: "180x180" },
+      { url: "/icons/apple-touch-icon.png", sizes: "180x180", type: "image/png" },
     ],
   },
   alternates: {
     canonical: BASE_URL,
+  },
+  appleWebApp: {
+    capable: true,
+    title: "SurebetFlow",
+    statusBarStyle: "black-translucent",
+  },
+  formatDetection: {
+    telephone: false,
+  },
+  other: {
+    "mobile-web-app-capable": "yes",
+    "msapplication-TileColor": "#1e3a8a",
+    "msapplication-TileImage": "/icons/icon-144x144.png",
+    "msapplication-config": "none",
   },
 }
 
@@ -90,6 +117,7 @@ export default function RootLayout({
           {children}
           <Toaster />
           <CookieBanner />
+          <PWAProvider />
         </ThemeProvider>
       </body>
     </html>
