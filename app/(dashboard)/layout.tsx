@@ -84,8 +84,10 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         .on("postgres_changes", { event: "*", schema: "public", table: "ticket_mensagens" }, fetchUnread)
         .subscribe()
 
-      // Redirect to onboarding if no profiles and first time
-      if (!pathname.startsWith("/onboarding")) {
+      // Redirect to onboarding if subscribed but no profiles yet
+      const isActive = subData?.status === "active" || subData?.status === "trialing"
+      const isOnboardingExcluded = pathname.startsWith("/onboarding") || pathname.startsWith("/assinatura")
+      if (isActive && !isOnboardingExcluded) {
         const alreadyOnboarded = typeof window !== "undefined" && localStorage.getItem("onboarding_done") === "1"
         if (!alreadyOnboarded) {
           const { count } = await supabase
@@ -99,6 +101,14 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             localStorage.setItem("onboarding_done", "1")
           }
         }
+      }
+
+      // Redirect brand new users (no subscription record) to /assinatura
+      const noSubscription = !subData
+      const allowedWithoutSub = pathname.startsWith("/assinatura") || pathname.startsWith("/configuracoes") || pathname.startsWith("/suporte")
+      if (noSubscription && !allowedWithoutSub) {
+        router.push("/assinatura")
+        return
       }
 
       setReady(true)
