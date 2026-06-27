@@ -130,6 +130,7 @@ export default function SurebetCalculator({ profiles, defaultProfileId, profileN
   const tipo = numLegs >= 3 ? "3-way" : "2-way"
   const [evento, setEvento] = useState("")
   const [esporte, setEsporte] = useState("")
+  const [competicao, setCompeticao] = useState("")
   const [dataEvento, setDataEvento] = useState("")
   const [horaEvento, setHoraEvento] = useState("")
   const [investimentoTotal, setInvestimentoTotal] = useState("")
@@ -378,6 +379,7 @@ export default function SurebetCalculator({ profiles, defaultProfileId, profileN
           profile_id: profileId,
           evento: evento.trim(),
           esporte: esporte.trim() || null,
+          competicao: competicao.trim() || null,
           tipo,
           data_evento: dataEvento ? `${dataEvento}${horaEvento ? `T${horaEvento}:00` : "T00:00:00"}` : null,
           investimento_total: investment,
@@ -583,7 +585,7 @@ export default function SurebetCalculator({ profiles, defaultProfileId, profileN
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
             <div className="space-y-2">
               <Label>Esporte</Label>
               <select
@@ -601,7 +603,11 @@ export default function SurebetCalculator({ profiles, defaultProfileId, profileN
             </div>
             <div className="space-y-2">
               <Label>Evento</Label>
-              <Input value={evento} onChange={e => setEvento(e.target.value)} placeholder="Ex: Flamengo x Corinthians" />
+              <Input value={evento} onChange={e => setEvento(e.target.value)} placeholder="Ex: Brasil x Espanha" />
+            </div>
+            <div className="space-y-2">
+              <Label>Competição</Label>
+              <Input value={competicao} onChange={e => setCompeticao(e.target.value)} placeholder="Ex: Copa do Mundo" />
             </div>
             <div className="space-y-2">
               <Label>Data do evento</Label>
