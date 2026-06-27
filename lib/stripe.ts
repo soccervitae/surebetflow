@@ -5,11 +5,19 @@ export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
 })
 
 export const STRIPE_PLANS = {
-  pro: {
-    name: "Pro",
+  trader: {
+    name: "Trader",
     price: "R$ 99,00",
-    amount: 9900, // centavos
-    priceId: process.env.STRIPE_PRICE_PRO!,
+    amount: 9900,
+    priceId: process.env.STRIPE_PRICE_TRADER!,
+    maxProfiles: 5,
+  },
+  trader_pro: {
+    name: "Trader Pro",
+    price: "R$ 179,00",
+    amount: 17900,
+    priceId: process.env.STRIPE_PRICE_TRADER_PRO!,
+    maxProfiles: 20,
   },
 } as const
 

@@ -8,7 +8,7 @@ export async function POST(req: NextRequest) {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return NextResponse.json({ error: "Não autorizado" }, { status: 401 })
 
-  const { plan = "pro" } = await req.json() as { plan?: StripePlanKey }
+  const { plan = "trader" } = await req.json() as { plan?: StripePlanKey }
   const planConfig = STRIPE_PLANS[plan]
   if (!planConfig) return NextResponse.json({ error: "Plano inválido" }, { status: 400 })
 

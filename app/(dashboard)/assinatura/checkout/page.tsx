@@ -1,3 +1,4 @@
+import { Suspense } from "react"
 import { createClient } from "@/lib/supabase/server"
 import { redirect } from "next/navigation"
 import CheckoutClient from "./CheckoutClient"
@@ -15,5 +16,9 @@ export default async function CheckoutPage() {
 
   if (sub?.status === "active" || sub?.status === "trialing") redirect("/assinatura")
 
-  return <CheckoutClient />
+  return (
+    <Suspense fallback={null}>
+      <CheckoutClient />
+    </Suspense>
+  )
 }

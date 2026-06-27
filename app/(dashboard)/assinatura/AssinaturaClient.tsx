@@ -3,7 +3,7 @@
 import { useState } from "react"
 import { useSearchParams } from "next/navigation"
 import Link from "next/link"
-import { CreditCard, CheckCircle, Star, AlertCircle, Clock, RefreshCw, Calendar, Hash, Activity, Loader2, ExternalLink } from "lucide-react"
+import { CreditCard, CheckCircle, Star, AlertCircle, Clock, Calendar, Hash, Activity, Loader2, ExternalLink, Zap } from "lucide-react"
 
 type Subscription = {
   status: string
@@ -13,13 +13,39 @@ type Subscription = {
   stripe_subscription_id: string | null
 } | null
 
-const PRO_FEATURES = [
-  "Perfis ilimitados de apostador",
-  "Casas de apostas ilimitadas por perfil",
-  "Calculadora de surebet 2-way e 3-way",
-  "Dashboard financeiro completo",
-  "Histórico completo de apostas",
-  "Suporte prioritário por ticket",
+const PLANS = [
+  {
+    key: "trader",
+    name: "Trader",
+    price: "R$ 99",
+    period: "/mês",
+    maxProfiles: 5,
+    icon: Star,
+    features: [
+      "Até 5 perfis de apostador",
+      "Casas de apostas ilimitadas por perfil",
+      "Calculadora de surebet 2-way e 3-way",
+      "Dashboard financeiro completo",
+      "Histórico completo de apostas",
+      "Suporte prioritário por ticket",
+    ],
+  },
+  {
+    key: "trader_pro",
+    name: "Trader Pro",
+    price: "R$ 179",
+    period: "/mês",
+    maxProfiles: 20,
+    icon: Zap,
+    features: [
+      "Até 20 perfis de apostador",
+      "Casas de apostas ilimitadas por perfil",
+      "Calculadora de surebet 2-way e 3-way",
+      "Dashboard financeiro completo",
+      "Histórico completo de apostas",
+      "Suporte prioritário por ticket",
+    ],
+  },
 ]
 
 const STATUS_INFO: Record<string, { label: string; color: string; bg: string; icon: React.ElementType }> = {
@@ -48,6 +74,7 @@ export default function AssinaturaClient({ subscription }: { subscription: Subsc
   const isActive = subscription?.status === "active" || subscription?.status === "trialing"
   const statusInfo = STATUS_INFO[subscription?.status ?? "inactive"]
   const StatusIcon = statusInfo.icon
+  const activePlan = PLANS.find(p => p.key === subscription?.plan) ?? null
 
   const paymentDetails = [
     {
@@ -63,7 +90,7 @@ export default function AssinaturaClient({ subscription }: { subscription: Subsc
     {
       icon: Star,
       label: "Plano",
-      value: <span className="text-[var(--text-primary)] font-medium">Pro — R$ 99,00/mês</span>,
+      value: <span className="text-[var(--text-primary)] font-medium">{activePlan?.name ?? "—"} — {activePlan?.price ?? "—"}/mês</span>,
     },
     ...(subscription?.current_period_end ? [{
       icon: Calendar,
@@ -82,7 +109,7 @@ export default function AssinaturaClient({ subscription }: { subscription: Subsc
   ]
 
   return (
-    <div className="max-w-lg mx-auto space-y-6">
+    <div className="max-w-2xl mx-auto space-y-6">
       <div className="flex items-center gap-3">
         <div className="w-9 h-9 bg-[#1e3a8a]/10 rounded-xl flex items-center justify-center">
           <CreditCard className="w-5 h-5 text-[#1e3a8a]" />
@@ -106,31 +133,19 @@ export default function AssinaturaClient({ subscription }: { subscription: Subsc
         </div>
       )}
 
-      {/* Plan card */}
-      <div className={`bg-[var(--bg-surface)] border rounded-2xl p-6 relative overflow-hidden ${isActive ? "border-[#1e3a8a]/40" : "border-[var(--border)]"}`}>
-        <div className="absolute top-4 right-4">
-          <span className="text-xs bg-[#1e3a8a]/20 text-[#1e3a8a] px-2.5 py-1 rounded-full font-medium">Plano único</span>
-        </div>
-
-        <div className="flex items-center gap-2 mb-3">
-          <Star className="w-5 h-5 text-[#1e3a8a]" />
-          <span className="text-lg font-bold text-[var(--text-primary)]">Pro</span>
-        </div>
-
-        <p className="text-4xl font-bold text-[var(--text-primary)] mb-0.5">
-          R$ 99<span className="text-xl font-normal text-[var(--text-muted)]">,00/mês</span>
-        </p>
-
-        <ul className="space-y-2 my-6">
-          {PRO_FEATURES.map(f => (
-            <li key={f} className="flex items-center gap-2.5 text-sm text-[var(--text-secondary)]">
-              <CheckCircle className="w-4 h-4 text-[#1e3a8a] flex-shrink-0" />
-              {f}
-            </li>
-          ))}
-        </ul>
-
-        {isActive ? (
+      {/* Active plan management */}
+      {isActive && activePlan && (
+        <div className="bg-[var(--bg-surface)] border border-[#1e3a8a]/40 rounded-2xl p-6">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-2">
+              <activePlan.icon className="w-5 h-5 text-[#1e3a8a]" />
+              <span className="text-lg font-bold text-[var(--text-primary)]">{activePlan.name}</span>
+            </div>
+            <span className="text-xs bg-[#1e3a8a]/20 text-[#1e3a8a] px-2.5 py-1 rounded-full font-medium">Plano atual</span>
+          </div>
+          <p className="text-4xl font-bold text-[var(--text-primary)] mb-6">
+            {activePlan.price}<span className="text-xl font-normal text-[var(--text-muted)]">{activePlan.period}</span>
+          </p>
           <button
             onClick={openPortal}
             disabled={portalLoading}
@@ -141,17 +156,41 @@ export default function AssinaturaClient({ subscription }: { subscription: Subsc
               : <><ExternalLink className="w-4 h-4" /> Gerenciar assinatura</>
             }
           </button>
-        ) : (
-          <Link
-            href="/assinatura/checkout"
-            className="block w-full py-3 rounded-xl text-sm font-semibold bg-[#1e3a8a] hover:bg-[#1e40af] text-white transition-colors text-center"
-          >
-            Assinar agora — R$ 99,00/mês
-          </Link>
-        )}
-      </div>
+        </div>
+      )}
 
-      {/* Payment details list */}
+      {/* Plan cards */}
+      {!isActive && (
+        <div className="grid sm:grid-cols-2 gap-4">
+          {PLANS.map(plan => (
+            <div key={plan.key} className="bg-[var(--bg-surface)] border border-[var(--border)] rounded-2xl p-6 flex flex-col">
+              <div className="flex items-center gap-2 mb-3">
+                <plan.icon className="w-5 h-5 text-[#1e3a8a]" />
+                <span className="text-lg font-bold text-[var(--text-primary)]">{plan.name}</span>
+              </div>
+              <p className="text-4xl font-bold text-[var(--text-primary)] mb-0.5">
+                {plan.price}<span className="text-xl font-normal text-[var(--text-muted)]">{plan.period}</span>
+              </p>
+              <ul className="space-y-2 my-6 flex-1">
+                {plan.features.map(f => (
+                  <li key={f} className="flex items-center gap-2.5 text-sm text-[var(--text-secondary)]">
+                    <CheckCircle className="w-4 h-4 text-[#1e3a8a] flex-shrink-0" />
+                    {f}
+                  </li>
+                ))}
+              </ul>
+              <Link
+                href={`/assinatura/checkout?plan=${plan.key}`}
+                className="block w-full py-3 rounded-xl text-sm font-semibold bg-[#1e3a8a] hover:bg-[#1e40af] text-white transition-colors text-center"
+              >
+                Assinar por {plan.price}/mês
+              </Link>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Payment details */}
       {subscription && (
         <div className="bg-[var(--bg-surface)] border border-[var(--border)] rounded-2xl overflow-hidden">
           <div className="px-5 py-4 border-b border-[var(--border)]">

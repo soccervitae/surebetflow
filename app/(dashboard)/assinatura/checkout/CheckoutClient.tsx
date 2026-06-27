@@ -1,19 +1,46 @@
 "use client"
 
 import { useState } from "react"
+import { useSearchParams } from "next/navigation"
 import Link from "next/link"
-import { ArrowLeft, ShieldCheck, Lock, CheckCircle, Loader2 } from "lucide-react"
+import { ArrowLeft, ShieldCheck, Lock, CheckCircle, Loader2, Star, Zap } from "lucide-react"
 
-const PRO_FEATURES = [
-  "Perfis ilimitados de apostador",
-  "Casas de apostas ilimitadas",
-  "Calculadora 2-way e 3-way",
-  "Dashboard financeiro completo",
-  "Histórico completo de apostas",
-  "Suporte prioritário por ticket",
-]
+const PLANS = {
+  trader: {
+    name: "Trader",
+    price: "R$ 99,00",
+    icon: Star,
+    maxProfiles: 5,
+    features: [
+      "Até 5 perfis de apostador",
+      "Casas de apostas ilimitadas",
+      "Calculadora 2-way e 3-way",
+      "Dashboard financeiro completo",
+      "Histórico completo de apostas",
+      "Suporte prioritário por ticket",
+    ],
+  },
+  trader_pro: {
+    name: "Trader Pro",
+    price: "R$ 179,00",
+    icon: Zap,
+    maxProfiles: 20,
+    features: [
+      "Até 20 perfis de apostador",
+      "Casas de apostas ilimitadas",
+      "Calculadora 2-way e 3-way",
+      "Dashboard financeiro completo",
+      "Histórico completo de apostas",
+      "Suporte prioritário por ticket",
+    ],
+  },
+}
 
 export default function CheckoutClient() {
+  const searchParams = useSearchParams()
+  const planKey = (searchParams.get("plan") ?? "trader") as keyof typeof PLANS
+  const plan = PLANS[planKey] ?? PLANS.trader
+
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
 
@@ -24,7 +51,7 @@ export default function CheckoutClient() {
       const res = await fetch("/api/stripe/checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ plan: "pro" }),
+        body: JSON.stringify({ plan: planKey }),
       })
       const data = await res.json()
       if (data.error) {
@@ -39,6 +66,8 @@ export default function CheckoutClient() {
     }
   }
 
+  const PlanIcon = plan.icon
+
   return (
     <div className="max-w-4xl mx-auto">
       <div className="flex items-center gap-3 mb-6">
@@ -47,7 +76,7 @@ export default function CheckoutClient() {
         </Link>
         <div>
           <h1 className="text-xl font-bold text-[var(--text-primary)]">Finalizar assinatura</h1>
-          <p className="text-sm text-[var(--text-secondary)]">Plano Pro · R$ 99,00/mês</p>
+          <p className="text-sm text-[var(--text-secondary)]">Plano {plan.name} · {plan.price}/mês</p>
         </div>
       </div>
 
@@ -75,7 +104,7 @@ export default function CheckoutClient() {
             >
               {loading
                 ? <><Loader2 className="w-4 h-4 animate-spin" /> Redirecionando...</>
-                : <><Lock className="w-4 h-4" /> Assinar por R$ 99,00/mês</>
+                : <><Lock className="w-4 h-4" /> Assinar por {plan.price}/mês</>
               }
             </button>
           </div>
@@ -90,15 +119,16 @@ export default function CheckoutClient() {
         <div className="md:col-span-2 space-y-4">
           <div className="bg-[var(--bg-surface)] border border-[var(--border)] rounded-2xl p-5">
             <p className="text-xs text-[var(--text-muted)] uppercase tracking-wider mb-3">Resumo do pedido</p>
-            <div className="flex items-baseline justify-between mb-1">
-              <span className="font-semibold text-[var(--text-primary)]">Plano Pro</span>
-              <span className="font-bold text-[var(--text-primary)]">R$ 99,00</span>
+            <div className="flex items-center gap-2 mb-1">
+              <PlanIcon className="w-4 h-4 text-[#1e3a8a]" />
+              <span className="font-semibold text-[var(--text-primary)]">Plano {plan.name}</span>
+              <span className="font-bold text-[var(--text-primary)] ml-auto">{plan.price}</span>
             </div>
             <p className="text-xs text-[var(--text-muted)] mb-4">Cobrança mensal recorrente</p>
             <div className="border-t border-[var(--border)] pt-4">
               <div className="flex items-baseline justify-between">
                 <span className="text-sm text-[var(--text-secondary)]">Total hoje</span>
-                <span className="text-lg font-bold text-[var(--text-primary)]">R$ 99,00</span>
+                <span className="text-lg font-bold text-[var(--text-primary)]">{plan.price}</span>
               </div>
             </div>
           </div>
@@ -106,7 +136,7 @@ export default function CheckoutClient() {
           <div className="bg-[var(--bg-surface)] border border-[var(--border)] rounded-2xl p-5">
             <p className="text-xs text-[var(--text-muted)] uppercase tracking-wider mb-3">Incluído no plano</p>
             <ul className="space-y-2">
-              {PRO_FEATURES.map(f => (
+              {plan.features.map(f => (
                 <li key={f} className="flex items-start gap-2 text-sm text-[var(--text-secondary)]">
                   <CheckCircle className="w-3.5 h-3.5 text-[#1e3a8a] flex-shrink-0 mt-0.5" />
                   {f}
