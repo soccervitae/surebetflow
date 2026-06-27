@@ -8,7 +8,7 @@ import { useTheme } from "@/components/ThemeProvider"
 import {
   Home, Users, Wallet, CreditCard, Settings,
   LogOut, Bell, ChevronLeft, ChevronRight,
-  Circle, Sun, Moon, MessageCircle, BookOpen, ClipboardList, Lock
+  Circle, Sun, Moon, MessageCircle, BookOpen, ClipboardList
 } from "lucide-react"
 import Logo, { LogoIcon } from "@/components/Logo"
 import Image from "next/image"
@@ -184,15 +184,10 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                   className={cn(
                     "w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all",
                     collapsed && "justify-center px-0",
-                    "text-white/30 hover:bg-white/5 hover:text-white/40 cursor-pointer"
+                    "text-white/50 hover:bg-white/5 hover:text-white/90"
                   )}
                 >
-                  <span className="relative flex-shrink-0">
-                    <Icon className="w-4 h-4" />
-                    <span className="absolute -top-1 -right-1 w-3 h-3 rounded-full bg-[#1e3a8a]/80 flex items-center justify-center">
-                      <Lock className="w-1.5 h-1.5 text-white/60" />
-                    </span>
-                  </span>
+                  <Icon className="w-4 h-4 flex-shrink-0" />
                   {!collapsed && <span className="flex-1 text-left">{label}</span>}
                 </button>
               )
@@ -342,17 +337,26 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           >
             {isDark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
           </button>
-          <Link
-            href="/suporte"
-            className="relative w-8 h-8 flex items-center justify-center rounded-lg text-[var(--text-secondary)]"
-          >
-            <Bell className="w-4 h-4" />
-            {unread > 0 && (
-              <span className="absolute top-1 right-1 min-w-[16px] h-4 px-0.5 flex items-center justify-center rounded-full bg-red-500 text-white text-[9px] font-bold leading-none">
-                {unread > 99 ? "99+" : unread}
-              </span>
-            )}
-          </Link>
+          {hasActivePlan ? (
+            <Link
+              href="/suporte"
+              className="relative w-8 h-8 flex items-center justify-center rounded-lg text-[var(--text-secondary)]"
+            >
+              <Bell className="w-4 h-4" />
+              {unread > 0 && (
+                <span className="absolute top-1 right-1 min-w-[16px] h-4 px-0.5 flex items-center justify-center rounded-full bg-red-500 text-white text-[9px] font-bold leading-none">
+                  {unread > 99 ? "99+" : unread}
+                </span>
+              )}
+            </Link>
+          ) : (
+            <button
+              onClick={() => setPlanoModal(true)}
+              className="relative w-8 h-8 flex items-center justify-center rounded-lg text-[var(--text-secondary)]"
+            >
+              <Bell className="w-4 h-4" />
+            </button>
+          )}
           <Link href="/configuracoes" className="w-7 h-7 bg-[#1e3a8a] rounded-full flex items-center justify-center text-white text-xs font-bold">
             {userInitials}
           </Link>
@@ -377,12 +381,12 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               <button
                 key={href}
                 onClick={() => setPlanoModal(true)}
-                className="flex-1 flex flex-col items-center py-2 text-xs gap-1 text-[var(--text-secondary)] opacity-40"
+                className={cn(
+                  "flex-1 flex flex-col items-center py-2 text-xs gap-1",
+                  "text-[var(--text-secondary)]"
+                )}
               >
-                <span className="relative">
-                  <Icon className="w-5 h-5" />
-                  <Lock className="absolute -top-1 -right-1 w-2.5 h-2.5 text-[#1e3a8a]" />
-                </span>
+                <Icon className="w-5 h-5" />
                 <span>{label}</span>
               </button>
             )
