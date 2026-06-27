@@ -12,7 +12,9 @@ export default async function HomePage() {
     redirect("/admin")
   }
 
-  const [dashResult, profilesResult, apostasResult] = await Promise.all([
+  const threeDaysAgo = new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString()
+
+  const [dashResult, profilesResult, apostasResult, apostasPendentesResult] = await Promise.all([
     supabase
       .from("dashboard_geral")
       .select("*")
@@ -28,6 +30,11 @@ export default async function HomePage() {
       .eq("profiles.user_id", user!.id)
       .order("created_at", { ascending: false })
       .limit(10),
+    supabase
+      .from("apostas")
+      .select("id", { count: "exact", head: true })
+      .eq("status", "pendente")
+      .lt("created_at", threeDaysAgo),
   ])
 
   // Get finalized apostas for chart
@@ -43,6 +50,7 @@ export default async function HomePage() {
       profiles={profilesResult.data ?? []}
       recentApostas={apostasResult.data ?? []}
       apostasFinalizadas={apostasFinalizadas ?? []}
+      apostasPendentesAntigas={apostasPendentesResult.count ?? 0}
     />
   )
 }
