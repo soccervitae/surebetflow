@@ -148,7 +148,6 @@ export default function SurebetCalculator({ profiles, defaultProfileId, profileN
   const imageInputRef = useRef<HTMLInputElement>(null)
   const [userStakes, setUserStakes] = useState<(number | null)[]>([null, null, null])
   const [roundStakes, setRoundStakes] = useState(false)
-  const [roundMultiple, setRoundMultiple] = useState("1")
   const { toast } = useToast()
   const supabase = createClient()
 
@@ -335,9 +334,7 @@ export default function SurebetCalculator({ profiles, defaultProfileId, profileN
 
   const stakes = computedStakes.map((computed, i) => {
     const raw = userStakes[i] ?? computed
-    if (!roundStakes) return raw
-    const m = parseFloat(roundMultiple) || 1
-    return Math.round(raw / m) * m
+    return roundStakes ? Math.round(raw) : raw
   })
 
   const guaranteedReturn = isArbitrage && stakes.length > 0 && odds[0] > 0
@@ -754,16 +751,7 @@ export default function SurebetCalculator({ profiles, defaultProfileId, profileN
         <label htmlFor="round-stakes" className="font-medium text-[var(--text-primary)] cursor-pointer select-none flex-1">
           Arredondar aposta até:
         </label>
-        <input
-          type="number"
-          min="1"
-          step="1"
-          value={roundMultiple}
-          onChange={e => setRoundMultiple(e.target.value)}
-          onFocus={() => setRoundStakes(true)}
-          inputMode="numeric"
-          className="w-16 text-center rounded-lg border border-[var(--border)] bg-[var(--bg-base)] text-[var(--text-primary)] text-sm px-2 py-1 focus:outline-none focus:border-[#1e3a8a]"
-        />
+        <span className="text-[var(--text-secondary)] text-sm font-mono">1</span>
       </div>
 
       {/* Result */}
