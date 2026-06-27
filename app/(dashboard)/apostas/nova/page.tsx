@@ -12,5 +12,18 @@ export default async function NovaApostaPage() {
     .select("id, nome, sobrenome, apelido")
     .eq("user_id", user.id)
 
-  return <NovaApostaClient profiles={profiles ?? []} />
+  const profileIds = (profiles ?? []).map(p => p.id)
+  const { data: betCounts } = profileIds.length > 0
+    ? await supabase
+        .from("profile_bets")
+        .select("profile_id")
+        .in("profile_id", profileIds)
+    : { data: [] }
+
+  const betCountMap: Record<string, number> = {}
+  for (const row of betCounts ?? []) {
+    betCountMap[row.profile_id] = (betCountMap[row.profile_id] ?? 0) + 1
+  }
+
+  return <NovaApostaClient profiles={profiles ?? []} betCountMap={betCountMap} />
 }

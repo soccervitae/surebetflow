@@ -13,13 +13,14 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet"
 import { formatCurrency } from "@/lib/utils"
 import { useToast } from "@/hooks/useToast"
-import { BookOpen, Filter, X, Plus, Calculator, CalendarIcon, ChevronDown } from "lucide-react"
+import { BookOpen, Filter, X, Plus, Calculator, CalendarIcon, ChevronDown, AlertTriangle } from "lucide-react"
 import type { Aposta, ApostaLeg } from "@/lib/types"
 import SurebetCalculator from "@/components/SurebetCalculator"
 
 interface Props {
   apostas: (Aposta & { profile?: { nome: string; sobrenome: string; apelido?: string | null } })[]
   profiles: { id: string; nome: string; sobrenome: string; apelido?: string | null }[]
+  betCountMap: Record<string, number>
 }
 
 function statusBadge(status: string) {
@@ -30,7 +31,7 @@ function statusBadge(status: string) {
   }
 }
 
-export default function ApostasClient({ apostas: initialApostas, profiles }: Props) {
+export default function ApostasClient({ apostas: initialApostas, profiles, betCountMap }: Props) {
   const [apostas, setApostas] = useState(initialApostas)
   const [filterStatus, setFilterStatus] = useState("todos")
   const [filterProfile, setFilterProfile] = useState("todos")
@@ -523,18 +524,39 @@ export default function ApostasClient({ apostas: initialApostas, profiles }: Pro
           <div className="space-y-2 mt-2">
             {profiles.map(p => {
               const name = p.apelido || `${p.nome} ${p.sobrenome}`
+              const count = betCountMap[p.id] ?? 0
+              const insufficient = count < 2
               return (
                 <button
                   key={p.id}
                   onClick={() => {
+                    if (insufficient) return
                     setSelectedProfileId(p.id)
                     setSelectedProfileName(name)
                     setSelectProfileModal(false)
                     setNovaModal(true)
                   }}
-                  className="w-full text-left px-4 py-3 rounded-xl border border-[var(--border)] hover:border-[#4d82d6] hover:bg-[#1e3a8a]/5 transition-colors"
+                  disabled={insufficient}
+                  className={`w-full text-left px-4 py-3 rounded-xl border transition-colors ${
+                    insufficient
+                      ? "border-[var(--border)] opacity-60 cursor-not-allowed"
+                      : "border-[var(--border)] hover:border-[#4d82d6] hover:bg-[#1e3a8a]/5"
+                  }`}
                 >
-                  <span className="font-semibold text-[var(--text-primary)] text-sm">{name}</span>
+                  <div className="flex items-center justify-between">
+                    <span className="font-semibold text-[var(--text-primary)] text-sm">{name}</span>
+                    {insufficient && (
+                      <span className="text-xs text-amber-500 font-medium flex items-center gap-1">
+                        <AlertTriangle className="w-3.5 h-3.5" />
+                        {count === 0 ? "Sem bets" : `${count} bet — mín. 2`}
+                      </span>
+                    )}
+                  </div>
+                  {insufficient && (
+                    <p className="text-xs text-[var(--text-muted)] mt-0.5">
+                      Adicione pelo menos 2 casas de apostas no perfil antes de criar uma aposta.
+                    </p>
+                  )}
                 </button>
               )
             })}
