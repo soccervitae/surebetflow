@@ -84,10 +84,10 @@ export default function NovaApostaClient({ profiles, betCountMap }: Props) {
           </div>
           <div className="flex flex-col gap-2">
             <Link
-              href={`/perfis`}
+              href={`/perfis/${selectedProfileId}?tab=bets`}
               className="px-4 py-2.5 rounded-xl bg-[#1e3a8a] text-white text-sm font-semibold"
             >
-              Ir para Perfis e adicionar bets
+              Adicionar bets no perfil
             </Link>
             <button
               onClick={() => setSelectedProfileId(null)}

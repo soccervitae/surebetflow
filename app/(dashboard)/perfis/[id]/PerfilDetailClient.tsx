@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from "react"
 import Link from "next/link"
-import { useRouter } from "next/navigation"
+import { useRouter, useSearchParams } from "next/navigation"
 import { createClient } from "@/lib/supabase/client"
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
 import { Card, CardContent } from "@/components/ui/card"
@@ -352,7 +352,9 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
     setFinalizando(false)
   }
 
-  const [activeTab, setActiveTab] = useState("dashboard")
+  const searchParams = useSearchParams()
+  const initialTab = searchParams.get("tab") === "bets" ? "casas" : "dashboard"
+  const [activeTab, setActiveTab] = useState(initialTab)
   const TABS = ["dashboard", "casas", "financeiro"]
 
   function changeTab(v: string) {

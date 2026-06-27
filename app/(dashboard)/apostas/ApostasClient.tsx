@@ -526,37 +526,38 @@ export default function ApostasClient({ apostas: initialApostas, profiles, betCo
               const name = p.apelido || `${p.nome} ${p.sobrenome}`
               const count = betCountMap[p.id] ?? 0
               const insufficient = count < 2
+              if (insufficient) {
+                return (
+                  <div key={p.id} className="px-4 py-3 rounded-xl border border-[var(--border)] space-y-2">
+                    <div className="flex items-center justify-between">
+                      <span className="font-semibold text-[var(--text-primary)] text-sm opacity-60">{name}</span>
+                      <span className="text-xs text-amber-500 font-medium flex items-center gap-1">
+                        <AlertTriangle className="w-3.5 h-3.5" />
+                        {count === 0 ? "Sem bets" : `${count} bet — mín. 2`}
+                      </span>
+                    </div>
+                    <Link
+                      href={`/perfis/${p.id}?tab=bets`}
+                      onClick={() => setSelectProfileModal(false)}
+                      className="inline-flex items-center gap-1.5 text-xs text-[#4d82d6] hover:underline font-medium"
+                    >
+                      Adicionar bets neste perfil →
+                    </Link>
+                  </div>
+                )
+              }
               return (
                 <button
                   key={p.id}
                   onClick={() => {
-                    if (insufficient) return
                     setSelectedProfileId(p.id)
                     setSelectedProfileName(name)
                     setSelectProfileModal(false)
                     setNovaModal(true)
                   }}
-                  disabled={insufficient}
-                  className={`w-full text-left px-4 py-3 rounded-xl border transition-colors ${
-                    insufficient
-                      ? "border-[var(--border)] opacity-60 cursor-not-allowed"
-                      : "border-[var(--border)] hover:border-[#4d82d6] hover:bg-[#1e3a8a]/5"
-                  }`}
+                  className="w-full text-left px-4 py-3 rounded-xl border border-[var(--border)] hover:border-[#4d82d6] hover:bg-[#1e3a8a]/5 transition-colors"
                 >
-                  <div className="flex items-center justify-between">
-                    <span className="font-semibold text-[var(--text-primary)] text-sm">{name}</span>
-                    {insufficient && (
-                      <span className="text-xs text-amber-500 font-medium flex items-center gap-1">
-                        <AlertTriangle className="w-3.5 h-3.5" />
-                        {count === 0 ? "Sem bets" : `${count} bet — mín. 2`}
-                      </span>
-                    )}
-                  </div>
-                  {insufficient && (
-                    <p className="text-xs text-[var(--text-muted)] mt-0.5">
-                      Adicione pelo menos 2 casas de apostas no perfil antes de criar uma aposta.
-                    </p>
-                  )}
+                  <span className="font-semibold text-[var(--text-primary)] text-sm">{name}</span>
                 </button>
               )
             })}
