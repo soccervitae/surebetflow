@@ -8,12 +8,13 @@ import { useTheme } from "@/components/ThemeProvider"
 import {
   Home, Users, Wallet, CreditCard, Settings,
   LogOut, Bell, ChevronLeft, ChevronRight,
-  Circle, Sun, Moon, MessageCircle, BookOpen, ClipboardList
+  Circle, Sun, Moon, MessageCircle, BookOpen, ClipboardList, Lock
 } from "lucide-react"
 import Logo, { LogoIcon } from "@/components/Logo"
 import Image from "next/image"
 import { cn } from "@/lib/utils"
 import RealtimeProvider from "@/components/RealtimeProvider"
+import PlanoRequeridoModal from "@/components/PlanoRequeridoModal"
 
 const navItems = [
   { href: "/dashboard", icon: Home, label: "Dashboard" },
@@ -37,6 +38,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const [unread, setUnread] = useState(0)
   const [userId, setUserId] = useState("")
   const [planName, setPlanName] = useState<string | null>(null)
+  const [hasActivePlan, setHasActivePlan] = useState(true)
+  const [planoModal, setPlanoModal] = useState(false)
 
   useEffect(() => {
     const supabase = createClient()
@@ -64,9 +67,11 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         .select("plan, status")
         .eq("user_id", user.id)
         .single()
-      if (subData?.status === "active" || subData?.status === "trialing") {
+      const isActiveSub = subData?.status === "active" || subData?.status === "trialing"
+      setHasActivePlan(isActiveSub)
+      if (isActiveSub) {
         const names: Record<string, string> = { trader: "Trader", trader_pro: "Trader Pro", pro: "Pro" }
-        setPlanName(names[subData.plan ?? ""] ?? subData.plan)
+        setPlanName(names[subData!.plan ?? ""] ?? subData!.plan)
       }
 
       async function fetchUnread() {
@@ -84,9 +89,19 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         .on("postgres_changes", { event: "*", schema: "public", table: "ticket_mensagens" }, fetchUnread)
         .subscribe()
 
+      // Pages allowed without an active plan
+      const ALLOWED_WITHOUT_PLAN = ["/assinatura", "/configuracoes", "/suporte", "/tutorial", "/bem-vindo"]
+      const isAllowedWithoutPlan = ALLOWED_WITHOUT_PLAN.some(p => pathname.startsWith(p))
+
+      // Redirect brand new users (no subscription record) to /bem-vindo
+      if (!subData && !isAllowedWithoutPlan) {
+        router.push("/bem-vindo")
+        return
+      }
+
       // Redirect to onboarding if subscribed but no profiles yet
       const isActive = subData?.status === "active" || subData?.status === "trialing"
-      const isOnboardingExcluded = pathname.startsWith("/onboarding") || pathname.startsWith("/assinatura")
+      const isOnboardingExcluded = pathname.startsWith("/onboarding") || isAllowedWithoutPlan
       if (isActive && !isOnboardingExcluded) {
         const alreadyOnboarded = typeof window !== "undefined" && localStorage.getItem("onboarding_done") === "1"
         if (!alreadyOnboarded) {
@@ -101,14 +116,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             localStorage.setItem("onboarding_done", "1")
           }
         }
-      }
-
-      // Redirect brand new users (no subscription record) to /assinatura
-      const noSubscription = !subData
-      const allowedWithoutSub = pathname.startsWith("/assinatura") || pathname.startsWith("/configuracoes") || pathname.startsWith("/suporte")
-      if (noSubscription && !allowedWithoutSub) {
-        router.push("/assinatura")
-        return
       }
 
       setReady(true)
@@ -165,6 +172,32 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           {navItems.map(({ href, icon: Icon, label }) => {
             const active = pathname === href || (href !== "/" && pathname.startsWith(href))
             const isSuporteLink = href === "/suporte"
+            const ALLOWED_WITHOUT_PLAN_NAV = ["/tutorial", "/configuracoes", "/suporte", "/assinatura", "/bem-vindo"]
+            const isLocked = !hasActivePlan && !ALLOWED_WITHOUT_PLAN_NAV.some(p => href.startsWith(p))
+
+            if (isLocked) {
+              return (
+                <button
+                  key={href}
+                  onClick={() => setPlanoModal(true)}
+                  title={collapsed ? label : undefined}
+                  className={cn(
+                    "w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all",
+                    collapsed && "justify-center px-0",
+                    "text-white/30 hover:bg-white/5 hover:text-white/40 cursor-pointer"
+                  )}
+                >
+                  <span className="relative flex-shrink-0">
+                    <Icon className="w-4 h-4" />
+                    <span className="absolute -top-1 -right-1 w-3 h-3 rounded-full bg-[#1e3a8a]/80 flex items-center justify-center">
+                      <Lock className="w-1.5 h-1.5 text-white/60" />
+                    </span>
+                  </span>
+                  {!collapsed && <span className="flex-1 text-left">{label}</span>}
+                </button>
+              )
+            }
+
             return (
               <Link
                 key={href}
@@ -336,6 +369,25 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           { href: "/tutorial",   icon: BookOpen,      label: "Tutorial" },
         ] as { href: string; icon: React.ElementType; label: string }[]).map(({ href, icon: Icon, label }) => {
           const active = pathname === href || (href !== "/" && pathname.startsWith(href))
+          const ALLOWED_WITHOUT_PLAN_MOB = ["/tutorial", "/configuracoes", "/suporte", "/assinatura", "/bem-vindo"]
+          const isLockedMob = !hasActivePlan && !ALLOWED_WITHOUT_PLAN_MOB.some(p => href.startsWith(p))
+
+          if (isLockedMob) {
+            return (
+              <button
+                key={href}
+                onClick={() => setPlanoModal(true)}
+                className="flex-1 flex flex-col items-center py-2 text-xs gap-1 text-[var(--text-secondary)] opacity-40"
+              >
+                <span className="relative">
+                  <Icon className="w-5 h-5" />
+                  <Lock className="absolute -top-1 -right-1 w-2.5 h-2.5 text-[#1e3a8a]" />
+                </span>
+                <span>{label}</span>
+              </button>
+            )
+          }
+
           return (
             <Link
               key={href}
@@ -354,6 +406,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
       {/* Global realtime sync across devices */}
       {userId && <RealtimeProvider userId={userId} />}
+
+      {/* Modal de plano requerido */}
+      <PlanoRequeridoModal open={planoModal} onClose={() => setPlanoModal(false)} />
 
       {/* Logout confirmation dialog */}
       {confirmLogout && (

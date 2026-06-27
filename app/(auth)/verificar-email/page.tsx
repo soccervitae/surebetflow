@@ -60,7 +60,7 @@ function VerificarEmailContent() {
     const data = await res.json()
     if (data.ok) {
       setSuccess(true)
-      setTimeout(() => router.push("/assinatura"), 1500)
+      setTimeout(() => router.push("/bem-vindo"), 1500)
     } else {
       setError(data.error ?? "Código inválido")
       setCode(["", "", "", "", "", ""])
