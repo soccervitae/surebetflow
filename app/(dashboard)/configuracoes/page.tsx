@@ -96,6 +96,8 @@ export default function ConfiguracoesPage() {
   const [loggingOut, setLoggingOut] = useState(false)
   const [assinatura, setAssinatura] = useState<Assinatura | null>(null)
   const [loadingAssinatura, setLoadingAssinatura] = useState(false)
+  const [portalLoading, setPortalLoading] = useState(false)
+  const [migrateLoading, setMigrateLoading] = useState(false)
 
   const fileInputRef = useRef<HTMLInputElement>(null)
 
@@ -183,6 +185,32 @@ export default function ConfiguracoesPage() {
     setProfileSuccess("Perfil atualizado com sucesso!")
     setSavingProfile(false)
     setTimeout(() => setProfileSuccess(""), 3000)
+  }
+
+  const PLAN_INFO: Record<string, { name: string; price: string; maxProfiles: number }> = {
+    trader:     { name: "Trader",     price: "R$ 99,00/mês",  maxProfiles: 5  },
+    trader_pro: { name: "Trader Pro", price: "R$ 179,00/mês", maxProfiles: 20 },
+    pro:        { name: "Trader",     price: "R$ 99,00/mês",  maxProfiles: 5  },
+  }
+
+  async function openPortal() {
+    setPortalLoading(true)
+    const res = await fetch("/api/stripe/portal", { method: "POST" })
+    const data = await res.json()
+    if (data.url) window.location.href = data.url
+    else setPortalLoading(false)
+  }
+
+  async function migratePlan(targetPlan: string) {
+    setMigrateLoading(true)
+    const res = await fetch("/api/stripe/checkout", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ plan: targetPlan }),
+    })
+    const data = await res.json()
+    if (data.url) window.location.href = data.url
+    else setMigrateLoading(false)
   }
 
   async function handleChangePassword(e: React.FormEvent) {
@@ -426,128 +454,123 @@ export default function ConfiguracoesPage() {
           ) : (
             <>
               {/* Status card */}
-              <Card className={`border ${assinatura.status === "active" ? "border-green-500/30 bg-green-500/5" : "border-[var(--border)]"}`}>
-                <CardContent className="p-5">
-                  <div className="flex items-start justify-between gap-4">
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-xl bg-[#1e3a8a]/10 flex items-center justify-center flex-shrink-0">
-                        <Star className="h-5 w-5 text-[var(--accent-text)]" />
-                      </div>
-                      <div>
-                        <p className="font-bold text-[var(--text-primary)] capitalize">
-                          Plano {assinatura.plan}
-                        </p>
-                        <p className="text-xs text-[var(--text-muted)] mt-0.5">
-                          {assinatura.cancel_at_period_end
-                            ? "Cancelamento agendado ao final do período"
-                            : "Renovação automática ativa"}
-                        </p>
-                      </div>
-                    </div>
-                    <span className={`flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold flex-shrink-0 ${
-                      assinatura.status === "active"
-                        ? "bg-green-500/15 text-green-600"
-                        : assinatura.status === "trialing"
-                        ? "bg-blue-500/15 text-blue-600"
-                        : assinatura.status === "past_due"
-                        ? "bg-yellow-500/15 text-yellow-600"
-                        : "bg-red-500/15 text-red-600"
-                    }`}>
-                      {assinatura.status === "active" && <CheckCircle className="h-3 w-3" />}
-                      {assinatura.status === "canceled" && <XCircle className="h-3 w-3" />}
-                      {{
-                        active: "Ativa",
-                        trialing: "Trial",
-                        past_due: "Pagamento pendente",
-                        canceled: "Cancelada",
-                        incomplete: "Incompleta",
-                      }[assinatura.status] ?? assinatura.status}
-                    </span>
-                  </div>
-                </CardContent>
-              </Card>
+              {(() => {
+                const planInfo = PLAN_INFO[assinatura.plan ?? ""] ?? { name: assinatura.plan, price: "—", maxProfiles: 0 }
+                const isActive = assinatura.status === "active" || assinatura.status === "trialing"
+                const otherPlan = assinatura.plan === "trader_pro" ? "trader" : "trader_pro"
+                const otherPlanInfo = PLAN_INFO[otherPlan]
+                return (
+                  <>
+                    <Card className={`border ${isActive ? "border-[#1e3a8a]/40 bg-[#1e3a8a]/5" : "border-[var(--border)]"}`}>
+                      <CardContent className="p-5">
+                        <div className="flex items-start justify-between gap-4 mb-4">
+                          <div className="flex items-center gap-3">
+                            <div className="w-10 h-10 rounded-xl bg-[#1e3a8a]/10 flex items-center justify-center flex-shrink-0">
+                              <Star className="h-5 w-5 text-[var(--accent-text)]" />
+                            </div>
+                            <div>
+                              <p className="font-bold text-[var(--text-primary)]">{planInfo.name}</p>
+                              <p className="text-sm text-[var(--text-muted)]">{planInfo.price}</p>
+                            </div>
+                          </div>
+                          <span className={`flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold flex-shrink-0 ${
+                            assinatura.status === "active" ? "bg-green-500/15 text-green-600"
+                            : assinatura.status === "trialing" ? "bg-blue-500/15 text-blue-600"
+                            : assinatura.status === "past_due" ? "bg-yellow-500/15 text-yellow-600"
+                            : "bg-red-500/15 text-red-600"
+                          }`}>
+                            {assinatura.status === "active" && <CheckCircle className="h-3 w-3" />}
+                            {assinatura.status === "canceled" && <XCircle className="h-3 w-3" />}
+                            {{ active: "Ativa", trialing: "Trial", past_due: "Pagamento pendente", canceled: "Cancelada", incomplete: "Incompleta" }[assinatura.status] ?? assinatura.status}
+                          </span>
+                        </div>
 
-              {/* Details */}
-              <Card>
-                <CardHeader className="pb-3">
-                  <CardTitle className="text-base flex items-center gap-2">
-                    <CreditCard className="h-4 w-4" /> Detalhes da assinatura
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="divide-y divide-[var(--border)]">
-                  {[
-                    {
-                      icon: Star,
-                      label: "Plano",
-                      value: <span className="font-semibold capitalize">{assinatura.plan}</span>,
-                    },
-                    {
-                      icon: CheckCircle,
-                      label: "Status",
-                      value: (
-                        <span className={`font-medium ${
-                          assinatura.status === "active" ? "text-green-600"
-                          : assinatura.status === "past_due" ? "text-yellow-600"
-                          : "text-red-600"
-                        }`}>
-                          {{
-                            active: "Ativa",
-                            trialing: "Em avaliação",
-                            past_due: "Pagamento pendente",
-                            canceled: "Cancelada",
-                            incomplete: "Incompleta",
-                          }[assinatura.status] ?? assinatura.status}
-                        </span>
-                      ),
-                    },
-                    {
-                      icon: Calendar,
-                      label: assinatura.cancel_at_period_end ? "Expira em" : "Próxima cobrança",
-                      value: assinatura.current_period_end
-                        ? new Date(assinatura.current_period_end).toLocaleDateString("pt-BR", { day: "2-digit", month: "long", year: "numeric" })
-                        : "—",
-                    },
-                    {
-                      icon: RefreshCw,
-                      label: "Renovação automática",
-                      value: assinatura.cancel_at_period_end ? (
-                        <span className="text-red-500 font-medium">Desativada</span>
-                      ) : (
-                        <span className="text-green-600 font-medium">Ativada</span>
-                      ),
-                    },
-                    ...(assinatura.created_at ? [{
-                      icon: Clock,
-                      label: "Assinante desde",
-                      value: new Date(assinatura.created_at).toLocaleDateString("pt-BR", { day: "2-digit", month: "long", year: "numeric" }),
-                    }] : []),
-                  ].map(({ icon: Icon, label, value }) => (
-                    <div key={label} className="flex items-center justify-between py-3 first:pt-0 last:pb-0">
-                      <div className="flex items-center gap-2 text-sm text-[var(--text-secondary)]">
-                        <Icon className="h-3.5 w-3.5 flex-shrink-0" />
-                        {label}
-                      </div>
-                      <div className="text-sm text-[var(--text-primary)]">{value}</div>
-                    </div>
-                  ))}
-                </CardContent>
-              </Card>
+                        <div className="grid grid-cols-2 gap-2 text-xs text-[var(--text-secondary)] border-t border-[var(--border)] pt-4">
+                          <div className="flex items-center gap-1.5">
+                            <CheckCircle className="h-3.5 w-3.5 text-[#1e3a8a]" />
+                            Até {planInfo.maxProfiles} perfis
+                          </div>
+                          <div className="flex items-center gap-1.5">
+                            <CheckCircle className="h-3.5 w-3.5 text-[#1e3a8a]" />
+                            Casas ilimitadas
+                          </div>
+                          <div className="flex items-center gap-1.5">
+                            <CheckCircle className="h-3.5 w-3.5 text-[#1e3a8a]" />
+                            Calculadora 2-way e 3-way
+                          </div>
+                          <div className="flex items-center gap-1.5">
+                            <CheckCircle className="h-3.5 w-3.5 text-[#1e3a8a]" />
+                            Dashboard financeiro
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
 
-              <div className="flex gap-3">
-                <Link
-                  href="/assinatura"
-                  className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-[#1e3a8a] hover:bg-[#1e40af] text-white text-sm font-medium transition-colors"
-                >
-                  <CreditCard className="h-4 w-4" />
-                  Gerenciar assinatura
-                </Link>
-                <Link
-                  href="/suporte"
-                  className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl border border-[var(--border)] text-[var(--text-secondary)] hover:bg-[var(--bg-elevated)] text-sm font-medium transition-colors"
-                >
-                  Suporte
-                </Link>
-              </div>
+                    {/* Details */}
+                    <Card>
+                      <CardHeader className="pb-3">
+                        <CardTitle className="text-base flex items-center gap-2">
+                          <CreditCard className="h-4 w-4" /> Detalhes da assinatura
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent className="divide-y divide-[var(--border)]">
+                        {[
+                          { icon: Calendar, label: assinatura.cancel_at_period_end ? "Expira em" : "Próxima cobrança", value: assinatura.current_period_end ? new Date(assinatura.current_period_end).toLocaleDateString("pt-BR", { day: "2-digit", month: "long", year: "numeric" }) : "—" },
+                          { icon: RefreshCw, label: "Renovação automática", value: assinatura.cancel_at_period_end ? <span className="text-red-500 font-medium">Desativada</span> : <span className="text-green-600 font-medium">Ativada</span> },
+                          ...(assinatura.created_at ? [{ icon: Clock, label: "Assinante desde", value: new Date(assinatura.created_at).toLocaleDateString("pt-BR", { day: "2-digit", month: "long", year: "numeric" }) }] : []),
+                        ].map(({ icon: Icon, label, value }) => (
+                          <div key={label} className="flex items-center justify-between py-3 first:pt-0 last:pb-0">
+                            <div className="flex items-center gap-2 text-sm text-[var(--text-secondary)]">
+                              <Icon className="h-3.5 w-3.5 flex-shrink-0" />
+                              {label}
+                            </div>
+                            <div className="text-sm text-[var(--text-primary)]">{value}</div>
+                          </div>
+                        ))}
+                      </CardContent>
+                    </Card>
+
+                    {/* Actions */}
+                    {isActive && (
+                      <>
+                        <button
+                          onClick={openPortal}
+                          disabled={portalLoading}
+                          className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-[#1e3a8a] hover:bg-[#1e40af] disabled:opacity-60 text-white text-sm font-medium transition-colors"
+                        >
+                          {portalLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <RefreshCw className="h-4 w-4" />}
+                          {portalLoading ? "Abrindo portal..." : "Renovar / Gerenciar assinatura"}
+                        </button>
+
+                        {/* Migrate plan */}
+                        <Card>
+                          <CardHeader className="pb-3">
+                            <CardTitle className="text-base flex items-center gap-2">
+                              <ExternalLink className="h-4 w-4" /> Migrar de plano
+                            </CardTitle>
+                          </CardHeader>
+                          <CardContent>
+                            <div className="flex items-center justify-between gap-4 p-4 rounded-xl border border-[var(--border)] bg-[var(--bg-muted)]">
+                              <div>
+                                <p className="font-semibold text-[var(--text-primary)] text-sm">{otherPlanInfo.name}</p>
+                                <p className="text-xs text-[var(--text-muted)]">{otherPlanInfo.price} · até {otherPlanInfo.maxProfiles} perfis</p>
+                              </div>
+                              <button
+                                onClick={() => migratePlan(otherPlan)}
+                                disabled={migrateLoading}
+                                className="flex items-center gap-2 px-4 py-2 rounded-xl border border-[#1e3a8a] text-[#1e3a8a] hover:bg-[#1e3a8a]/10 disabled:opacity-60 text-sm font-medium transition-colors flex-shrink-0"
+                              >
+                                {migrateLoading ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : null}
+                                {assinatura.plan === "trader_pro" ? "Fazer downgrade" : "Fazer upgrade"}
+                              </button>
+                            </div>
+                          </CardContent>
+                        </Card>
+                      </>
+                    )}
+                  </>
+                )
+              })()}
             </>
           )}
         </>
