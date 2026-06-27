@@ -653,8 +653,8 @@ export default function SurebetCalculator({ profiles, defaultProfileId, profileN
               <p className="text-sm font-semibold text-[var(--text-primary)] mb-3">Aposta {i + 1}</p>
 
               {/* Mobile: stacked; Desktop: horizontal 4 cols */}
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
-                <div className="space-y-1.5 md:col-span-1">
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                <div className="space-y-1.5 col-span-2 md:col-span-1">
                   <Label className="text-xs">Casa de Apostas</Label>
                   <Select value={leg.profileBetId} onValueChange={v => updateLeg(i, "profileBetId", v)}>
                     <SelectTrigger>
@@ -674,7 +674,7 @@ export default function SurebetCalculator({ profiles, defaultProfileId, profileN
                   </Select>
                 </div>
 
-                <div className="space-y-1.5 md:col-span-1">
+                <div className="space-y-1.5 col-span-2 md:col-span-1">
                   <Label className="text-xs">Resultado Apostado</Label>
                   <Input
                     value={leg.resultadoApostado}
