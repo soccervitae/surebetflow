@@ -63,6 +63,16 @@ export const metadata: Metadata = {
       "Calcule surebets, gerencie perfis de apostador e acompanhe lucros garantidos com segurança total.",
     images: ["/og-image.png"],
   },
+  icons: {
+    icon: [
+      { url: "/favicon.ico", sizes: "any" },
+      { url: "/favicon.svg", type: "image/svg+xml" },
+      { url: "/icon.png", type: "image/png", sizes: "32x32" },
+    ],
+    apple: [
+      { url: "/apple-icon.png", type: "image/png", sizes: "180x180" },
+    ],
+  },
   alternates: {
     canonical: BASE_URL,
   },
