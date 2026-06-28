@@ -4,7 +4,7 @@ import Image from "next/image"
 import { useTheme } from "@/components/ThemeProvider"
 
 const LOGO_DARK  = "https://gkkuttabavwxjuibmrnr.supabase.co/storage/v1/object/public/logos/SUREBETFLOW%20LOGOSS%20DARK.png"
-const LOGO_LIGHT = "https://gkkuttabavwxjuibmrnr.supabase.co/storage/v1/object/public/logos/surebetflow-horizontal-vazada-navy%20(2).png"
+const LOGO_LIGHT = "https://gkkuttabavwxjuibmrnr.supabase.co/storage/v1/object/public/logos/SUREBETFLOW%20LOGOSS%20LIGHT.png"
 
 interface LogoProps {
   size?: "sm" | "md" | "lg"
