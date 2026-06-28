@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { CheckCircle, Clock, XCircle, AlertCircle, Users, DollarSign, Search, MoreVertical, RefreshCw } from "lucide-react"
+import { CheckCircle, Clock, XCircle, AlertCircle, Users, DollarSign, Search, MoreVertical, RefreshCw, Download } from "lucide-react"
 import { useRouter } from "next/navigation"
 
 type Sub = {
@@ -31,6 +31,24 @@ const STATUS_CONFIG: Record<string, { label: string; color: string; bg: string; 
   canceled:   { label: "Cancelada", color: "text-gray-400",   bg: "bg-gray-500/10",   icon: XCircle },
   incomplete: { label: "Pendente",  color: "text-yellow-400", bg: "bg-yellow-500/10", icon: Clock },
   inactive:   { label: "Inativa",   color: "text-gray-400",   bg: "bg-gray-500/10",   icon: XCircle },
+}
+
+function exportCSV(subs: Sub[], emailMap: Record<string, string>) {
+  const header = ["E-mail", "Status", "Plano", "Próx. cobrança", "Assinante desde", "ID MP"]
+  const lines = subs.map(s => [
+    `"${emailMap[s.user_id] ?? s.user_id}"`,
+    s.status,
+    s.plan ?? "",
+    s.current_period_end ? new Date(s.current_period_end).toLocaleDateString("pt-BR") : "",
+    new Date(s.created_at).toLocaleDateString("pt-BR"),
+    s.stripe_subscription_id ?? "",
+  ].join(","))
+  const csv = [header.join(","), ...lines].join("\n")
+  const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" })
+  const url = URL.createObjectURL(blob)
+  const a = document.createElement("a")
+  a.href = url; a.download = "assinaturas.csv"; a.click()
+  URL.revokeObjectURL(url)
 }
 
 export default function AssinaturasClient({ subs, emailMap, stats }: {
@@ -66,9 +84,18 @@ export default function AssinaturasClient({ subs, emailMap, stats }: {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-white">Assinaturas</h1>
-        <p className="text-gray-400 text-sm mt-1">Gerencie todos os assinantes da plataforma</p>
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-bold text-white">Assinaturas</h1>
+          <p className="text-gray-400 text-sm mt-1">Gerencie todos os assinantes da plataforma</p>
+        </div>
+        <button
+          onClick={() => exportCSV(filtered, emailMap)}
+          className="flex items-center gap-2 bg-gray-800 hover:bg-gray-700 border border-gray-700 text-white text-sm font-medium px-4 py-2 rounded-xl transition-colors"
+        >
+          <Download className="w-4 h-4" />
+          Exportar CSV
+        </button>
       </div>
 
       {/* Stats */}

@@ -17,12 +17,15 @@ export default async function AdminAssinaturasPage() {
     if (user) emailMap[uid] = user.email ?? uid
   }
 
+  const PLAN_PRICES: Record<string, number> = { trader: 99, trader_pro: 179, pro: 99 }
+  const activeSubs = subs?.filter(s => s.status === "active" || s.status === "trialing") ?? []
+
   const stats = {
-    total: subs?.length ?? 0,
-    active: subs?.filter(s => s.status === "active" || s.status === "trialing").length ?? 0,
-    canceled: subs?.filter(s => s.status === "canceled").length ?? 0,
+    total:      subs?.length ?? 0,
+    active:     activeSubs.length,
+    canceled:   subs?.filter(s => s.status === "canceled").length ?? 0,
     incomplete: subs?.filter(s => s.status === "incomplete" || s.status === "inactive").length ?? 0,
-    mrr: (subs?.filter(s => s.status === "active" || s.status === "trialing").length ?? 0) * 99,
+    mrr:        activeSubs.reduce((sum, s) => sum + (PLAN_PRICES[s.plan ?? ""] ?? 99), 0),
   }
 
   return <AssinaturasClient subs={subs ?? []} emailMap={emailMap} stats={stats} />
