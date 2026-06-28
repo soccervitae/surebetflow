@@ -43,7 +43,7 @@ export default async function LandingPage() {
       <nav className="sticky top-0 z-50 bg-[#0f172a]/90 backdrop-blur border-b border-white/5">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="https://gkkuttabavwxjuibmrnr.supabase.co/storage/v1/object/public/logos/surebetflow-horizontal-vazada-branca%20(1).png" alt="SurebetFlow" height={36} className="h-9 w-auto" />
+          <img src="https://gkkuttabavwxjuibmrnr.supabase.co/storage/v1/object/public/logos/SUREBETFLOW%20LOGOSS%20DARK.png" alt="SurebetFlow" height={36} className="h-9 w-auto" />
           <div className="hidden sm:flex items-center gap-3">
             <Link href="/login" className="text-sm font-medium text-gray-400 hover:text-white transition-colors">
               Entrar
@@ -516,7 +516,7 @@ export default async function LandingPage() {
             {/* Brand */}
             <div className="col-span-1 space-y-4">
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src="https://gkkuttabavwxjuibmrnr.supabase.co/storage/v1/object/public/logos/surebetflow-horizontal-vazada-branca%20(1).png" alt="SurebetFlow" className="h-8 w-auto" />
+              <img src="https://gkkuttabavwxjuibmrnr.supabase.co/storage/v1/object/public/logos/SUREBETFLOW%20LOGOSS%20DARK.png" alt="SurebetFlow" className="h-8 w-auto" />
               <p className="text-sm text-gray-500 leading-relaxed">A plataforma completa para apostadores de arbitragem esportiva.</p>
             </div>
             {/* Plataforma */}
@@ -571,7 +571,7 @@ export default async function LandingPage() {
         {/* Mobile footer */}
         <div className="md:hidden max-w-6xl mx-auto px-4 py-8 flex flex-col items-center gap-4 text-center">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="https://gkkuttabavwxjuibmrnr.supabase.co/storage/v1/object/public/logos/surebetflow-horizontal-vazada-branca%20(1).png" alt="SurebetFlow" className="h-8 w-auto" />
+          <img src="https://gkkuttabavwxjuibmrnr.supabase.co/storage/v1/object/public/logos/SUREBETFLOW%20LOGOSS%20DARK.png" alt="SurebetFlow" className="h-8 w-auto" />
           <div className="flex flex-wrap justify-center gap-4">
             <Link href="/privacidade" className="text-xs text-gray-500 hover:text-white transition-colors">Privacidade</Link>
             <Link href="/termos" className="text-xs text-gray-500 hover:text-white transition-colors">Termos de Uso</Link>

@@ -166,7 +166,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         )}>
           {collapsed
             ? <LogoIcon size="sm" />
-            : <Image src="https://gkkuttabavwxjuibmrnr.supabase.co/storage/v1/object/public/logos/surebetflow-horizontal-vazada-branca%20(1).png" alt="SurebetFlow" width={140} height={36} priority />
+            : <Image src="https://gkkuttabavwxjuibmrnr.supabase.co/storage/v1/object/public/logos/SUREBETFLOW%20LOGOSS%20DARK.png" alt="SurebetFlow" width={140} height={36} priority />
           }
         </div>
 
