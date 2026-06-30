@@ -21,13 +21,21 @@ type Movimentacao = {
 
 type Periodo = "hoje" | "semana" | "mes" | "ano" | "todos"
 
+function tipoConfig(tipo: string) {
+  switch (tipo) {
+    case "deposito": return { label: "Depósito", color: "text-[var(--accent-text)]", bg: "bg-[#1e3a8a]/10",    sign: "+", icon: <ArrowDownLeft className="h-5 w-5 text-[var(--accent-text)]" /> }
+    case "lucro":    return { label: "Lucro",    color: "text-green-500",             bg: "bg-green-500/10",    sign: "+", icon: <ArrowDownLeft className="h-5 w-5 text-green-500" /> }
+    case "perda":    return { label: "Perda",    color: "text-orange-500",            bg: "bg-orange-500/10",   sign: "-", icon: <ArrowUpRight  className="h-5 w-5 text-orange-500" /> }
+    case "bonus":    return { label: "Bônus",    color: "text-purple-500",            bg: "bg-purple-500/10",   sign: "+", icon: <ArrowDownLeft className="h-5 w-5 text-purple-500" /> }
+    default:         return { label: "Saque",    color: "text-[#DC2626]",             bg: "bg-[#DC2626]/10",    sign: "-", icon: <ArrowUpRight  className="h-5 w-5 text-[#DC2626]" /> }
+  }
+}
+
 function ExtratoList({ movimentacoes }: { movimentacoes: Movimentacao[] }) {
-  // Agrupa por data (dia)
   const groups = useMemo(() => {
     const map = new Map<string, Movimentacao[]>()
     for (const m of movimentacoes) {
-      const d = new Date(m.created_at)
-      const key = d.toISOString().slice(0, 10) // "2025-06-28"
+      const key = new Date(m.created_at).toISOString().slice(0, 10)
       if (!map.has(key)) map.set(key, [])
       map.get(key)!.push(m)
     }
@@ -35,11 +43,8 @@ function ExtratoList({ movimentacoes }: { movimentacoes: Movimentacao[] }) {
   }, [movimentacoes])
 
   function formatGroupDate(iso: string) {
-    const d = new Date(iso + "T12:00:00")
-    return d.toLocaleDateString("pt-BR", { day: "numeric", month: "short" })
-      .replace(".", "").replace(/^\d/, c => c.toUpperCase())
+    return new Date(iso + "T12:00:00").toLocaleDateString("pt-BR", { day: "numeric", month: "short" }).replace(".", "")
   }
-
   function formatHora(iso: string) {
     return new Date(iso).toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" })
   }
@@ -48,40 +53,27 @@ function ExtratoList({ movimentacoes }: { movimentacoes: Movimentacao[] }) {
     <div className="space-y-4">
       {groups.map(([dateKey, items]) => (
         <div key={dateKey}>
-          {/* Cabeçalho da data */}
-          <p className="text-xs font-semibold text-[var(--text-muted)] px-1 mb-2">
-            {formatGroupDate(dateKey)}
-          </p>
-
-          {/* Card do grupo */}
+          <p className="text-xs font-semibold text-[var(--text-muted)] px-1 mb-2">{formatGroupDate(dateKey)}</p>
           <Card>
             <CardContent className="p-0 divide-y divide-[var(--border)]">
               {items.map(m => {
+                const cfg        = tipoConfig(m.tipo)
                 const betNome    = m.profile_bet?.bet?.nome ?? "—"
                 const perfilNome = m.profile?.apelido || `${m.profile?.nome ?? ""} ${m.profile?.sobrenome ?? ""}`.trim()
-                const hora       = formatHora(m.created_at)
-                const isDeposito = m.tipo === "deposito"
                 return (
                   <div key={m.id} className="flex items-center gap-3 px-4 py-3.5">
-                    {/* Ícone */}
-                    <div className={`w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 ${isDeposito ? "bg-[#1e3a8a]/10" : "bg-[#DC2626]/10"}`}>
-                      {isDeposito
-                        ? <ArrowDownLeft className="h-5 w-5 text-[var(--accent-text)]" />
-                        : <ArrowUpRight  className="h-5 w-5 text-[#DC2626]" />
-                      }
+                    <div className={`w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 ${cfg.bg}`}>
+                      {cfg.icon}
                     </div>
-
-                    {/* Info */}
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-semibold text-[var(--text-primary)] truncate">{betNome}</p>
                       <p className="text-xs text-[var(--text-muted)] truncate">
-                        {perfilNome} · {hora} · {isDeposito ? "Depósito" : "Saque"}
+                        {perfilNome} · {formatHora(m.created_at)} · {cfg.label}
+                        {m.descricao ? ` · ${m.descricao}` : ""}
                       </p>
                     </div>
-
-                    {/* Valor */}
-                    <p className={`text-sm font-bold flex-shrink-0 ${isDeposito ? "text-[var(--accent-text)]" : "text-[#DC2626]"}`}>
-                      {isDeposito ? "+" : "-"}{formatCurrency(Number(m.valor))}
+                    <p className={`text-sm font-bold flex-shrink-0 ${cfg.color}`}>
+                      {cfg.sign}{formatCurrency(Number(m.valor))}
                     </p>
                   </div>
                 )
