@@ -316,17 +316,20 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             )}
           </div>
           <div className="flex items-center gap-2">
-            {/* Theme toggle */}
-            <button
-              onClick={toggle}
-              title={isDark ? "Modo claro" : "Modo escuro"}
-              className="w-8 h-8 flex items-center justify-center rounded-lg text-[var(--text-secondary)] hover:bg-[var(--bg-elevated)] hover:text-[var(--text-primary)] transition-colors"
-            >
-              {isDark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
-            </button>
-            <button className="w-8 h-8 flex items-center justify-center rounded-lg text-[var(--text-secondary)] hover:bg-[var(--bg-elevated)] hover:text-[var(--text-primary)] transition-colors">
-              <Bell className="w-4 h-4" />
-            </button>
+            {hasActivePlan && (
+              <>
+                <button
+                  onClick={toggle}
+                  title={isDark ? "Modo claro" : "Modo escuro"}
+                  className="w-8 h-8 flex items-center justify-center rounded-lg text-[var(--text-secondary)] hover:bg-[var(--bg-elevated)] hover:text-[var(--text-primary)] transition-colors"
+                >
+                  {isDark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+                </button>
+                <button className="w-8 h-8 flex items-center justify-center rounded-lg text-[var(--text-secondary)] hover:bg-[var(--bg-elevated)] hover:text-[var(--text-primary)] transition-colors">
+                  <Bell className="w-4 h-4" />
+                </button>
+              </>
+            )}
             <Link href="/configuracoes" className="w-8 h-8 bg-[#1e3a8a] rounded-full flex items-center justify-center text-white text-xs font-bold hover:opacity-80 transition-opacity">
               {userInitials}
             </Link>
@@ -343,32 +346,27 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       <header className="md:hidden fixed top-0 left-0 right-0 bg-[var(--bg-surface)] border-b border-[var(--border)] z-20 flex items-center justify-between px-4" style={{ paddingTop: "env(safe-area-inset-top)", height: "calc(56px + env(safe-area-inset-top))" }}>
         <Logo size="sm" />
         <div className="flex items-center gap-2">
-          <button
-            onClick={toggle}
-            title={isDark ? "Modo claro" : "Modo escuro"}
-            className="w-8 h-8 flex items-center justify-center rounded-lg text-[var(--text-secondary)]"
-          >
-            {isDark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
-          </button>
-          {hasActivePlan ? (
-            <Link
-              href="/suporte"
-              className="relative w-8 h-8 flex items-center justify-center rounded-lg text-[var(--text-secondary)]"
-            >
-              <Bell className="w-4 h-4" />
-              {unread > 0 && (
-                <span className="absolute top-1 right-1 min-w-[16px] h-4 px-0.5 flex items-center justify-center rounded-full bg-red-500 text-white text-[9px] font-bold leading-none">
-                  {unread > 99 ? "99+" : unread}
-                </span>
-              )}
-            </Link>
-          ) : (
-            <button
-              onClick={() => setPlanoModal(true)}
-              className="relative w-8 h-8 flex items-center justify-center rounded-lg text-[var(--text-secondary)]"
-            >
-              <Bell className="w-4 h-4" />
-            </button>
+          {hasActivePlan && (
+            <>
+              <button
+                onClick={toggle}
+                title={isDark ? "Modo claro" : "Modo escuro"}
+                className="w-8 h-8 flex items-center justify-center rounded-lg text-[var(--text-secondary)]"
+              >
+                {isDark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+              </button>
+              <Link
+                href="/suporte"
+                className="relative w-8 h-8 flex items-center justify-center rounded-lg text-[var(--text-secondary)]"
+              >
+                <Bell className="w-4 h-4" />
+                {unread > 0 && (
+                  <span className="absolute top-1 right-1 min-w-[16px] h-4 px-0.5 flex items-center justify-center rounded-full bg-red-500 text-white text-[9px] font-bold leading-none">
+                    {unread > 99 ? "99+" : unread}
+                  </span>
+                )}
+              </Link>
+            </>
           )}
           <Link href="/configuracoes" className="w-7 h-7 bg-[#1e3a8a] rounded-full flex items-center justify-center text-white text-xs font-bold">
             {userInitials}
