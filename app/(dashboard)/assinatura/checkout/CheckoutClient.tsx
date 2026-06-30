@@ -3,7 +3,7 @@
 import { useState } from "react"
 import { useSearchParams } from "next/navigation"
 import Link from "next/link"
-import { ArrowLeft, ShieldCheck, Lock, CheckCircle, Loader2, Star, Zap } from "lucide-react"
+import { ArrowLeft, ShieldCheck, Lock, CheckCircle, Loader2, Star, Zap, CreditCard, ExternalLink } from "lucide-react"
 
 const PLANS = {
   trader: {
@@ -12,6 +12,7 @@ const PLANS = {
     amount: 99,
     icon: Star,
     maxProfiles: 5,
+    hotmartUrl: process.env.NEXT_PUBLIC_HOTMART_URL_TRADER ?? "",
     features: [
       "Até 5 perfis de apostador",
       "Casas de apostas ilimitadas",
@@ -27,6 +28,7 @@ const PLANS = {
     amount: 179,
     icon: Zap,
     maxProfiles: 20,
+    hotmartUrl: process.env.NEXT_PUBLIC_HOTMART_URL_TRADER_PRO ?? "",
     features: [
       "Até 20 perfis de apostador",
       "Casas de apostas ilimitadas",
@@ -38,15 +40,18 @@ const PLANS = {
   },
 }
 
+type PaymentMethod = "hotmart" | "stripe"
+
 export default function CheckoutClient() {
   const searchParams = useSearchParams()
   const planKey = (searchParams.get("plan") ?? "trader") as keyof typeof PLANS
   const plan = PLANS[planKey] ?? PLANS.trader
 
+  const [method, setMethod] = useState<PaymentMethod>("hotmart")
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
 
-  async function handleCardCheckout() {
+  async function handleStripeCheckout() {
     setLoading(true)
     setError("")
     try {
@@ -85,27 +90,93 @@ export default function CheckoutClient() {
       <div className="grid md:grid-cols-5 gap-6">
         {/* Payment action */}
         <div className="md:col-span-3 space-y-4">
-          <div className="bg-[var(--bg-surface)] border border-[var(--border)] rounded-2xl p-6">
-            <div className="flex items-center gap-2 mb-5">
-              <Lock className="w-4 h-4 text-[var(--accent-text)]" />
-              <span className="text-sm font-medium text-[var(--text-primary)]">Pagamento seguro via Stripe</span>
-            </div>
-            <p className="text-sm text-[var(--text-secondary)] mb-6 leading-relaxed">
-              Você será redirecionado para a página de pagamento segura do Stripe, onde poderá pagar com cartão de crédito ou débito. Seus dados são protegidos com criptografia de ponta a ponta.
-            </p>
-            {error && (
-              <div className="mb-4 bg-red-500/10 border border-red-500/20 rounded-xl px-4 py-3 text-red-400 text-sm">{error}</div>
-            )}
+
+          {/* Seletor de método */}
+          <div className="flex gap-2 bg-[var(--bg-elevated)] rounded-xl p-1">
             <button
-              onClick={handleCardCheckout}
-              disabled={loading}
-              className="w-full py-3.5 rounded-xl bg-[#1e3a8a] hover:bg-[#1e40af] disabled:opacity-60 text-white font-semibold text-sm transition-colors flex items-center justify-center gap-2"
+              onClick={() => setMethod("hotmart")}
+              className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg text-sm font-medium transition-colors ${
+                method === "hotmart"
+                  ? "bg-[var(--bg-surface)] text-[var(--text-primary)] shadow-sm border border-[var(--border)]"
+                  : "text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
+              }`}
             >
-              {loading
-                ? <><Loader2 className="w-4 h-4 animate-spin" /> Redirecionando...</>
-                : <><Lock className="w-4 h-4" /> Assinar por {plan.price}/mês</>
-              }
+              <ExternalLink className="w-4 h-4" />
+              Hotmart
             </button>
+            <button
+              onClick={() => setMethod("stripe")}
+              className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg text-sm font-medium transition-colors ${
+                method === "stripe"
+                  ? "bg-[var(--bg-surface)] text-[var(--text-primary)] shadow-sm border border-[var(--border)]"
+                  : "text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
+              }`}
+            >
+              <CreditCard className="w-4 h-4" />
+              Cartão / Boleto
+            </button>
+          </div>
+
+          <div className="bg-[var(--bg-surface)] border border-[var(--border)] rounded-2xl p-6">
+
+            {/* Hotmart */}
+            {method === "hotmart" && (
+              <>
+                <div className="flex items-center gap-2 mb-5">
+                  <ExternalLink className="w-4 h-4 text-[var(--accent-text)]" />
+                  <span className="text-sm font-medium text-[var(--text-primary)]">Pagamento via Hotmart</span>
+                </div>
+                <p className="text-sm text-[var(--text-secondary)] mb-2 leading-relaxed">
+                  Você será redirecionado para a Hotmart, onde poderá pagar com <strong className="text-[var(--text-primary)]">Pix, cartão ou boleto</strong>.
+                </p>
+                <ul className="text-xs text-[var(--text-muted)] space-y-1 mb-6 list-disc list-inside">
+                  <li>Pix com confirmação instantânea</li>
+                  <li>Cartão de crédito em até 12x</li>
+                  <li>Boleto bancário com prazo de 3 dias</li>
+                </ul>
+                {plan.hotmartUrl ? (
+                  <a
+                    href={plan.hotmartUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-full py-3.5 rounded-xl bg-[#e74c3c] hover:bg-[#c0392b] text-white font-semibold text-sm transition-colors flex items-center justify-center gap-2"
+                  >
+                    <ExternalLink className="w-4 h-4" />
+                    Assinar via Hotmart — {plan.price}/mês
+                  </a>
+                ) : (
+                  <div className="text-center text-sm text-[var(--text-muted)] py-2">
+                    Link da Hotmart não configurado ainda.
+                  </div>
+                )}
+              </>
+            )}
+
+            {/* Stripe */}
+            {method === "stripe" && (
+              <>
+                <div className="flex items-center gap-2 mb-5">
+                  <Lock className="w-4 h-4 text-[var(--accent-text)]" />
+                  <span className="text-sm font-medium text-[var(--text-primary)]">Pagamento via Stripe</span>
+                </div>
+                <p className="text-sm text-[var(--text-secondary)] mb-6 leading-relaxed">
+                  Você será redirecionado para a página de pagamento segura do Stripe. Seus dados são protegidos com criptografia de ponta a ponta.
+                </p>
+                {error && (
+                  <div className="mb-4 bg-red-500/10 border border-red-500/20 rounded-xl px-4 py-3 text-red-400 text-sm">{error}</div>
+                )}
+                <button
+                  onClick={handleStripeCheckout}
+                  disabled={loading}
+                  className="w-full py-3.5 rounded-xl bg-[#1e3a8a] hover:bg-[#1e40af] disabled:opacity-60 text-white font-semibold text-sm transition-colors flex items-center justify-center gap-2"
+                >
+                  {loading
+                    ? <><Loader2 className="w-4 h-4 animate-spin" /> Redirecionando...</>
+                    : <><Lock className="w-4 h-4" /> Assinar por {plan.price}/mês</>
+                  }
+                </button>
+              </>
+            )}
           </div>
 
           <div className="flex items-center gap-2 text-xs text-[var(--text-muted)] px-1">
