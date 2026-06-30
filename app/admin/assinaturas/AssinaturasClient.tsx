@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { CheckCircle, Clock, XCircle, AlertCircle, Users, DollarSign, Search, MoreVertical, RefreshCw, Download } from "lucide-react"
+import { CheckCircle, Clock, XCircle, AlertCircle, Users, DollarSign, Search, MoreVertical, RefreshCw, Download, Gift, X, Loader2, Calendar } from "lucide-react"
 import { useRouter } from "next/navigation"
 
 type Sub = {
@@ -27,14 +27,27 @@ type Stats = {
 const STATUS_CONFIG: Record<string, { label: string; color: string; bg: string; icon: React.ElementType }> = {
   active:     { label: "Ativa",     color: "text-green-400",  bg: "bg-green-500/10",  icon: CheckCircle },
   trialing:   { label: "Trial",     color: "text-blue-400",   bg: "bg-blue-500/10",   icon: Clock },
+  courtesy:   { label: "Cortesia",  color: "text-purple-400", bg: "bg-purple-500/10", icon: Gift },
   past_due:   { label: "Vencida",   color: "text-red-400",    bg: "bg-red-500/10",    icon: AlertCircle },
   canceled:   { label: "Cancelada", color: "text-gray-400",   bg: "bg-gray-500/10",   icon: XCircle },
   incomplete: { label: "Pendente",  color: "text-yellow-400", bg: "bg-yellow-500/10", icon: Clock },
   inactive:   { label: "Inativa",   color: "text-gray-400",   bg: "bg-gray-500/10",   icon: XCircle },
 }
 
+const PRESETS = [
+  { label: "7 dias", days: 7 },
+  { label: "30 dias", days: 30 },
+  { label: "90 dias", days: 90 },
+]
+
+function addDays(d: number) {
+  const dt = new Date()
+  dt.setDate(dt.getDate() + d)
+  return dt.toISOString().slice(0, 10)
+}
+
 function exportCSV(subs: Sub[], emailMap: Record<string, string>) {
-  const header = ["E-mail", "Status", "Plano", "Próx. cobrança", "Assinante desde", "ID MP"]
+  const header = ["E-mail", "Status", "Plano", "Próx. cobrança", "Assinante desde", "ID Stripe"]
   const lines = subs.map(s => [
     `"${emailMap[s.user_id] ?? s.user_id}"`,
     s.status,
@@ -62,6 +75,18 @@ export default function AssinaturasClient({ subs, emailMap, stats }: {
   const [openMenu, setOpenMenu] = useState<string | null>(null)
   const router = useRouter()
 
+  // Courtesy modal state
+  const [courtesyModal, setCourtesyModal] = useState<{ userId: string; email: string } | null>(null)
+  const [selectedDays, setSelectedDays] = useState<number | null>(30)
+  const [customDate, setCustomDate] = useState("")
+  const [courtesyLoading, setCourtesyLoading] = useState(false)
+
+  // New courtesy by email
+  const [newCourtesyEmail, setNewCourtesyEmail] = useState("")
+  const [newCourtesyModal, setNewCourtesyModal] = useState(false)
+  const [newCourtesyLoading, setNewCourtesyLoading] = useState(false)
+  const [newCourtesyError, setNewCourtesyError] = useState("")
+
   const filtered = subs.filter(s => {
     const email = emailMap[s.user_id] ?? ""
     const matchSearch = email.toLowerCase().includes(search.toLowerCase()) ||
@@ -82,30 +107,93 @@ export default function AssinaturasClient({ subs, emailMap, stats }: {
     router.refresh()
   }
 
+  function openCourtesyModal(userId: string, email: string) {
+    setOpenMenu(null)
+    setSelectedDays(30)
+    setCustomDate("")
+    setCourtesyModal({ userId, email })
+  }
+
+  async function grantCourtesy(userId: string) {
+    const endsAt = selectedDays ? addDays(selectedDays) : customDate
+    if (!endsAt) return
+    setCourtesyLoading(true)
+    await fetch("/api/admin/courtesy", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ userId, action: "grant", endsAt }),
+    })
+    setCourtesyLoading(false)
+    setCourtesyModal(null)
+    router.refresh()
+  }
+
+  async function revokeCourtesy(userId: string) {
+    setActionLoading(userId)
+    setOpenMenu(null)
+    await fetch("/api/admin/courtesy", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ userId, action: "revoke" }),
+    })
+    setActionLoading(null)
+    router.refresh()
+  }
+
+  async function grantCourtesyByEmail() {
+    setNewCourtesyError("")
+    const endsAt = selectedDays ? addDays(selectedDays) : customDate
+    if (!endsAt || !newCourtesyEmail) return
+    setNewCourtesyLoading(true)
+    const res = await fetch("/api/admin/courtesy", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email: newCourtesyEmail, action: "grant", endsAt }),
+    })
+    const data = await res.json()
+    setNewCourtesyLoading(false)
+    if (data.error) {
+      setNewCourtesyError(data.error)
+    } else {
+      setNewCourtesyModal(false)
+      setNewCourtesyEmail("")
+      router.refresh()
+    }
+  }
+
   return (
     <div className="space-y-6">
-      <div className="flex items-start justify-between gap-4">
+      <div className="flex items-start justify-between gap-4 flex-wrap">
         <div>
           <h1 className="text-2xl font-bold text-white">Assinaturas</h1>
           <p className="text-gray-400 text-sm mt-1">Gerencie todos os assinantes da plataforma</p>
         </div>
-        <button
-          onClick={() => exportCSV(filtered, emailMap)}
-          className="flex items-center gap-2 bg-gray-800 hover:bg-gray-700 border border-gray-700 text-white text-sm font-medium px-4 py-2 rounded-xl transition-colors"
-        >
-          <Download className="w-4 h-4" />
-          Exportar CSV
-        </button>
+        <div className="flex gap-2">
+          <button
+            onClick={() => { setSelectedDays(30); setCustomDate(""); setNewCourtesyEmail(""); setNewCourtesyError(""); setNewCourtesyModal(true) }}
+            className="flex items-center gap-2 bg-purple-600/20 hover:bg-purple-600/30 border border-purple-500/30 text-purple-400 text-sm font-medium px-4 py-2 rounded-xl transition-colors"
+          >
+            <Gift className="w-4 h-4" />
+            Conceder cortesia
+          </button>
+          <button
+            onClick={() => exportCSV(filtered, emailMap)}
+            className="flex items-center gap-2 bg-gray-800 hover:bg-gray-700 border border-gray-700 text-white text-sm font-medium px-4 py-2 rounded-xl transition-colors"
+          >
+            <Download className="w-4 h-4" />
+            Exportar CSV
+          </button>
+        </div>
       </div>
 
       {/* Stats */}
       <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
         {[
-          { label: "Total",      value: stats.total,      color: "text-white",        icon: Users,      suffix: "" },
-          { label: "Ativas",     value: stats.active,     color: "text-green-400",    icon: CheckCircle,suffix: "" },
-          { label: "Canceladas", value: stats.canceled,   color: "text-gray-400",     icon: XCircle,    suffix: "" },
-          { label: "Pendentes",  value: stats.incomplete, color: "text-yellow-400",   icon: AlertCircle,suffix: "" },
-          { label: "MRR",        value: stats.mrr,        color: "text-[var(--accent-text)]",    icon: DollarSign, suffix: "" },
+          { label: "Total",      value: stats.total,      color: "text-white",        icon: Users,       },
+          { label: "Ativas",     value: stats.active,     color: "text-green-400",    icon: CheckCircle, },
+          { label: "Canceladas", value: stats.canceled,   color: "text-gray-400",     icon: XCircle,     },
+          { label: "Pendentes",  value: stats.incomplete, color: "text-yellow-400",   icon: AlertCircle, },
+          { label: "MRR",        value: stats.mrr,        color: "text-blue-400",     icon: DollarSign,  },
         ].map(s => {
           const Icon = s.icon
           return (
@@ -142,6 +230,7 @@ export default function AssinaturasClient({ subs, emailMap, stats }: {
           <option value="all">Todos os status</option>
           <option value="active">Ativas</option>
           <option value="trialing">Trial</option>
+          <option value="courtesy">Cortesia</option>
           <option value="past_due">Vencidas</option>
           <option value="canceled">Canceladas</option>
           <option value="incomplete">Pendentes</option>
@@ -158,16 +247,15 @@ export default function AssinaturasClient({ subs, emailMap, stats }: {
                 <th className="text-left text-xs font-medium text-gray-400 uppercase tracking-wider px-5 py-3">Usuário</th>
                 <th className="text-left text-xs font-medium text-gray-400 uppercase tracking-wider px-5 py-3">Status</th>
                 <th className="text-left text-xs font-medium text-gray-400 uppercase tracking-wider px-5 py-3">Plano</th>
-                <th className="text-left text-xs font-medium text-gray-400 uppercase tracking-wider px-5 py-3">Próx. cobrança</th>
-                <th className="text-left text-xs font-medium text-gray-400 uppercase tracking-wider px-5 py-3">Assinante desde</th>
-                <th className="text-left text-xs font-medium text-gray-400 uppercase tracking-wider px-5 py-3">ID MP</th>
+                <th className="text-left text-xs font-medium text-gray-400 uppercase tracking-wider px-5 py-3">Expira / Próx. cobrança</th>
+                <th className="text-left text-xs font-medium text-gray-400 uppercase tracking-wider px-5 py-3">Desde</th>
                 <th className="px-5 py-3" />
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-800">
               {filtered.length === 0 ? (
                 <tr>
-                  <td colSpan={7} className="text-center py-12 text-gray-500 text-sm">
+                  <td colSpan={6} className="text-center py-12 text-gray-500 text-sm">
                     Nenhuma assinatura encontrada
                   </td>
                 </tr>
@@ -175,6 +263,8 @@ export default function AssinaturasClient({ subs, emailMap, stats }: {
                 const st = STATUS_CONFIG[s.status] ?? STATUS_CONFIG.inactive
                 const StIcon = st.icon
                 const isActive = s.status === "active" || s.status === "trialing"
+                const isCourtesy = s.status === "courtesy"
+                const isExpired = isCourtesy && s.current_period_end && new Date(s.current_period_end) < new Date()
                 return (
                   <tr key={s.id} className="hover:bg-gray-800/40 transition-colors">
                     <td className="px-5 py-4">
@@ -185,16 +275,14 @@ export default function AssinaturasClient({ subs, emailMap, stats }: {
                         <StIcon className="w-3 h-3" />
                         {st.label}
                       </span>
-                      {s.cancel_at_period_end && (
-                        <span className="ml-2 text-xs text-red-400">cancela no fim</span>
-                      )}
+                      {isExpired && <span className="ml-2 text-xs text-red-400">expirada</span>}
+                      {s.cancel_at_period_end && <span className="ml-2 text-xs text-red-400">cancela no fim</span>}
                     </td>
                     <td className="px-5 py-4">
-                      <span className="text-sm text-white capitalize">{s.plan ?? "—"}</span>
-                      <p className="text-xs text-gray-500">R$ 99,00/mês</p>
+                      <span className="text-sm text-white capitalize">{s.plan?.replace("_", " ") ?? "—"}</span>
                     </td>
                     <td className="px-5 py-4">
-                      <span className="text-sm text-gray-300">
+                      <span className={`text-sm ${isExpired ? "text-red-400" : "text-gray-300"}`}>
                         {s.current_period_end
                           ? new Date(s.current_period_end).toLocaleDateString("pt-BR")
                           : "—"}
@@ -203,13 +291,6 @@ export default function AssinaturasClient({ subs, emailMap, stats }: {
                     <td className="px-5 py-4">
                       <span className="text-sm text-gray-300">
                         {new Date(s.created_at).toLocaleDateString("pt-BR")}
-                      </span>
-                    </td>
-                    <td className="px-5 py-4">
-                      <span className="text-xs text-gray-500 font-mono">
-                        {s.stripe_subscription_id
-                          ? s.stripe_subscription_id.slice(0, 16) + "..."
-                          : "—"}
                       </span>
                     </td>
                     <td className="px-5 py-4 relative">
@@ -223,24 +304,44 @@ export default function AssinaturasClient({ subs, emailMap, stats }: {
                         }
                       </button>
                       {openMenu === s.id && (
-                        <div className="absolute right-4 top-10 z-10 bg-gray-800 border border-gray-700 rounded-xl shadow-xl overflow-hidden w-44">
-                          {!isActive && (
-                            <button
-                              onClick={() => handleAction(s.user_id, "activate")}
-                              className="w-full text-left px-4 py-2.5 text-sm text-green-400 hover:bg-gray-700 transition-colors"
-                            >
-                              Ativar acesso
-                            </button>
-                          )}
-                          {isActive && (
-                            <button
-                              onClick={() => handleAction(s.user_id, "cancel")}
-                              className="w-full text-left px-4 py-2.5 text-sm text-red-400 hover:bg-gray-700 transition-colors"
-                            >
-                              Cancelar acesso
-                            </button>
-                          )}
-                        </div>
+                        <>
+                          <div className="fixed inset-0 z-10" onClick={() => setOpenMenu(null)} />
+                          <div className="absolute right-4 top-10 z-20 bg-gray-800 border border-gray-700 rounded-xl shadow-xl overflow-hidden w-48">
+                            {!isActive && !isCourtesy && (
+                              <button
+                                onClick={() => handleAction(s.user_id, "activate")}
+                                className="w-full text-left px-4 py-2.5 text-sm text-green-400 hover:bg-gray-700 transition-colors"
+                              >
+                                Ativar acesso
+                              </button>
+                            )}
+                            {!isCourtesy && (
+                              <button
+                                onClick={() => openCourtesyModal(s.user_id, emailMap[s.user_id] ?? s.user_id)}
+                                className="w-full text-left px-4 py-2.5 text-sm text-purple-400 hover:bg-gray-700 transition-colors flex items-center gap-2"
+                              >
+                                <Gift className="w-3.5 h-3.5" />
+                                Conceder cortesia
+                              </button>
+                            )}
+                            {isCourtesy && (
+                              <button
+                                onClick={() => revokeCourtesy(s.user_id)}
+                                className="w-full text-left px-4 py-2.5 text-sm text-red-400 hover:bg-gray-700 transition-colors"
+                              >
+                                Revogar cortesia
+                              </button>
+                            )}
+                            {isActive && (
+                              <button
+                                onClick={() => handleAction(s.user_id, "cancel")}
+                                className="w-full text-left px-4 py-2.5 text-sm text-red-400 hover:bg-gray-700 transition-colors"
+                              >
+                                Cancelar acesso
+                              </button>
+                            )}
+                          </div>
+                        </>
                       )}
                     </td>
                   </tr>
@@ -255,6 +356,120 @@ export default function AssinaturasClient({ subs, emailMap, stats }: {
             {filtered.length} assinatura{filtered.length !== 1 ? "s" : ""} encontrada{filtered.length !== 1 ? "s" : ""}
           </div>
         )}
+      </div>
+
+      {/* Modal cortesia (usuário já na lista) */}
+      {courtesyModal && (
+        <CourtesyModal
+          title={`Cortesia para ${courtesyModal.email}`}
+          selectedDays={selectedDays}
+          setSelectedDays={setSelectedDays}
+          customDate={customDate}
+          setCustomDate={setCustomDate}
+          loading={courtesyLoading}
+          onClose={() => setCourtesyModal(null)}
+          onConfirm={() => grantCourtesy(courtesyModal.userId)}
+        />
+      )}
+
+      {/* Modal cortesia (novo usuário por email) */}
+      {newCourtesyModal && (
+        <CourtesyModal
+          title="Conceder acesso cortesia"
+          selectedDays={selectedDays}
+          setSelectedDays={setSelectedDays}
+          customDate={customDate}
+          setCustomDate={setCustomDate}
+          loading={newCourtesyLoading}
+          onClose={() => setNewCourtesyModal(false)}
+          onConfirm={grantCourtesyByEmail}
+          error={newCourtesyError}
+        >
+          <div className="mb-4">
+            <label className="text-xs text-gray-500 mb-1.5 block">E-mail do usuário</label>
+            <input
+              type="email"
+              value={newCourtesyEmail}
+              onChange={e => setNewCourtesyEmail(e.target.value)}
+              placeholder="usuario@email.com"
+              className="w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-2.5 text-white text-sm focus:outline-none focus:border-purple-500/50"
+            />
+          </div>
+        </CourtesyModal>
+      )}
+    </div>
+  )
+}
+
+function CourtesyModal({ title, selectedDays, setSelectedDays, customDate, setCustomDate, loading, onClose, onConfirm, error, children }: {
+  title: string
+  selectedDays: number | null
+  setSelectedDays: (d: number | null) => void
+  customDate: string
+  setCustomDate: (d: string) => void
+  loading: boolean
+  onClose: () => void
+  onConfirm: () => void
+  error?: string
+  children?: React.ReactNode
+}) {
+  return (
+    <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+      <div className="bg-gray-900 border border-gray-700 rounded-2xl p-6 w-full max-w-sm shadow-xl">
+        <div className="flex items-center justify-between mb-5">
+          <div className="flex items-center gap-2">
+            <Gift className="w-5 h-5 text-purple-400" />
+            <h2 className="text-white font-semibold">{title}</h2>
+          </div>
+          <button onClick={onClose} className="text-gray-400 hover:text-white">
+            <X className="w-5 h-5" />
+          </button>
+        </div>
+
+        {children}
+
+        <p className="text-gray-400 text-sm mb-4">Por quanto tempo?</p>
+        <div className="flex gap-2 mb-4">
+          {PRESETS.map(p => (
+            <button
+              key={p.days}
+              onClick={() => { setSelectedDays(p.days); setCustomDate("") }}
+              className={`flex-1 py-2 rounded-xl text-sm font-semibold border transition-colors ${
+                selectedDays === p.days
+                  ? "bg-purple-600 border-purple-600 text-white"
+                  : "border-gray-700 text-gray-400 hover:border-gray-500 hover:text-white"
+              }`}
+            >
+              {p.label}
+            </button>
+          ))}
+        </div>
+        <div className="mb-5">
+          <label className="text-xs text-gray-500 mb-1.5 block flex items-center gap-1">
+            <Calendar className="w-3 h-3" /> Ou data específica
+          </label>
+          <input
+            type="date"
+            value={customDate}
+            min={new Date().toISOString().slice(0, 10)}
+            onChange={e => { setCustomDate(e.target.value); setSelectedDays(null) }}
+            className="w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-2.5 text-white text-sm focus:outline-none focus:border-purple-500/50"
+          />
+        </div>
+        {error && <p className="text-red-400 text-xs mb-4">{error}</p>}
+        <div className="flex gap-3">
+          <button onClick={onClose} className="flex-1 py-2.5 rounded-xl border border-gray-700 text-gray-400 hover:text-white text-sm font-medium transition-colors">
+            Cancelar
+          </button>
+          <button
+            onClick={onConfirm}
+            disabled={loading || (!selectedDays && !customDate)}
+            className="flex-1 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-700 disabled:opacity-50 text-white text-sm font-semibold transition-colors flex items-center justify-center gap-2"
+          >
+            {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Gift className="w-4 h-4" />}
+            Confirmar
+          </button>
+        </div>
       </div>
     </div>
   )
