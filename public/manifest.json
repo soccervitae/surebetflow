@@ -1,7 +1,7 @@
 {
   "name": "SurebetFlow",
   "short_name": "SurebetFlow",
-  "description": "Calculadora e gerenciador de surebet para apostadores profissionais",
+  "description": "Sistema de gestão para apostadores de arbitragem esportiva",
   "start_url": "/login",
   "scope": "/",
   "display": "standalone",
