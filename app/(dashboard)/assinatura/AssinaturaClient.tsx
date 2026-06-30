@@ -172,7 +172,12 @@ export default function AssinaturaClient({ subscription }: { subscription: Subsc
       {!isActive && (
         <div className="grid sm:grid-cols-2 gap-4">
           {PLANS.map(plan => (
-            <div key={plan.key} className="bg-[var(--bg-surface)] border border-[var(--border)] rounded-2xl p-6 flex flex-col">
+            <div key={plan.key} className="bg-[var(--bg-surface)] border border-[var(--border)] rounded-2xl p-6 flex flex-col relative">
+              {plan.key === "trader_pro" && (
+                <span className="absolute -top-3 left-1/2 -translate-x-1/2 text-[10px] font-bold uppercase tracking-wider bg-[#1e3a8a] text-white px-3 py-1 rounded-full">
+                  Mais popular
+                </span>
+              )}
               <div className="flex items-center gap-2 mb-3">
                 <plan.icon className="w-5 h-5 text-[var(--accent-text)]" />
                 <span className="text-lg font-bold text-[var(--text-primary)]">{plan.name}</span>
@@ -192,7 +197,7 @@ export default function AssinaturaClient({ subscription }: { subscription: Subsc
                 href={`/assinatura/checkout?plan=${plan.key}`}
                 className="block w-full py-3 rounded-xl text-sm font-semibold bg-[#1e3a8a] hover:bg-[#1e40af] text-white transition-colors text-center"
               >
-                Assinar por {plan.price}/mês
+                Assinar {plan.name} →
               </Link>
             </div>
           ))}
