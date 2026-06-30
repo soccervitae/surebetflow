@@ -352,7 +352,7 @@ export default async function LandingPage() {
             </div>
           </div>
           <div className="text-center">
-            <Link href="/cadastro" className="inline-flex items-center gap-2 bg-purple-600 hover:bg-purple-700 text-white font-semibold px-8 py-3.5 rounded-xl transition-colors">
+            <Link href="/cadastro" className="inline-flex items-center gap-2 bg-[#1e3a8a] hover:bg-[#1e40af] text-white font-semibold px-8 py-3.5 rounded-xl transition-colors">
               Criar minha conta <ArrowRight className="w-4 h-4" />
             </Link>
           </div>
