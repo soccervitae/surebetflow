@@ -258,13 +258,30 @@ export default function ApostasClient({ apostas: initialApostas, profiles, betCo
         </div>
       </div>
 
-      {/* Filters — always visible (mobile + desktop) */}
+      {/* Filters */}
       <Card>
         <CardContent className="p-4 space-y-4">
-          <div className="hidden md:flex items-center gap-2">
-            <Filter className="h-4 w-4 text-[var(--text-secondary)]" />
-            <span className="text-sm font-medium text-[var(--text-primary)]">Filtros</span>
+          <div className="flex items-center justify-between">
+            <button
+              onClick={() => setShowFilter(v => !v)}
+              className="flex items-center gap-2 text-sm font-medium text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors"
+            >
+              <Filter className="h-4 w-4" />
+              Filtrar
+              <ChevronDown className={`h-3.5 w-3.5 transition-transform ${showFilter ? "rotate-180" : ""}`} />
+            </button>
+            {(filterStatus !== "todos" || filterProfile !== "todos" || filterPeriod !== "todos" || filterEsporte || filterCompeticao) && (
+              <button
+                onClick={() => { setFilterStatus("todos"); setFilterProfile("todos"); setFilterPeriod("todos"); setFilterCustomDate(""); setFilterCustomFrom(""); setFilterCustomTo(""); setFilterEsporte(""); setFilterCompeticao("") }}
+                className="text-xs text-[var(--text-secondary)] hover:text-[var(--text-primary)] flex items-center gap-1 transition-colors"
+              >
+                <X className="h-3 w-3" />
+                Limpar
+              </button>
+            )}
           </div>
+
+          {showFilter && <>
 
           {/* Status + Perfil */}
           <div className="grid grid-cols-2 gap-3">
@@ -420,15 +437,7 @@ export default function ApostasClient({ apostas: initialApostas, profiles, betCo
             )}
           </div>
 
-          {(filterStatus !== "todos" || filterProfile !== "todos" || filterPeriod !== "todos" || filterEsporte || filterCompeticao) && (
-            <button
-              onClick={() => { setFilterStatus("todos"); setFilterProfile("todos"); setFilterPeriod("todos"); setFilterCustomDate(""); setFilterCustomFrom(""); setFilterCustomTo(""); setFilterEsporte(""); setFilterCompeticao("") }}
-              className="text-xs text-[var(--text-secondary)] hover:text-[var(--text-primary)] flex items-center gap-1 transition-colors"
-            >
-              <X className="h-3 w-3" />
-              Limpar filtros
-            </button>
-          )}
+          </>}
         </CardContent>
       </Card>
 
