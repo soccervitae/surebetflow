@@ -1004,80 +1004,97 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
             )
           })()}
 
-          {/* List */}
+          {/* Extrato estilo bancário */}
           {!movLoaded ? (
             <Card><CardContent className="py-8 text-center text-[var(--text-secondary)] text-sm">Carregando...</CardContent></Card>
           ) : (finFiltered.length === 0 && bonusFiltered.length === 0) ? (
             <Card><CardContent className="py-8 text-center text-[var(--text-secondary)] text-sm">Nenhuma movimentação encontrada</CardContent></Card>
-          ) : (
-            <div className="space-y-2">
-              {/* Bonus entries */}
-              {bonusFiltered.map(b => {
-                const betNome = profileBetsFinanceiro.find(pb => pb.id === b.profile_bet_id)?.bet?.nome
-                return (
-                  <Card key={`bonus-${b.id}`}>
-                    <CardContent className="p-4">
-                      <div className="flex items-center gap-3">
-                        <div className="p-2 rounded-lg bg-purple-500/10">
-                          <Gift className="h-4 w-4 text-purple-500" />
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          {betNome && <p className="text-xs font-semibold text-[var(--accent-text)] mb-0.5">{betNome}</p>}
-                          <p className="text-sm font-medium text-[var(--text-primary)]">Bônus</p>
-                          {b.descricao && <p className="text-xs text-[var(--text-muted)] truncate">{b.descricao}</p>}
-                          <p className="text-xs text-[var(--text-secondary)]">{new Date(b.created_at).toLocaleDateString("pt-BR")}</p>
-                        </div>
-                        <p className="text-sm font-bold text-purple-500">+{formatCurrency(b.valor)}</p>
-                      </div>
-                    </CardContent>
-                  </Card>
-                )
-              })}
-              {/* Movimentações regulares */}
-              {finFiltered.map(m => (
-                <Card key={m.id}>
-                  <CardContent className="p-4">
-                    <div className="flex items-center gap-3">
-                      <div className={`p-2 rounded-lg ${
-                        m.tipo === "deposito" ? "bg-[#1e3a8a]/10"
-                        : m.tipo === "lucro" ? "bg-green-500/10"
-                        : m.tipo === "perda" ? "bg-orange-500/10"
-                        : "bg-[#DC2626]/10"
-                      }`}>
-                        {m.tipo === "deposito"
-                          ? <ArrowDownCircle className="h-4 w-4 text-[var(--accent-text)]" />
-                          : m.tipo === "lucro"
-                          ? <TrendingUp className="h-4 w-4 text-green-500" />
-                          : m.tipo === "perda"
-                          ? <ArrowDownLeft className="h-4 w-4 text-orange-500" />
-                          : <ArrowUpCircle className="h-4 w-4 text-[#DC2626]" />}
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        {(m.profile_bet as MovimentacaoFinanceira["profile_bet"])?.bet?.nome && (
-                          <p className="text-xs font-semibold text-[var(--accent-text)] mb-0.5">
-                            {(m.profile_bet as MovimentacaoFinanceira["profile_bet"])?.bet?.nome}
-                          </p>
-                        )}
-                        <p className="text-sm font-medium text-[var(--text-primary)]">
-                          {m.tipo === "deposito" ? "Depósito" : m.tipo === "lucro" ? "Lucro externo" : m.tipo === "perda" ? "Perda" : "Saque"}
-                        </p>
-                        {m.descricao && <p className="text-xs text-[var(--text-muted)] truncate">{m.descricao}</p>}
-                        <p className="text-xs text-[var(--text-secondary)]">{new Date(m.created_at).toLocaleDateString("pt-BR")}</p>
-                      </div>
-                      <p className={`text-sm font-bold ${
-                        m.tipo === "saque" ? "text-[#DC2626]"
-                        : m.tipo === "perda" ? "text-orange-500"
-                        : m.tipo === "lucro" ? "text-green-500"
-                        : "text-[var(--accent-text)]"
-                      }`}>
-                        {m.tipo === "saque" || m.tipo === "perda" ? "-" : "+"}{formatCurrency(m.valor)}
-                      </p>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          )}
+          ) : (() => {
+            // Junta movimentações + bônus e agrupa por data
+            type Item = { id: string; created_at: string; isBonus: boolean; tipo: string; valor: number; betNome?: string; descricao?: string | null }
+            const allItems: Item[] = [
+              ...finFiltered.map(m => ({
+                id: m.id,
+                created_at: m.created_at,
+                isBonus: false,
+                tipo: m.tipo,
+                valor: m.valor,
+                betNome: (m.profile_bet as MovimentacaoFinanceira["profile_bet"])?.bet?.nome,
+                descricao: m.descricao,
+              })),
+              ...bonusFiltered.map(b => ({
+                id: `bonus-${b.id}`,
+                created_at: b.created_at,
+                isBonus: true,
+                tipo: "bonus",
+                valor: b.valor,
+                betNome: profileBetsFinanceiro.find(pb => pb.id === b.profile_bet_id)?.bet?.nome,
+                descricao: b.descricao,
+              })),
+            ].sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+
+            const groupMap = new Map<string, Item[]>()
+            for (const item of allItems) {
+              const key = item.created_at.slice(0, 10)
+              if (!groupMap.has(key)) groupMap.set(key, [])
+              groupMap.get(key)!.push(item)
+            }
+            const groups = Array.from(groupMap.entries()).sort((a, b) => b[0].localeCompare(a[0]))
+
+            function formatGroupDate(iso: string) {
+              return new Date(iso + "T12:00:00").toLocaleDateString("pt-BR", { day: "numeric", month: "short" }).replace(".", "")
+            }
+            function formatHora(iso: string) {
+              return new Date(iso).toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" })
+            }
+            function tipoLabel(tipo: string) {
+              return tipo === "deposito" ? "Depósito" : tipo === "saque" ? "Saque" : tipo === "lucro" ? "Lucro" : tipo === "perda" ? "Perda" : "Bônus"
+            }
+            function tipoColor(tipo: string) {
+              return tipo === "saque" ? "text-[#DC2626]" : tipo === "perda" ? "text-orange-500" : tipo === "lucro" ? "text-green-500" : tipo === "bonus" ? "text-purple-500" : "text-[var(--accent-text)]"
+            }
+            function tipoBg(tipo: string) {
+              return tipo === "saque" ? "bg-[#DC2626]/10" : tipo === "perda" ? "bg-orange-500/10" : tipo === "lucro" ? "bg-green-500/10" : tipo === "bonus" ? "bg-purple-500/10" : "bg-[#1e3a8a]/10"
+            }
+            function tipoIcon(tipo: string) {
+              if (tipo === "deposito") return <ArrowDownCircle className="h-5 w-5 text-[var(--accent-text)]" />
+              if (tipo === "lucro")    return <TrendingUp      className="h-5 w-5 text-green-500" />
+              if (tipo === "perda")   return <ArrowDownLeft    className="h-5 w-5 text-orange-500" />
+              if (tipo === "bonus")   return <Gift             className="h-5 w-5 text-purple-500" />
+              return                         <ArrowUpCircle    className="h-5 w-5 text-[#DC2626]" />
+            }
+
+            return (
+              <div className="space-y-4">
+                {groups.map(([dateKey, items]) => (
+                  <div key={dateKey}>
+                    <p className="text-xs font-semibold text-[var(--text-muted)] px-1 mb-2">{formatGroupDate(dateKey)}</p>
+                    <Card>
+                      <CardContent className="p-0 divide-y divide-[var(--border)]">
+                        {items.map(item => (
+                          <div key={item.id} className="flex items-center gap-3 px-4 py-3.5">
+                            <div className={`w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 ${tipoBg(item.tipo)}`}>
+                              {tipoIcon(item.tipo)}
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <p className="text-sm font-semibold text-[var(--text-primary)] truncate">{item.betNome ?? "—"}</p>
+                              <p className="text-xs text-[var(--text-muted)] truncate">
+                                {tipoLabel(item.tipo)} · {formatHora(item.created_at)}{item.descricao ? ` · ${item.descricao}` : ""}
+                              </p>
+                            </div>
+                            <p className={`text-sm font-bold flex-shrink-0 ${tipoColor(item.tipo)}`}>
+                              {item.tipo === "saque" || item.tipo === "perda" ? "-" : "+"}{formatCurrency(item.valor)}
+                            </p>
+                          </div>
+                        ))}
+                      </CardContent>
+                    </Card>
+                  </div>
+                ))}
+                <p className="text-xs text-[var(--text-muted)] text-center pb-2">{allItems.length} movimentaç{allItems.length !== 1 ? "ões" : "ão"}</p>
+              </div>
+            )
+          })()}
         </TabsContent>
 
         </div> {/* end swipe wrapper */}
