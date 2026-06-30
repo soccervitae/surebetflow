@@ -17,13 +17,9 @@ import AddBetToProfile from "@/components/AddBetToProfile"
 import { formatCurrency } from "@/lib/utils"
 import { useToast } from "@/hooks/useToast"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { DollarSign, TrendingUp, Clock, ArrowUpRight, Pencil, Calculator, ArrowDownCircle, ArrowUpCircle, Gift, ArrowDownLeft, Wallet, SlidersHorizontal, X } from "lucide-react"
+import { DollarSign, TrendingUp, Clock, ArrowUpRight, Pencil, Calculator, Gift, ArrowDownLeft, Wallet, SlidersHorizontal, X } from "lucide-react"
 import SurebetCalculator from "@/components/SurebetCalculator"
 import type { Profile, ProfileDashboard, Aposta, MovimentacaoFinanceira, ProfileBet } from "@/lib/types"
-import {
-  LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip,
-  ResponsiveContainer, ReferenceLine
-} from "recharts"
 
 interface Props {
   profile: Profile
@@ -57,7 +53,7 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
   const [movimentacoes, setMovimentacoes] = useState<MovimentacaoFinanceira[]>([])
   const [movLoaded, setMovLoaded] = useState(false)
   const [profileBetsFinanceiro, setProfileBetsFinanceiro] = useState<(ProfileBet & { bet?: { id: string; nome: string } })[]>([])
-  const [finPeriodo, setFinPeriodo] = useState<"hoje" | "semana" | "mes" | "todos">("mes")
+  const [finPeriodo, setFinPeriodo] = useState<"hoje" | "semana" | "mes" | "ano" | "todos">("mes")
   const [finTipo, setFinTipo] = useState<"todos" | "deposito" | "saque" | "bonus" | "lucro" | "perda">("todos")
   const [finCasa, setFinCasa] = useState("todos")
   const [bonusEntries, setBonusEntries] = useState<{ id: string; profile_bet_id: string | null; valor: number; descricao: string | null; created_at: string; _tipo: "bonus" }[]>([])
@@ -197,6 +193,8 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
       if (date < semanaAtras) return false
     } else if (finPeriodo === "mes") {
       if (date.getMonth() !== nowFin.getMonth() || date.getFullYear() !== nowFin.getFullYear()) return false
+    } else if (finPeriodo === "ano") {
+      if (date.getFullYear() !== nowFin.getFullYear()) return false
     }
     if (finTipo !== "todos" && m.tipo !== finTipo) return false
     if (finCasa !== "todos" && m.profile_bet_id !== finCasa) return false
@@ -209,6 +207,7 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
     if (finPeriodo === "hoje") { if (date.toDateString() !== nowFin.toDateString()) return false }
     else if (finPeriodo === "semana") { const s = new Date(nowFin); s.setDate(nowFin.getDate() - 7); if (date < s) return false }
     else if (finPeriodo === "mes") { if (date.getMonth() !== nowFin.getMonth() || date.getFullYear() !== nowFin.getFullYear()) return false }
+    else if (finPeriodo === "ano") { if (date.getFullYear() !== nowFin.getFullYear()) return false }
     if (finTipo !== "todos" && finTipo !== "bonus") return false
     if (finCasa !== "todos" && b.profile_bet_id !== finCasa) return false
     return true
@@ -721,84 +720,122 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
 
         {/* Financeiro Tab */}
         <TabsContent value="financeiro" className="space-y-4">
-          {/* Summary cards */}
-          <div className="grid grid-cols-2 lg:grid-cols-3 gap-3">
-            {[
-              { label: "Depositado",    value: formatCurrency(totalDepositos), icon: ArrowDownLeft,  bg: "bg-[#1e3a8a]/10",  color: "text-[var(--accent-text)]" },
-              { label: "Sacado",        value: formatCurrency(totalSaques),    icon: ArrowUpRight,   bg: "bg-[#DC2626]/10",  color: "text-[#DC2626]" },
-              { label: "Saldo Líquido", value: formatCurrency(saldoLiquido),   icon: Wallet,         bg: saldoLiquido >= 0 ? "bg-[#1e3a8a]/10" : "bg-[#DC2626]/10", color: saldoLiquido >= 0 ? "text-[var(--accent-text)]" : "text-[#DC2626]" },
-              { label: "Lucro",         value: formatCurrency(totalLucro),     icon: TrendingUp,     bg: "bg-green-500/10",  color: "text-green-600" },
-              { label: "Perda",         value: formatCurrency(totalPerda),     icon: ArrowDownCircle,bg: "bg-orange-500/10", color: "text-orange-500" },
-              { label: "Total Bônus",   value: formatCurrency(totalBonus),     icon: Gift,           bg: "bg-purple-500/10", color: "text-purple-500" },
-            ].map(({ label, value, icon: Icon, bg, color }) => (
-              <Card key={label} className="overflow-hidden">
-                <CardContent className="p-4">
-                  <div className="flex items-center gap-2 min-w-0">
-                    <div className={`p-2 ${bg} rounded-lg flex-shrink-0`}>
-                      <Icon className={`h-4 w-4 ${color}`} />
-                    </div>
-                    <div className="min-w-0 flex-1">
-                      <p className="text-xs text-[var(--text-secondary)] truncate">{label}</p>
-                      <p className={`text-sm font-bold ${color} truncate`}>{value}</p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-
-          {/* Filters */}
-          {/* Mobile: toggle button */}
-          <div className="flex md:hidden items-center justify-between">
-            <span className="text-xs text-[var(--text-secondary)]">
-              {finPeriodo === "hoje" ? "Hoje" : finPeriodo === "semana" ? "Semana" : finPeriodo === "mes" ? "Mês" : "Todos"} · {finTipo === "todos" ? "Todos" : finTipo === "deposito" ? "Depósito" : finTipo === "saque" ? "Saque" : finTipo === "bonus" ? "Bônus" : finTipo === "lucro" ? "Lucro" : "Perda"}
-            </span>
+          {/* Header com botão Filtrar + Nova Movimentação */}
+          <div className="flex items-center justify-between gap-2">
             <button
               onClick={() => setFinShowFilter(v => !v)}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-xs font-medium transition-colors ${finShowFilter ? "border-[#1e3a8a]/40 bg-[#1e3a8a]/10 text-[var(--accent-text)]" : "border-[var(--border)] text-[var(--text-secondary)]"}`}
+              className={`flex items-center gap-1.5 px-3 py-2 rounded-xl border text-sm font-medium transition-colors flex-shrink-0 ${
+                finShowFilter || finTipo !== "todos" || finCasa !== "todos"
+                  ? "bg-[#1e3a8a]/10 border-[#1e3a8a]/30 text-[var(--accent-text)]"
+                  : "border-[var(--border)] text-[var(--text-secondary)] hover:bg-[var(--bg-elevated)]"
+              }`}
             >
-              {finShowFilter ? <X className="w-3.5 h-3.5" /> : <SlidersHorizontal className="w-3.5 h-3.5" />}
-              Filtrar
+              {finShowFilter ? <X className="w-4 h-4" /> : <SlidersHorizontal className="w-4 h-4" />}
+              Filtrar{(finTipo !== "todos" || finCasa !== "todos") && !finShowFilter ? " •" : ""}
+            </button>
+            <button
+              onClick={() => setFinShowForm(true)}
+              className="flex items-center gap-1.5 px-3 py-2 rounded-xl border border-[var(--border)] text-sm font-medium text-[var(--text-secondary)] hover:bg-[var(--bg-elevated)] transition-colors"
+            >
+              + Movimentação
             </button>
           </div>
 
-          {/* Filter options: always visible on desktop, toggle on mobile */}
-          <div className={`${finShowFilter ? "flex" : "hidden"} md:flex flex-wrap items-center gap-2`}>
-            <div className="flex gap-1 bg-[var(--bg-elevated)] rounded-lg p-1">
-              {(["hoje", "semana", "mes", "todos"] as const).map(p => (
-                <button key={p} onClick={() => setFinPeriodo(p)}
-                  className={`px-3 py-1 rounded-md text-xs font-medium transition-colors ${finPeriodo === p ? "bg-[var(--bg-surface)] text-[var(--accent-text)] shadow-sm border border-[var(--border)]" : "text-[var(--text-secondary)] hover:text-[var(--text-primary)]"}`}>
-                  {p === "hoje" ? "Hoje" : p === "semana" ? "Semana" : p === "mes" ? "Mês" : "Todos"}
-                </button>
-              ))}
-            </div>
-            <div className="flex gap-1 flex-wrap">
-              {(["todos", "deposito", "saque", "lucro", "perda", "bonus"] as const).map(t => (
-                <button key={t} onClick={() => setFinTipo(t)}
-                  className={`px-3 py-1 rounded-lg text-xs font-medium border transition-colors ${finTipo === t
-                    ? t === "deposito" ? "bg-[#1e3a8a] text-white border-[#1e3a8a]"
-                      : t === "saque" ? "bg-[#DC2626] text-white border-[#DC2626]"
-                      : t === "bonus" ? "bg-purple-600 text-white border-purple-600"
-                      : t === "lucro" ? "bg-green-600 text-white border-green-600"
-                      : t === "perda" ? "bg-orange-600 text-white border-orange-600"
-                      : "bg-[var(--bg-surface)] text-[var(--text-primary)] border-[var(--border)]"
-                    : "bg-transparent text-[var(--text-secondary)] border-[var(--border)] hover:text-[var(--text-primary)]"}`}>
-                  {t === "todos" ? "Todos" : t === "deposito" ? "Depósito" : t === "saque" ? "Saque" : t === "lucro" ? "Lucro" : t === "perda" ? "Perda" : "Bônus"}
-                </button>
-              ))}
-            </div>
-            {profileBetsFinanceiro.length > 0 && (
-              <select value={finCasa} onChange={e => setFinCasa(e.target.value)}
-                className="h-8 px-2 rounded-lg border border-[var(--border)] bg-[var(--bg-surface)] text-[var(--text-primary)] text-xs">
-                <option value="todos">Todas as casas</option>
-                {profileBetsFinanceiro.map(pb => (
-                  <option key={pb.id} value={pb.id}>{pb.bet?.nome ?? pb.id}</option>
-                ))}
-              </select>
-            )}
+          {/* Painel de filtros */}
+          {finShowFilter && (
+            <Card>
+              <CardContent className="p-4 space-y-3">
+                <div className="flex items-center justify-between">
+                  <p className="text-xs font-semibold text-[var(--text-muted)] uppercase tracking-wide">Período</p>
+                  {(finTipo !== "todos" || finCasa !== "todos" || finPeriodo !== "mes") && (
+                    <button
+                      onClick={() => { setFinTipo("todos"); setFinCasa("todos"); setFinPeriodo("mes") }}
+                      className="flex items-center gap-1 text-xs text-[var(--text-muted)] hover:text-[#DC2626] transition-colors"
+                    >
+                      <X className="h-3 w-3" /> Limpar
+                    </button>
+                  )}
+                </div>
+                {/* Período */}
+                <div className="flex gap-1 bg-[var(--bg-elevated)] rounded-lg p-1">
+                  {(["hoje", "semana", "mes", "ano", "todos"] as const).map(p => (
+                    <button key={p} onClick={() => setFinPeriodo(p)}
+                      className={`flex-1 py-1.5 rounded-md text-xs font-medium transition-colors ${
+                        finPeriodo === p
+                          ? "bg-[var(--bg-surface)] text-[var(--accent-text)] border border-[var(--border)] shadow-sm"
+                          : "text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
+                      }`}>
+                      {p === "hoje" ? "Dia" : p === "semana" ? "Semana" : p === "mes" ? "Mês" : p === "ano" ? "Ano" : "Todos"}
+                    </button>
+                  ))}
+                </div>
+                {/* Tipo */}
+                <div className="flex flex-wrap gap-1">
+                  {([
+                    { value: "todos",    label: "Todos",    active: "border-[#2563EB] bg-[#2563EB]/10 text-[#2563EB]" },
+                    { value: "deposito", label: "Depósito", active: "border-[#1e3a8a] bg-[#1e3a8a]/10 text-[var(--accent-text)]" },
+                    { value: "saque",    label: "Saque",    active: "border-[#DC2626] bg-[#DC2626]/10 text-[#DC2626]" },
+                    { value: "lucro",    label: "Lucro",    active: "border-green-500 bg-green-500/10 text-green-500" },
+                    { value: "perda",    label: "Perda",    active: "border-orange-500 bg-orange-500/10 text-orange-500" },
+                    { value: "bonus",    label: "Bônus",    active: "border-purple-500 bg-purple-500/10 text-purple-500" },
+                  ] as { value: "todos" | "deposito" | "saque" | "lucro" | "perda" | "bonus"; label: string; active: string }[]).map(({ value, label, active }) => (
+                    <button key={value} onClick={() => setFinTipo(value)}
+                      className={`px-3 py-1.5 rounded-lg border text-xs font-medium transition-colors ${
+                        finTipo === value ? active : "border-[var(--border)] text-[var(--text-secondary)]"
+                      }`}>
+                      {label}
+                    </button>
+                  ))}
+                </div>
+                {/* Casa */}
+                {profileBetsFinanceiro.length > 0 && (
+                  <div>
+                    <p className="text-xs text-[var(--text-muted)] mb-1 font-medium">Bet</p>
+                    <select value={finCasa} onChange={e => setFinCasa(e.target.value)}
+                      className="w-full h-9 px-3 rounded-lg border border-[var(--border)] bg-[var(--bg-surface)] text-[var(--text-primary)] text-sm">
+                      <option value="todos">Todas as casas</option>
+                      {profileBetsFinanceiro.map(pb => (
+                        <option key={pb.id} value={pb.id}>{pb.bet?.nome ?? pb.id}</option>
+                      ))}
+                    </select>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Resumo */}
+          <div className="grid grid-cols-3 gap-2">
+            <Card>
+              <CardContent className="p-3">
+                <div className="flex items-center gap-1.5 mb-1">
+                  <ArrowDownLeft className="h-3.5 w-3.5 text-[var(--accent-text)]" />
+                  <span className="text-xs text-[var(--text-secondary)]">Depósitos</span>
+                </div>
+                <p className="text-sm font-bold text-[var(--accent-text)]">{formatCurrency(totalDepositos)}</p>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardContent className="p-3">
+                <div className="flex items-center gap-1.5 mb-1">
+                  <ArrowUpRight className="h-3.5 w-3.5 text-[#DC2626]" />
+                  <span className="text-xs text-[var(--text-secondary)]">Saques</span>
+                </div>
+                <p className="text-sm font-bold text-[#DC2626]">{formatCurrency(totalSaques)}</p>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardContent className="p-3">
+                <div className="flex items-center gap-1.5 mb-1">
+                  <DollarSign className="h-3.5 w-3.5 text-[#2563EB]" />
+                  <span className="text-xs text-[var(--text-secondary)]">Líquido</span>
+                </div>
+                <p className="text-sm font-bold text-[#2563EB]">{formatCurrency(saldoLiquido)}</p>
+              </CardContent>
+            </Card>
           </div>
 
-          {/* Modal form */}
+          {/* Modal nova movimentação */}
           <Dialog open={finShowForm} onOpenChange={open => { if (!open) { setFinShowForm(false); setFinFormBet(""); setFinFormTipo("deposito"); setFinFormValor(""); setFinFormDescricao("") } }}>
             <DialogContent>
               <DialogHeader>
@@ -821,32 +858,25 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
                   </div>
                   <div className="space-y-1.5">
                     <Label>Valor (R$)</Label>
-                    <Input placeholder="0,00" value={finFormValor}
-                      onChange={e => setFinFormValor(formatBRL(e.target.value))} />
+                    <Input placeholder="0,00" value={finFormValor} onChange={e => setFinFormValor(formatBRL(e.target.value))} />
                   </div>
                 </div>
                 {finFormTipo === "perda" && (
                   <div className="flex items-start gap-2.5 rounded-xl bg-orange-500/10 border border-orange-500/20 px-4 py-3">
                     <ArrowDownLeft className="h-4 w-4 text-orange-400 shrink-0 mt-0.5" />
-                    <p className="text-xs text-orange-300 leading-relaxed">
-                      Registre perdas que <strong>não vieram de surebets</strong> — apostas perdidas, retiradas de emergência ou outros prejuízos. O valor é <strong>subtraído</strong> do saldo da casa selecionada.
-                    </p>
+                    <p className="text-xs text-orange-300 leading-relaxed">Registre perdas que <strong>não vieram de surebets</strong>. O valor é <strong>subtraído</strong> do saldo da casa selecionada.</p>
                   </div>
                 )}
                 {finFormTipo === "lucro" && (
                   <div className="flex items-start gap-2.5 rounded-xl bg-green-500/10 border border-green-500/20 px-4 py-3">
                     <TrendingUp className="h-4 w-4 text-green-400 shrink-0 mt-0.5" />
-                    <p className="text-xs text-green-300 leading-relaxed">
-                      Registre lucros que <strong>não vieram de surebets</strong> — value bets, promoções, cashbacks ou qualquer outro ganho. O valor é somado ao saldo da casa selecionada.
-                    </p>
+                    <p className="text-xs text-green-300 leading-relaxed">Registre lucros que <strong>não vieram de surebets</strong>. O valor é somado ao saldo da casa selecionada.</p>
                   </div>
                 )}
                 {finFormTipo === "bonus" && (
                   <div className="flex items-start gap-2.5 rounded-xl bg-purple-500/10 border border-purple-500/20 px-4 py-3">
                     <Gift className="h-4 w-4 text-purple-400 shrink-0 mt-0.5" />
-                    <p className="text-xs text-purple-300 leading-relaxed">
-                      O valor do bônus é registrado <strong>separadamente</strong> do saldo real. Ele aparece como <span className="font-semibold">Saldo Bônus</span> na casa de apostas e não entra no cálculo do saldo líquido.
-                    </p>
+                    <p className="text-xs text-purple-300 leading-relaxed">O bônus é registrado <strong>separadamente</strong> e não entra no cálculo do saldo líquido.</p>
                   </div>
                 )}
                 {profileBetsFinanceiro.length > 0 && (
@@ -865,158 +895,25 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
                 )}
                 <div className="space-y-1.5">
                   <Label>Descrição (opcional)</Label>
-                  <Input placeholder="Ex: Depósito inicial" value={finFormDescricao}
-                    onChange={e => setFinFormDescricao(e.target.value)} />
+                  <Input placeholder="Ex: Depósito inicial" value={finFormDescricao} onChange={e => setFinFormDescricao(e.target.value)} />
                 </div>
               </div>
               <DialogFooter>
                 <Button variant="outline" onClick={() => setFinShowForm(false)}>Cancelar</Button>
-                <Button onClick={handleFinSave} disabled={finSaving}>
-                  {finSaving ? "Salvando..." : "Salvar"}
-                </Button>
+                <Button onClick={handleFinSave} disabled={finSaving}>{finSaving ? "Salvando..." : "Salvar"}</Button>
               </DialogFooter>
             </DialogContent>
           </Dialog>
 
-          {/* Charts: evolução do saldo + lucro/perda por mês */}
-          {movLoaded && movimentacoes.length > 0 && (() => {
-            // Build cumulative balance over time (all movimentacoes, sorted ascending)
-            const sorted = [...movimentacoes].sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime())
-            let saldo = 0
-            const balanceData = sorted.map(m => {
-              if (m.tipo === "deposito" || m.tipo === "lucro") saldo += m.valor
-              else if (m.tipo === "saque" || m.tipo === "perda") saldo -= m.valor
-              return {
-                data: new Date(m.created_at).toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit" }),
-                saldo: parseFloat(saldo.toFixed(2)),
-              }
-            })
-
-            // Monthly profit/loss
-            const monthlyMap: Record<string, number> = {}
-            for (const m of sorted) {
-              const key = new Date(m.created_at).toLocaleDateString("pt-BR", { month: "short", year: "2-digit" })
-              if (!monthlyMap[key]) monthlyMap[key] = 0
-              if (m.tipo === "lucro") monthlyMap[key] += m.valor
-              else if (m.tipo === "perda") monthlyMap[key] -= m.valor
-            }
-            const monthlyData = Object.entries(monthlyMap).map(([mes, lucro]) => ({ mes, lucro: parseFloat(lucro.toFixed(2)) }))
-
-            return (
-              <div className="space-y-4">
-                {/* Evolução do saldo */}
-                <Card>
-                  <CardContent className="p-4">
-                    <p className="text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wide mb-3">Evolução do Saldo</p>
-                    <ResponsiveContainer width="100%" height={180}>
-                      <LineChart data={balanceData} margin={{ top: 4, right: 8, bottom: 0, left: 0 }}>
-                        <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
-                        <XAxis dataKey="data" tick={{ fontSize: 10, fill: "var(--text-secondary)" }} interval="preserveStartEnd" />
-                        <YAxis tick={{ fontSize: 10, fill: "var(--text-secondary)" }} tickFormatter={v => `R$${v}`} width={60} />
-                        <Tooltip
-                          formatter={(value: unknown) => [formatCurrency(Number(value ?? 0)), "Saldo"]}
-                          contentStyle={{ background: "var(--bg-surface)", border: "1px solid var(--border)", borderRadius: 8, fontSize: 12 }}
-                        />
-                        <ReferenceLine y={0} stroke="#DC2626" strokeDasharray="3 3" />
-                        <Line
-                          type="monotone" dataKey="saldo" stroke="#1e3a8a" strokeWidth={2}
-                          dot={false} activeDot={{ r: 4 }}
-                        />
-                      </LineChart>
-                    </ResponsiveContainer>
-                  </CardContent>
-                </Card>
-
-                {/* Lucro/Perda por mês */}
-                {monthlyData.length > 0 && (
-                  <Card>
-                    <CardContent className="p-4">
-                      <p className="text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wide mb-3">Lucro / Perda por Mês</p>
-                      <ResponsiveContainer width="100%" height={160}>
-                        <BarChart data={monthlyData} margin={{ top: 4, right: 8, bottom: 0, left: 0 }}>
-                          <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
-                          <XAxis dataKey="mes" tick={{ fontSize: 10, fill: "var(--text-secondary)" }} />
-                          <YAxis tick={{ fontSize: 10, fill: "var(--text-secondary)" }} tickFormatter={v => `R$${v}`} width={60} />
-                          <Tooltip
-                            formatter={(value: unknown) => [formatCurrency(Number(value ?? 0)), "Lucro"]}
-                            contentStyle={{ background: "var(--bg-surface)", border: "1px solid var(--border)", borderRadius: 8, fontSize: 12 }}
-                          />
-                          <ReferenceLine y={0} stroke="var(--border)" />
-                          <Bar dataKey="lucro" radius={[4, 4, 0, 0]}
-                            fill="#1e3a8a"
-                            label={false}
-                          />
-                        </BarChart>
-                      </ResponsiveContainer>
-                    </CardContent>
-                  </Card>
-                )}
-              </div>
-            )
-          })()}
-
-          {/* Desempenho por casa */}
-          {movLoaded && profileBetsFinanceiro.length > 0 && (() => {
-            const casaStats = profileBetsFinanceiro.map(pb => {
-              const movs = movimentacoes.filter(m => m.profile_bet_id === pb.id)
-              const depositado = movs.filter(m => m.tipo === "deposito").reduce((s, m) => s + m.valor, 0)
-              const sacado = movs.filter(m => m.tipo === "saque").reduce((s, m) => s + m.valor, 0)
-              const lucro = movs.filter(m => m.tipo === "lucro").reduce((s, m) => s + m.valor, 0)
-              const perda = movs.filter(m => m.tipo === "perda").reduce((s, m) => s + m.valor, 0)
-              const liquido = depositado + lucro - sacado - perda
-              return { pb, depositado, sacado, lucro, perda, liquido, saldoAtual: pb.saldo ?? 0 }
-            })
-            const maxSaldo = Math.max(...casaStats.map(c => Math.abs(c.saldoAtual)), 1)
-
-            return (
-              <Card>
-                <CardContent className="p-4">
-                  <p className="text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wide mb-3">Desempenho por Casa</p>
-                  <div className="space-y-3">
-                    {casaStats.map(({ pb, depositado, sacado, liquido, saldoAtual }) => {
-                      const pct = Math.min(100, (Math.abs(saldoAtual) / maxSaldo) * 100)
-                      const isPositive = saldoAtual >= 0
-                      return (
-                        <div key={pb.id} className="space-y-1.5">
-                          <div className="flex items-center justify-between gap-2">
-                            <p className="text-sm font-semibold text-[var(--text-primary)] truncate">{pb.bet?.nome ?? pb.id}</p>
-                            <p className={`text-sm font-bold flex-shrink-0 ${isPositive ? "text-[var(--accent-text)]" : "text-[#DC2626]"}`}>
-                              {formatCurrency(saldoAtual)}
-                            </p>
-                          </div>
-                          <div className="w-full h-1.5 bg-[var(--bg-elevated)] rounded-full overflow-hidden">
-                            <div
-                              className={`h-full rounded-full transition-all ${isPositive ? "bg-[#1e3a8a]" : "bg-[#DC2626]"}`}
-                              style={{ width: `${pct}%` }}
-                            />
-                          </div>
-                          <div className="flex gap-3 text-xs text-[var(--text-secondary)]">
-                            <span>Dep: <span className="text-[var(--accent-text)]">{formatCurrency(depositado)}</span></span>
-                            <span>Saques: <span className="text-[#DC2626]">{formatCurrency(sacado)}</span></span>
-                            <span>Líquido: <span className={liquido >= 0 ? "text-green-500" : "text-orange-500"}>{formatCurrency(liquido)}</span></span>
-                          </div>
-                        </div>
-                      )
-                    })}
-                  </div>
-                </CardContent>
-              </Card>
-            )
-          })()}
-
-          {/* Extrato estilo bancário */}
+          {/* Extrato bancário */}
           {!movLoaded ? (
             <Card><CardContent className="py-8 text-center text-[var(--text-secondary)] text-sm">Carregando...</CardContent></Card>
-          ) : (finFiltered.length === 0 && bonusFiltered.length === 0) ? (
-            <Card><CardContent className="py-8 text-center text-[var(--text-secondary)] text-sm">Nenhuma movimentação encontrada</CardContent></Card>
           ) : (() => {
-            // Junta movimentações + bônus e agrupa por data
-            type Item = { id: string; created_at: string; isBonus: boolean; tipo: string; valor: number; betNome?: string; descricao?: string | null }
+            type Item = { id: string; created_at: string; tipo: string; valor: number; betNome?: string; descricao?: string | null }
             const allItems: Item[] = [
               ...finFiltered.map(m => ({
                 id: m.id,
                 created_at: m.created_at,
-                isBonus: false,
                 tipo: m.tipo,
                 valor: m.valor,
                 betNome: (m.profile_bet as MovimentacaoFinanceira["profile_bet"])?.bet?.nome,
@@ -1025,13 +922,16 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
               ...bonusFiltered.map(b => ({
                 id: `bonus-${b.id}`,
                 created_at: b.created_at,
-                isBonus: true,
                 tipo: "bonus",
                 valor: b.valor,
                 betNome: profileBetsFinanceiro.find(pb => pb.id === b.profile_bet_id)?.bet?.nome,
                 descricao: b.descricao,
               })),
             ].sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+
+            if (allItems.length === 0) {
+              return <Card><CardContent className="py-8 text-center text-[var(--text-secondary)] text-sm">Nenhuma movimentação encontrada</CardContent></Card>
+            }
 
             const groupMap = new Map<string, Item[]>()
             for (const item of allItems) {
@@ -1041,50 +941,53 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
             }
             const groups = Array.from(groupMap.entries()).sort((a, b) => b[0].localeCompare(a[0]))
 
-            function formatGroupDate(iso: string) {
+            function fmtDate(iso: string) {
               return new Date(iso + "T12:00:00").toLocaleDateString("pt-BR", { day: "numeric", month: "short" }).replace(".", "")
             }
-            function formatHora(iso: string) {
+            function fmtHora(iso: string) {
               return new Date(iso).toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" })
             }
-            function tipoLabel(tipo: string) {
+            function tLabel(tipo: string) {
               return tipo === "deposito" ? "Depósito" : tipo === "saque" ? "Saque" : tipo === "lucro" ? "Lucro" : tipo === "perda" ? "Perda" : "Bônus"
             }
-            function tipoColor(tipo: string) {
+            function tColor(tipo: string) {
               return tipo === "saque" ? "text-[#DC2626]" : tipo === "perda" ? "text-orange-500" : tipo === "lucro" ? "text-green-500" : tipo === "bonus" ? "text-purple-500" : "text-[var(--accent-text)]"
             }
-            function tipoBg(tipo: string) {
+            function tBg(tipo: string) {
               return tipo === "saque" ? "bg-[#DC2626]/10" : tipo === "perda" ? "bg-orange-500/10" : tipo === "lucro" ? "bg-green-500/10" : tipo === "bonus" ? "bg-purple-500/10" : "bg-[#1e3a8a]/10"
             }
-            function tipoIcon(tipo: string) {
-              if (tipo === "deposito") return <ArrowDownCircle className="h-5 w-5 text-[var(--accent-text)]" />
-              if (tipo === "lucro")    return <TrendingUp      className="h-5 w-5 text-green-500" />
-              if (tipo === "perda")   return <ArrowDownLeft    className="h-5 w-5 text-orange-500" />
-              if (tipo === "bonus")   return <Gift             className="h-5 w-5 text-purple-500" />
-              return                         <ArrowUpCircle    className="h-5 w-5 text-[#DC2626]" />
+            function tIcon(tipo: string) {
+              if (tipo === "deposito") return <ArrowDownLeft className="h-5 w-5 text-[var(--accent-text)]" />
+              if (tipo === "lucro")    return <TrendingUp    className="h-5 w-5 text-green-500" />
+              if (tipo === "perda")   return <ArrowUpRight  className="h-5 w-5 text-orange-500" />
+              if (tipo === "bonus")   return <Gift          className="h-5 w-5 text-purple-500" />
+              return                         <ArrowUpRight  className="h-5 w-5 text-[#DC2626]" />
             }
 
             return (
               <div className="space-y-4">
                 {groups.map(([dateKey, items]) => (
                   <div key={dateKey}>
-                    <p className="text-xs font-semibold text-[var(--text-muted)] px-1 mb-2">{formatGroupDate(dateKey)}</p>
+                    <p className="text-xs font-semibold text-[var(--text-muted)] px-1 mb-2">{fmtDate(dateKey)}</p>
                     <Card>
                       <CardContent className="p-0 divide-y divide-[var(--border)]">
                         {items.map(item => (
                           <div key={item.id} className="flex items-center gap-3 px-4 py-3.5">
-                            <div className={`w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 ${tipoBg(item.tipo)}`}>
-                              {tipoIcon(item.tipo)}
+                            <div className={`w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 ${tBg(item.tipo)}`}>
+                              {tIcon(item.tipo)}
                             </div>
                             <div className="flex-1 min-w-0">
                               <p className="text-sm font-semibold text-[var(--text-primary)] truncate">{item.betNome ?? "—"}</p>
                               <p className="text-xs text-[var(--text-muted)] truncate">
-                                {tipoLabel(item.tipo)} · {formatHora(item.created_at)}{item.descricao ? ` · ${item.descricao}` : ""}
+                                {fmtHora(item.created_at)}{item.descricao ? ` · ${item.descricao}` : ""}
                               </p>
                             </div>
-                            <p className={`text-sm font-bold flex-shrink-0 ${tipoColor(item.tipo)}`}>
-                              {item.tipo === "saque" || item.tipo === "perda" ? "-" : "+"}{formatCurrency(item.valor)}
-                            </p>
+                            <div className="text-right flex-shrink-0">
+                              <p className={`text-sm font-bold ${tColor(item.tipo)}`}>
+                                {item.tipo === "saque" || item.tipo === "perda" ? "-" : "+"}{formatCurrency(item.valor)}
+                              </p>
+                              <p className="text-xs text-[var(--text-muted)]">{tLabel(item.tipo)}</p>
+                            </div>
                           </div>
                         ))}
                       </CardContent>
