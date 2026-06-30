@@ -74,7 +74,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         .select("plan, status")
         .eq("user_id", user.id)
         .single()
-      const isActiveSub = subData?.status === "active" || subData?.status === "trialing"
+      const isActiveSub = subData?.status === "active" || subData?.status === "trialing" || subData?.status === "courtesy"
       setHasActivePlan(isActiveSub)
       if (isActiveSub) {
         const names: Record<string, string> = { trader: "Trader", trader_pro: "Trader Pro", pro: "Pro" }
@@ -107,7 +107,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       }
 
       // Redirect to onboarding if subscribed but no profiles yet
-      const isActive = subData?.status === "active" || subData?.status === "trialing"
+      const isActive = subData?.status === "active" || subData?.status === "trialing" || subData?.status === "courtesy"
       const isOnboardingExcluded = pathname.startsWith("/onboarding") || isAllowedWithoutPlan
       if (isActive && !isOnboardingExcluded) {
         const alreadyOnboarded = typeof window !== "undefined" && localStorage.getItem("onboarding_done") === "1"

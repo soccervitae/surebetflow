@@ -3,6 +3,7 @@ import { formatCurrency } from "@/lib/utils"
 import Link from "next/link"
 import { ArrowLeft } from "lucide-react"
 import { notFound } from "next/navigation"
+import CourtesyButton from "./CourtesyButton"
 
 export default async function AdminUsuarioDetailPage({ params }: { params: { id: string } }) {
   const supabase = createAdminClient()
@@ -10,11 +11,14 @@ export default async function AdminUsuarioDetailPage({ params }: { params: { id:
   const { data: { user }, error } = await supabase.auth.admin.getUserById(params.id)
   if (error || !user) notFound()
 
-  const [{ data: profiles }, { data: apostas }, { data: movimentacoes }] = await Promise.all([
+  const [{ data: profiles }, { data: apostas }, { data: movimentacoes }, { data: subscription }] = await Promise.all([
     supabase.from("profiles").select("id, nome, sobrenome, apelido, email, ativo, created_at").eq("user_id", params.id),
     supabase.from("apostas").select("profile_id, investimento_total, resultado_real, lucro_garantido, status"),
     supabase.from("movimentacoes_financeiras").select("profile_id, tipo, valor"),
+    supabase.from("subscriptions").select("status, plan").eq("user_id", params.id).maybeSingle(),
   ])
+
+  const hasCourtesy = subscription?.status === "courtesy"
 
   const profileIds = (profiles ?? []).map(p => p.id)
 
@@ -40,14 +44,30 @@ export default async function AdminUsuarioDetailPage({ params }: { params: { id:
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center gap-4">
-        <Link href="/admin/usuarios" className="text-gray-400 hover:text-white transition-colors">
-          <ArrowLeft className="w-5 h-5" />
-        </Link>
-        <div>
-          <h1 className="text-2xl font-bold text-white">{user.user_metadata?.full_name ?? user.email}</h1>
-          <p className="text-gray-400 text-sm mt-0.5">{user.email} · Cadastrado em {new Date(user.created_at).toLocaleDateString("pt-BR")}</p>
+      <div className="flex items-start justify-between gap-4 flex-wrap">
+        <div className="flex items-center gap-4">
+          <Link href="/admin/usuarios" className="text-gray-400 hover:text-white transition-colors">
+            <ArrowLeft className="w-5 h-5" />
+          </Link>
+          <div>
+            <h1 className="text-2xl font-bold text-white">{user.user_metadata?.full_name ?? user.email}</h1>
+            <p className="text-gray-400 text-sm mt-0.5">
+              {user.email} · Cadastrado em {new Date(user.created_at).toLocaleDateString("pt-BR")}
+              {subscription && (
+                <span className={`ml-2 inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold ${
+                  subscription.status === "active" || subscription.status === "trialing"
+                    ? "bg-green-500/10 text-green-400"
+                    : subscription.status === "courtesy"
+                      ? "bg-purple-500/10 text-purple-400"
+                      : "bg-gray-700 text-gray-400"
+                }`}>
+                  {subscription.status === "courtesy" ? "Cortesia" : subscription.status === "active" ? "Ativo" : subscription.status}
+                </span>
+              )}
+            </p>
+          </div>
         </div>
+        <CourtesyButton userId={params.id} hasCourtesy={hasCourtesy} />
       </div>
 
       <div>
