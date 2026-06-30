@@ -38,6 +38,7 @@ const PRESETS = [
   { label: "7 dias", days: 7 },
   { label: "30 dias", days: 30 },
   { label: "90 dias", days: 90 },
+  { label: "1 ano", days: 365 },
 ]
 
 function addDays(d: number) {
@@ -76,7 +77,7 @@ export default function AssinaturasClient({ subs, emailMap, stats }: {
   const router = useRouter()
 
   // Courtesy modal state
-  const [courtesyModal, setCourtesyModal] = useState<{ userId: string; email: string } | null>(null)
+  const [courtesyModal, setCourtesyModal] = useState<{ userId: string; email: string; isEdit?: boolean } | null>(null)
   const [selectedDays, setSelectedDays] = useState<number | null>(30)
   const [customDate, setCustomDate] = useState("")
   const [courtesyLoading, setCourtesyLoading] = useState(false)
@@ -107,11 +108,11 @@ export default function AssinaturasClient({ subs, emailMap, stats }: {
     router.refresh()
   }
 
-  function openCourtesyModal(userId: string, email: string) {
+  function openCourtesyModal(userId: string, email: string, isEdit = false) {
     setOpenMenu(null)
     setSelectedDays(30)
     setCustomDate("")
-    setCourtesyModal({ userId, email })
+    setCourtesyModal({ userId, email, isEdit })
   }
 
   async function grantCourtesy(userId: string) {
@@ -268,7 +269,15 @@ export default function AssinaturasClient({ subs, emailMap, stats }: {
                 return (
                   <tr key={s.id} className="hover:bg-gray-800/40 transition-colors">
                     <td className="px-5 py-4">
-                      <p className="text-sm font-medium text-white">{emailMap[s.user_id] ?? s.user_id}</p>
+                      <div className="flex items-center gap-2">
+                        <p className="text-sm font-medium text-white">{emailMap[s.user_id] ?? s.user_id}</p>
+                        {isCourtesy && (
+                          <span className="inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-wide bg-purple-500/15 text-purple-400 border border-purple-500/25 px-1.5 py-0.5 rounded-md flex-shrink-0">
+                            <Gift className="w-2.5 h-2.5" />
+                            Cortesia
+                          </span>
+                        )}
+                      </div>
                     </td>
                     <td className="px-5 py-4">
                       <span className={`inline-flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-full ${st.bg} ${st.color}`}>
@@ -326,6 +335,15 @@ export default function AssinaturasClient({ subs, emailMap, stats }: {
                             )}
                             {isCourtesy && (
                               <button
+                                onClick={() => openCourtesyModal(s.user_id, emailMap[s.user_id] ?? s.user_id, true)}
+                                className="w-full text-left px-4 py-2.5 text-sm text-purple-400 hover:bg-gray-700 transition-colors flex items-center gap-2"
+                              >
+                                <Gift className="w-3.5 h-3.5" />
+                                Editar cortesia
+                              </button>
+                            )}
+                            {isCourtesy && (
+                              <button
                                 onClick={() => revokeCourtesy(s.user_id)}
                                 className="w-full text-left px-4 py-2.5 text-sm text-red-400 hover:bg-gray-700 transition-colors"
                               >
@@ -361,7 +379,7 @@ export default function AssinaturasClient({ subs, emailMap, stats }: {
       {/* Modal cortesia (usuário já na lista) */}
       {courtesyModal && (
         <CourtesyModal
-          title={`Cortesia para ${courtesyModal.email}`}
+          title={courtesyModal.isEdit ? `Editar cortesia — ${courtesyModal.email}` : `Cortesia para ${courtesyModal.email}`}
           selectedDays={selectedDays}
           setSelectedDays={setSelectedDays}
           customDate={customDate}
