@@ -444,7 +444,7 @@ export default function SurebetCalculator({ profiles, defaultProfileId, profileN
             <div className="space-y-3">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <Sparkles className="h-4 w-4 text-[#1e3a8a]" />
+                  <Sparkles className="h-4 w-4 text-[var(--accent-text)]" />
                   <p className="text-sm font-semibold text-[var(--text-primary)]">
                     {aiSurebets.length} surebets encontradas — escolha uma
                   </p>
@@ -523,12 +523,12 @@ export default function SurebetCalculator({ profiles, defaultProfileId, profileN
           ) : !showPaste ? (
             /* Collapsed — two action buttons */
             <div className="flex items-center gap-2">
-              <Sparkles className="h-4 w-4 text-[#1e3a8a] flex-shrink-0" />
-              <span className="text-sm text-[#1e3a8a] font-medium flex-1">Preencher com IA</span>
+              <Sparkles className="h-4 w-4 text-[var(--accent-text)] flex-shrink-0" />
+              <span className="text-sm text-[var(--accent-text)] font-medium flex-1">Preencher com IA</span>
               <button
                 type="button"
                 onClick={() => { setAiMode("text"); setShowPaste(true) }}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-[#1e3a8a]/30 text-[#1e3a8a] text-xs font-medium hover:bg-[#1e3a8a]/10 transition-colors"
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-[#1e3a8a]/30 text-[var(--accent-text)] text-xs font-medium hover:bg-[#1e3a8a]/10 transition-colors"
               >
                 <ClipboardPaste className="h-3.5 w-3.5" />
                 Colar texto
@@ -537,7 +537,7 @@ export default function SurebetCalculator({ profiles, defaultProfileId, profileN
                 type="button"
                 onClick={() => imageInputRef.current?.click()}
                 disabled={aiLoading}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-[#1e3a8a]/30 text-[#1e3a8a] text-xs font-medium hover:bg-[#1e3a8a]/10 transition-colors disabled:opacity-50"
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-[#1e3a8a]/30 text-[var(--accent-text)] text-xs font-medium hover:bg-[#1e3a8a]/10 transition-colors disabled:opacity-50"
               >
                 {aiLoading ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <ImageIcon className="h-3.5 w-3.5" />}
                 {aiLoading ? "Lendo..." : "Imagem"}
@@ -554,7 +554,7 @@ export default function SurebetCalculator({ profiles, defaultProfileId, profileN
             /* Text paste panel */
             <div className="space-y-3">
               <div className="flex items-center gap-2">
-                <Sparkles className="h-4 w-4 text-[#1e3a8a]" />
+                <Sparkles className="h-4 w-4 text-[var(--accent-text)]" />
                 <p className="text-sm font-medium text-[var(--text-primary)]">Cole o texto do localizador de surebets</p>
               </div>
               <textarea
@@ -586,7 +586,7 @@ export default function SurebetCalculator({ profiles, defaultProfileId, profileN
       <Card>
         <CardHeader className="pb-3">
           <CardTitle className="flex items-center gap-2">
-            <Calculator className="h-5 w-5 text-[#1e3a8a]" />
+            <Calculator className="h-5 w-5 text-[var(--accent-text)]" />
             Configuração da Aposta
           </CardTitle>
         </CardHeader>
@@ -785,9 +785,9 @@ export default function SurebetCalculator({ profiles, defaultProfileId, profileN
             {isArbitrage ? (
               <div className="flex items-center gap-2">
                 <div className="p-1.5 bg-[#1e3a8a]/10 rounded-full">
-                  <Check className="h-4 w-4 text-[#1e3a8a]" />
+                  <Check className="h-4 w-4 text-[var(--accent-text)]" />
                 </div>
-                <span className="font-semibold text-[#1e3a8a]">Arbitragem encontrada!</span>
+                <span className="font-semibold text-[var(--accent-text)]">Arbitragem encontrada!</span>
               </div>
             ) : sumProbs > 0 ? (
               <div className="flex items-center gap-2">
@@ -809,11 +809,11 @@ export default function SurebetCalculator({ profiles, defaultProfileId, profileN
               </div>
               <div>
                 <p className="text-xs text-[var(--text-secondary)] mb-1">Lucro Garantido</p>
-                <p className="text-lg font-bold text-[#1e3a8a]">{formatCurrency(lucroGarantido)}</p>
+                <p className="text-lg font-bold text-[var(--accent-text)]">{formatCurrency(lucroGarantido)}</p>
               </div>
               <div>
                 <p className="text-xs text-[var(--text-secondary)] mb-1">ROI</p>
-                <p className="text-lg font-bold text-[#1e3a8a]">{roi.toFixed(2)}%</p>
+                <p className="text-lg font-bold text-[var(--accent-text)]">{roi.toFixed(2)}%</p>
               </div>
             </div>
           )}

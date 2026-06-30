@@ -69,7 +69,7 @@ export default function PlanoRequeridoModal({ open, onClose }: Props) {
               onClick={onClose}
               className="flex flex-col items-center gap-1.5 p-4 rounded-xl border border-[var(--border)] bg-[var(--bg-surface)] hover:border-[#1e3a8a]/50 hover:bg-[#1e3a8a]/5 transition-all text-center group"
             >
-              <Star className="w-5 h-5 text-[#1e3a8a] group-hover:scale-110 transition-transform" />
+              <Star className="w-5 h-5 text-[var(--accent-text)] group-hover:scale-110 transition-transform" />
               <span className="text-sm font-bold text-[var(--text-primary)]">Trader</span>
               <span className="text-xs text-[var(--text-muted)]">R$ 99/mês</span>
               <span className="text-[10px] text-[var(--text-secondary)] mt-0.5">Até 5 perfis</span>
@@ -82,7 +82,7 @@ export default function PlanoRequeridoModal({ open, onClose }: Props) {
               className="flex flex-col items-center gap-1.5 p-4 rounded-xl border border-[#1e3a8a]/50 bg-gradient-to-b from-[#0f1e40]/60 to-transparent hover:border-[#1e3a8a] hover:bg-[#1e3a8a]/10 transition-all text-center group relative overflow-hidden"
             >
               <span className="absolute top-0 inset-x-0 h-0.5 bg-gradient-to-r from-transparent via-[#1e3a8a] to-transparent" />
-              <Zap className="w-5 h-5 text-[#1e3a8a] group-hover:scale-110 transition-transform" />
+              <Zap className="w-5 h-5 text-[var(--accent-text)] group-hover:scale-110 transition-transform" />
               <span className="text-sm font-bold text-[var(--text-primary)]">Trader Pro</span>
               <span className="text-xs text-[var(--text-muted)]">R$ 179/mês</span>
               <span className="text-[10px] text-[var(--text-secondary)] mt-0.5">Até 20 perfis</span>

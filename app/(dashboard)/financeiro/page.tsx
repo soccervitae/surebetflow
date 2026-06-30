@@ -185,7 +185,7 @@ export default function FinanceiroPage() {
                   onClick={() => setFilterPeriodo(value)}
                   className={`px-4 py-1.5 rounded-md text-xs font-medium transition-colors ${
                     filterPeriodo === value
-                      ? "bg-[var(--bg-surface)] text-[#1e3a8a] border border-[var(--border)] shadow-sm"
+                      ? "bg-[var(--bg-surface)] text-[var(--accent-text)] border border-[var(--border)] shadow-sm"
                       : "text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
                   }`}
                 >
@@ -212,7 +212,7 @@ export default function FinanceiroPage() {
                     className={`flex-1 py-1.5 rounded-lg border text-xs font-medium transition-colors ${
                       filterTipo === value
                         ? value === "deposito"
-                          ? "border-[#1e3a8a] bg-[#1e3a8a]/10 text-[#1e3a8a]"
+                          ? "border-[#1e3a8a] bg-[#1e3a8a]/10 text-[var(--accent-text)]"
                           : value === "saque"
                           ? "border-[#DC2626] bg-[#DC2626]/10 text-[#DC2626]"
                           : "border-[#2563EB] bg-[#2563EB]/10 text-[#2563EB]"
@@ -265,10 +265,10 @@ export default function FinanceiroPage() {
         <Card>
           <CardContent className="p-4">
             <div className="flex items-center gap-2 mb-1">
-              <ArrowDownLeft className="h-4 w-4 text-[#1e3a8a]" />
+              <ArrowDownLeft className="h-4 w-4 text-[var(--accent-text)]" />
               <span className="text-xs text-[var(--text-secondary)]">Total Depositado</span>
             </div>
-            <p className="text-lg font-bold text-[#1e3a8a]">{formatCurrency(totalDepositos)}</p>
+            <p className="text-lg font-bold text-[var(--accent-text)]">{formatCurrency(totalDepositos)}</p>
           </CardContent>
         </Card>
         <Card>
@@ -302,7 +302,7 @@ export default function FinanceiroPage() {
                 <div key={m.id} className="flex items-center gap-4 p-3 rounded-xl border border-[var(--border)]">
                   <div className={`p-2 rounded-lg flex-shrink-0 ${m.tipo === "deposito" ? "bg-[#1e3a8a]/10" : "bg-[#DC2626]/10"}`}>
                     {m.tipo === "deposito"
-                      ? <ArrowDownLeft className="h-4 w-4 text-[#1e3a8a]" />
+                      ? <ArrowDownLeft className="h-4 w-4 text-[var(--accent-text)]" />
                       : <ArrowUpRight className="h-4 w-4 text-[#DC2626]" />
                     }
                   </div>
@@ -319,7 +319,7 @@ export default function FinanceiroPage() {
                     </p>
                   </div>
                   <div className="text-right flex-shrink-0">
-                    <p className={`text-base font-bold ${m.tipo === "deposito" ? "text-[#1e3a8a]" : "text-[#DC2626]"}`}>
+                    <p className={`text-base font-bold ${m.tipo === "deposito" ? "text-[var(--accent-text)]" : "text-[#DC2626]"}`}>
                       {m.tipo === "deposito" ? "+" : "-"}{formatCurrency(Number(m.valor))}
                     </p>
                     <p className="text-xs text-[var(--text-muted)]">{m.tipo === "deposito" ? "Depósito" : "Saque"}</p>

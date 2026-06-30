@@ -11,7 +11,7 @@ const steps = [
   {
     title: "Bem-vindo ao SurebetFlow!",
     icon: TrendingUp,
-    color: "text-[#1e3a8a]",
+    color: "text-[var(--accent-text)]",
     bg: "bg-[#1e3a8a]/10",
     description: "O que é uma Surebet?",
     content: (
@@ -29,7 +29,7 @@ const steps = [
               "Garante lucro em qualquer resultado",
             ].map((item, i) => (
               <li key={i} className="flex items-start gap-2">
-                <CheckCircle className="w-4 h-4 text-[#1e3a8a] flex-shrink-0 mt-0.5" />
+                <CheckCircle className="w-4 h-4 text-[var(--accent-text)] flex-shrink-0 mt-0.5" />
                 <span>{item}</span>
               </li>
             ))}

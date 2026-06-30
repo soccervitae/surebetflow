@@ -295,7 +295,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         {/* Top bar */}
         <header className="hidden md:flex items-center justify-between px-6 py-3 bg-[var(--bg-surface)] border-b border-[var(--border)] sticky top-0 z-10">
           <div className="flex items-center gap-2 text-sm text-[var(--text-secondary)]">
-            <Circle className="w-2 h-2 fill-[#1e3a8a] text-[#1e3a8a]" />
+            <Circle className="w-2 h-2 fill-[#1e3a8a] text-[var(--accent-text)]" />
             <span>Sessão ativa</span>
             <span className="opacity-30">•</span>
             <span className="text-[var(--text-primary)] font-medium">{userName}</span>

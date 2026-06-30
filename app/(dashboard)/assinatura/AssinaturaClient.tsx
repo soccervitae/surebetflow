@@ -121,7 +121,7 @@ export default function AssinaturaClient({ subscription }: { subscription: Subsc
     <div className="max-w-2xl mx-auto space-y-6">
       <div className="flex items-center gap-3">
         <div className="w-9 h-9 bg-[#1e3a8a]/10 rounded-xl flex items-center justify-center">
-          <CreditCard className="w-5 h-5 text-[#1e3a8a]" />
+          <CreditCard className="w-5 h-5 text-[var(--accent-text)]" />
         </div>
         <div>
           <h1 className="text-2xl font-bold text-[var(--text-primary)]">Assinatura</h1>
@@ -147,10 +147,10 @@ export default function AssinaturaClient({ subscription }: { subscription: Subsc
         <div className="bg-[var(--bg-surface)] border border-[#1e3a8a]/40 rounded-2xl p-6">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-2">
-              <activePlan.icon className="w-5 h-5 text-[#1e3a8a]" />
+              <activePlan.icon className="w-5 h-5 text-[var(--accent-text)]" />
               <span className="text-lg font-bold text-[var(--text-primary)]">{activePlan.name}</span>
             </div>
-            <span className="text-xs bg-[#1e3a8a]/20 text-[#1e3a8a] px-2.5 py-1 rounded-full font-medium">Plano atual</span>
+            <span className="text-xs bg-[#1e3a8a]/20 text-[var(--accent-text)] px-2.5 py-1 rounded-full font-medium">Plano atual</span>
           </div>
           <p className="text-4xl font-bold text-[var(--text-primary)] mb-6">
             {activePlan.price}<span className="text-xl font-normal text-[var(--text-muted)]">{activePlan.period}</span>
@@ -174,7 +174,7 @@ export default function AssinaturaClient({ subscription }: { subscription: Subsc
           {PLANS.map(plan => (
             <div key={plan.key} className="bg-[var(--bg-surface)] border border-[var(--border)] rounded-2xl p-6 flex flex-col">
               <div className="flex items-center gap-2 mb-3">
-                <plan.icon className="w-5 h-5 text-[#1e3a8a]" />
+                <plan.icon className="w-5 h-5 text-[var(--accent-text)]" />
                 <span className="text-lg font-bold text-[var(--text-primary)]">{plan.name}</span>
               </div>
               <p className="text-4xl font-bold text-[var(--text-primary)] mb-0.5">
@@ -183,7 +183,7 @@ export default function AssinaturaClient({ subscription }: { subscription: Subsc
               <ul className="space-y-2 my-6 flex-1">
                 {plan.features.map(f => (
                   <li key={f} className="flex items-center gap-2.5 text-sm text-[var(--text-secondary)]">
-                    <CheckCircle className="w-4 h-4 text-[#1e3a8a] flex-shrink-0" />
+                    <CheckCircle className="w-4 h-4 text-[var(--accent-text)] flex-shrink-0" />
                     {f}
                   </li>
                 ))}

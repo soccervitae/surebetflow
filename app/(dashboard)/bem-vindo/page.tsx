@@ -82,7 +82,7 @@ export default function BemVindoPage() {
           {LOCKED_FEATURES.map((f, i) => (
             <div key={i} className={`flex items-center gap-3 px-5 py-3.5 ${i % 2 === 0 && i + 1 < LOCKED_FEATURES.length ? "sm:border-r border-[var(--border)]" : ""}`}>
               <div className="w-5 h-5 rounded-full bg-[#1e3a8a]/10 flex items-center justify-center flex-shrink-0">
-                <Lock className="w-3 h-3 text-[#1e3a8a]" />
+                <Lock className="w-3 h-3 text-[var(--accent-text)]" />
               </div>
               <span className="text-sm text-[var(--text-secondary)]">{f}</span>
             </div>
@@ -112,7 +112,7 @@ export default function BemVindoPage() {
                 )}
 
                 <div className="flex items-center gap-2 mb-3">
-                  <Icon className="w-5 h-5 text-[#1e3a8a]" />
+                  <Icon className="w-5 h-5 text-[var(--accent-text)]" />
                   <span className="text-lg font-bold text-[var(--text-primary)]">{plan.name}</span>
                 </div>
 
@@ -124,7 +124,7 @@ export default function BemVindoPage() {
                 <ul className="space-y-2 my-5 flex-1">
                   {plan.features.map(f => (
                     <li key={f} className="flex items-center gap-2.5 text-sm text-[var(--text-secondary)]">
-                      <CheckCircle className="w-4 h-4 text-[#1e3a8a] flex-shrink-0" />
+                      <CheckCircle className="w-4 h-4 text-[var(--accent-text)] flex-shrink-0" />
                       {f}
                     </li>
                   ))}

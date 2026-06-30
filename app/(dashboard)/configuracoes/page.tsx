@@ -498,19 +498,19 @@ export default function ConfiguracoesPage() {
 
                         <div className="grid grid-cols-2 gap-2 text-xs text-[var(--text-secondary)] border-t border-[var(--border)] pt-4">
                           <div className="flex items-center gap-1.5">
-                            <CheckCircle className="h-3.5 w-3.5 text-[#1e3a8a]" />
+                            <CheckCircle className="h-3.5 w-3.5 text-[var(--accent-text)]" />
                             Até {planInfo.maxProfiles} perfis
                           </div>
                           <div className="flex items-center gap-1.5">
-                            <CheckCircle className="h-3.5 w-3.5 text-[#1e3a8a]" />
+                            <CheckCircle className="h-3.5 w-3.5 text-[var(--accent-text)]" />
                             Casas ilimitadas
                           </div>
                           <div className="flex items-center gap-1.5">
-                            <CheckCircle className="h-3.5 w-3.5 text-[#1e3a8a]" />
+                            <CheckCircle className="h-3.5 w-3.5 text-[var(--accent-text)]" />
                             Calculadora 2-way e 3-way
                           </div>
                           <div className="flex items-center gap-1.5">
-                            <CheckCircle className="h-3.5 w-3.5 text-[#1e3a8a]" />
+                            <CheckCircle className="h-3.5 w-3.5 text-[var(--accent-text)]" />
                             Dashboard financeiro
                           </div>
                         </div>
@@ -572,7 +572,7 @@ export default function ConfiguracoesPage() {
                               <button
                                 onClick={() => migratePlan(otherPlan)}
                                 disabled={migrateLoading}
-                                className="flex items-center gap-2 px-4 py-2 rounded-xl border border-[#1e3a8a] text-[#1e3a8a] hover:bg-[#1e3a8a]/10 disabled:opacity-60 text-sm font-medium transition-colors flex-shrink-0"
+                                className="flex items-center gap-2 px-4 py-2 rounded-xl border border-[#1e3a8a] text-[var(--accent-text)] hover:bg-[#1e3a8a]/10 disabled:opacity-60 text-sm font-medium transition-colors flex-shrink-0"
                               >
                                 {migrateLoading ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : null}
                                 {assinatura.plan === "trader_pro" ? "Fazer downgrade" : "Fazer upgrade"}

@@ -85,7 +85,7 @@ export default function CheckoutClient() {
         <div className="md:col-span-3 space-y-4">
           <div className="bg-[var(--bg-surface)] border border-[var(--border)] rounded-2xl p-6">
             <div className="flex items-center gap-2 mb-5">
-              <Lock className="w-4 h-4 text-[#1e3a8a]" />
+              <Lock className="w-4 h-4 text-[var(--accent-text)]" />
               <span className="text-sm font-medium text-[var(--text-primary)]">Pagamento seguro via Stripe</span>
             </div>
 
@@ -110,7 +110,7 @@ export default function CheckoutClient() {
           </div>
 
           <div className="flex items-center gap-2 text-xs text-[var(--text-muted)] px-1">
-            <ShieldCheck className="w-4 h-4 text-[#1e3a8a] flex-shrink-0" />
+            <ShieldCheck className="w-4 h-4 text-[var(--accent-text)] flex-shrink-0" />
             Pagamento 100% seguro. Dados criptografados pelo Stripe. Cancele quando quiser.
           </div>
         </div>
@@ -120,7 +120,7 @@ export default function CheckoutClient() {
           <div className="bg-[var(--bg-surface)] border border-[var(--border)] rounded-2xl p-5">
             <p className="text-xs text-[var(--text-muted)] uppercase tracking-wider mb-3">Resumo do pedido</p>
             <div className="flex items-center gap-2 mb-1">
-              <PlanIcon className="w-4 h-4 text-[#1e3a8a]" />
+              <PlanIcon className="w-4 h-4 text-[var(--accent-text)]" />
               <span className="font-semibold text-[var(--text-primary)]">Plano {plan.name}</span>
               <span className="font-bold text-[var(--text-primary)] ml-auto">{plan.price}</span>
             </div>
@@ -138,7 +138,7 @@ export default function CheckoutClient() {
             <ul className="space-y-2">
               {plan.features.map(f => (
                 <li key={f} className="flex items-start gap-2 text-sm text-[var(--text-secondary)]">
-                  <CheckCircle className="w-3.5 h-3.5 text-[#1e3a8a] flex-shrink-0 mt-0.5" />
+                  <CheckCircle className="w-3.5 h-3.5 text-[var(--accent-text)] flex-shrink-0 mt-0.5" />
                   {f}
                 </li>
               ))}

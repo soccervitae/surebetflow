@@ -43,10 +43,10 @@ export default function FinanceiroClient({ movimentacoes: initial, profiles, pro
         <Card>
           <CardContent className="p-4">
             <div className="flex items-center gap-2 mb-1">
-              <ArrowDownLeft className="h-4 w-4 text-[#1e3a8a]" />
+              <ArrowDownLeft className="h-4 w-4 text-[var(--accent-text)]" />
               <span className="text-xs text-[var(--text-secondary)]">Total Depositado</span>
             </div>
-            <p className="text-lg font-bold text-[#1e3a8a]">{formatCurrency(totalDepositos)}</p>
+            <p className="text-lg font-bold text-[var(--accent-text)]">{formatCurrency(totalDepositos)}</p>
           </CardContent>
         </Card>
         <Card>
@@ -119,7 +119,7 @@ export default function FinanceiroClient({ movimentacoes: initial, profiles, pro
                 <div className="flex items-center gap-4">
                   <div className={`p-2 rounded-lg ${mov.tipo === "deposito" ? "bg-[#1e3a8a]/10" : "bg-[#DC2626]/10"}`}>
                     {mov.tipo === "deposito"
-                      ? <ArrowDownLeft className="h-4 w-4 text-[#1e3a8a]" />
+                      ? <ArrowDownLeft className="h-4 w-4 text-[var(--accent-text)]" />
                       : <ArrowUpRight className="h-4 w-4 text-[#DC2626]" />
                     }
                   </div>
@@ -138,7 +138,7 @@ export default function FinanceiroClient({ movimentacoes: initial, profiles, pro
                       {" · "}{new Date(mov.created_at).toLocaleDateString("pt-BR")}
                     </p>
                   </div>
-                  <p className={`font-bold text-base flex-shrink-0 ${mov.tipo === "deposito" ? "text-[#1e3a8a]" : "text-[#DC2626]"}`}>
+                  <p className={`font-bold text-base flex-shrink-0 ${mov.tipo === "deposito" ? "text-[var(--accent-text)]" : "text-[#DC2626]"}`}>
                     {mov.tipo === "deposito" ? "+" : "-"}{formatCurrency(mov.valor)}
                   </p>
                 </div>
