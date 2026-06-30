@@ -68,13 +68,16 @@ function ExtratoList({ movimentacoes }: { movimentacoes: Movimentacao[] }) {
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-semibold text-[var(--text-primary)] truncate">{betNome}</p>
                       <p className="text-xs text-[var(--text-muted)] truncate">
-                        {perfilNome} · {formatHora(m.created_at)} · {cfg.label}
+                        {perfilNome} · {formatHora(m.created_at)}
                         {m.descricao ? ` · ${m.descricao}` : ""}
                       </p>
                     </div>
-                    <p className={`text-sm font-bold flex-shrink-0 ${cfg.color}`}>
-                      {cfg.sign}{formatCurrency(Number(m.valor))}
-                    </p>
+                    <div className="text-right flex-shrink-0">
+                      <p className={`text-sm font-bold ${cfg.color}`}>
+                        {cfg.sign}{formatCurrency(Number(m.valor))}
+                      </p>
+                      <p className="text-xs text-[var(--text-muted)]">{cfg.label}</p>
+                    </div>
                   </div>
                 )
               })}
