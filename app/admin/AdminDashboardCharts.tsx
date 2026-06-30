@@ -27,7 +27,7 @@ export default function AdminDashboardCharts({ data }: { data: ChartPoint[] }) {
               contentStyle={{ background: "#111827", border: "1px solid #374151", borderRadius: 8 }}
               labelStyle={{ color: "#fff", fontSize: 11 }}
               itemStyle={{ color: "#60a5fa", fontSize: 11 }}
-              formatter={(v: number) => [v, "usuários"]}
+              formatter={(v: unknown) => [typeof v === "number" ? v : 0, "usuários"]}
             />
             <Bar dataKey="usuarios" fill="#1e3a8a" radius={[4, 4, 0, 0]} />
           </BarChart>
@@ -54,7 +54,7 @@ export default function AdminDashboardCharts({ data }: { data: ChartPoint[] }) {
               contentStyle={{ background: "#111827", border: "1px solid #374151", borderRadius: 8 }}
               labelStyle={{ color: "#fff", fontSize: 11 }}
               itemStyle={{ color: "#22c55e", fontSize: 11 }}
-              formatter={(v: number) => [formatBRL(v), "MRR"]}
+              formatter={(v: unknown) => [formatBRL(typeof v === "number" ? v : 0), "MRR"]}
             />
             <Area type="monotone" dataKey="mrr" stroke="#22c55e" strokeWidth={2} fill="url(#mrrGrad)" />
           </AreaChart>

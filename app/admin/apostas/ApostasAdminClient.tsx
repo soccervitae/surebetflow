@@ -15,7 +15,7 @@ type Aposta = {
   roi_percentual: number
   status: string
   created_at: string
-  profile: { nome: string; sobrenome: string; apelido: string | null } | null
+  profile: { nome: string; sobrenome: string; apelido: string | null }[] | null
 }
 
 const STATUS_COLOR: Record<string, string> = {
@@ -27,7 +27,8 @@ const STATUS_COLOR: Record<string, string> = {
 type SortKey = "evento" | "perfil" | "investimento_total" | "lucro_garantido" | "roi_percentual" | "status" | "created_at"
 
 function profileName(a: Aposta) {
-  return a.profile?.apelido ?? `${a.profile?.nome ?? ""} ${a.profile?.sobrenome ?? ""}`.trim()
+  const p = Array.isArray(a.profile) ? a.profile[0] : a.profile
+  return p?.apelido ?? `${p?.nome ?? ""} ${p?.sobrenome ?? ""}`.trim()
 }
 
 function exportCSV(rows: Aposta[]) {
