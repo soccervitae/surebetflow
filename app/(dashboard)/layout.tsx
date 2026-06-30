@@ -71,10 +71,12 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
       const { data: subData } = await supabase
         .from("subscriptions")
-        .select("plan, status")
+        .select("plan, status, current_period_end")
         .eq("user_id", user.id)
         .single()
-      const isActiveSub = subData?.status === "active" || subData?.status === "trialing" || subData?.status === "courtesy"
+      const courtesyActive = subData?.status === "courtesy" &&
+        (!subData.current_period_end || new Date(subData.current_period_end) > new Date())
+      const isActiveSub = subData?.status === "active" || subData?.status === "trialing" || courtesyActive
       setHasActivePlan(isActiveSub)
       if (isActiveSub) {
         const names: Record<string, string> = { trader: "Trader", trader_pro: "Trader Pro", pro: "Pro" }
@@ -107,7 +109,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       }
 
       // Redirect to onboarding if subscribed but no profiles yet
-      const isActive = subData?.status === "active" || subData?.status === "trialing" || subData?.status === "courtesy"
+      const isActive = subData?.status === "active" || subData?.status === "trialing" || courtesyActive
       const isOnboardingExcluded = pathname.startsWith("/onboarding") || isAllowedWithoutPlan
       if (isActive && !isOnboardingExcluded) {
         const alreadyOnboarded = typeof window !== "undefined" && localStorage.getItem("onboarding_done") === "1"

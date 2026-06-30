@@ -15,10 +15,11 @@ export default async function AdminUsuarioDetailPage({ params }: { params: { id:
     supabase.from("profiles").select("id, nome, sobrenome, apelido, email, ativo, created_at").eq("user_id", params.id),
     supabase.from("apostas").select("profile_id, investimento_total, resultado_real, lucro_garantido, status"),
     supabase.from("movimentacoes_financeiras").select("profile_id, tipo, valor"),
-    supabase.from("subscriptions").select("status, plan").eq("user_id", params.id).maybeSingle(),
+    supabase.from("subscriptions").select("status, plan, current_period_end").eq("user_id", params.id).maybeSingle(),
   ])
 
   const hasCourtesy = subscription?.status === "courtesy"
+  const expiresAt = subscription?.current_period_end ?? null
 
   const profileIds = (profiles ?? []).map(p => p.id)
 
@@ -67,7 +68,7 @@ export default async function AdminUsuarioDetailPage({ params }: { params: { id:
             </p>
           </div>
         </div>
-        <CourtesyButton userId={params.id} hasCourtesy={hasCourtesy} />
+        <CourtesyButton userId={params.id} hasCourtesy={hasCourtesy} expiresAt={expiresAt} />
       </div>
 
       <div>
