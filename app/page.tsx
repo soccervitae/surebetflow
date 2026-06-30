@@ -39,12 +39,12 @@ export default async function LandingPage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
 
-      {/* Navbar */}
-      <nav className="sticky top-0 z-50 bg-[#0f172a]/90 backdrop-blur border-b border-white/5">
+      {/* Navbar — oculta em mobile */}
+      <nav className="hidden sm:block sticky top-0 z-50 bg-[#0f172a]/90 backdrop-blur border-b border-white/5">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src="https://gkkuttabavwxjuibmrnr.supabase.co/storage/v1/object/public/logos/SUREBETFLOW%20LOGOSS%20DARK.png" alt="SurebetFlow" height={36} className="h-9 w-auto" />
-          <div className="hidden sm:flex items-center gap-3">
+          <div className="flex items-center gap-3">
             <Link href="/login" className="text-sm font-medium text-gray-400 hover:text-white transition-colors">
               Entrar
             </Link>
@@ -56,7 +56,14 @@ export default async function LandingPage() {
       </nav>
 
       {/* Hero */}
-      <section className="max-w-6xl mx-auto px-4 sm:px-6 pt-24 pb-28 text-center">
+      <section className="max-w-6xl mx-auto px-4 sm:px-6 pt-16 sm:pt-24 pb-28 text-center">
+        {/* Logo visível só em mobile (navbar oculta) */}
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src="https://gkkuttabavwxjuibmrnr.supabase.co/storage/v1/object/public/logos/SUREBETFLOW%20LOGOSS%20DARK.png"
+          alt="SurebetFlow"
+          className="sm:hidden h-10 w-auto mx-auto mb-8"
+        />
         <div className="inline-flex items-center gap-2 bg-white/5 border border-white/10 text-gray-400 text-sm font-medium px-4 py-1.5 rounded-full mb-8">
           <Zap className="w-3.5 h-3.5" />
           Lucro garantido — é matemática pura
