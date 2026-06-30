@@ -31,6 +31,52 @@ function statusBadge(status: string) {
   }
 }
 
+function ProfilePickerContent({ profiles, betCountMap, onSelect, onClose }: {
+  profiles: { id: string; nome: string; sobrenome: string; apelido?: string | null }[]
+  betCountMap: Record<string, number>
+  onSelect: (id: string, name: string) => void
+  onClose: () => void
+}) {
+  return (
+    <div className="space-y-2">
+      {profiles.map(p => {
+        const name = p.apelido || `${p.nome} ${p.sobrenome}`
+        const count = betCountMap[p.id] ?? 0
+        const insufficient = count < 2
+        if (insufficient) {
+          return (
+            <div key={p.id} className="px-4 py-3 rounded-xl border border-[var(--border)] space-y-2">
+              <div className="flex items-center justify-between">
+                <span className="font-semibold text-[var(--text-primary)] text-sm opacity-60">{name}</span>
+                <span className="text-xs text-amber-500 font-medium flex items-center gap-1">
+                  <AlertTriangle className="w-3.5 h-3.5" />
+                  {count === 0 ? "Sem bets" : `${count} bet — mín. 2`}
+                </span>
+              </div>
+              <Link
+                href={`/perfis/${p.id}?tab=bets`}
+                onClick={onClose}
+                className="inline-flex items-center gap-1.5 text-xs text-[#4d82d6] hover:underline font-medium"
+              >
+                Adicionar bets neste perfil →
+              </Link>
+            </div>
+          )
+        }
+        return (
+          <button
+            key={p.id}
+            onClick={() => onSelect(p.id, name)}
+            className="w-full text-left px-4 py-3 rounded-xl border border-[var(--border)] hover:border-[#4d82d6] hover:bg-[#1e3a8a]/5 transition-colors"
+          >
+            <span className="font-semibold text-[var(--text-primary)] text-sm">{name}</span>
+          </button>
+        )
+      })}
+    </div>
+  )
+}
+
 export default function ApostasClient({ apostas: initialApostas, profiles, betCountMap }: Props) {
   const [apostas, setApostas] = useState(initialApostas)
   const [filterStatus, setFilterStatus] = useState("todos")
@@ -664,52 +710,32 @@ export default function ApostasClient({ apostas: initialApostas, profiles, betCo
         </>
       )}
 
-      {/* Profile picker — Modal desktop */}
+      {/* Profile picker — Sheet mobile / Dialog desktop */}
+      <Sheet open={selectProfileModal} onOpenChange={setSelectProfileModal}>
+        <SheetContent side="bottom" className="md:hidden rounded-t-2xl px-4 pb-8">
+          <SheetHeader className="mb-4">
+            <SheetTitle>Escolha o perfil</SheetTitle>
+          </SheetHeader>
+          <ProfilePickerContent
+            profiles={profiles}
+            betCountMap={betCountMap}
+            onSelect={(id, name) => { setSelectedProfileId(id); setSelectedProfileName(name); setSelectProfileModal(false); setNovaModal(true) }}
+            onClose={() => setSelectProfileModal(false)}
+          />
+        </SheetContent>
+      </Sheet>
       <Dialog open={selectProfileModal} onOpenChange={setSelectProfileModal}>
-        <DialogContent className="max-w-sm">
+        <DialogContent className="hidden md:block max-w-sm">
           <DialogHeader>
             <DialogTitle>Escolha o perfil</DialogTitle>
           </DialogHeader>
-          <div className="space-y-2 mt-2">
-            {profiles.map(p => {
-              const name = p.apelido || `${p.nome} ${p.sobrenome}`
-              const count = betCountMap[p.id] ?? 0
-              const insufficient = count < 2
-              if (insufficient) {
-                return (
-                  <div key={p.id} className="px-4 py-3 rounded-xl border border-[var(--border)] space-y-2">
-                    <div className="flex items-center justify-between">
-                      <span className="font-semibold text-[var(--text-primary)] text-sm opacity-60">{name}</span>
-                      <span className="text-xs text-amber-500 font-medium flex items-center gap-1">
-                        <AlertTriangle className="w-3.5 h-3.5" />
-                        {count === 0 ? "Sem bets" : `${count} bet — mín. 2`}
-                      </span>
-                    </div>
-                    <Link
-                      href={`/perfis/${p.id}?tab=bets`}
-                      onClick={() => setSelectProfileModal(false)}
-                      className="inline-flex items-center gap-1.5 text-xs text-[#4d82d6] hover:underline font-medium"
-                    >
-                      Adicionar bets neste perfil →
-                    </Link>
-                  </div>
-                )
-              }
-              return (
-                <button
-                  key={p.id}
-                  onClick={() => {
-                    setSelectedProfileId(p.id)
-                    setSelectedProfileName(name)
-                    setSelectProfileModal(false)
-                    setNovaModal(true)
-                  }}
-                  className="w-full text-left px-4 py-3 rounded-xl border border-[var(--border)] hover:border-[#4d82d6] hover:bg-[#1e3a8a]/5 transition-colors"
-                >
-                  <span className="font-semibold text-[var(--text-primary)] text-sm">{name}</span>
-                </button>
-              )
-            })}
+          <div className="mt-2">
+            <ProfilePickerContent
+              profiles={profiles}
+              betCountMap={betCountMap}
+              onSelect={(id, name) => { setSelectedProfileId(id); setSelectedProfileName(name); setSelectProfileModal(false); setNovaModal(true) }}
+              onClose={() => setSelectProfileModal(false)}
+            />
           </div>
         </DialogContent>
       </Dialog>
