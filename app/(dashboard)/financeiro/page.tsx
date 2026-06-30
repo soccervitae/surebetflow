@@ -95,7 +95,7 @@ export default function FinanceiroPage() {
 
   const [showFilter, setShowFilter] = useState(false)
   const [filterPeriodo, setFilterPeriodo] = useState<Periodo>("mes")
-  const [filterTipo, setFilterTipo] = useState<"todos" | "deposito" | "saque">("todos")
+  const [filterTipo, setFilterTipo] = useState<"todos" | "deposito" | "saque" | "lucro" | "perda" | "bonus">("todos")
   const [filterProfile, setFilterProfile] = useState("")
   const [filterBet, setFilterBet] = useState("")
   const [filterProfileBets, setFilterProfileBets] = useState<{ id: string; nome: string }[]>([])
@@ -237,21 +237,20 @@ export default function FinanceiroPage() {
           </div>
 
           {/* Tipo */}
-          <div className="flex gap-1">
+          <div className="flex flex-wrap gap-1">
             {([
-              { value: "todos",   label: "Todos" },
-              { value: "deposito", label: "Depósito" },
-              { value: "saque",   label: "Saque" },
-            ] as { value: "todos" | "deposito" | "saque"; label: string }[]).map(({ value, label }) => (
+              { value: "todos",    label: "Todos",    active: "border-[#2563EB] bg-[#2563EB]/10 text-[#2563EB]" },
+              { value: "deposito", label: "Depósito", active: "border-[#1e3a8a] bg-[#1e3a8a]/10 text-[var(--accent-text)]" },
+              { value: "saque",    label: "Saque",    active: "border-[#DC2626] bg-[#DC2626]/10 text-[#DC2626]" },
+              { value: "lucro",    label: "Lucro",    active: "border-green-500 bg-green-500/10 text-green-500" },
+              { value: "perda",    label: "Perda",    active: "border-orange-500 bg-orange-500/10 text-orange-500" },
+              { value: "bonus",    label: "Bônus",    active: "border-purple-500 bg-purple-500/10 text-purple-500" },
+            ] as { value: "todos" | "deposito" | "saque" | "lucro" | "perda" | "bonus"; label: string; active: string }[]).map(({ value, label, active }) => (
               <button
                 key={value}
                 onClick={() => setFilterTipo(value)}
-                className={`flex-1 py-1.5 rounded-lg border text-xs font-medium transition-colors ${
-                  filterTipo === value
-                    ? value === "deposito" ? "border-[#1e3a8a] bg-[#1e3a8a]/10 text-[var(--accent-text)]"
-                    : value === "saque"    ? "border-[#DC2626] bg-[#DC2626]/10 text-[#DC2626]"
-                    :                       "border-[#2563EB] bg-[#2563EB]/10 text-[#2563EB]"
-                    : "border-[var(--border)] text-[var(--text-secondary)]"
+                className={`px-3 py-1.5 rounded-lg border text-xs font-medium transition-colors ${
+                  filterTipo === value ? active : "border-[var(--border)] text-[var(--text-secondary)]"
                 }`}
               >
                 {label}
