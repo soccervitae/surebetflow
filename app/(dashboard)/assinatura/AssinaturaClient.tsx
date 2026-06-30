@@ -205,7 +205,7 @@ export default function AssinaturaClient({ subscription }: { subscription: Subsc
       )}
 
       {/* Payment details */}
-      {subscription && (
+      {isActive && subscription && (
         <div className="bg-[var(--bg-surface)] border border-[var(--border)] rounded-2xl overflow-hidden">
           <div className="px-5 py-4 border-b border-[var(--border)]">
             <h2 className="text-sm font-semibold text-[var(--text-primary)]">Detalhes da assinatura</h2>
