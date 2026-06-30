@@ -452,8 +452,24 @@ export default function ApostasClient({ apostas: initialApostas, profiles, betCo
       ) : (
         <>
           {/* ── Desktop table ── */}
-          <div className="hidden md:block space-y-3">
-            {filtered.map(aposta => {
+          {(() => {
+            function formatGroupDate(iso: string) {
+              return new Date(iso + "T12:00:00").toLocaleDateString("pt-BR", { day: "numeric", month: "short" }).replace(".", "")
+            }
+            const map = new Map<string, typeof filtered>()
+            for (const a of filtered) {
+              const key = new Date(a.created_at).toISOString().slice(0, 10)
+              if (!map.has(key)) map.set(key, [])
+              map.get(key)!.push(a)
+            }
+            const groups = Array.from(map.entries()).sort((a, b) => b[0].localeCompare(a[0]))
+            return (
+          <div className="hidden md:block space-y-6">
+            {groups.map(([dateKey, apostasGroup]) => (
+              <div key={dateKey}>
+                <p className="text-xs font-semibold text-[var(--text-muted)] px-1 mb-2">{formatGroupDate(dateKey)}</p>
+                <div className="space-y-3">
+            {apostasGroup.map(aposta => {
               const legs = (aposta as Aposta & { legs?: ApostaLeg[] }).legs ?? []
               const d = aposta.data_evento ? new Date(aposta.data_evento) : new Date(aposta.created_at)
               const dataStr = d.toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit" })
@@ -519,11 +535,32 @@ export default function ApostasClient({ apostas: initialApostas, profiles, betCo
                 </Card>
               )
             })}
+                </div>
+              </div>
+            ))}
           </div>
+            )
+          })()}
 
           {/* ── Mobile cards ── */}
-          <div className="md:hidden space-y-3">
-            {filtered.map(aposta => {
+          {(() => {
+            function formatGroupDate(iso: string) {
+              return new Date(iso + "T12:00:00").toLocaleDateString("pt-BR", { day: "numeric", month: "short" }).replace(".", "")
+            }
+            const map = new Map<string, typeof filtered>()
+            for (const a of filtered) {
+              const key = new Date(a.created_at).toISOString().slice(0, 10)
+              if (!map.has(key)) map.set(key, [])
+              map.get(key)!.push(a)
+            }
+            const groups = Array.from(map.entries()).sort((a, b) => b[0].localeCompare(a[0]))
+            return (
+          <div className="md:hidden space-y-6">
+            {groups.map(([dateKey, apostasGroup]) => (
+              <div key={dateKey}>
+                <p className="text-xs font-semibold text-[var(--text-muted)] px-1 mb-2">{formatGroupDate(dateKey)}</p>
+                <div className="space-y-3">
+            {apostasGroup.map(aposta => {
               const legs = (aposta as Aposta & { legs?: ApostaLeg[] }).legs ?? []
               const greenLegId = aposta.status === "finalizada" && aposta.resultado_real != null
                 ? legs.find(l => Math.abs(l.stake * l.odd - aposta.investimento_total - aposta.resultado_real!) < 0.5)?.id ?? null
@@ -618,7 +655,12 @@ export default function ApostasClient({ apostas: initialApostas, profiles, betCo
               </Link>
               )
             })}
+                </div>
+              </div>
+            ))}
           </div>
+            )
+          })()}
         </>
       )}
 
