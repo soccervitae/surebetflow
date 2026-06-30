@@ -26,7 +26,7 @@ export default function Logo({ size = "md", showText = true }: LogoProps) {
   const { theme } = useTheme()
   const isDark = theme === "dark"
 
-  const logoH = size === "sm" ? 36 : size === "lg" ? 56 : 44
+  const logoH = size === "sm" ? 28 : size === "lg" ? 56 : 44
 
   if (!showText) return <LogoIcon size={size} />
 
