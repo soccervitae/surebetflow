@@ -156,8 +156,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     <div className="flex min-h-screen bg-[var(--bg-base)]">
       {/* Sidebar */}
       <aside className={cn(
-        "hidden md:flex flex-col fixed top-0 left-0 h-full z-20 transition-all duration-200",
+        "flex-col fixed top-0 left-0 h-full z-20 transition-all duration-200",
         "bg-[#0b1631] border-r border-white/5",
+        hasActivePlan ? "hidden md:flex" : "hidden",
         sidebarW
       )}>
         {/* Logo */}
@@ -292,7 +293,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       {/* Content */}
       <div className={cn(
         "flex-1 flex flex-col transition-all duration-200",
-        collapsed ? "md:ml-16" : "md:ml-60"
+        hasActivePlan && (collapsed ? "md:ml-16" : "md:ml-60")
       )}>
         {/* Top bar */}
         <header className="hidden md:flex items-center justify-between px-6 py-3 bg-[var(--bg-surface)] border-b border-[var(--border)] sticky top-0 z-10">
@@ -376,7 +377,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       </header>
 
       {/* Bottom nav mobile */}
-      <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-[var(--bg-surface)] border-t border-[var(--border)] z-20 flex" style={{ paddingBottom: "env(safe-area-inset-bottom)" }}>
+      {hasActivePlan && <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-[var(--bg-surface)] border-t border-[var(--border)] z-20 flex" style={{ paddingBottom: "env(safe-area-inset-bottom)" }}>
         {([
           { href: "/dashboard",  icon: Home,          label: "Dashboard" },
           { href: "/perfis",     icon: Users,         label: "Perfis" },
@@ -418,7 +419,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             </Link>
           )
         })}
-      </nav>
+      </nav>}
 
       {/* Global realtime sync across devices */}
       {userId && <RealtimeProvider userId={userId} />}
