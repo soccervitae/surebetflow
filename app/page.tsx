@@ -68,7 +68,7 @@ export default async function LandingPage() {
           <Zap className="w-3.5 h-3.5" />
           Lucro garantido — é matemática pura
         </div>
-        <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold leading-tight mb-6 bg-gradient-to-br from-[#60a5fa] via-[#93c5fd] to-[#1e3a8a] bg-clip-text text-transparent">
+        <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold leading-tight mb-6 text-white">
           Calcular vitórias nunca<br />
           foi tão simples
         </h1>
