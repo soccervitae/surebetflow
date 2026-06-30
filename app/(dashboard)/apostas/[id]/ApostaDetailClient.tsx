@@ -14,7 +14,7 @@ import { formatCurrency } from "@/lib/utils"
 import { useToast } from "@/hooks/useToast"
 import {
   TrendingUp, DollarSign, Clock, BarChart2,
-  CheckCircle2, XCircle, AlertCircle, CalendarDays, Tag, Trash2, Pencil
+  CheckCircle2, XCircle, AlertCircle, CalendarDays, Tag, Pencil
 } from "lucide-react"
 import type { Aposta } from "@/lib/types"
 
@@ -61,7 +61,6 @@ function inferGreenLegId(legs: ApostaWithDetails["legs"], resultado_real: number
 export default function ApostaDetailClient({ aposta: initial }: { aposta: ApostaWithDetails }) {
   const [aposta, setAposta] = useState(initial)
   const [finalizarOpen, setFinalizarOpen] = useState(false)
-  const [deletarOpen, setDeletarOpen] = useState(false)
   const [greenLegId, setGreenLegId] = useState<string | null>(
     initial.status === "finalizada"
       ? inferGreenLegId(initial.legs, initial.resultado_real, initial.investimento_total)
@@ -71,7 +70,6 @@ export default function ApostaDetailClient({ aposta: initial }: { aposta: Aposta
   const [alterarConfirmOpen, setAlterarConfirmOpen] = useState(false)
   const [finalizando, setFinalizando] = useState(false)
   const [cancelando, setCancelando] = useState(false)
-  const [deletando, setDeletando] = useState(false)
   const [editarOpen, setEditarOpen] = useState(false)
   const [editEvento, setEditEvento] = useState(initial.evento)
   const [editEsporte, setEditEsporte] = useState(initial.esporte ?? "")
@@ -227,19 +225,6 @@ export default function ApostaDetailClient({ aposta: initial }: { aposta: Aposta
       toast({ title: "Erro ao salvar alterações", variant: "destructive" })
     } finally {
       setSalvandoEdicao(false)
-    }
-  }
-
-  async function handleDeletar() {
-    setDeletando(true)
-    const { error } = await supabase.from("apostas").delete().eq("id", aposta.id)
-    if (error) {
-      toast({ title: "Erro ao deletar aposta", variant: "destructive" })
-      setDeletando(false)
-    } else {
-      toast({ title: "Aposta deletada" })
-      router.push("/apostas")
-      router.refresh()
     }
   }
 
@@ -453,7 +438,7 @@ export default function ApostaDetailClient({ aposta: initial }: { aposta: Aposta
         </CardContent>
       </Card>
 
-      {/* Botões Editar / Deletar */}
+      {/* Botão Editar */}
       <div className="flex gap-3">
         <Button
           variant="outline"
@@ -463,14 +448,14 @@ export default function ApostaDetailClient({ aposta: initial }: { aposta: Aposta
           <Pencil className="w-4 h-4" />
           Editar
         </Button>
-        <Button
-          variant="outline"
-          className="flex-1 gap-2 text-[#DC2626] border-[#DC2626]/30 hover:bg-[#DC2626]/5"
-          onClick={() => setDeletarOpen(true)}
-        >
-          <Trash2 className="w-4 h-4" />
-          Deletar
-        </Button>
+      </div>
+
+      {/* Aviso: apostas não podem ser deletadas */}
+      <div className="flex items-start gap-2.5 rounded-xl bg-[var(--bg-elevated)] border border-[var(--border)] px-4 py-3">
+        <AlertCircle className="h-4 w-4 text-[var(--text-muted)] shrink-0 mt-0.5" />
+        <p className="text-xs text-[var(--text-muted)] leading-relaxed">
+          Apostas não podem ser excluídas. Ao finalizar uma aposta, o resultado é registrado automaticamente no histórico financeiro do perfil para manter a integridade dos dados.
+        </p>
       </div>
 
       {/* Ações */}
@@ -594,28 +579,6 @@ export default function ApostaDetailClient({ aposta: initial }: { aposta: Aposta
             <Button variant="outline" onClick={() => setEditarOpen(false)}>Cancelar</Button>
             <Button onClick={handleEditar} disabled={salvandoEdicao} className="bg-[#1e3a8a] hover:bg-[#1e40af] text-white">
               {salvandoEdicao ? "Salvando..." : "Salvar alterações"}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-
-      {/* Dialog Deletar */}
-      <Dialog open={deletarOpen} onOpenChange={setDeletarOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Deletar Aposta</DialogTitle>
-          </DialogHeader>
-          <p className="text-sm text-[var(--text-secondary)]">
-            Tem certeza que deseja deletar a aposta <strong className="text-[var(--text-primary)]">{aposta.evento}</strong>? Esta ação não pode ser desfeita.
-          </p>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setDeletarOpen(false)}>Cancelar</Button>
-            <Button
-              variant="destructive"
-              onClick={handleDeletar}
-              disabled={deletando}
-            >
-              {deletando ? "Deletando..." : "Deletar"}
             </Button>
           </DialogFooter>
         </DialogContent>
