@@ -1,6 +1,5 @@
 "use client"
 
-import Image from "next/image"
 import { useTheme } from "@/components/ThemeProvider"
 
 const LOGO_DARK  = "https://gkkuttabavwxjuibmrnr.supabase.co/storage/v1/object/public/logos/SUREBETFLOW%20LOGOSS%20DARK.png"
@@ -11,7 +10,6 @@ interface LogoProps {
   showText?: boolean
 }
 
-// Símbolo isolado (ícone) — mantido para uso pontual
 export function LogoIcon({ size = "md" }: { size?: "sm" | "md" | "lg" }) {
   const px = size === "sm" ? 28 : size === "lg" ? 48 : 36
   return (
@@ -24,25 +22,21 @@ export function LogoIcon({ size = "md" }: { size?: "sm" | "md" | "lg" }) {
   )
 }
 
-// Logo completa: adapta ao tema automaticamente
 export default function Logo({ size = "md", showText = true }: LogoProps) {
   const { theme } = useTheme()
   const isDark = theme === "dark"
 
   const logoH = size === "sm" ? 36 : size === "lg" ? 56 : 44
-  const logoW = Math.round(logoH * (620 / 160))
 
   if (!showText) return <LogoIcon size={size} />
 
   return (
-    <div className="select-none flex items-center">
-      <Image
-        src={isDark ? LOGO_DARK : LOGO_LIGHT}
-        alt="SurebetFlow"
-        width={logoW}
-        height={logoH}
-        priority
-      />
-    </div>
+    // eslint-disable-next-line @next/next/no-img-element
+    <img
+      src={isDark ? LOGO_DARK : LOGO_LIGHT}
+      alt="SurebetFlow"
+      style={{ height: logoH, width: "auto" }}
+      className="select-none"
+    />
   )
 }

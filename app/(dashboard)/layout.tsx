@@ -11,7 +11,6 @@ import {
   Circle, Sun, Moon, MessageCircle, BookOpen, ClipboardList
 } from "lucide-react"
 import Logo, { LogoIcon } from "@/components/Logo"
-import Image from "next/image"
 import { cn } from "@/lib/utils"
 import RealtimeProvider from "@/components/RealtimeProvider"
 import PlanoRequeridoModal from "@/components/PlanoRequeridoModal"
@@ -166,7 +165,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         )}>
           {collapsed
             ? <LogoIcon size="sm" />
-            : <Image src="https://gkkuttabavwxjuibmrnr.supabase.co/storage/v1/object/public/logos/SUREBETFLOW%20LOGOSS%20DARK.png" alt="SurebetFlow" width={140} height={36} priority />
+            : <Logo size="sm" />
           }
         </div>
 
