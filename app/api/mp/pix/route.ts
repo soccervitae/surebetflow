@@ -9,7 +9,13 @@ export async function POST(req: NextRequest) {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return NextResponse.json({ error: "Não autorizado" }, { status: 401 })
 
-  const { email } = await req.json()
+  const { email, plan } = await req.json()
+
+  const PLAN_AMOUNTS: Record<string, { amount: number; label: string }> = {
+    trader:     { amount: 99.00,  label: "SurebetFlow — Plano Trader" },
+    trader_pro: { amount: 179.00, label: "SurebetFlow — Plano Trader Pro" },
+  }
+  const { amount, label } = PLAN_AMOUNTS[plan] ?? PLAN_AMOUNTS.trader
 
   try {
     const mpClient = await getMpClient()
@@ -17,8 +23,8 @@ export async function POST(req: NextRequest) {
 
     const result = await payment.create({
       body: {
-        transaction_amount: 99.00,
-        description: "SureBetFlow — Plano Pro",
+        transaction_amount: amount,
+        description: label,
         payment_method_id: "pix",
         payer: {
           email: email || user.email!,
