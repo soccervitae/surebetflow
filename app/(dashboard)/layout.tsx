@@ -34,6 +34,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const [userName, setUserName] = useState("")
   const [userInitials, setUserInitials] = useState("")
   const [confirmLogout, setConfirmLogout] = useState(false)
+  const [avatarMenu, setAvatarMenu] = useState(false)
   const [unread, setUnread] = useState(0)
   const [userId, setUserId] = useState("")
   const [planName, setPlanName] = useState<string | null>(null)
@@ -368,9 +369,36 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               </Link>
             </>
           )}
-          <Link href="/configuracoes" className="w-7 h-7 bg-[#1e3a8a] rounded-full flex items-center justify-center text-white text-xs font-bold">
-            {userInitials}
-          </Link>
+          <div className="relative">
+            <button
+              onClick={() => setAvatarMenu(v => !v)}
+              className="w-7 h-7 bg-[#1e3a8a] rounded-full flex items-center justify-center text-white text-xs font-bold"
+            >
+              {userInitials}
+            </button>
+            {avatarMenu && (
+              <>
+                <div className="fixed inset-0 z-30" onClick={() => setAvatarMenu(false)} />
+                <div className="absolute right-0 top-9 z-40 bg-[var(--bg-surface)] border border-[var(--border)] rounded-xl shadow-xl overflow-hidden w-44">
+                  <Link
+                    href="/configuracoes"
+                    onClick={() => setAvatarMenu(false)}
+                    className="flex items-center gap-2.5 px-4 py-3 text-sm text-[var(--text-primary)] hover:bg-[var(--bg-elevated)] transition-colors"
+                  >
+                    <Settings className="w-4 h-4 text-[var(--text-muted)]" />
+                    Minha Conta
+                  </Link>
+                  <button
+                    onClick={() => { setAvatarMenu(false); setConfirmLogout(true) }}
+                    className="w-full flex items-center gap-2.5 px-4 py-3 text-sm text-red-400 hover:bg-[var(--bg-elevated)] transition-colors border-t border-[var(--border)]"
+                  >
+                    <LogOut className="w-4 h-4" />
+                    Sair
+                  </button>
+                </div>
+              </>
+            )}
+          </div>
         </div>
       </header>
 
