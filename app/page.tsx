@@ -68,9 +68,9 @@ export default async function LandingPage() {
           <Zap className="w-3.5 h-3.5" />
           Lucro garantido — é matemática pura
         </div>
-        <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold leading-tight mb-6">
+        <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold leading-tight mb-6 bg-gradient-to-br from-[#60a5fa] via-[#93c5fd] to-[#1e3a8a] bg-clip-text text-transparent">
           Calcular vitórias nunca<br />
-          foi tão <span className="text-[#1e3a8a]">simples</span>
+          foi tão simples
         </h1>
         <p className="text-lg text-gray-400 max-w-2xl mx-auto mb-10">
           A plataforma completa para apostadores de arbitragem. Calcule, registre e acompanhe seus lucros garantidos com segurança total e controle profissional.
