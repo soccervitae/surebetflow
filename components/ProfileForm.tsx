@@ -160,7 +160,7 @@ export function ProfileForm({ profile, onSuccess, userId }: ProfileFormProps) {
         </Button>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <div className="grid grid-cols-2 gap-4">
         <div className="space-y-2">
           <Label htmlFor="nome">Nome *</Label>
           <Input id="nome" value={nome} onChange={e => setNome(e.target.value)} placeholder="João" />
@@ -173,18 +173,19 @@ export function ProfileForm({ profile, onSuccess, userId }: ProfileFormProps) {
         </div>
       </div>
 
-      <div className="space-y-2">
-        <Label htmlFor="apelido">Apelido (opcional)</Label>
-        <Input id="apelido" value={apelido} onChange={e => setApelido(e.target.value)} placeholder="Ex: Perfil Principal" />
+      <div className="grid grid-cols-2 gap-4">
+        <div className="space-y-2">
+          <Label htmlFor="apelido">Apelido (opcional)</Label>
+          <Input id="apelido" value={apelido} onChange={e => setApelido(e.target.value)} placeholder="Ex: Principal" />
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="cpf">CPF *</Label>
+          <Input id="cpf" value={cpf} onChange={handleCpfChange} placeholder="000.000.000-00" maxLength={14} />
+          {errors.cpf && <p className="text-xs text-[#DC2626]">{errors.cpf}</p>}
+        </div>
       </div>
 
-      <div className="space-y-2">
-        <Label htmlFor="cpf">CPF *</Label>
-        <Input id="cpf" value={cpf} onChange={handleCpfChange} placeholder="000.000.000-00" maxLength={14} />
-        {errors.cpf && <p className="text-xs text-[#DC2626]">{errors.cpf}</p>}
-      </div>
-
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <div className="grid grid-cols-2 gap-4">
         <div className="space-y-2">
           <Label htmlFor="telefone">Telefone (opcional)</Label>
           <Input id="telefone" value={telefone} onChange={handlePhoneChange(setTelefone)} placeholder="(11) 99999-9999" maxLength={15} />
