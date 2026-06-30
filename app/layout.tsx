@@ -84,13 +84,15 @@ export const metadata: Metadata = {
   },
   icons: {
     icon: [
-      { url: "/icons/icon-512x512.png", sizes: "any", type: "image/png" },
-      { url: "/icons/favicon-32x32.png", sizes: "32x32", type: "image/png" },
-      { url: "/icons/icon-192x192.png",  sizes: "192x192", type: "image/png" },
+      { url: "/icons/favicon-64x64.png",  sizes: "64x64",   type: "image/png" },
+      { url: "/icons/favicon-32x32.png",  sizes: "32x32",   type: "image/png" },
+      { url: "/icons/icon-192x192.png",   sizes: "192x192", type: "image/png" },
+      { url: "/icons/icon-512x512.png",   sizes: "512x512", type: "image/png" },
     ],
     apple: [
       { url: "/icons/apple-touch-icon.png", sizes: "180x180", type: "image/png" },
     ],
+    shortcut: "/icons/favicon-64x64.png",
   },
   alternates: {
     canonical: BASE_URL,
