@@ -21,6 +21,82 @@ type Movimentacao = {
 
 type Periodo = "hoje" | "semana" | "mes" | "ano" | "todos"
 
+function ExtratoList({ movimentacoes }: { movimentacoes: Movimentacao[] }) {
+  // Agrupa por data (dia)
+  const groups = useMemo(() => {
+    const map = new Map<string, Movimentacao[]>()
+    for (const m of movimentacoes) {
+      const d = new Date(m.created_at)
+      const key = d.toISOString().slice(0, 10) // "2025-06-28"
+      if (!map.has(key)) map.set(key, [])
+      map.get(key)!.push(m)
+    }
+    return Array.from(map.entries()).sort((a, b) => b[0].localeCompare(a[0]))
+  }, [movimentacoes])
+
+  function formatGroupDate(iso: string) {
+    const d = new Date(iso + "T12:00:00")
+    return d.toLocaleDateString("pt-BR", { day: "numeric", month: "short" })
+      .replace(".", "").replace(/^\d/, c => c.toUpperCase())
+  }
+
+  function formatHora(iso: string) {
+    return new Date(iso).toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" })
+  }
+
+  return (
+    <div className="space-y-4">
+      {groups.map(([dateKey, items]) => (
+        <div key={dateKey}>
+          {/* Cabeçalho da data */}
+          <p className="text-xs font-semibold text-[var(--text-muted)] px-1 mb-2">
+            {formatGroupDate(dateKey)}
+          </p>
+
+          {/* Card do grupo */}
+          <Card>
+            <CardContent className="p-0 divide-y divide-[var(--border)]">
+              {items.map(m => {
+                const betNome    = m.profile_bet?.bet?.nome ?? "—"
+                const perfilNome = m.profile?.apelido || `${m.profile?.nome ?? ""} ${m.profile?.sobrenome ?? ""}`.trim()
+                const hora       = formatHora(m.created_at)
+                const isDeposito = m.tipo === "deposito"
+                return (
+                  <div key={m.id} className="flex items-center gap-3 px-4 py-3.5">
+                    {/* Ícone */}
+                    <div className={`w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 ${isDeposito ? "bg-[#1e3a8a]/10" : "bg-[#DC2626]/10"}`}>
+                      {isDeposito
+                        ? <ArrowDownLeft className="h-5 w-5 text-[var(--accent-text)]" />
+                        : <ArrowUpRight  className="h-5 w-5 text-[#DC2626]" />
+                      }
+                    </div>
+
+                    {/* Info */}
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-semibold text-[var(--text-primary)] truncate">{betNome}</p>
+                      <p className="text-xs text-[var(--text-muted)] truncate">
+                        {perfilNome} · {hora} · {isDeposito ? "Depósito" : "Saque"}
+                      </p>
+                    </div>
+
+                    {/* Valor */}
+                    <p className={`text-sm font-bold flex-shrink-0 ${isDeposito ? "text-[var(--accent-text)]" : "text-[#DC2626]"}`}>
+                      {isDeposito ? "+" : "-"}{formatCurrency(Number(m.valor))}
+                    </p>
+                  </div>
+                )
+              })}
+            </CardContent>
+          </Card>
+        </div>
+      ))}
+      <p className="text-xs text-[var(--text-muted)] text-center pb-2">
+        {movimentacoes.length} movimentaç{movimentacoes.length !== 1 ? "ões" : "ão"}
+      </p>
+    </div>
+  )
+}
+
 export default function FinanceiroPage() {
   const [profiles, setProfiles] = useState<Profile[]>([])
   const [movimentacoes, setMovimentacoes] = useState<Movimentacao[]>([])
@@ -241,61 +317,12 @@ export default function FinanceiroPage() {
         </Card>
       </div>
 
-      {/* Lista */}
-      <Card>
-        <CardContent className="pt-4">
-          {filtered.length === 0 ? (
-            <p className="text-center text-[var(--text-muted)] py-8 text-sm">Nenhuma movimentação encontrada.</p>
-          ) : (
-            <div className="space-y-2">
-              {filtered.map(m => {
-                const betNome    = m.profile_bet?.bet?.nome
-                const perfilNome = m.profile?.apelido || `${m.profile?.nome ?? ""} ${m.profile?.sobrenome ?? ""}`.trim()
-                const data       = new Date(m.created_at).toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit", year: "numeric" })
-                return (
-                  <div key={m.id} className="flex items-center gap-3 p-3 rounded-xl border border-[var(--border)]">
-                    {/* Ícone */}
-                    <div className={`p-2 rounded-lg flex-shrink-0 ${m.tipo === "deposito" ? "bg-[#1e3a8a]/10" : "bg-[#DC2626]/10"}`}>
-                      {m.tipo === "deposito"
-                        ? <ArrowDownLeft className="h-4 w-4 text-[var(--accent-text)]" />
-                        : <ArrowUpRight  className="h-4 w-4 text-[#DC2626]" />
-                      }
-                    </div>
-
-                    {/* Info */}
-                    <div className="flex-1 min-w-0">
-                      {/* Bet */}
-                      <p className="text-sm font-semibold text-[var(--text-primary)] truncate">
-                        {betNome ?? "—"}
-                      </p>
-                      {/* Perfil + data */}
-                      <p className="text-xs text-[var(--text-muted)] truncate">
-                        {perfilNome} · {data}
-                      </p>
-                      {m.descricao && (
-                        <p className="text-xs text-[var(--text-muted)] truncate">{m.descricao}</p>
-                      )}
-                    </div>
-
-                    {/* Valor */}
-                    <div className="text-right flex-shrink-0">
-                      <p className={`text-sm font-bold ${m.tipo === "deposito" ? "text-[var(--accent-text)]" : "text-[#DC2626]"}`}>
-                        {m.tipo === "deposito" ? "+" : "-"}{formatCurrency(Number(m.valor))}
-                      </p>
-                      <p className="text-xs text-[var(--text-muted)]">{m.tipo === "deposito" ? "Depósito" : "Saque"}</p>
-                    </div>
-                  </div>
-                )
-              })}
-            </div>
-          )}
-          {filtered.length > 0 && (
-            <p className="text-xs text-[var(--text-muted)] text-center pt-3">
-              {filtered.length} movimentaç{filtered.length !== 1 ? "ões" : "ão"}
-            </p>
-          )}
-        </CardContent>
-      </Card>
+      {/* Extrato */}
+      {filtered.length === 0 ? (
+        <Card><CardContent className="py-12 text-center text-[var(--text-muted)] text-sm">Nenhuma movimentação encontrada.</CardContent></Card>
+      ) : (
+        <ExtratoList movimentacoes={filtered} />
+      )}
     </div>
   )
 }
