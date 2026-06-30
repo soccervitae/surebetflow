@@ -31,17 +31,9 @@ function tipoConfig(tipo: string) {
   }
 }
 
-function ExtratoList({ movimentacoes }: { movimentacoes: Movimentacao[] }) {
-  const groups = useMemo(() => {
-    const map = new Map<string, Movimentacao[]>()
-    for (const m of movimentacoes) {
-      const key = new Date(m.created_at).toISOString().slice(0, 10)
-      if (!map.has(key)) map.set(key, [])
-      map.get(key)!.push(m)
-    }
-    return Array.from(map.entries()).sort((a, b) => b[0].localeCompare(a[0]))
-  }, [movimentacoes])
+const TIPO_ORDER = ["deposito", "lucro", "bonus", "saque", "perda"]
 
+function ExtratoList({ movimentacoes, filterTipo }: { movimentacoes: Movimentacao[]; filterTipo: string }) {
   function formatGroupDate(iso: string) {
     return new Date(iso + "T12:00:00").toLocaleDateString("pt-BR", { day: "numeric", month: "short" }).replace(".", "")
   }
@@ -49,45 +41,80 @@ function ExtratoList({ movimentacoes }: { movimentacoes: Movimentacao[] }) {
     return new Date(iso).toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" })
   }
 
-  return (
-    <div className="space-y-4">
-      {groups.map(([dateKey, items]) => (
-        <div key={dateKey}>
-          <p className="text-xs font-semibold text-[var(--text-muted)] px-1 mb-2">{formatGroupDate(dateKey)}</p>
-          <Card>
-            <CardContent className="p-0 divide-y divide-[var(--border)]">
-              {items.map(m => {
-                const cfg        = tipoConfig(m.tipo)
-                const betNome    = m.profile_bet?.bet?.nome ?? "—"
-                const perfilNome = m.profile?.apelido || `${m.profile?.nome ?? ""} ${m.profile?.sobrenome ?? ""}`.trim()
-                return (
-                  <div key={m.id} className="flex items-center gap-3 px-4 py-3.5">
-                    <div className={`w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 ${cfg.bg}`}>
-                      {cfg.icon}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-semibold text-[var(--text-primary)] truncate">{betNome}</p>
-                      <p className="text-xs text-[var(--text-muted)] truncate">
-                        {perfilNome} · {formatHora(m.created_at)}
-                        {m.descricao ? ` · ${m.descricao}` : ""}
-                      </p>
-                    </div>
-                    <div className="text-right flex-shrink-0">
-                      <p className={`text-sm font-bold ${cfg.color}`}>
-                        {cfg.sign}{formatCurrency(Number(m.valor))}
-                      </p>
-                      <p className="text-xs text-[var(--text-muted)]">{cfg.label}</p>
-                    </div>
-                  </div>
-                )
-              })}
-            </CardContent>
-          </Card>
+  function renderItem(m: Movimentacao) {
+    const cfg        = tipoConfig(m.tipo)
+    const betNome    = m.profile_bet?.bet?.nome ?? "—"
+    const perfilNome = m.profile?.apelido || `${m.profile?.nome ?? ""} ${m.profile?.sobrenome ?? ""}`.trim()
+    return (
+      <div key={m.id} className="flex items-center gap-3 px-4 py-3.5">
+        <div className={`w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 ${cfg.bg}`}>
+          {cfg.icon}
         </div>
-      ))}
-      <p className="text-xs text-[var(--text-muted)] text-center pb-2">
-        {movimentacoes.length} movimentaç{movimentacoes.length !== 1 ? "ões" : "ão"}
-      </p>
+        <div className="flex-1 min-w-0">
+          <p className="text-sm font-semibold text-[var(--text-primary)] truncate">{betNome}</p>
+          <p className="text-xs text-[var(--text-muted)] truncate">
+            {perfilNome} · {formatHora(m.created_at)}{m.descricao ? ` · ${m.descricao}` : ""}
+          </p>
+        </div>
+        <div className="text-right flex-shrink-0">
+          <p className={`text-sm font-bold ${cfg.color}`}>{cfg.sign}{formatCurrency(Number(m.valor))}</p>
+          <p className="text-xs text-[var(--text-muted)]">{cfg.label}</p>
+        </div>
+      </div>
+    )
+  }
+
+  // Quando tipo específico selecionado → agrupa por data
+  if (filterTipo !== "todos") {
+    const map = new Map<string, Movimentacao[]>()
+    for (const m of movimentacoes) {
+      const key = new Date(m.created_at).toISOString().slice(0, 10)
+      if (!map.has(key)) map.set(key, [])
+      map.get(key)!.push(m)
+    }
+    const groups = Array.from(map.entries()).sort((a, b) => b[0].localeCompare(a[0]))
+    return (
+      <div className="space-y-4">
+        {groups.map(([dateKey, items]) => (
+          <div key={dateKey}>
+            <p className="text-xs font-semibold text-[var(--text-muted)] px-1 mb-2">{formatGroupDate(dateKey)}</p>
+            <Card><CardContent className="p-0 divide-y divide-[var(--border)]">{items.map(renderItem)}</CardContent></Card>
+          </div>
+        ))}
+        <p className="text-xs text-[var(--text-muted)] text-center pb-2">{movimentacoes.length} movimentaç{movimentacoes.length !== 1 ? "ões" : "ão"}</p>
+      </div>
+    )
+  }
+
+  // Quando "Todos" → agrupa por tipo (seções)
+  const byTipo = new Map<string, Movimentacao[]>()
+  for (const m of movimentacoes) {
+    if (!byTipo.has(m.tipo)) byTipo.set(m.tipo, [])
+    byTipo.get(m.tipo)!.push(m)
+  }
+  const tipoGroups = TIPO_ORDER.filter(t => byTipo.has(t)).map(t => ({ tipo: t, items: byTipo.get(t)! }))
+
+  return (
+    <div className="space-y-5">
+      {tipoGroups.map(({ tipo, items }) => {
+        const cfg   = tipoConfig(tipo)
+        const total = items.reduce((s, m) => s + Number(m.valor), 0)
+        return (
+          <div key={tipo}>
+            {/* Cabeçalho da seção */}
+            <div className="flex items-center justify-between px-1 mb-2">
+              <p className={`text-xs font-semibold ${cfg.color}`}>{cfg.label}s</p>
+              <p className={`text-xs font-bold ${cfg.color}`}>{cfg.sign}{formatCurrency(total)}</p>
+            </div>
+            <Card>
+              <CardContent className="p-0 divide-y divide-[var(--border)]">
+                {items.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()).map(renderItem)}
+              </CardContent>
+            </Card>
+          </div>
+        )
+      })}
+      <p className="text-xs text-[var(--text-muted)] text-center pb-2">{movimentacoes.length} movimentaç{movimentacoes.length !== 1 ? "ões" : "ão"}</p>
     </div>
   )
 }
@@ -329,7 +356,7 @@ export default function FinanceiroPage() {
       {filtered.length === 0 ? (
         <Card><CardContent className="py-12 text-center text-[var(--text-muted)] text-sm">Nenhuma movimentação encontrada.</CardContent></Card>
       ) : (
-        <ExtratoList movimentacoes={filtered} />
+        <ExtratoList movimentacoes={filtered} filterTipo={filterTipo} />
       )}
     </div>
   )
