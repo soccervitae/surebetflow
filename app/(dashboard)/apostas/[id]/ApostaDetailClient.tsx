@@ -134,6 +134,29 @@ export default function ApostaDetailClient({ aposta: initial }: { aposta: Aposta
     if (error) {
       toast({ title: "Erro ao finalizar aposta", variant: "destructive" })
     } else {
+      // Registrar movimentação por leg: GREEN = lucro líquido, RED = perda do stake
+      for (const leg of aposta.legs ?? []) {
+        if (!leg.profile_bet_id) continue
+        const isGreen = leg.id === effectiveGreenId
+        const tipo = isGreen ? "lucro" : "perda"
+        const movValor = isGreen ? leg.stake * leg.odd - leg.stake : leg.stake
+        if (movValor > 0) {
+          await supabase.from("movimentacoes_financeiras").insert({
+            profile_id: aposta.profile_id,
+            profile_bet_id: leg.profile_bet_id,
+            tipo,
+            valor: movValor,
+            descricao: `Aposta: ${aposta.evento}`,
+          })
+        }
+        const { data: movs } = await supabase
+          .from("movimentacoes_financeiras")
+          .select("tipo, valor")
+          .eq("profile_bet_id", leg.profile_bet_id)
+        const novoSaldo = (movs ?? []).reduce((acc, m) =>
+          acc + (m.tipo === "deposito" || m.tipo === "lucro" ? m.valor : -m.valor), 0)
+        await supabase.from("profile_bets").update({ saldo: novoSaldo }).eq("id", leg.profile_bet_id)
+      }
       setAposta(prev => ({ ...prev, status: "finalizada", resultado_real: resultado, finalizada_at: new Date().toISOString() }))
       setGreenLegId(effectiveGreenId)
       toast({ title: overrideGreenId ? "Resultado alterado com sucesso!" : "Aposta finalizada com sucesso!" })

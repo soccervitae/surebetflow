@@ -227,24 +227,31 @@ export default function ApostasClient({ apostas: initialApostas, profiles, betCo
     if (error) {
       toast({ title: "Erro ao finalizar aposta", variant: "destructive" })
     } else {
-      // Registrar lucro/perda no saldo da casa de apostas da primeira leg
-      const firstLeg = finalizarDialog.legs?.[0]
-      if (firstLeg?.profile_bet_id && valor !== 0) {
-        const tipo = valor > 0 ? "lucro" : "perda"
-        await supabase.from("movimentacoes_financeiras").insert({
-          profile_id: finalizarDialog.profile_id,
-          profile_bet_id: firstLeg.profile_bet_id,
-          tipo,
-          valor: Math.abs(valor),
-          descricao: `Aposta: ${finalizarDialog.evento}`,
-        })
+      // Para cada leg: GREEN recebe lucro líquido da conta, RED perde o stake
+      const legs = finalizarDialog.legs ?? []
+      const totalInvestido = finalizarDialog.investimento_total
+      for (const leg of legs) {
+        if (!leg.profile_bet_id) continue
+        const legReturn = leg.stake * leg.odd
+        const isGreen = Math.abs(legReturn - totalInvestido - valor) < 2
+        const tipo = isGreen ? "lucro" : "perda"
+        const movValor = isGreen ? legReturn - leg.stake : leg.stake
+        if (movValor > 0) {
+          await supabase.from("movimentacoes_financeiras").insert({
+            profile_id: finalizarDialog.profile_id,
+            profile_bet_id: leg.profile_bet_id,
+            tipo,
+            valor: movValor,
+            descricao: `Aposta: ${finalizarDialog.evento}`,
+          })
+        }
         const { data: movs } = await supabase
           .from("movimentacoes_financeiras")
           .select("tipo, valor")
-          .eq("profile_bet_id", firstLeg.profile_bet_id)
+          .eq("profile_bet_id", leg.profile_bet_id)
         const novoSaldo = (movs ?? []).reduce((acc, m) =>
           acc + (m.tipo === "deposito" || m.tipo === "lucro" ? m.valor : -m.valor), 0)
-        await supabase.from("profile_bets").update({ saldo: novoSaldo }).eq("id", firstLeg.profile_bet_id)
+        await supabase.from("profile_bets").update({ saldo: novoSaldo }).eq("id", leg.profile_bet_id)
       }
 
       setApostas(prev => prev.map(a => a.id === finalizarDialog.id
