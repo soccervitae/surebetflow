@@ -462,7 +462,7 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
             <ellipse cx="320" cy="220" rx="160" ry="120" fill="#5c6bc0" opacity="0.3" />
           </svg>
 
-          <div className="relative flex items-end justify-between gap-6">
+          <div className="relative z-10 flex items-end justify-between gap-6">
             {/* Left: avatar + info */}
             <div className="flex items-end gap-6 pb-6">
               <Avatar className="h-24 w-24 flex-shrink-0 ring-4 ring-white/60 shadow-lg">
@@ -502,7 +502,7 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
           </div>
 
           {/* Tabs row */}
-          <div className="flex items-center gap-0 mt-2">
+          <div className="relative z-10 flex items-center gap-0 mt-2">
             {[
               { value: "dashboard", label: "Dashboard" },
               { value: "apostas", label: "Apostas" },
