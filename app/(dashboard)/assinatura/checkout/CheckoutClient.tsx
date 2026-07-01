@@ -12,7 +12,7 @@ const PLANS = {
     amount: 99,
     icon: Star,
     maxProfiles: 5,
-    hotmartUrl: process.env.NEXT_PUBLIC_HOTMART_URL_TRADER ?? "",
+    caktoUrl: process.env.NEXT_PUBLIC_CAKTO_URL_TRADER ?? "",
     features: [
       "Até 5 perfis de apostador",
       "Casas de apostas ilimitadas",
@@ -28,7 +28,7 @@ const PLANS = {
     amount: 179,
     icon: Zap,
     maxProfiles: 20,
-    hotmartUrl: process.env.NEXT_PUBLIC_HOTMART_URL_TRADER_PRO ?? "",
+    caktoUrl: process.env.NEXT_PUBLIC_CAKTO_URL_TRADER_PRO ?? "",
     features: [
       "Até 20 perfis de apostador",
       "Casas de apostas ilimitadas",
@@ -40,14 +40,14 @@ const PLANS = {
   },
 }
 
-type PaymentMethod = "hotmart" | "stripe"
+type PaymentMethod = "cakto" | "stripe"
 
 export default function CheckoutClient() {
   const searchParams = useSearchParams()
   const planKey = (searchParams.get("plan") ?? "trader") as keyof typeof PLANS
   const plan = PLANS[planKey] ?? PLANS.trader
 
-  const [method, setMethod] = useState<PaymentMethod>("hotmart")
+  const [method, setMethod] = useState<PaymentMethod>("cakto")
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
 
@@ -94,15 +94,15 @@ export default function CheckoutClient() {
           {/* Seletor de método */}
           <div className="flex gap-2 bg-[var(--bg-elevated)] rounded-xl p-1">
             <button
-              onClick={() => setMethod("hotmart")}
+              onClick={() => setMethod("cakto")}
               className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg text-sm font-medium transition-colors ${
-                method === "hotmart"
+                method === "cakto"
                   ? "bg-[var(--bg-surface)] text-[var(--text-primary)] shadow-sm border border-[var(--border)]"
                   : "text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
               }`}
             >
               <ExternalLink className="w-4 h-4" />
-              Hotmart
+              Cakto
             </button>
             <button
               onClick={() => setMethod("stripe")}
@@ -119,34 +119,34 @@ export default function CheckoutClient() {
 
           <div className="bg-[var(--bg-surface)] border border-[var(--border)] rounded-2xl p-6">
 
-            {/* Hotmart */}
-            {method === "hotmart" && (
+            {/* Cakto */}
+            {method === "cakto" && (
               <>
                 <div className="flex items-center gap-2 mb-5">
                   <ExternalLink className="w-4 h-4 text-[var(--accent-text)]" />
-                  <span className="text-sm font-medium text-[var(--text-primary)]">Pagamento via Hotmart</span>
+                  <span className="text-sm font-medium text-[var(--text-primary)]">Pagamento via Cakto</span>
                 </div>
                 <p className="text-sm text-[var(--text-secondary)] mb-2 leading-relaxed">
-                  Você será redirecionado para a Hotmart, onde poderá pagar com <strong className="text-[var(--text-primary)]">Pix, cartão ou boleto</strong>.
+                  Você será redirecionado para a Cakto, onde poderá pagar com <strong className="text-[var(--text-primary)]">Pix, cartão ou boleto</strong>.
                 </p>
                 <ul className="text-xs text-[var(--text-muted)] space-y-1 mb-6 list-disc list-inside">
                   <li>Pix com confirmação instantânea</li>
                   <li>Cartão de crédito em até 12x</li>
                   <li>Boleto bancário com prazo de 3 dias</li>
                 </ul>
-                {plan.hotmartUrl ? (
+                {plan.caktoUrl ? (
                   <a
-                    href={plan.hotmartUrl}
+                    href={plan.caktoUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="w-full py-3.5 rounded-xl bg-[#e74c3c] hover:bg-[#c0392b] text-white font-semibold text-sm transition-colors flex items-center justify-center gap-2"
+                    className="w-full py-3.5 rounded-xl bg-[#7c3aed] hover:bg-[#6d28d9] text-white font-semibold text-sm transition-colors flex items-center justify-center gap-2"
                   >
                     <ExternalLink className="w-4 h-4" />
-                    Assinar via Hotmart — {plan.price}/mês
+                    Assinar via Cakto — {plan.price}/mês
                   </a>
                 ) : (
                   <div className="text-center text-sm text-[var(--text-muted)] py-2">
-                    Link da Hotmart não configurado ainda.
+                    Link da Cakto não configurado ainda.
                   </div>
                 )}
               </>
