@@ -20,7 +20,7 @@ export default async function HomePage() {
 
   const threeDaysAgo = new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString()
 
-  const [dashResult, profilesResult, apostasResult, apostasPendentesResult] = await Promise.all([
+  const [dashResult, profilesResult, apostasResult, apostasPendentesResult, pendentesCountResult] = await Promise.all([
     supabase
       .from("dashboard_geral")
       .select("*")
@@ -32,7 +32,7 @@ export default async function HomePage() {
       .eq("user_id", user!.id),
     supabase
       .from("apostas")
-      .select("*, profile:profiles(nome, sobrenome, apelido)")
+      .select("*, profile:profiles(nome, sobrenome, apelido), legs:aposta_legs(*, profile_bet:profile_bets(*, bet:bets(*)))")
       .eq("profiles.user_id", user!.id)
       .order("created_at", { ascending: false })
       .limit(10),
@@ -41,9 +41,13 @@ export default async function HomePage() {
       .select("id", { count: "exact", head: true })
       .eq("status", "pendente")
       .lt("created_at", threeDaysAgo),
+    supabase
+      .from("apostas")
+      .select("id", { count: "exact", head: true })
+      .eq("status", "pendente"),
   ])
 
-  // Get finalized apostas for chart
+  // Get finalized apostas for chart + win rate
   const { data: apostasFinalizadas } = await supabase
     .from("apostas")
     .select("lucro_garantido, resultado_real, finalizada_at, profile_id")
@@ -57,6 +61,7 @@ export default async function HomePage() {
       recentApostas={apostasResult.data ?? []}
       apostasFinalizadas={apostasFinalizadas ?? []}
       apostasPendentesAntigas={apostasPendentesResult.count ?? 0}
+      pendentesCount={pendentesCountResult.count ?? 0}
     />
   )
 }
