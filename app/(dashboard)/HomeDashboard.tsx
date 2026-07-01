@@ -44,7 +44,7 @@ export default function HomeDashboard({ dashboard, profiles, recentApostas, apos
 
   const stats = [
     { label: "Saldo Total", value: formatCurrency(dashboard?.saldo_total ?? 0), icon: DollarSign, color: "text-[#3b82f6]", ring: "border-[#3b82f6]/20", bg: "bg-[#3b82f6]/10" },
-    { label: "Lucro Realizado", value: formatCurrency(dashboard?.lucro_realizado ?? 0), icon: TrendingUp, color: "text-[var(--accent-text)]", ring: "border-[#1e3a8a]/20", bg: "bg-[#1e3a8a]/10" },
+    { label: "Lucro", value: formatCurrency(dashboard?.lucro_realizado ?? 0), icon: TrendingUp, color: "text-[var(--accent-text)]", ring: "border-[#1e3a8a]/20", bg: "bg-[#1e3a8a]/10" },
     { label: "Lucro Pendente", value: formatCurrency(dashboard?.lucro_pendente ?? 0), icon: Clock, color: "text-yellow-500", ring: "border-yellow-500/20", bg: "bg-yellow-500/10" },
     { label: "ROI", value: `${(dashboard?.roi_percentual ?? 0).toFixed(2)}%`, icon: ArrowUpRight, color: "text-[#a855f7]", ring: "border-[#a855f7]/20", bg: "bg-[#a855f7]/10" },
   ]
@@ -128,7 +128,7 @@ export default function HomeDashboard({ dashboard, profiles, recentApostas, apos
           <div className="flex-1 space-y-3">
             {[
               { label: "Total Investido", value: formatCurrency(dashboard?.total_investido ?? 0), cls: "text-[var(--text-primary)]" },
-              { label: "Lucro Realizado", value: formatCurrency(dashboard?.lucro_realizado ?? 0), cls: "text-[var(--accent-text)]" },
+              { label: "Lucro", value: formatCurrency(dashboard?.lucro_realizado ?? 0), cls: "text-[var(--accent-text)]" },
               { label: "Lucro Pendente", value: formatCurrency(dashboard?.lucro_pendente ?? 0), cls: "text-yellow-500" },
               { label: "Total Apostas", value: String(dashboard?.total_apostas ?? 0), cls: "text-[var(--text-primary)]" },
             ].map(({ label, value, cls }) => (

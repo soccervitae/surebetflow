@@ -122,13 +122,13 @@ export default function BetDetailClient({ profile, profileBet: initial, moviment
         </CardContent>
       </Card>
 
-      {/* Lucro realizado + ROI */}
+      {/* Lucro + ROI */}
       <div className="grid grid-cols-2 gap-3">
         <Card>
           <CardContent className="p-4">
             <div className="flex items-center gap-2 mb-1">
               <TrendingUp className="w-3.5 h-3.5 text-green-500" />
-              <p className="text-xs text-[var(--text-muted)] uppercase tracking-wider">Lucro realizado</p>
+              <p className="text-xs text-[var(--text-muted)] uppercase tracking-wider">Lucro</p>
             </div>
             <p className={`text-xl font-bold ${lucroRealizado > 0 ? "text-green-500" : lucroRealizado < 0 ? "text-[#DC2626]" : "text-[var(--text-primary)]"}`}>
               {lucroRealizado >= 0 ? "+" : ""}{formatCurrency(lucroRealizado)}

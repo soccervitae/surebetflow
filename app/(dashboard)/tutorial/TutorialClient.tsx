@@ -59,7 +59,7 @@ function SectionContent({ id }: { id: string }) {
             <h3 className="text-sm font-semibold text-[var(--text-primary)]">O que você encontra aqui</h3>
             <div className="grid grid-cols-2 gap-3">
               {[
-                { icon: TrendingUp,   label: "Lucro Realizado", desc: "Soma de todos os lucros confirmados" },
+                { icon: TrendingUp,   label: "Lucro", desc: "Soma de todos os lucros confirmados" },
                 { icon: Clock,        label: "Lucro Pendente",  desc: "Apostas ainda não finalizadas" },
                 { icon: ArrowUpRight, label: "ROI",             desc: "Retorno sobre investimento total" },
                 { icon: BarChart2,    label: "Gráfico",         desc: "Evolução do lucro acumulado ao longo do tempo" },

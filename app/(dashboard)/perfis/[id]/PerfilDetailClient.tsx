@@ -529,7 +529,7 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
                     <TrendingUp className="h-4 w-4 text-[var(--accent-text)]" />
                   </div>
                   <div className="min-w-0 flex-1">
-                    <p className="text-xs text-[var(--text-secondary)] truncate">Lucro Realizado</p>
+                    <p className="text-xs text-[var(--text-secondary)] truncate">Lucro</p>
                     <p className="text-sm font-bold text-[var(--accent-text)] truncate">{formatCurrency(dashboard?.lucro_realizado ?? 0)}</p>
                   </div>
                 </div>
