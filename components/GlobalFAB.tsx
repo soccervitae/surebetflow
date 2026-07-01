@@ -166,20 +166,21 @@ export default function GlobalFAB() {
       )}
 
       {/* Desktop FAB */}
-      <div className="fixed bottom-8 right-8 hidden lg:flex flex-col items-end gap-3 z-50">
+      <div className="fixed bottom-8 right-8 hidden lg:flex flex-col items-end gap-2 z-50">
         {/* Options (expand upward) */}
         {open && (
-          <div className="flex flex-col items-end gap-2 mb-1">
-            {fabItems.map(({ label, icon: Icon, color, onClick }) => (
+          <div className="flex flex-col items-end gap-3 mb-2">
+            {fabItems.map(({ label, icon: Icon, color, onClick }, i) => (
               <button
                 key={label}
                 onClick={onClick}
-                className="flex items-center gap-3 hover:scale-105 transition-transform"
+                className="flex items-center gap-3"
+                style={{ animation: `fabItemIn 0.15s ease both`, animationDelay: `${i * 40}ms` }}
               >
-                <span className="bg-[var(--bg-surface)] text-[var(--text-primary)] text-sm font-medium px-3 py-1.5 rounded-lg shadow-md border border-[var(--border)] whitespace-nowrap">
+                <span className="text-sm font-semibold text-[var(--text-primary)] bg-[var(--bg-surface)] px-3 py-1.5 rounded-lg shadow-md whitespace-nowrap">
                   {label}
                 </span>
-                <div className={`w-11 h-11 rounded-full ${color} flex items-center justify-center shadow-lg flex-shrink-0`}>
+                <div className={`w-12 h-12 rounded-full ${color} flex items-center justify-center shadow-lg flex-shrink-0 hover:scale-110 transition-transform`}>
                   <Icon className="w-5 h-5 text-white" />
                 </div>
               </button>
@@ -190,8 +191,8 @@ export default function GlobalFAB() {
         {/* Main button */}
         <button
           onClick={handleOpen}
-          className={`w-14 h-14 rounded-full bg-[#0f172a] hover:bg-[#1e293b] flex items-center justify-center shadow-xl transition-all ${open ? "rotate-45" : ""}`}
-          style={{ transition: "transform 0.2s, background-color 0.2s" }}
+          className="w-14 h-14 rounded-full bg-[#0f172a] hover:bg-[#1e293b] flex items-center justify-center shadow-xl"
+          style={{ transition: "transform 0.2s, background-color 0.2s", transform: open ? "rotate(45deg)" : "rotate(0deg)" }}
         >
           <Plus className="w-7 h-7 text-white" />
         </button>
@@ -199,6 +200,13 @@ export default function GlobalFAB() {
 
       {/* Click outside to close */}
       {open && <div className="fixed inset-0 z-40 hidden lg:block" onClick={() => setOpen(false)} />}
+
+      <style>{`
+        @keyframes fabItemIn {
+          from { opacity: 0; transform: translateY(8px) scale(0.95); }
+          to   { opacity: 1; transform: translateY(0)    scale(1); }
+        }
+      `}</style>
 
       {/* Profile picker for Aposta */}
       <Dialog open={apostaPickStep} onOpenChange={v => { if (!v) setApostaPickStep(false) }}>
