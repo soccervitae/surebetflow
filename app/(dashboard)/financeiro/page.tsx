@@ -11,7 +11,7 @@ type Movimentacao = {
   id: string
   profile_id: string
   profile_bet_id?: string | null
-  tipo: "deposito" | "saque"
+  tipo: "deposito" | "saque" | "lucro" | "perda" | "bonus"
   valor: number
   descricao?: string | null
   created_at: string
@@ -162,6 +162,9 @@ export default function FinanceiroPage() {
 
   const totalDepositos = filtered.filter(m => m.tipo === "deposito").reduce((s, m) => s + m.valor, 0)
   const totalSaques    = filtered.filter(m => m.tipo === "saque").reduce((s, m) => s + m.valor, 0)
+  const totalLucro     = filtered.filter(m => m.tipo === "lucro").reduce((s, m) => s + m.valor, 0)
+  const totalPerda     = filtered.filter(m => m.tipo === "perda").reduce((s, m) => s + m.valor, 0)
+  const saldoLiquido   = totalDepositos + totalLucro - totalSaques - totalPerda
   const hasActiveFilters = filterTipo !== "todos" || filterProfile !== "" || filterBet !== ""
 
   function clearFilters() {
@@ -288,7 +291,7 @@ export default function FinanceiroPage() {
       </Card>}
 
       {/* Resumo */}
-      <div className="grid grid-cols-3 gap-2">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
         <Card>
           <CardContent className="p-3">
             <div className="flex items-center gap-1.5 mb-1">
@@ -310,10 +313,19 @@ export default function FinanceiroPage() {
         <Card>
           <CardContent className="p-3">
             <div className="flex items-center gap-1.5 mb-1">
-              <DollarSign className="h-3.5 w-3.5 text-[#2563EB]" />
-              <span className="text-xs text-[var(--text-secondary)]">Líquido</span>
+              <ArrowDownLeft className="h-3.5 w-3.5 text-green-500" />
+              <span className="text-xs text-[var(--text-secondary)]">Lucro</span>
             </div>
-            <p className="text-sm font-bold text-[#2563EB]">{formatCurrency(totalDepositos - totalSaques)}</p>
+            <p className="text-sm font-bold text-green-500">{formatCurrency(totalLucro)}</p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="p-3">
+            <div className="flex items-center gap-1.5 mb-1">
+              <DollarSign className="h-3.5 w-3.5 text-[#2563EB]" />
+              <span className="text-xs text-[var(--text-secondary)]">Saldo</span>
+            </div>
+            <p className={`text-sm font-bold ${saldoLiquido >= 0 ? "text-[#2563EB]" : "text-[#DC2626]"}`}>{formatCurrency(saldoLiquido)}</p>
           </CardContent>
         </Card>
       </div>

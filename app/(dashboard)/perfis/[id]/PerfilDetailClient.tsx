@@ -17,7 +17,7 @@ import AddBetToProfile from "@/components/AddBetToProfile"
 import { formatCurrency } from "@/lib/utils"
 import { useToast } from "@/hooks/useToast"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { DollarSign, TrendingUp, Clock, ArrowUpRight, Pencil, Calculator, Gift, ArrowDownLeft, Wallet, SlidersHorizontal, X } from "lucide-react"
+import { DollarSign, TrendingUp, Clock, ArrowUpRight, Pencil, Calculator, Gift, ArrowDownLeft, Wallet, SlidersHorizontal, X, Check } from "lucide-react"
 import SurebetCalculator from "@/components/SurebetCalculator"
 import type { Profile, ProfileDashboard, Aposta, MovimentacaoFinanceira, ProfileBet } from "@/lib/types"
 
@@ -46,6 +46,7 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
   const [periodoFiltro, setPeriodoFiltro] = useState<"dia" | "semana" | "mes" | "ano">("dia")
   const [casaFiltro, setCasaFiltro] = useState<string>("todas")
   const [resultadoReal, setResultadoReal] = useState("")
+  const [greenLegId, setGreenLegId] = useState<string | null>(null)
   const [finalizando, setFinalizando] = useState(false)
   // Financeiro tab state
   const [movimentacoes, setMovimentacoes] = useState<MovimentacaoFinanceira[]>([])
@@ -306,13 +307,14 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
 
   async function handleFinalizar() {
     if (!finalizarDialog) return
-    setFinalizando(true)
-    const valor = parseBRL(resultadoReal)
-    if (isNaN(valor)) {
-      toast({ title: "Valor inválido", variant: "destructive" })
-      setFinalizando(false)
+    if (!greenLegId) {
+      toast({ title: "Selecione qual casa deu green", variant: "destructive" })
       return
     }
+    setFinalizando(true)
+    const greenLeg = (finalizarDialog.legs ?? []).find(l => l.id === greenLegId)
+    if (!greenLeg) { setFinalizando(false); return }
+    const valor = greenLeg.stake * greenLeg.odd - finalizarDialog.investimento_total
     const { error } = await supabase
       .from("apostas")
       .update({
@@ -325,24 +327,30 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
     if (error) {
       toast({ title: "Erro ao finalizar aposta", variant: "destructive" })
     } else {
-      // Registrar lucro/perda no saldo da casa de apostas da primeira leg
-      const firstLeg = finalizarDialog.legs?.[0]
-      if (firstLeg?.profile_bet_id && valor !== 0) {
-        const tipo = valor > 0 ? "lucro" : "perda"
-        await supabase.from("movimentacoes_financeiras").insert({
-          profile_id: finalizarDialog.profile_id,
-          profile_bet_id: firstLeg.profile_bet_id,
-          tipo,
-          valor: Math.abs(valor),
-          descricao: `Aposta: ${finalizarDialog.evento}`,
-        })
+      for (const leg of finalizarDialog.legs ?? []) {
+        if (!leg.profile_bet_id) continue
+        const isGreen = leg.id === greenLegId
+        const tipo = isGreen ? "lucro" : "perda"
+        const movValor = isGreen ? leg.stake * leg.odd - leg.stake : leg.stake
+        if (movValor > 0) {
+          await supabase.from("movimentacoes_financeiras").insert({
+            profile_id: finalizarDialog.profile_id,
+            profile_bet_id: leg.profile_bet_id,
+            tipo,
+            valor: movValor,
+            descricao: `Aposta: ${finalizarDialog.evento}`,
+          })
+        }
         const { data: movs } = await supabase
           .from("movimentacoes_financeiras")
           .select("tipo, valor")
-          .eq("profile_bet_id", firstLeg.profile_bet_id)
-        const novoSaldo = (movs ?? []).reduce((acc, m) =>
-          acc + (m.tipo === "deposito" || m.tipo === "lucro" ? m.valor : -m.valor), 0)
-        await supabase.from("profile_bets").update({ saldo: novoSaldo }).eq("id", firstLeg.profile_bet_id)
+          .eq("profile_bet_id", leg.profile_bet_id)
+        const novoSaldo = (movs ?? []).reduce((acc, m) => {
+          if (m.tipo === "deposito" || m.tipo === "lucro") return acc + m.valor
+          if (m.tipo === "saque" || m.tipo === "perda") return acc - m.valor
+          return acc
+        }, 0)
+        await supabase.from("profile_bets").update({ saldo: novoSaldo }).eq("id", leg.profile_bet_id)
       }
 
       setCurrentApostas(prev =>
@@ -353,6 +361,7 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
       )
       toast({ title: "Aposta finalizada com sucesso!" })
       setFinalizarDialog(null)
+      setGreenLegId(null)
       setResultadoReal("")
     }
     setFinalizando(false)
@@ -1068,29 +1077,41 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
       </Dialog>
 
       {/* Finalizar Dialog */}
-      <Dialog open={!!finalizarDialog} onOpenChange={open => !open && setFinalizarDialog(null)}>
+      <Dialog open={!!finalizarDialog} onOpenChange={open => { if (!open) { setFinalizarDialog(null); setGreenLegId(null) } }}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Finalizar Aposta</DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
-            <p className="text-sm text-[var(--text-secondary)]">
-              Informe o resultado real obtido para a aposta <strong>{finalizarDialog?.evento}</strong>.
-            </p>
+            <p className="text-sm font-medium text-[var(--text-primary)]">{finalizarDialog?.evento}</p>
             <div className="space-y-2">
-              <Label>Resultado real (R$)</Label>
-              <Input
-                type="text"
-                inputMode="numeric"
-                value={resultadoReal}
-                onChange={e => setResultadoReal(formatBRL(e.target.value))}
-                placeholder="0,00"
-              />
+              <Label>Qual casa deu green?</Label>
+              <div className="space-y-2">
+                {(finalizarDialog?.legs ?? []).map(leg => (
+                  <button
+                    key={leg.id}
+                    onClick={() => setGreenLegId(leg.id)}
+                    className={`w-full flex items-center justify-between px-4 py-3 rounded-xl border transition-all text-left ${
+                      greenLegId === leg.id
+                        ? "border-green-500 bg-green-500/10"
+                        : "border-[var(--border)] bg-[var(--bg-surface)] hover:border-[#1e3a8a]/40"
+                    }`}
+                  >
+                    <div>
+                      <p className={`font-semibold text-sm ${greenLegId === leg.id ? "text-green-600" : "text-[var(--text-primary)]"}`}>
+                        {(leg as any).profile_bet?.bet?.nome ?? "Bet"}
+                      </p>
+                      <p className="text-xs text-[var(--text-secondary)]">@{Number(leg.odd).toFixed(2)} · {formatCurrency(leg.stake)}</p>
+                    </div>
+                    {greenLegId === leg.id && <Check className="w-4 h-4 text-green-600 flex-shrink-0" />}
+                  </button>
+                ))}
+              </div>
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setFinalizarDialog(null)}>Cancelar</Button>
-            <Button onClick={handleFinalizar} disabled={finalizando}>
+            <Button variant="outline" onClick={() => { setFinalizarDialog(null); setGreenLegId(null) }}>Cancelar</Button>
+            <Button onClick={handleFinalizar} disabled={finalizando || !greenLegId}>
               {finalizando ? "Finalizando..." : "Confirmar"}
             </Button>
           </DialogFooter>

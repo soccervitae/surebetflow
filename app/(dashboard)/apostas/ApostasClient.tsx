@@ -13,7 +13,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet"
 import { formatCurrency } from "@/lib/utils"
 import { useToast } from "@/hooks/useToast"
-import { BookOpen, Filter, X, Plus, Calculator, CalendarIcon, ChevronDown, AlertTriangle, Download } from "lucide-react"
+import { BookOpen, Filter, X, Plus, Calculator, CalendarIcon, ChevronDown, AlertTriangle, Download, Check } from "lucide-react"
 import type { Aposta, ApostaLeg } from "@/lib/types"
 import SurebetCalculator from "@/components/SurebetCalculator"
 
@@ -97,6 +97,7 @@ export default function ApostasClient({ apostas: initialApostas, profiles, betCo
   const [selectedProfileId, setSelectedProfileId] = useState<string>("")
   const [selectedProfileName, setSelectedProfileName] = useState<string>("")
   const [resultadoReal, setResultadoReal] = useState("")
+  const [greenLegId, setGreenLegId] = useState<string | null>(null)
   const [finalizando, setFinalizando] = useState(false)
   const [deletando, setDeletando] = useState(false)
   const { toast } = useToast()
@@ -212,30 +213,28 @@ export default function ApostasClient({ apostas: initialApostas, profiles, betCo
 
   async function handleFinalizar() {
     if (!finalizarDialog) return
-    setFinalizando(true)
-    const valor = parseBRL(resultadoReal)
-    if (isNaN(valor)) {
-      toast({ title: "Valor inválido", variant: "destructive" })
-      setFinalizando(false)
+    if (!greenLegId) {
+      toast({ title: "Selecione qual casa deu green", variant: "destructive" })
       return
     }
+    setFinalizando(true)
+    const greenLeg = (finalizarDialog.legs ?? []).find(l => l.id === greenLegId)
+    if (!greenLeg) { setFinalizando(false); return }
+    const resultado = greenLeg.stake * greenLeg.odd - finalizarDialog.investimento_total
+
     const { error } = await supabase
       .from("apostas")
-      .update({ status: "finalizada", resultado_real: valor, finalizada_at: new Date().toISOString() })
+      .update({ status: "finalizada", resultado_real: resultado, finalizada_at: new Date().toISOString() })
       .eq("id", finalizarDialog.id)
 
     if (error) {
       toast({ title: "Erro ao finalizar aposta", variant: "destructive" })
     } else {
-      // Para cada leg: GREEN recebe lucro líquido da conta, RED perde o stake
-      const legs = finalizarDialog.legs ?? []
-      const totalInvestido = finalizarDialog.investimento_total
-      for (const leg of legs) {
+      for (const leg of finalizarDialog.legs ?? []) {
         if (!leg.profile_bet_id) continue
-        const legReturn = leg.stake * leg.odd
-        const isGreen = Math.abs(legReturn - totalInvestido - valor) < 2
+        const isGreen = leg.id === greenLegId
         const tipo = isGreen ? "lucro" : "perda"
-        const movValor = isGreen ? legReturn - leg.stake : leg.stake
+        const movValor = isGreen ? leg.stake * leg.odd - leg.stake : leg.stake
         if (movValor > 0) {
           await supabase.from("movimentacoes_financeiras").insert({
             profile_id: finalizarDialog.profile_id,
@@ -249,17 +248,21 @@ export default function ApostasClient({ apostas: initialApostas, profiles, betCo
           .from("movimentacoes_financeiras")
           .select("tipo, valor")
           .eq("profile_bet_id", leg.profile_bet_id)
-        const novoSaldo = (movs ?? []).reduce((acc, m) =>
-          acc + (m.tipo === "deposito" || m.tipo === "lucro" ? m.valor : -m.valor), 0)
+        const novoSaldo = (movs ?? []).reduce((acc, m) => {
+          if (m.tipo === "deposito" || m.tipo === "lucro") return acc + m.valor
+          if (m.tipo === "saque" || m.tipo === "perda") return acc - m.valor
+          return acc
+        }, 0)
         await supabase.from("profile_bets").update({ saldo: novoSaldo }).eq("id", leg.profile_bet_id)
       }
 
       setApostas(prev => prev.map(a => a.id === finalizarDialog.id
-        ? { ...a, status: "finalizada" as const, resultado_real: valor, finalizada_at: new Date().toISOString() }
+        ? { ...a, status: "finalizada" as const, resultado_real: resultado, finalizada_at: new Date().toISOString() }
         : a
       ))
       toast({ title: "Aposta finalizada!" })
       setFinalizarDialog(null)
+      setGreenLegId(null)
       setResultadoReal("")
     }
     setFinalizando(false)
@@ -791,26 +794,39 @@ export default function ApostasClient({ apostas: initialApostas, profiles, betCo
       </Dialog>
 
       {/* Finalizar — Sheet no mobile */}
-      <Sheet open={!!finalizarDialog} onOpenChange={open => !open && setFinalizarDialog(null)}>
+      <Sheet open={!!finalizarDialog} onOpenChange={open => { if (!open) { setFinalizarDialog(null); setGreenLegId(null) } }}>
         <SheetContent side="bottom" className="md:hidden rounded-t-2xl px-5 pb-8 pt-5 space-y-5">
           <SheetTitle>Finalizar Aposta</SheetTitle>
           <p className="text-sm text-[var(--text-secondary)]">
-            Evento: <strong className="text-[var(--text-primary)]">{finalizarDialog?.evento}</strong><br />
-            Lucro esperado: <strong className="text-[var(--text-primary)]">{formatCurrency(finalizarDialog?.lucro_garantido ?? 0)}</strong>
+            <strong className="text-[var(--text-primary)]">{finalizarDialog?.evento}</strong>
           </p>
           <div className="space-y-2">
-            <Label>Resultado real obtido (R$)</Label>
-            <Input
-              type="text"
-              inputMode="numeric"
-              value={resultadoReal}
-              onChange={e => setResultadoReal(formatBRL(e.target.value))}
-              placeholder="0,00"
-            />
+            <Label>Qual casa deu green?</Label>
+            <div className="space-y-2">
+              {(finalizarDialog?.legs ?? []).map(leg => (
+                <button
+                  key={leg.id}
+                  onClick={() => setGreenLegId(leg.id)}
+                  className={`w-full flex items-center justify-between px-4 py-3 rounded-xl border transition-all text-left ${
+                    greenLegId === leg.id
+                      ? "border-green-500 bg-green-500/10"
+                      : "border-[var(--border)] bg-[var(--bg-surface)] hover:border-[#1e3a8a]/40"
+                  }`}
+                >
+                  <div>
+                    <p className={`font-semibold text-sm ${greenLegId === leg.id ? "text-green-600" : "text-[var(--text-primary)]"}`}>
+                      {(leg as any).profile_bet?.bet?.nome ?? "Bet"}
+                    </p>
+                    <p className="text-xs text-[var(--text-secondary)]">@{Number(leg.odd).toFixed(2)} · {formatCurrency(leg.stake)}</p>
+                  </div>
+                  {greenLegId === leg.id && <Check className="w-4 h-4 text-green-600 flex-shrink-0" />}
+                </button>
+              ))}
+            </div>
           </div>
           <div className="flex gap-3">
-            <Button variant="outline" className="flex-1" onClick={() => setFinalizarDialog(null)}>Cancelar</Button>
-            <Button className="flex-1" onClick={handleFinalizar} disabled={finalizando}>
+            <Button variant="outline" className="flex-1" onClick={() => { setFinalizarDialog(null); setGreenLegId(null) }}>Cancelar</Button>
+            <Button className="flex-1" onClick={handleFinalizar} disabled={finalizando || !greenLegId}>
               {finalizando ? "Finalizando..." : "Confirmar"}
             </Button>
           </div>
@@ -818,30 +834,43 @@ export default function ApostasClient({ apostas: initialApostas, profiles, betCo
       </Sheet>
 
       {/* Finalizar — Dialog no desktop */}
-      <Dialog open={!!finalizarDialog} onOpenChange={open => !open && setFinalizarDialog(null)}>
+      <Dialog open={!!finalizarDialog} onOpenChange={open => { if (!open) { setFinalizarDialog(null); setGreenLegId(null) } }}>
         <DialogContent className="hidden md:block">
           <DialogHeader>
             <DialogTitle>Finalizar Aposta</DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
             <p className="text-sm text-[var(--text-secondary)]">
-              Evento: <strong>{finalizarDialog?.evento}</strong><br />
-              Lucro esperado: <strong>{formatCurrency(finalizarDialog?.lucro_garantido ?? 0)}</strong>
+              <strong>{finalizarDialog?.evento}</strong>
             </p>
             <div className="space-y-2">
-              <Label>Resultado real obtido (R$)</Label>
-              <Input
-                type="text"
-                inputMode="numeric"
-                value={resultadoReal}
-                onChange={e => setResultadoReal(formatBRL(e.target.value))}
-                placeholder="0,00"
-              />
+              <Label>Qual casa deu green?</Label>
+              <div className="space-y-2">
+                {(finalizarDialog?.legs ?? []).map(leg => (
+                  <button
+                    key={leg.id}
+                    onClick={() => setGreenLegId(leg.id)}
+                    className={`w-full flex items-center justify-between px-4 py-3 rounded-xl border transition-all text-left ${
+                      greenLegId === leg.id
+                        ? "border-green-500 bg-green-500/10"
+                        : "border-[var(--border)] bg-[var(--bg-surface)] hover:border-[#1e3a8a]/40"
+                    }`}
+                  >
+                    <div>
+                      <p className={`font-semibold text-sm ${greenLegId === leg.id ? "text-green-600" : "text-[var(--text-primary)]"}`}>
+                        {(leg as any).profile_bet?.bet?.nome ?? "Bet"}
+                      </p>
+                      <p className="text-xs text-[var(--text-secondary)]">@{Number(leg.odd).toFixed(2)} · {formatCurrency(leg.stake)}</p>
+                    </div>
+                    {greenLegId === leg.id && <Check className="w-4 h-4 text-green-600 flex-shrink-0" />}
+                  </button>
+                ))}
+              </div>
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setFinalizarDialog(null)}>Cancelar</Button>
-            <Button onClick={handleFinalizar} disabled={finalizando}>
+            <Button variant="outline" onClick={() => { setFinalizarDialog(null); setGreenLegId(null) }}>Cancelar</Button>
+            <Button onClick={handleFinalizar} disabled={finalizando || !greenLegId}>
               {finalizando ? "Finalizando..." : "Confirmar"}
             </Button>
           </DialogFooter>
