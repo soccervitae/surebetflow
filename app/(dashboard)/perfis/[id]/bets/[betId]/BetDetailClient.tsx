@@ -12,7 +12,7 @@ import { useToast } from "@/hooks/useToast"
 import { formatCurrency } from "@/lib/utils"
 import {
   ArrowLeft, Eye, EyeOff, Pencil, Loader2,
-  ArrowDownLeft, ArrowUpRight, TrendingUp, TrendingDown, Gift, Plus, Percent,
+  ArrowDownLeft, ArrowUpRight, TrendingUp, TrendingDown, Gift, Plus, Percent, ChevronDown,
 } from "lucide-react"
 import type { MovimentacaoFinanceira } from "@/lib/types"
 
@@ -53,6 +53,7 @@ export default function BetDetailClient({ profile, profileBet: initial, moviment
   const [editEmail, setEditEmail] = useState(initial.email ?? "")
   const [editSenha, setEditSenha] = useState("")
   const [salvando, setSalvando] = useState(false)
+  const [credenciaisExpanded, setCredenciaisExpanded] = useState(false)
 
   const profileName = profile.apelido || `${profile.nome} ${profile.sobrenome}`
 
@@ -151,57 +152,67 @@ export default function BetDetailClient({ profile, profileBet: initial, moviment
       {/* Credenciais */}
       <Card>
         <CardHeader className="pb-3">
-          <div className="flex items-center justify-between">
+          <button
+            className="flex items-center justify-between w-full"
+            onClick={() => { if (!editando) setCredenciaisExpanded(v => !v) }}
+          >
             <CardTitle className="text-sm">Credenciais de acesso</CardTitle>
-            {!editando && (
-              <Button variant="ghost" size="sm" onClick={() => { setEditEmail(pb.email ?? ""); setEditSenha(""); setEditando(true) }}>
-                <Pencil className="w-3.5 h-3.5 mr-1.5" />
-                Editar
-              </Button>
-            )}
-          </div>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          {editando ? (
-            <>
-              <div className="space-y-1.5">
-                <Label>Email</Label>
-                <Input value={editEmail} onChange={e => setEditEmail(e.target.value)} placeholder="email@exemplo.com" />
-              </div>
-              <div className="space-y-1.5">
-                <Label>Nova senha <span className="text-[var(--text-muted)] font-normal">(deixe em branco para não alterar)</span></Label>
-                <Input type="text" value={editSenha} onChange={e => setEditSenha(e.target.value)} placeholder="Senha da conta" autoComplete="off" />
-              </div>
-              <div className="flex gap-2">
-                <Button variant="outline" className="flex-1" onClick={() => setEditando(false)}>Cancelar</Button>
-                <Button className="flex-1" onClick={handleSalvarCredenciais} disabled={salvando}>
-                  {salvando ? <Loader2 className="w-4 h-4 animate-spin" /> : "Salvar"}
+            <div className="flex items-center gap-2">
+              {!editando && credenciaisExpanded && (
+                <Button variant="ghost" size="sm" onClick={e => { e.stopPropagation(); setEditEmail(pb.email ?? ""); setEditSenha(""); setEditando(true) }}>
+                  <Pencil className="w-3.5 h-3.5 mr-1.5" />
+                  Editar
                 </Button>
-              </div>
-            </>
-          ) : (
-            <>
-              <div>
-                <p className="text-xs text-[var(--text-muted)] uppercase tracking-wide mb-1">Email</p>
-                <p className="text-sm text-[var(--text-primary)]">{pb.email || "—"}</p>
-              </div>
-              <div>
-                <p className="text-xs text-[var(--text-muted)] uppercase tracking-wide mb-1">Senha</p>
-                <div className="flex items-center gap-2">
-                  <p className="text-sm text-[var(--text-primary)] font-mono flex-1">
-                    {showSenha ? (pb.senha_texto || "—") : "••••••••"}
-                  </p>
-                  <button
-                    onClick={() => setShowSenha(v => !v)}
-                    className="p-1 rounded text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors"
-                  >
-                    {showSenha ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                  </button>
+              )}
+              {!editando && (
+                <ChevronDown className={`w-4 h-4 text-[var(--text-muted)] transition-transform ${credenciaisExpanded ? "rotate-180" : ""}`} />
+              )}
+            </div>
+          </button>
+        </CardHeader>
+        {(credenciaisExpanded || editando) && (
+          <CardContent className="space-y-4">
+            {editando ? (
+              <>
+                <div className="space-y-1.5">
+                  <Label>Email</Label>
+                  <Input value={editEmail} onChange={e => setEditEmail(e.target.value)} placeholder="email@exemplo.com" />
                 </div>
-              </div>
-            </>
-          )}
-        </CardContent>
+                <div className="space-y-1.5">
+                  <Label>Nova senha <span className="text-[var(--text-muted)] font-normal">(deixe em branco para não alterar)</span></Label>
+                  <Input type="text" value={editSenha} onChange={e => setEditSenha(e.target.value)} placeholder="Senha da conta" autoComplete="off" />
+                </div>
+                <div className="flex gap-2">
+                  <Button variant="outline" className="flex-1" onClick={() => setEditando(false)}>Cancelar</Button>
+                  <Button className="flex-1" onClick={handleSalvarCredenciais} disabled={salvando}>
+                    {salvando ? <Loader2 className="w-4 h-4 animate-spin" /> : "Salvar"}
+                  </Button>
+                </div>
+              </>
+            ) : (
+              <>
+                <div>
+                  <p className="text-xs text-[var(--text-muted)] uppercase tracking-wide mb-1">Email</p>
+                  <p className="text-sm text-[var(--text-primary)]">{pb.email || "—"}</p>
+                </div>
+                <div>
+                  <p className="text-xs text-[var(--text-muted)] uppercase tracking-wide mb-1">Senha</p>
+                  <div className="flex items-center gap-2">
+                    <p className="text-sm text-[var(--text-primary)] font-mono flex-1">
+                      {showSenha ? (pb.senha_texto || "—") : "••••••••"}
+                    </p>
+                    <button
+                      onClick={() => setShowSenha(v => !v)}
+                      className="p-1 rounded text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors"
+                    >
+                      {showSenha ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    </button>
+                  </div>
+                </div>
+              </>
+            )}
+          </CardContent>
+        )}
       </Card>
 
       {/* Extrato */}
