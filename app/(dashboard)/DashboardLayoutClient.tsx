@@ -10,6 +10,7 @@ import {
   CreditCard, Settings, LogOut, Menu, X, HelpCircle
 } from "lucide-react"
 import Logo from "@/components/Logo"
+import GlobalFAB from "@/components/GlobalFAB"
 const navItems = [
   { href: "/dashboard", label: "Início", icon: Home },
   { href: "/perfis", label: "Perfis", icon: Users },
@@ -128,6 +129,8 @@ export default function DashboardLayoutClient({ children }: { children: React.Re
         <main className="flex-1 overflow-y-auto p-4 lg:p-6">
           {children}
         </main>
+
+        <GlobalFAB />
 
         {/* Mobile bottom nav */}
         <nav className="lg:hidden bg-[var(--bg-surface)] border-t border-[var(--border)] px-2 py-2 safe-area-bottom">
