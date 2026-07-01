@@ -65,8 +65,11 @@ function ExtratoList({ movimentacoes }: { movimentacoes: Movimentacao[] }) {
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-semibold text-[var(--text-primary)] truncate">{betNome}</p>
+                      {m.tipo === "perda" && m.descricao?.startsWith("Aposta: ") && (
+                        <p className="text-xs text-[var(--text-secondary)] truncate">{m.descricao.replace("Aposta: ", "")}</p>
+                      )}
                       <p className="text-xs text-[var(--text-muted)] truncate">
-                        {perfilNome} · {formatHora(m.created_at)}{m.descricao ? ` · ${m.descricao}` : ""}
+                        {perfilNome} · {formatHora(m.created_at)}
                       </p>
                     </div>
                     <div className="text-right flex-shrink-0">

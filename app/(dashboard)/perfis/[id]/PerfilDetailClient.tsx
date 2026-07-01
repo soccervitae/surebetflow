@@ -968,8 +968,11 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
                             </div>
                             <div className="flex-1 min-w-0">
                               <p className="text-sm font-semibold text-[var(--text-primary)] truncate">{item.betNome ?? "—"}</p>
+                              {item.tipo === "perda" && item.descricao?.startsWith("Aposta: ") && (
+                                <p className="text-xs text-[var(--text-secondary)] truncate">{item.descricao.replace("Aposta: ", "")}</p>
+                              )}
                               <p className="text-xs text-[var(--text-muted)] truncate">
-                                {fmtHora(item.created_at)}{item.descricao ? ` · ${item.descricao}` : ""}
+                                {fmtHora(item.created_at)}{item.descricao && !item.descricao.startsWith("Aposta: ") ? ` · ${item.descricao}` : ""}
                               </p>
                             </div>
                             <div className="text-right flex-shrink-0">
