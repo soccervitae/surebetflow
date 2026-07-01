@@ -783,8 +783,36 @@ export default function ApostasClient({ apostas: initialApostas, profiles, betCo
         </DialogContent>
       </Dialog>
 
+      {/* Finalizar — Sheet no mobile */}
+      <Sheet open={!!finalizarDialog} onOpenChange={open => !open && setFinalizarDialog(null)}>
+        <SheetContent side="bottom" className="md:hidden rounded-t-2xl px-5 pb-8 pt-5 space-y-5">
+          <SheetTitle>Finalizar Aposta</SheetTitle>
+          <p className="text-sm text-[var(--text-secondary)]">
+            Evento: <strong className="text-[var(--text-primary)]">{finalizarDialog?.evento}</strong><br />
+            Lucro esperado: <strong className="text-[var(--text-primary)]">{formatCurrency(finalizarDialog?.lucro_garantido ?? 0)}</strong>
+          </p>
+          <div className="space-y-2">
+            <Label>Resultado real obtido (R$)</Label>
+            <Input
+              type="text"
+              inputMode="numeric"
+              value={resultadoReal}
+              onChange={e => setResultadoReal(formatBRL(e.target.value))}
+              placeholder="0,00"
+            />
+          </div>
+          <div className="flex gap-3">
+            <Button variant="outline" className="flex-1" onClick={() => setFinalizarDialog(null)}>Cancelar</Button>
+            <Button className="flex-1" onClick={handleFinalizar} disabled={finalizando}>
+              {finalizando ? "Finalizando..." : "Confirmar"}
+            </Button>
+          </div>
+        </SheetContent>
+      </Sheet>
+
+      {/* Finalizar — Dialog no desktop */}
       <Dialog open={!!finalizarDialog} onOpenChange={open => !open && setFinalizarDialog(null)}>
-        <DialogContent>
+        <DialogContent className="hidden md:block">
           <DialogHeader>
             <DialogTitle>Finalizar Aposta</DialogTitle>
           </DialogHeader>
