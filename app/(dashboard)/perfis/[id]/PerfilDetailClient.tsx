@@ -675,10 +675,17 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
                 {apostasFiltradasPeriodo.map(aposta => {
                   type LegWithBet = { id: string; resultado_apostado: string; odd: number; stake: number; profile_bet?: { bet?: { nome: string } } }
                   const legs = (aposta as Aposta & { legs?: LegWithBet[] }).legs ?? []
-                  // Infer green leg from resultado_real
-                  const greenLegId = aposta.status === "finalizada" && aposta.resultado_real != null
-                    ? legs.find(l => Math.abs(l.stake * l.odd - aposta.investimento_total - aposta.resultado_real!) < 0.5)?.id ?? null
-                    : null
+                  const greenLegId = (() => {
+                    if (aposta.status !== "finalizada" || aposta.resultado_real == null) return null
+                    const inv = parseFloat(String(aposta.investimento_total))
+                    const res = parseFloat(String(aposta.resultado_real))
+                    let minDiff = Infinity, minId: string | null = null
+                    for (const l of legs) {
+                      const diff = Math.abs(parseFloat(String(l.stake)) * parseFloat(String(l.odd)) - inv - res)
+                      if (diff < minDiff) { minDiff = diff; minId = l.id }
+                    }
+                    return minDiff < 5 ? minId : null
+                  })()
 
                   return (
                   <Link key={aposta.id} href={`/apostas/${aposta.id}`}>
@@ -967,6 +974,18 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
                                 const dataStr = d.toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit" })
                                 const horaStr = aposta.data_evento ? d.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" }) : null
                                 const isFinished = aposta.status === "finalizada" && aposta.resultado_real != null
+                                const detectedGreenLegId = isFinished
+                                  ? (() => {
+                                      const inv = parseFloat(String(aposta.investimento_total))
+                                      const res = parseFloat(String(aposta.resultado_real))
+                                      let minDiff = Infinity, minId: string | null = null
+                                      for (const l of legs) {
+                                        const diff = Math.abs(parseFloat(String(l.stake)) * parseFloat(String(l.odd)) - inv - res)
+                                        if (diff < minDiff) { minDiff = diff; minId = l.id }
+                                      }
+                                      return minDiff < 5 ? minId : null
+                                    })()
+                                  : null
                                 return (
                                   <Card
                                     key={aposta.id}
@@ -989,8 +1008,8 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
                                     </div>
                                     <div className="divide-y divide-[var(--border)]">
                                       {legs.map((leg: any) => {
-                                        const isGreen = isFinished && Math.abs(leg.stake * leg.odd - aposta.investimento_total - (aposta.resultado_real ?? 0)) < 1.5
-                                        const isRed = isFinished && !isGreen
+                                        const isGreen = detectedGreenLegId === leg.id
+                                        const isRed = isFinished && detectedGreenLegId !== null && !isGreen
                                         return (
                                           <div key={leg.id} className={`flex items-center gap-4 px-5 py-3 ${isGreen ? "bg-green-500/5" : isRed ? "bg-[#DC2626]/5" : ""}`}>
                                             <div className="w-36 flex-shrink-0">
