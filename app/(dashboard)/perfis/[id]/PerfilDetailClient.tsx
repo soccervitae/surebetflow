@@ -1028,10 +1028,10 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
                                             </div>
                                             {isFinished && (
                                               <div className="text-right flex-shrink-0 w-28">
+                                                <p className="text-xs text-[var(--text-muted)]">{isGreen ? "Retorno" : "Perda"}</p>
                                                 <p className={`text-sm font-bold ${isGreen ? "text-green-600" : "text-[#DC2626]"}`}>
                                                   {isGreen ? `+${formatCurrency(leg.stake * leg.odd)}` : `-${formatCurrency(leg.stake)}`}
                                                 </p>
-                                                <p className="text-xs text-[var(--text-muted)]">{isGreen ? "Retorno" : "Perda"}</p>
                                               </div>
                                             )}
                                             {isFinished && (
