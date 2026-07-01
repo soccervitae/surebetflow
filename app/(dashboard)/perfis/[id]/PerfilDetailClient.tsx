@@ -52,7 +52,11 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
   const [movimentacoes, setMovimentacoes] = useState<MovimentacaoFinanceira[]>([])
   const [movLoaded, setMovLoaded] = useState(false)
   const [profileBetsFinanceiro, setProfileBetsFinanceiro] = useState<(ProfileBet & { bet?: { id: string; nome: string } })[]>([])
-  const [finPeriodo, setFinPeriodo] = useState<"hoje" | "semana" | "mes" | "ano" | "todos">("todos")
+  const [finPeriodo, setFinPeriodo] = useState<"hoje" | "semana" | "mes" | "ano" | "todos" | "custom">("todos")
+  const [finCustomMode, setFinCustomMode] = useState<"single" | "range">("single")
+  const [finCustomDate, setFinCustomDate] = useState("")
+  const [finCustomFrom, setFinCustomFrom] = useState("")
+  const [finCustomTo, setFinCustomTo] = useState("")
   const [finTipo, setFinTipo] = useState<"todos" | "deposito" | "saque" | "bonus" | "lucro" | "perda">("todos")
   const [finCasa, setFinCasa] = useState("todos")
   const [bonusEntries, setBonusEntries] = useState<{ id: string; profile_bet_id: string | null; valor: number; descricao: string | null; created_at: string; _tipo: "bonus" }[]>([])
@@ -179,18 +183,30 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
   }
 
   const nowFin = new Date()
-  const finFiltered = movimentacoes.filter(m => {
-    const date = new Date(m.created_at)
+  function applyFinPeriod(date: Date): boolean {
     if (finPeriodo === "hoje") {
       if (date.toDateString() !== nowFin.toDateString()) return false
     } else if (finPeriodo === "semana") {
-      const semanaAtras = new Date(nowFin); semanaAtras.setDate(nowFin.getDate() - 7)
-      if (date < semanaAtras) return false
+      const s = new Date(nowFin); s.setDate(nowFin.getDate() - 7)
+      if (date < s) return false
     } else if (finPeriodo === "mes") {
       if (date.getMonth() !== nowFin.getMonth() || date.getFullYear() !== nowFin.getFullYear()) return false
     } else if (finPeriodo === "ano") {
       if (date.getFullYear() !== nowFin.getFullYear()) return false
+    } else if (finPeriodo === "custom") {
+      if (finCustomMode === "single" && finCustomDate) {
+        const from = new Date(finCustomDate); from.setHours(0,0,0,0)
+        const to = new Date(finCustomDate); to.setHours(23,59,59,999)
+        if (date < from || date > to) return false
+      } else if (finCustomMode === "range") {
+        if (finCustomFrom) { const f = new Date(finCustomFrom); f.setHours(0,0,0,0); if (date < f) return false }
+        if (finCustomTo)   { const t = new Date(finCustomTo);   t.setHours(23,59,59,999); if (date > t) return false }
+      }
     }
+    return true
+  }
+  const finFiltered = movimentacoes.filter(m => {
+    if (!applyFinPeriod(new Date(m.created_at))) return false
     if (finTipo !== "todos" && m.tipo !== finTipo) return false
     if (finCasa !== "todos" && m.profile_bet_id !== finCasa) return false
     return true
@@ -198,11 +214,7 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
 
   // Filtrar bonus entries
   const bonusFiltered = bonusEntries.filter(b => {
-    const date = new Date(b.created_at)
-    if (finPeriodo === "hoje") { if (date.toDateString() !== nowFin.toDateString()) return false }
-    else if (finPeriodo === "semana") { const s = new Date(nowFin); s.setDate(nowFin.getDate() - 7); if (date < s) return false }
-    else if (finPeriodo === "mes") { if (date.getMonth() !== nowFin.getMonth() || date.getFullYear() !== nowFin.getFullYear()) return false }
-    else if (finPeriodo === "ano") { if (date.getFullYear() !== nowFin.getFullYear()) return false }
+    if (!applyFinPeriod(new Date(b.created_at))) return false
     if (finTipo !== "todos" && finTipo !== "bonus") return false
     if (finCasa !== "todos" && b.profile_bet_id !== finCasa) return false
     return true
@@ -1133,7 +1145,7 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
                   <p className="text-xs font-semibold text-[var(--text-muted)] uppercase tracking-wide">Período</p>
                   {(finTipo !== "todos" || finCasa !== "todos" || finPeriodo !== "todos") && (
                     <button
-                      onClick={() => { setFinTipo("todos"); setFinCasa("todos"); setFinPeriodo("todos") }}
+                      onClick={() => { setFinTipo("todos"); setFinCasa("todos"); setFinPeriodo("todos"); setFinCustomDate(""); setFinCustomFrom(""); setFinCustomTo("") }}
                       className="flex items-center gap-1 text-xs text-[var(--text-muted)] hover:text-[#DC2626] transition-colors"
                     >
                       <X className="h-3 w-3" /> Limpar
@@ -1141,17 +1153,47 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
                   )}
                 </div>
                 {/* Período */}
-                <div className="flex gap-1 bg-[var(--bg-elevated)] rounded-lg p-1">
-                  {(["hoje", "semana", "mes", "ano", "todos"] as const).map(p => (
-                    <button key={p} onClick={() => setFinPeriodo(p)}
-                      className={`flex-1 py-1.5 rounded-md text-xs font-medium transition-colors ${
-                        finPeriodo === p
-                          ? "bg-[var(--bg-surface)] text-[var(--accent-text)] border border-[var(--border)] shadow-sm"
-                          : "text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
-                      }`}>
-                      {p === "hoje" ? "Dia" : p === "semana" ? "Semana" : p === "mes" ? "Mês" : p === "ano" ? "Ano" : "Todos"}
+                <div className="space-y-2">
+                  <div className="flex flex-wrap gap-2">
+                    {(["todos", "hoje", "semana", "mes", "ano"] as const).map(p => (
+                      <button key={p} onClick={() => setFinPeriodo(p)}
+                        className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors border ${
+                          finPeriodo === p
+                            ? "bg-[#1e3a8a] border-[#1e3a8a] text-white"
+                            : "border-[var(--border)] text-[var(--text-secondary)] hover:bg-[var(--bg-elevated)]"
+                        }`}>
+                        {{ todos: "Todos", hoje: "Hoje", semana: "Semana", mes: "Mês", ano: "Ano" }[p]}
+                      </button>
+                    ))}
+                    <button
+                      onClick={() => setFinPeriodo("custom")}
+                      title="Data personalizada"
+                      className={`flex items-center justify-center w-[34px] h-[34px] rounded-lg transition-colors border ${
+                        finPeriodo === "custom"
+                          ? "bg-[#1e3a8a] border-[#1e3a8a] text-white"
+                          : "border-[var(--border)] text-[var(--text-secondary)] hover:bg-[var(--bg-elevated)]"
+                      }`}
+                    >
+                      <CalendarIcon className="h-3.5 w-3.5" />
                     </button>
-                  ))}
+                  </div>
+                  {finPeriodo === "custom" && (
+                    <div className="space-y-2">
+                      <div className="flex gap-1 p-0.5 bg-[var(--bg-elevated)] rounded-lg w-fit">
+                        <button onClick={() => setFinCustomMode("single")} className={`px-3 py-1 rounded-md text-xs font-medium transition-colors ${finCustomMode === "single" ? "bg-[var(--bg-surface)] text-[var(--text-primary)] shadow-sm" : "text-[var(--text-secondary)]"}`}>Data</button>
+                        <button onClick={() => setFinCustomMode("range")} className={`px-3 py-1 rounded-md text-xs font-medium transition-colors ${finCustomMode === "range" ? "bg-[var(--bg-surface)] text-[var(--text-primary)] shadow-sm" : "text-[var(--text-secondary)]"}`}>Intervalo</button>
+                      </div>
+                      {finCustomMode === "single" ? (
+                        <Input type="date" value={finCustomDate} onChange={e => setFinCustomDate(e.target.value)} className="text-xs h-8 max-w-[160px]" />
+                      ) : (
+                        <div className="flex items-center gap-2">
+                          <Input type="date" value={finCustomFrom} onChange={e => setFinCustomFrom(e.target.value)} className="text-xs h-8 max-w-[140px]" />
+                          <span className="text-[var(--text-muted)] text-xs">até</span>
+                          <Input type="date" value={finCustomTo} onChange={e => setFinCustomTo(e.target.value)} className="text-xs h-8 max-w-[140px]" />
+                        </div>
+                      )}
+                    </div>
+                  )}
                 </div>
                 {/* Tipo */}
                 <div className="flex flex-wrap gap-1">

@@ -5,7 +5,8 @@ import { createClient } from "@/lib/supabase/client"
 import { Card, CardContent } from "@/components/ui/card"
 import { formatCurrency } from "@/lib/utils"
 import { Profile } from "@/lib/types"
-import { Wallet, ArrowDownLeft, ArrowUpRight, DollarSign, X, SlidersHorizontal } from "lucide-react"
+import { Wallet, ArrowDownLeft, ArrowUpRight, DollarSign, X, SlidersHorizontal, CalendarIcon } from "lucide-react"
+import { Input } from "@/components/ui/input"
 
 type Movimentacao = {
   id: string
@@ -19,7 +20,7 @@ type Movimentacao = {
   profile_bet?: { id: string; bet?: { id: string; nome: string } }
 }
 
-type Periodo = "hoje" | "semana" | "mes" | "ano" | "todos"
+type Periodo = "hoje" | "semana" | "mes" | "ano" | "todos" | "custom"
 
 function tipoConfig(tipo: string) {
   switch (tipo) {
@@ -94,6 +95,10 @@ export default function FinanceiroPage() {
 
   const [showFilter, setShowFilter] = useState(false)
   const [filterPeriodo, setFilterPeriodo] = useState<Periodo>("todos")
+  const [filterCustomMode, setFilterCustomMode] = useState<"single" | "range">("single")
+  const [filterCustomDate, setFilterCustomDate] = useState("")
+  const [filterCustomFrom, setFilterCustomFrom] = useState("")
+  const [filterCustomTo, setFilterCustomTo] = useState("")
   const [filterTipo, setFilterTipo] = useState<"todos" | "deposito" | "saque" | "lucro" | "perda" | "bonus">("todos")
   const [filterProfile, setFilterProfile] = useState("")
   const [filterBet, setFilterBet] = useState("")
@@ -152,6 +157,15 @@ export default function FinanceiroPage() {
         if (date.getMonth() !== now.getMonth() || date.getFullYear() !== now.getFullYear()) return false
       } else if (filterPeriodo === "ano") {
         if (date.getFullYear() !== now.getFullYear()) return false
+      } else if (filterPeriodo === "custom") {
+        if (filterCustomMode === "single" && filterCustomDate) {
+          const from = new Date(filterCustomDate); from.setHours(0, 0, 0, 0)
+          const to = new Date(filterCustomDate); to.setHours(23, 59, 59, 999)
+          if (date < from || date > to) return false
+        } else if (filterCustomMode === "range") {
+          if (filterCustomFrom) { const f = new Date(filterCustomFrom); f.setHours(0,0,0,0); if (date < f) return false }
+          if (filterCustomTo)   { const t = new Date(filterCustomTo);   t.setHours(23,59,59,999); if (date > t) return false }
+        }
       }
       if (filterTipo !== "todos" && m.tipo !== filterTipo) return false
       if (filterProfile && m.profile_id !== filterProfile) return false
@@ -161,27 +175,20 @@ export default function FinanceiroPage() {
       }
       return true
     })
-  }, [movimentacoes, filterPeriodo, filterTipo, filterProfile, filterBet])
+  }, [movimentacoes, filterPeriodo, filterCustomMode, filterCustomDate, filterCustomFrom, filterCustomTo, filterTipo, filterProfile, filterBet])
 
   const totalDepositos = filtered.filter(m => m.tipo === "deposito").reduce((s, m) => s + m.valor, 0)
   const totalSaques    = filtered.filter(m => m.tipo === "saque").reduce((s, m) => s + m.valor, 0)
   const totalLucro     = filtered.filter(m => m.tipo === "lucro").reduce((s, m) => s + m.valor, 0)
   const totalPerda     = filtered.filter(m => m.tipo === "perda").reduce((s, m) => s + m.valor, 0)
   const saldoLiquido   = totalDepositos + totalLucro - totalSaques - totalPerda
-  const hasActiveFilters = filterTipo !== "todos" || filterProfile !== "" || filterBet !== ""
+  const hasActiveFilters = filterTipo !== "todos" || filterProfile !== "" || filterBet !== "" || filterPeriodo !== "todos"
 
   function clearFilters() {
     setFilterTipo("todos"); setFilterProfile(""); setFilterBet("")
-    setFilterProfileBets([]); setFilterPeriodo("mes")
+    setFilterProfileBets([]); setFilterPeriodo("todos")
+    setFilterCustomDate(""); setFilterCustomFrom(""); setFilterCustomTo("")
   }
-
-  const periodos: { value: Periodo; label: string }[] = [
-    { value: "hoje",   label: "Dia" },
-    { value: "semana", label: "Semana" },
-    { value: "mes",    label: "Mês" },
-    { value: "ano",    label: "Ano" },
-    { value: "todos",  label: "Todos" },
-  ]
 
   return (
     <div className="space-y-4">
@@ -222,20 +229,56 @@ export default function FinanceiroPage() {
           </div>
 
           {/* Período */}
-          <div className="flex gap-1 bg-[var(--bg-elevated)] rounded-lg p-1">
-            {periodos.map(({ value, label }) => (
+          <div className="space-y-2">
+            <div className="flex flex-wrap gap-2">
+              {(["todos", "hoje", "semana", "mes", "ano"] as const).map(p => (
+                <button
+                  key={p}
+                  onClick={() => setFilterPeriodo(p)}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors border ${
+                    filterPeriodo === p
+                      ? "bg-[#1e3a8a] border-[#1e3a8a] text-white"
+                      : "border-[var(--border)] text-[var(--text-secondary)] hover:bg-[var(--bg-elevated)]"
+                  }`}
+                >
+                  {{ todos: "Todos", hoje: "Hoje", semana: "Semana", mes: "Mês", ano: "Ano" }[p]}
+                </button>
+              ))}
               <button
-                key={value}
-                onClick={() => setFilterPeriodo(value)}
-                className={`flex-1 py-1.5 rounded-md text-xs font-medium transition-colors ${
-                  filterPeriodo === value
-                    ? "bg-[var(--bg-surface)] text-[var(--accent-text)] border border-[var(--border)] shadow-sm"
-                    : "text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
+                onClick={() => setFilterPeriodo("custom")}
+                title="Data personalizada"
+                className={`flex items-center justify-center w-[34px] h-[34px] rounded-lg transition-colors border ${
+                  filterPeriodo === "custom"
+                    ? "bg-[#1e3a8a] border-[#1e3a8a] text-white"
+                    : "border-[var(--border)] text-[var(--text-secondary)] hover:bg-[var(--bg-elevated)]"
                 }`}
               >
-                {label}
+                <CalendarIcon className="h-3.5 w-3.5" />
               </button>
-            ))}
+            </div>
+            {filterPeriodo === "custom" && (
+              <div className="space-y-2">
+                <div className="flex gap-1 p-0.5 bg-[var(--bg-elevated)] rounded-lg w-fit">
+                  <button
+                    onClick={() => setFilterCustomMode("single")}
+                    className={`px-3 py-1 rounded-md text-xs font-medium transition-colors ${filterCustomMode === "single" ? "bg-[var(--bg-surface)] text-[var(--text-primary)] shadow-sm" : "text-[var(--text-secondary)]"}`}
+                  >Data</button>
+                  <button
+                    onClick={() => setFilterCustomMode("range")}
+                    className={`px-3 py-1 rounded-md text-xs font-medium transition-colors ${filterCustomMode === "range" ? "bg-[var(--bg-surface)] text-[var(--text-primary)] shadow-sm" : "text-[var(--text-secondary)]"}`}
+                  >Intervalo</button>
+                </div>
+                {filterCustomMode === "single" ? (
+                  <Input type="date" value={filterCustomDate} onChange={e => setFilterCustomDate(e.target.value)} className="text-xs h-8 max-w-[160px]" />
+                ) : (
+                  <div className="flex items-center gap-2">
+                    <Input type="date" value={filterCustomFrom} onChange={e => setFilterCustomFrom(e.target.value)} className="text-xs h-8 max-w-[140px]" />
+                    <span className="text-[var(--text-muted)] text-xs">até</span>
+                    <Input type="date" value={filterCustomTo} onChange={e => setFilterCustomTo(e.target.value)} className="text-xs h-8 max-w-[140px]" />
+                  </div>
+                )}
+              </div>
+            )}
           </div>
 
           {/* Tipo */}
