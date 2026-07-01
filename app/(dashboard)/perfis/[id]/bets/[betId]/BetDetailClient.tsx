@@ -21,6 +21,7 @@ type ProfileBetFull = {
   profile_id: string
   bet_id: string
   email: string | null
+  telefone: string | null
   senha_texto: string | null
   saldo: number
   ativo: boolean
@@ -52,7 +53,26 @@ export default function BetDetailClient({ profile, profileBet: initial, moviment
   const [editando, setEditando] = useState(false)
   const [editEmail, setEditEmail] = useState(initial.email ?? "")
   const [editSenha, setEditSenha] = useState("")
+  const [editTelefone, setEditTelefone] = useState(formatPhone(initial.telefone ?? ""))
   const [salvando, setSalvando] = useState(false)
+
+  function formatPhone(raw: string) {
+    const d = raw.replace(/\D/g, "").slice(0, 11)
+    if (d.length === 0) return ""
+    if (d.length <= 2) return `(${d}`
+    if (d.length <= 6) return `(${d.slice(0, 2)}) ${d.slice(2)}`
+    const isMobile = d.length === 11 || (d.length >= 10 && d[2] === "9")
+    if (isMobile) {
+      if (d.length < 11) return `(${d.slice(0, 2)}) ${d.slice(2, 6)}-${d.slice(6)}`
+      return `(${d.slice(0, 2)}) ${d.slice(2, 7)}-${d.slice(7)}`
+    }
+    return `(${d.slice(0, 2)}) ${d.slice(2, 6)}-${d.slice(6)}`
+  }
+
+  function displayPhone(digits: string | null) {
+    if (!digits) return "—"
+    return formatPhone(digits)
+  }
   const [credenciaisExpanded, setCredenciaisExpanded] = useState(false)
 
   const profileName = profile.apelido || `${profile.nome} ${profile.sobrenome}`
@@ -80,13 +100,16 @@ export default function BetDetailClient({ profile, profileBet: initial, moviment
 
   async function handleSalvarCredenciais() {
     setSalvando(true)
-    const updates: Record<string, string | null> = { email: editEmail.trim() || null }
+    const updates: Record<string, string | null> = {
+      email: editEmail.trim() || null,
+      telefone: editTelefone.replace(/\D/g, "") || null,
+    }
     if (editSenha.trim()) updates.senha_texto = editSenha.trim()
     const { error } = await supabase.from("profile_bets").update(updates).eq("id", pb.id)
     if (error) {
       toast({ title: "Erro ao salvar", variant: "destructive" })
     } else {
-      setPb(prev => ({ ...prev, email: editEmail.trim() || null, senha_texto: editSenha.trim() || prev.senha_texto }))
+      setPb(prev => ({ ...prev, email: editEmail.trim() || null, telefone: updates.telefone, senha_texto: editSenha.trim() || prev.senha_texto }))
       toast({ title: "Credenciais atualizadas!" })
       setEditando(false)
       setEditSenha("")
@@ -159,7 +182,7 @@ export default function BetDetailClient({ profile, profileBet: initial, moviment
             <CardTitle className="text-sm">Credenciais de acesso</CardTitle>
             <div className="flex items-center gap-2">
               {!editando && credenciaisExpanded && (
-                <Button variant="ghost" size="sm" onClick={e => { e.stopPropagation(); setEditEmail(pb.email ?? ""); setEditSenha(""); setEditando(true) }}>
+                <Button variant="ghost" size="sm" onClick={e => { e.stopPropagation(); setEditEmail(pb.email ?? ""); setEditSenha(""); setEditTelefone(formatPhone(pb.telefone ?? "")); setEditando(true) }}>
                   <Pencil className="w-3.5 h-3.5 mr-1.5" />
                   Editar
                 </Button>
@@ -179,6 +202,18 @@ export default function BetDetailClient({ profile, profileBet: initial, moviment
                   <Input value={editEmail} onChange={e => setEditEmail(e.target.value)} placeholder="email@exemplo.com" />
                 </div>
                 <div className="space-y-1.5">
+                  <Label>Telefone <span className="text-[var(--text-muted)] font-normal">(opcional)</span></Label>
+                  <Input
+                    type="tel"
+                    value={editTelefone}
+                    onChange={e => setEditTelefone(formatPhone(e.target.value))}
+                    placeholder="(11) 99999-9999"
+                    maxLength={15}
+                    inputMode="numeric"
+                    autoComplete="off"
+                  />
+                </div>
+                <div className="space-y-1.5">
                   <Label>Nova senha <span className="text-[var(--text-muted)] font-normal">(deixe em branco para não alterar)</span></Label>
                   <Input type="text" value={editSenha} onChange={e => setEditSenha(e.target.value)} placeholder="Senha da conta" autoComplete="off" />
                 </div>
@@ -195,6 +230,12 @@ export default function BetDetailClient({ profile, profileBet: initial, moviment
                   <p className="text-xs text-[var(--text-muted)] uppercase tracking-wide mb-1">Email</p>
                   <p className="text-sm text-[var(--text-primary)]">{pb.email || "—"}</p>
                 </div>
+                {pb.telefone && (
+                  <div>
+                    <p className="text-xs text-[var(--text-muted)] uppercase tracking-wide mb-1">Telefone</p>
+                    <p className="text-sm text-[var(--text-primary)]">{displayPhone(pb.telefone)}</p>
+                  </div>
+                )}
                 <div>
                   <p className="text-xs text-[var(--text-muted)] uppercase tracking-wide mb-1">Senha</p>
                   <div className="flex items-center gap-2">

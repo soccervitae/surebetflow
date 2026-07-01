@@ -26,6 +26,7 @@ export interface ProfileBet {
   profile_id: string
   bet_id: string
   email: string
+  telefone?: string | null
   senha_encrypted?: Uint8Array | null
   senha_nonce?: Uint8Array | null
   saldo: number

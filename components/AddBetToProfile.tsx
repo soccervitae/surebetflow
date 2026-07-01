@@ -31,6 +31,7 @@ export default function AddBetToProfile({ profileId }: Props) {
   const [selectedBet, setSelectedBet] = useState("")
   const [email, setEmail] = useState("")
   const [senha, setSenha] = useState("")
+  const [telefone, setTelefone] = useState("")
   const [loading, setLoading] = useState(false)
   const [betSearch, setBetSearch] = useState("")
   const [deletarDialog, setDeletarDialog] = useState<ProfileBetWithBet | null>(null)
@@ -48,6 +49,7 @@ export default function AddBetToProfile({ profileId }: Props) {
   const [editDialog, setEditDialog] = useState<ProfileBetWithBet | null>(null)
   const [editEmail, setEditEmail] = useState("")
   const [editSenha, setEditSenha] = useState("")
+  const [editTelefone, setEditTelefone] = useState("")
   const [editSaving, setEditSaving] = useState(false)
 
   const { toast } = useToast()
@@ -109,6 +111,20 @@ export default function AddBetToProfile({ profileId }: Props) {
     return parseFloat(v.replace(/\./g, "").replace(",", ".")) || 0
   }
 
+  function maskPhone(raw: string) {
+    const d = raw.replace(/\D/g, "").slice(0, 11)
+    if (d.length === 0) return ""
+    if (d.length <= 2) return `(${d}`
+    if (d.length <= 6) return `(${d.slice(0, 2)}) ${d.slice(2)}`
+    // Mobile (11 digits with 9 as 5th digit) or landline
+    const isMobile = d.length === 11 || (d.length === 10 && d[2] === "9")
+    if (isMobile) {
+      if (d.length <= 10) return `(${d.slice(0, 2)}) ${d.slice(2, 6)}-${d.slice(6)}`
+      return `(${d.slice(0, 2)}) ${d.slice(2, 7)}-${d.slice(7)}`
+    }
+    return `(${d.slice(0, 2)}) ${d.slice(2, 6)}-${d.slice(6)}`
+  }
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     if (!selectedBet || !email || !senha) {
@@ -121,11 +137,13 @@ export default function AddBetToProfile({ profileId }: Props) {
     }
     setLoading(true)
     try {
+      const telefoneDigits = telefone.replace(/\D/g, "") || null
       const { error } = await supabase.from("profile_bets").insert({
         profile_id: profileId,
         bet_id: selectedBet,
         email,
         senha_texto: senha,
+        telefone: telefoneDigits,
         saldo: 0,
       })
       if (error) throw new Error(error.message)
@@ -134,6 +152,7 @@ export default function AddBetToProfile({ profileId }: Props) {
       setSelectedBet("")
       setEmail("")
       setSenha("")
+      setTelefone("")
       await loadData()
     } catch (err: unknown) {
       toast({ title: (err as Error)?.message ?? "Erro ao adicionar", variant: "destructive" })
@@ -168,16 +187,15 @@ export default function AddBetToProfile({ profileId }: Props) {
       return
     }
     setEditSaving(true)
-    const updates: Record<string, string> = { email: editEmail.trim() }
-    if (editSenha.trim()) {
-      updates.senha_texto = editSenha.trim()
-    }
+    const updates: Record<string, string | null> = { email: editEmail.trim() }
+    if (editSenha.trim()) updates.senha_texto = editSenha.trim()
+    updates.telefone = editTelefone.replace(/\D/g, "") || null
     const { error } = await supabase.from("profile_bets").update(updates).eq("id", editDialog.id)
     if (error) {
       toast({ title: "Erro ao salvar", variant: "destructive" })
     } else {
       setProfileBets(prev => prev.map(pb => pb.id === editDialog.id
-        ? { ...pb, email: editEmail.trim(), senha_texto: editSenha.trim() || (pb as any).senha_texto }
+        ? { ...pb, email: editEmail.trim(), telefone: updates.telefone }
         : pb
       ))
       toast({ title: "Dados atualizados!" })
@@ -253,7 +271,7 @@ export default function AddBetToProfile({ profileId }: Props) {
       </div>
 
       {/* Dialog Adicionar */}
-      <Dialog open={showForm} onOpenChange={open => { if (!open) { setShowForm(false); setSelectedBet(""); setEmail(""); setSenha(""); setBetSearch("") } }}>
+      <Dialog open={showForm} onOpenChange={open => { if (!open) { setShowForm(false); setSelectedBet(""); setEmail(""); setSenha(""); setTelefone(""); setBetSearch("") } }}>
         <DialogContent className="max-w-2xl p-0 gap-0 flex flex-col max-h-[90vh]">
           <DialogHeader className="px-5 pt-5 pb-3 border-b border-[var(--border)] flex-shrink-0">
             <DialogTitle>Adicionar Bet</DialogTitle>
@@ -315,7 +333,7 @@ export default function AddBetToProfile({ profileId }: Props) {
             })()}
           </div>
 
-          {/* Footer fixo — email + senha + botões */}
+          {/* Footer fixo — email + senha + telefone + botões */}
           <form onSubmit={handleSubmit} className="border-t border-[var(--border)] px-5 py-4 flex-shrink-0 space-y-3 bg-[var(--bg-surface)]">
             {selectedBet && (
               <p className="text-xs text-[var(--text-secondary)]">
@@ -329,16 +347,20 @@ export default function AddBetToProfile({ profileId }: Props) {
               </div>
               <div className="flex-1 space-y-1.5">
                 <Label className="text-xs">Senha da conta *</Label>
-                <div className="relative">
-                  <Input
-                    type="text"
-                    value={senha}
-                    onChange={e => setSenha(e.target.value)}
-                    placeholder="Senha da conta"
-                    autoComplete="off"
-                  />
-                </div>
+                <Input type="text" value={senha} onChange={e => setSenha(e.target.value)} placeholder="Senha da conta" autoComplete="off" />
               </div>
+            </div>
+            <div className="space-y-1.5">
+              <Label className="text-xs">Telefone <span className="text-[var(--text-muted)] font-normal">(opcional)</span></Label>
+              <Input
+                type="tel"
+                value={telefone}
+                onChange={e => setTelefone(maskPhone(e.target.value))}
+                placeholder="(11) 99999-9999"
+                maxLength={15}
+                inputMode="numeric"
+                autoComplete="off"
+              />
             </div>
             <div className="flex gap-2 justify-end">
               <Button type="button" variant="outline" onClick={() => setShowForm(false)}>Cancelar</Button>

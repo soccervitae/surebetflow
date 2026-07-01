@@ -11,6 +11,12 @@ import { useToast } from "@/hooks/useToast"
 import { Plus, User } from "lucide-react"
 import type { Profile } from "@/lib/types"
 
+function maskCpf(cpf: string) {
+  const d = cpf.replace(/\D/g, "")
+  if (d.length !== 11) return cpf
+  return `***.${d.slice(3, 6)}.${d.slice(6, 9)}-**`
+}
+
 interface Props {
   profiles: Profile[]
   userId: string
@@ -92,8 +98,10 @@ export default function PerfisClient({ profiles: initialProfiles, userId, planLi
                             {profile.ativo ? "Ativo" : "Inativo"}
                           </span>
                         </div>
-                        {profile.email && (
-                          <p className="text-sm text-[var(--text-secondary)] truncate">{profile.email}</p>
+                        {profile.cpf && (
+                          <p className="text-xs text-[var(--text-muted)] font-mono mt-0.5">
+                            {maskCpf(profile.cpf)}
+                          </p>
                         )}
                       </div>
                     </div>
