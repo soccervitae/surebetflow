@@ -565,17 +565,6 @@ export default function AddBetToProfile({ profileId }: Props) {
               <Card className={`hover:border-[#1e3a8a]/40 transition-colors cursor-pointer ${!pb.ativo ? "opacity-60" : ""}`}>
                 <CardContent className="p-4">
                   <div className="flex items-center gap-3">
-                    {/* Logo */}
-                    {pb.bet?.logo_url ? (
-                      <div className="hidden sm:flex w-9 h-9 rounded-lg border border-[var(--border)] bg-white items-center justify-center flex-shrink-0 overflow-hidden p-0.5">
-                        <img src={pb.bet.logo_url} alt={pb.bet.nome} className="w-full h-full object-contain" onError={handleLogoError} />
-                      </div>
-                    ) : (
-                      <div className="hidden sm:flex w-9 h-9 rounded-lg border border-[var(--border)] bg-[var(--bg-elevated)] items-center justify-center flex-shrink-0 text-xs font-bold text-[var(--text-secondary)]">
-                        {(pb.bet?.nome ?? "?").charAt(0)}
-                      </div>
-                    )}
-
                     {/* Info */}
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 flex-wrap">
