@@ -768,11 +768,9 @@ export default function SurebetCalculator({ profiles, defaultProfileId, profileN
                 <div className="mt-3 flex items-start gap-2.5 px-3 py-2.5 rounded-lg bg-amber-50 border border-amber-200">
                   <AlertTriangle className="h-4 w-4 text-amber-500 flex-shrink-0 mt-0.5" />
                   <p className="text-xs text-amber-800 leading-relaxed">
-                    O saldo atual da <span className="font-semibold">{selectedPB.bet?.nome ?? "casa"}</span> é{" "}
-                    <span className="font-semibold">{formatCurrency(saldo)}</span>, mas a stake é apenas{" "}
-                    <span className="font-semibold">{formatCurrency(stake)}</span>. Após salvar a aposta, registre o saldo
-                    de <span className="font-semibold">{formatCurrency(saldo - stake)}</span> que permanece na conta
-                    como uma nova movimentação.
+                    A stake desta aposta na <span className="font-semibold">{selectedPB.bet?.nome ?? "casa"}</span> é
+                    menor que o saldo atual da conta. Após salvar a aposta, lembre-se de registrar uma movimentação
+                    com o saldo que havia na conta antes de fazer a aposta.
                   </p>
                 </div>
               )}
