@@ -181,8 +181,6 @@ export default function DashboardLayoutClient({ children }: { children: React.Re
           {children}
         </main>
 
-        <GlobalFAB />
-
         {/* Mobile bottom nav */}
         <nav className="lg:hidden bg-[var(--bg-surface)] border-t border-[var(--border)] px-2 py-2 safe-area-bottom">
           <div className="flex items-center justify-around">
@@ -214,6 +212,9 @@ export default function DashboardLayoutClient({ children }: { children: React.Re
           </div>
         </nav>
       </div>
+
+      {/* GlobalFAB fora dos wrappers overflow-hidden para position:fixed funcionar */}
+      <GlobalFAB />
     </div>
   )
 }
