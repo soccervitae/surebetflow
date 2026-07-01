@@ -12,7 +12,7 @@ import { useToast } from "@/hooks/useToast"
 import { formatCurrency } from "@/lib/utils"
 import {
   ArrowLeft, Eye, EyeOff, Pencil, Loader2,
-  ArrowDownLeft, ArrowUpRight, TrendingUp, TrendingDown, Gift, Plus,
+  ArrowDownLeft, ArrowUpRight, TrendingUp, TrendingDown, Gift, Plus, Percent,
 } from "lucide-react"
 import type { MovimentacaoFinanceira } from "@/lib/types"
 
@@ -55,6 +55,13 @@ export default function BetDetailClient({ profile, profileBet: initial, moviment
   const [salvando, setSalvando] = useState(false)
 
   const profileName = profile.apelido || `${profile.nome} ${profile.sobrenome}`
+
+  // Compute stats from movimentacoes
+  const totalDepositos = movimentacoes.filter(m => m.tipo === "deposito").reduce((s, m) => s + m.valor, 0)
+  const totalLucro = movimentacoes.filter(m => m.tipo === "lucro").reduce((s, m) => s + m.valor, 0)
+  const totalPerda = movimentacoes.filter(m => m.tipo === "perda").reduce((s, m) => s + m.valor, 0)
+  const lucroRealizado = totalLucro - totalPerda
+  const roi = totalDepositos > 0 ? (lucroRealizado / totalDepositos) * 100 : 0
 
   // Group movimentações by date
   const groups: { date: string; items: MovimentacaoFinanceira[] }[] = []
@@ -105,7 +112,7 @@ export default function BetDetailClient({ profile, profileBet: initial, moviment
         </span>
       </div>
 
-      {/* Saldo */}
+      {/* Saldo + stats */}
       <Card>
         <CardContent className="p-5">
           <p className="text-xs text-[var(--text-muted)] uppercase tracking-wider mb-1">Saldo atual</p>
@@ -114,6 +121,32 @@ export default function BetDetailClient({ profile, profileBet: initial, moviment
           </p>
         </CardContent>
       </Card>
+
+      {/* Lucro realizado + ROI */}
+      <div className="grid grid-cols-2 gap-3">
+        <Card>
+          <CardContent className="p-4">
+            <div className="flex items-center gap-2 mb-1">
+              <TrendingUp className="w-3.5 h-3.5 text-green-500" />
+              <p className="text-xs text-[var(--text-muted)] uppercase tracking-wider">Lucro realizado</p>
+            </div>
+            <p className={`text-xl font-bold ${lucroRealizado > 0 ? "text-green-500" : lucroRealizado < 0 ? "text-[#DC2626]" : "text-[var(--text-primary)]"}`}>
+              {lucroRealizado >= 0 ? "+" : ""}{formatCurrency(lucroRealizado)}
+            </p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="p-4">
+            <div className="flex items-center gap-2 mb-1">
+              <Percent className="w-3.5 h-3.5 text-[#a855f7]" />
+              <p className="text-xs text-[var(--text-muted)] uppercase tracking-wider">ROI</p>
+            </div>
+            <p className={`text-xl font-bold ${roi > 0 ? "text-[#a855f7]" : roi < 0 ? "text-[#DC2626]" : "text-[var(--text-primary)]"}`}>
+              {roi >= 0 ? "+" : ""}{roi.toFixed(2)}%
+            </p>
+          </CardContent>
+        </Card>
+      </div>
 
       {/* Credenciais */}
       <Card>
