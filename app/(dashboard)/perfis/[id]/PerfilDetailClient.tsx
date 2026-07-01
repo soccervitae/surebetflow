@@ -438,7 +438,7 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
           </div>
         </div>
         <div className="flex items-center gap-2 flex-wrap">
-          {/* Mobile: abre Sheet */}
+          {/* Mobile: Nova Aposta + Nova Movimentação + Editar (só ícone) */}
           <Button
             onClick={async () => {
               const { data } = await createClient()
@@ -452,12 +452,26 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
               }
             }}
             size="sm"
-            className="md:hidden flex-1 sm:flex-none"
+            className="md:hidden"
           >
             <Calculator className="h-4 w-4 mr-2" />
             Nova Aposta
           </Button>
-          {/* Desktop: abre Dialog */}
+          <Button
+            variant="outline"
+            size="sm"
+            className="md:hidden"
+            onClick={() => setFinShowForm(true)}
+          >
+            <DollarSign className="h-4 w-4 mr-2" />
+            Movimentação
+          </Button>
+          <Link href={`/perfis/${profile.id}/editar`} className="md:hidden">
+            <Button variant="outline" size="sm">
+              <Pencil className="h-4 w-4" />
+            </Button>
+          </Link>
+          {/* Desktop: Nova Aposta + Editar */}
           <Button
             onClick={async () => {
               const { data } = await createClient()
@@ -471,13 +485,13 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
               }
             }}
             size="sm"
-            className="hidden md:flex flex-1 sm:flex-none"
+            className="hidden md:flex"
           >
             <Calculator className="h-4 w-4 mr-2" />
             Nova Aposta
           </Button>
-          <Link href={`/perfis/${profile.id}/editar`} className="flex-1 sm:flex-none">
-            <Button variant="outline" size="sm" className="w-full">
+          <Link href={`/perfis/${profile.id}/editar`} className="hidden md:block">
+            <Button variant="outline" size="sm">
               <Pencil className="h-4 w-4 mr-2" />
               Editar
             </Button>
