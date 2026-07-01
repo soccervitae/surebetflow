@@ -539,7 +539,11 @@ export default function ApostasClient({ apostas: initialApostas, profiles, betCo
                 ? (() => {
                     let minDiff = Infinity, minId: string | null = null
                     for (const l of legs) {
-                      const diff = Math.abs(l.stake * l.odd - aposta.investimento_total - (aposta.resultado_real ?? 0))
+                      const stake = parseFloat(String(l.stake))
+                      const odd = parseFloat(String(l.odd))
+                      const inv = parseFloat(String(aposta.investimento_total))
+                      const res = parseFloat(String(aposta.resultado_real ?? 0))
+                      const diff = Math.abs(stake * odd - inv - res)
                       if (diff < minDiff) { minDiff = diff; minId = l.id }
                     }
                     return minDiff < 5 ? minId : null
@@ -641,7 +645,16 @@ export default function ApostasClient({ apostas: initialApostas, profiles, betCo
             {apostasGroup.map(aposta => {
               const legs = (aposta as Aposta & { legs?: ApostaLeg[] }).legs ?? []
               const greenLegId = aposta.status === "finalizada" && aposta.resultado_real != null
-                ? legs.find(l => Math.abs(l.stake * l.odd - aposta.investimento_total - aposta.resultado_real!) < 0.5)?.id ?? null
+                ? (() => {
+                    const inv = parseFloat(String(aposta.investimento_total))
+                    const res = parseFloat(String(aposta.resultado_real))
+                    let minDiff = Infinity, minId: string | null = null
+                    for (const l of legs) {
+                      const diff = Math.abs(parseFloat(String(l.stake)) * parseFloat(String(l.odd)) - inv - res)
+                      if (diff < minDiff) { minDiff = diff; minId = l.id }
+                    }
+                    return minDiff < 5 ? minId : null
+                  })()
                 : null
 
               return (

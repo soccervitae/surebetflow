@@ -51,11 +51,14 @@ function statusBadge(status: string) {
 
 function inferGreenLegId(legs: ApostaWithDetails["legs"], resultado_real: number | null | undefined, investimento_total: number): string | null {
   if (resultado_real == null || !legs?.length) return null
+  const inv = parseFloat(String(investimento_total))
+  const res = parseFloat(String(resultado_real))
+  let minDiff = Infinity, minId: string | null = null
   for (const leg of legs) {
-    const lucro = leg.stake * leg.odd - investimento_total
-    if (Math.abs(lucro - resultado_real) < 0.5) return leg.id
+    const diff = Math.abs(parseFloat(String(leg.stake)) * parseFloat(String(leg.odd)) - inv - res)
+    if (diff < minDiff) { minDiff = diff; minId = leg.id }
   }
-  return null
+  return minDiff < 5 ? minId : null
 }
 
 export default function ApostaDetailClient({ aposta: initial }: { aposta: ApostaWithDetails }) {
