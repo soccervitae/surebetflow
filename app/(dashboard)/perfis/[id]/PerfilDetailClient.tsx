@@ -413,89 +413,129 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
   }
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="space-y-3">
+    <div className="space-y-0">
+      {/* Mobile header */}
+      <div className="md:hidden space-y-3 mb-6">
         <div className="flex items-center gap-3">
-          <div className="flex items-center gap-3 flex-1 min-w-0">
-            <Avatar className="h-10 w-10 flex-shrink-0">
-              {currentProfile.foto_url && <AvatarImage src={currentProfile.foto_url} />}
-              <AvatarFallback>
-                {currentProfile.nome.charAt(0)}{currentProfile.sobrenome.charAt(0)}
-              </AvatarFallback>
-            </Avatar>
-            <div className="min-w-0">
-              <h1 className="text-lg font-bold text-[var(--text-primary)] truncate">
-                {currentProfile.apelido || `${currentProfile.nome} ${currentProfile.sobrenome}`}
-              </h1>
-              <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium ${
-                currentProfile.ativo ? "bg-green-500/10 text-green-600" : "bg-red-500/10 text-red-500"
-              }`}>
-                <span className={`w-1.5 h-1.5 rounded-full ${currentProfile.ativo ? "bg-green-500" : "bg-red-500"}`} />
-                {currentProfile.ativo ? "Ativo" : "Inativo"}
-              </span>
-            </div>
+          <Avatar className="h-10 w-10 flex-shrink-0">
+            {currentProfile.foto_url && <AvatarImage src={currentProfile.foto_url} />}
+            <AvatarFallback>{currentProfile.nome.charAt(0)}{currentProfile.sobrenome.charAt(0)}</AvatarFallback>
+          </Avatar>
+          <div className="min-w-0 flex-1">
+            <h1 className="text-lg font-bold text-[var(--text-primary)] truncate">
+              {currentProfile.apelido || `${currentProfile.nome} ${currentProfile.sobrenome}`}
+            </h1>
+            <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium ${currentProfile.ativo ? "bg-green-500/10 text-green-600" : "bg-red-500/10 text-red-500"}`}>
+              <span className={`w-1.5 h-1.5 rounded-full ${currentProfile.ativo ? "bg-green-500" : "bg-red-500"}`} />
+              {currentProfile.ativo ? "Ativo" : "Inativo"}
+            </span>
           </div>
         </div>
-        <div className="flex items-center gap-2 flex-wrap">
-          {/* Mobile: Nova Aposta + Nova Movimentação + Editar (só ícone) */}
+        <div className="flex items-center gap-2">
           <Button
             onClick={async () => {
-              const { data } = await createClient()
-                .from("profile_bets")
-                .select("id")
-                .eq("profile_id", currentProfile.id)
-              if (!data || data.length < 2) {
-                setMinBetsAlertOpen(true)
-              } else {
-                setShowCalculadoraSheet(true)
-              }
+              const { data } = await createClient().from("profile_bets").select("id").eq("profile_id", currentProfile.id)
+              if (!data || data.length < 2) setMinBetsAlertOpen(true)
+              else setShowCalculadoraSheet(true)
             }}
             size="sm"
-            className="md:hidden"
           >
             <Calculator className="h-4 w-4 mr-2" />
             Nova Aposta
           </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            className="md:hidden"
-            onClick={() => setFinShowForm(true)}
-          >
+          <Button variant="outline" size="sm" onClick={() => setFinShowForm(true)}>
             <DollarSign className="h-4 w-4 mr-2" />
             Movimentação
           </Button>
-          <Link href={`/perfis/${profile.id}/editar`} className="md:hidden">
-            <Button variant="outline" size="sm">
-              <Pencil className="h-4 w-4" />
-            </Button>
+          <Link href={`/perfis/${profile.id}/editar`}>
+            <Button variant="outline" size="sm"><Pencil className="h-4 w-4" /></Button>
           </Link>
-          {/* Desktop: Nova Aposta + Editar */}
-          <Button
-            onClick={async () => {
-              const { data } = await createClient()
-                .from("profile_bets")
-                .select("id")
-                .eq("profile_id", currentProfile.id)
-              if (!data || data.length < 2) {
-                setMinBetsAlertOpen(true)
-              } else {
-                setShowCalculadoraModal(true)
-              }
-            }}
-            size="sm"
-            className="hidden md:flex"
-          >
-            <Calculator className="h-4 w-4 mr-2" />
-            Nova Aposta
-          </Button>
-          <Link href={`/perfis/${profile.id}/editar`} className="hidden md:block">
-            <Button variant="outline" size="sm">
-              <Pencil className="h-4 w-4 mr-2" />
-              Editar
-            </Button>
-          </Link>
+        </div>
+      </div>
+
+      {/* Desktop banner */}
+      <div className="hidden md:block -mx-6 -mt-6 mb-0">
+        <div className="relative overflow-hidden bg-gradient-to-br from-[#e8eaf6] to-[#c5cae9] dark:from-[#1e1e3a] dark:to-[#12122a] px-8 pt-8 pb-0">
+          {/* Decorative curves */}
+          <svg className="absolute right-0 top-0 h-full w-1/3 opacity-30" viewBox="0 0 400 300" fill="none" preserveAspectRatio="xMidYMid slice">
+            <ellipse cx="350" cy="80" rx="220" ry="180" fill="#7986cb" opacity="0.4" />
+            <ellipse cx="320" cy="220" rx="160" ry="120" fill="#5c6bc0" opacity="0.3" />
+          </svg>
+
+          <div className="relative flex items-end justify-between gap-6">
+            {/* Left: avatar + info */}
+            <div className="flex items-end gap-6 pb-6">
+              <Avatar className="h-24 w-24 flex-shrink-0 ring-4 ring-white/60 shadow-lg">
+                {currentProfile.foto_url && <AvatarImage src={currentProfile.foto_url} />}
+                <AvatarFallback className="text-3xl font-bold bg-[#3949ab] text-white">
+                  {currentProfile.nome.charAt(0)}{currentProfile.sobrenome.charAt(0)}
+                </AvatarFallback>
+              </Avatar>
+              <div className="pb-1">
+                <div className="flex items-center gap-3 mb-1">
+                  <h1 className="text-3xl font-bold text-[#1a237e] dark:text-white">
+                    {currentProfile.apelido || currentProfile.nome}
+                  </h1>
+                  <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold ${currentProfile.ativo ? "bg-green-100 text-green-700" : "bg-red-100 text-red-600"}`}>
+                    <span className={`w-1.5 h-1.5 rounded-full ${currentProfile.ativo ? "bg-green-500" : "bg-red-500"}`} />
+                    {currentProfile.ativo ? "Ativo" : "Inativo"}
+                  </span>
+                </div>
+                <div className="flex items-center gap-4 text-sm text-[#3949ab]/70 dark:text-white/60">
+                  <span className="flex items-center gap-1.5">
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                    Membro desde {new Date(currentProfile.created_at).toLocaleDateString("pt-BR", { day: "2-digit", month: "long", year: "numeric" })}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {/* Right: action button */}
+            <div className="pb-6 flex-shrink-0">
+              <Link href={`/perfis/${profile.id}/editar`}>
+                <Button variant="outline" className="bg-white/80 hover:bg-white border-white/60 text-[#1a237e] gap-2">
+                  <Pencil className="h-4 w-4" />
+                  Editar perfil
+                </Button>
+              </Link>
+            </div>
+          </div>
+
+          {/* Tabs row */}
+          <div className="flex items-center gap-0 mt-2">
+            {[
+              { value: "dashboard", label: "Dashboard" },
+              { value: "apostas", label: "Apostas" },
+              { value: "casas", label: "Bets" },
+              { value: "financeiro", label: "Financeiro" },
+            ].map(tab => (
+              <button
+                key={tab.value}
+                onClick={() => changeTab(tab.value)}
+                className={`px-5 py-3 text-sm font-medium border-b-2 transition-colors ${
+                  activeTab === tab.value
+                    ? "border-[#1a237e] text-[#1a237e] dark:border-white dark:text-white"
+                    : "border-transparent text-[#3949ab]/60 dark:text-white/50 hover:text-[#1a237e] dark:hover:text-white"
+                }`}
+              >
+                {tab.label}
+              </button>
+            ))}
+            <div className="ml-auto pb-0 flex items-center gap-2 mb-2">
+              <Button
+                onClick={async () => {
+                  const { data } = await createClient().from("profile_bets").select("id").eq("profile_id", currentProfile.id)
+                  if (!data || data.length < 2) setMinBetsAlertOpen(true)
+                  else setShowCalculadoraModal(true)
+                }}
+                size="sm"
+                className="bg-[#1a237e] hover:bg-[#283593] text-white"
+              >
+                <Calculator className="h-4 w-4 mr-2" />
+                Nova Aposta
+              </Button>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -523,27 +563,9 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
             ))}
           </div>
         </div>
-        {/* Desktop: botões */}
-        <div className="hidden md:flex items-center gap-2">
-          {[
-            { value: "dashboard", label: "Dashboard" },
-            { value: "apostas", label: "Apostas" },
-            { value: "casas", label: "Bets" },
-            { value: "financeiro", label: "Financeiro" },
-          ].map(tab => (
-            <Button
-              key={tab.value}
-              size="sm"
-              variant={activeTab === tab.value ? "default" : "outline"}
-              onClick={() => changeTab(tab.value)}
-            >
-              {tab.label}
-            </Button>
-          ))}
-        </div>
 
         {/* Swipe wrapper (mobile) */}
-        <div onTouchStart={handleTouchStart} onTouchEnd={handleTouchEnd}>
+        <div onTouchStart={handleTouchStart} onTouchEnd={handleTouchEnd} className="md:mt-6">
 
         {/* Dashboard Tab */}
         <TabsContent value="dashboard" className="space-y-6">
