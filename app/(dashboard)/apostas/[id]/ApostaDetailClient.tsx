@@ -153,8 +153,12 @@ export default function ApostaDetailClient({ aposta: initial }: { aposta: Aposta
           .from("movimentacoes_financeiras")
           .select("tipo, valor")
           .eq("profile_bet_id", leg.profile_bet_id)
-        const novoSaldo = (movs ?? []).reduce((acc, m) =>
-          acc + (m.tipo === "deposito" || m.tipo === "lucro" ? m.valor : -m.valor), 0)
+        const novoSaldo = (movs ?? []).reduce((acc, m) => {
+          const val = parseFloat(String(m.valor)) || 0
+          if (m.tipo === "deposito" || m.tipo === "lucro") return acc + val
+          if (m.tipo === "saque" || m.tipo === "perda") return acc - val
+          return acc
+        }, 0)
         await supabase.from("profile_bets").update({ saldo: novoSaldo }).eq("id", leg.profile_bet_id)
       }
       setAposta(prev => ({ ...prev, status: "finalizada", resultado_real: resultado, finalizada_at: new Date().toISOString() }))

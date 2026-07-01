@@ -251,8 +251,9 @@ export default function ApostasClient({ apostas: initialApostas, profiles, betCo
           .select("tipo, valor")
           .eq("profile_bet_id", leg.profile_bet_id)
         const novoSaldo = (movs ?? []).reduce((acc, m) => {
-          if (m.tipo === "deposito" || m.tipo === "lucro") return acc + m.valor
-          if (m.tipo === "saque" || m.tipo === "perda") return acc - m.valor
+          const val = parseFloat(String(m.valor)) || 0
+          if (m.tipo === "deposito" || m.tipo === "lucro") return acc + val
+          if (m.tipo === "saque" || m.tipo === "perda") return acc - val
           return acc
         }, 0)
         await supabase.from("profile_bets").update({ saldo: novoSaldo }).eq("id", leg.profile_bet_id)

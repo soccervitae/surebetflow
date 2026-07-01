@@ -225,8 +225,9 @@ export default function AddBetToProfile({ profileId }: Props) {
         .select("tipo, valor")
         .eq("profile_bet_id", movDialog.id)
       const saldoReal = (movs ?? []).reduce((acc, m) => {
-        if (m.tipo === "deposito" || m.tipo === "lucro") return acc + m.valor
-        if (m.tipo === "saque" || m.tipo === "perda") return acc - m.valor
+        const val = parseFloat(String(m.valor)) || 0
+        if (m.tipo === "deposito" || m.tipo === "lucro") return acc + val
+        if (m.tipo === "saque" || m.tipo === "perda") return acc - val
         return acc // bonus: não afeta saldo real
       }, 0)
       await supabase.from("profile_bets").update({ saldo: saldoReal }).eq("id", movDialog.id)
