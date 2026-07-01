@@ -17,7 +17,7 @@ import AddBetToProfile from "@/components/AddBetToProfile"
 import { formatCurrency } from "@/lib/utils"
 import { useToast } from "@/hooks/useToast"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { DollarSign, TrendingUp, Clock, ArrowUpRight, Pencil, Calculator, Gift, ArrowDownLeft, Wallet, SlidersHorizontal, X, Check } from "lucide-react"
+import { DollarSign, TrendingUp, Clock, ArrowUpRight, Pencil, Calculator, Gift, ArrowDownLeft, Wallet, SlidersHorizontal, X, Check, Filter, ChevronDown, CalendarIcon, BookOpen, Download } from "lucide-react"
 import SurebetCalculator from "@/components/SurebetCalculator"
 import type { Profile, ProfileDashboard, Aposta, MovimentacaoFinanceira, ProfileBet } from "@/lib/types"
 
@@ -63,6 +63,17 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
   const [finFormValor, setFinFormValor] = useState("")
   const [finFormDescricao, setFinFormDescricao] = useState("")
   const [finSaving, setFinSaving] = useState(false)
+  // Apostas tab state
+  const [apFilterStatus, setApFilterStatus] = useState("todos")
+  const [apFilterPeriod, setApFilterPeriod] = useState<"todos" | "dia" | "semana" | "mes" | "custom">("todos")
+  const [apFilterCustomMode, setApFilterCustomMode] = useState<"single" | "range">("single")
+  const [apFilterCustomDate, setApFilterCustomDate] = useState("")
+  const [apFilterCustomFrom, setApFilterCustomFrom] = useState("")
+  const [apFilterCustomTo, setApFilterCustomTo] = useState("")
+  const [apFilterEsporte, setApFilterEsporte] = useState("")
+  const [apFilterCompeticao, setApFilterCompeticao] = useState("")
+  const [apSortBy, setApSortBy] = useState<"data_desc" | "data_asc" | "valor_desc" | "roi_desc">("data_desc")
+  const [apShowFilter, setApShowFilter] = useState(false)
   const { toast } = useToast()
   const router = useRouter()
 
@@ -468,6 +479,7 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
           <div className="flex border-b border-[var(--border)]">
             {[
               { value: "dashboard", label: "Dashboard" },
+              { value: "apostas", label: "Apostas" },
               { value: "casas", label: "Bets" },
               { value: "financeiro", label: "Financeiro" },
             ].map(tab => (
@@ -489,6 +501,7 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
         <div className="hidden md:flex items-center gap-2">
           {[
             { value: "dashboard", label: "Dashboard" },
+            { value: "apostas", label: "Apostas" },
             { value: "casas", label: "Bets" },
             { value: "financeiro", label: "Financeiro" },
           ].map(tab => (
@@ -701,6 +714,387 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
               </div>
             )}
           </div>
+        </TabsContent>
+
+        {/* Apostas Tab */}
+        <TabsContent value="apostas" className="space-y-4">
+          {(() => {
+            function getPeriodRange() {
+              const now = new Date()
+              if (apFilterPeriod === "dia") {
+                const from = new Date(now); from.setHours(0, 0, 0, 0)
+                const to = new Date(now); to.setHours(23, 59, 59, 999)
+                return { from, to }
+              }
+              if (apFilterPeriod === "semana") {
+                const from = new Date(now); from.setDate(now.getDate() - now.getDay()); from.setHours(0, 0, 0, 0)
+                const to = new Date(now); to.setHours(23, 59, 59, 999)
+                return { from, to }
+              }
+              if (apFilterPeriod === "mes") {
+                const from = new Date(now.getFullYear(), now.getMonth(), 1, 0, 0, 0, 0)
+                const to = new Date(now); to.setHours(23, 59, 59, 999)
+                return { from, to }
+              }
+              if (apFilterPeriod === "custom") {
+                if (apFilterCustomMode === "single" && apFilterCustomDate) {
+                  const from = new Date(apFilterCustomDate); from.setHours(0, 0, 0, 0)
+                  const to = new Date(apFilterCustomDate); to.setHours(23, 59, 59, 999)
+                  return { from, to }
+                }
+                if (apFilterCustomMode === "range") {
+                  const from = apFilterCustomFrom ? (() => { const d = new Date(apFilterCustomFrom); d.setHours(0,0,0,0); return d })() : null
+                  const to = apFilterCustomTo ? (() => { const d = new Date(apFilterCustomTo); d.setHours(23,59,59,999); return d })() : null
+                  return { from, to }
+                }
+              }
+              return { from: null, to: null }
+            }
+
+            const apFiltered = currentApostas.filter(a => {
+              if (apFilterStatus !== "todos" && a.status !== apFilterStatus) return false
+              const { from, to } = getPeriodRange()
+              const created = new Date(a.created_at)
+              if (from && created < from) return false
+              if (to && created > to) return false
+              if (apFilterEsporte && !(a.esporte ?? "").toLowerCase().includes(apFilterEsporte.toLowerCase())) return false
+              if (apFilterCompeticao && !(a.competicao ?? "").toLowerCase().includes(apFilterCompeticao.toLowerCase())) return false
+              return true
+            }).sort((a, b) => {
+              if (apSortBy === "data_asc") return new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
+              if (apSortBy === "valor_desc") return b.investimento_total - a.investimento_total
+              if (apSortBy === "roi_desc") return b.roi_percentual - a.roi_percentual
+              return new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+            })
+
+            const hasActiveFilter = apFilterStatus !== "todos" || apFilterPeriod !== "todos" || apFilterEsporte || apFilterCompeticao
+
+            return (
+              <>
+                {/* Filter card */}
+                <Card>
+                  <CardContent className="p-4 space-y-4">
+                    <div className="flex items-center justify-between">
+                      <button
+                        onClick={() => setApShowFilter(v => !v)}
+                        className="flex items-center gap-2 text-sm font-medium text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors"
+                      >
+                        <Filter className="h-4 w-4" />
+                        Filtrar
+                        <ChevronDown className={`h-3.5 w-3.5 transition-transform ${apShowFilter ? "rotate-180" : ""}`} />
+                      </button>
+                      {hasActiveFilter && (
+                        <button
+                          onClick={() => { setApFilterStatus("todos"); setApFilterPeriod("todos"); setApFilterCustomDate(""); setApFilterCustomFrom(""); setApFilterCustomTo(""); setApFilterEsporte(""); setApFilterCompeticao("") }}
+                          className="text-xs text-[var(--text-secondary)] hover:text-[var(--text-primary)] flex items-center gap-1 transition-colors"
+                        >
+                          <X className="h-3 w-3" />
+                          Limpar
+                        </button>
+                      )}
+                    </div>
+
+                    {apShowFilter && (
+                      <>
+                        <div className="space-y-1.5">
+                          <Label className="text-xs">Status</Label>
+                          <Select value={apFilterStatus} onValueChange={setApFilterStatus}>
+                            <SelectTrigger><SelectValue /></SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="todos">Todos</SelectItem>
+                              <SelectItem value="pendente">Pendentes</SelectItem>
+                              <SelectItem value="finalizada">Finalizadas</SelectItem>
+                              <SelectItem value="cancelada">Canceladas</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-3">
+                          <div className="space-y-1.5">
+                            <Label className="text-xs">Esporte</Label>
+                            <Input value={apFilterEsporte} onChange={e => setApFilterEsporte(e.target.value)} placeholder="ex: Futebol" className="text-xs h-9" />
+                          </div>
+                          <div className="space-y-1.5">
+                            <Label className="text-xs">Competição</Label>
+                            <Input value={apFilterCompeticao} onChange={e => setApFilterCompeticao(e.target.value)} placeholder="ex: Champions" className="text-xs h-9" />
+                          </div>
+                        </div>
+
+                        <div className="space-y-1.5">
+                          <Label className="text-xs">Ordenar por</Label>
+                          <Select value={apSortBy} onValueChange={v => setApSortBy(v as typeof apSortBy)}>
+                            <SelectTrigger className="text-xs h-9"><SelectValue /></SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="data_desc">Data (mais recente)</SelectItem>
+                              <SelectItem value="data_asc">Data (mais antigo)</SelectItem>
+                              <SelectItem value="valor_desc">Maior investimento</SelectItem>
+                              <SelectItem value="roi_desc">Maior ROI</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+
+                        <div className="space-y-2">
+                          <Label className="text-xs flex items-center gap-1">
+                            <CalendarIcon className="h-3 w-3" />
+                            Período
+                          </Label>
+                          <div className="flex flex-wrap gap-2">
+                            {(["todos", "dia", "semana", "mes"] as const).map(p => (
+                              <button
+                                key={p}
+                                onClick={() => setApFilterPeriod(p)}
+                                className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors border ${
+                                  apFilterPeriod === p
+                                    ? "bg-[#1e3a8a] border-[#1e3a8a] text-white"
+                                    : "border-[var(--border)] text-[var(--text-secondary)] hover:bg-[var(--bg-elevated)]"
+                                }`}
+                              >
+                                {{ todos: "Todos", dia: "Hoje", semana: "Semana", mes: "Mês" }[p]}
+                              </button>
+                            ))}
+                            <button
+                              onClick={() => setApFilterPeriod("custom")}
+                              className={`flex items-center justify-center w-[34px] h-[34px] rounded-lg transition-colors border ${
+                                apFilterPeriod === "custom"
+                                  ? "bg-[#1e3a8a] border-[#1e3a8a] text-white"
+                                  : "border-[var(--border)] text-[var(--text-secondary)] hover:bg-[var(--bg-elevated)]"
+                              }`}
+                            >
+                              <CalendarIcon className="h-3.5 w-3.5" />
+                            </button>
+                          </div>
+                          {apFilterPeriod === "custom" && (
+                            <div className="mt-2 space-y-2">
+                              <div className="flex gap-1 p-0.5 bg-[var(--bg-elevated)] rounded-lg w-fit">
+                                <button
+                                  onClick={() => setApFilterCustomMode("single")}
+                                  className={`px-3 py-1 rounded-md text-xs font-medium transition-colors ${apFilterCustomMode === "single" ? "bg-[var(--bg-surface)] text-[var(--text-primary)] shadow-sm" : "text-[var(--text-secondary)]"}`}
+                                >Data</button>
+                                <button
+                                  onClick={() => setApFilterCustomMode("range")}
+                                  className={`px-3 py-1 rounded-md text-xs font-medium transition-colors ${apFilterCustomMode === "range" ? "bg-[var(--bg-surface)] text-[var(--text-primary)] shadow-sm" : "text-[var(--text-secondary)]"}`}
+                                >Intervalo</button>
+                              </div>
+                              {apFilterCustomMode === "single" ? (
+                                <Input type="date" value={apFilterCustomDate} onChange={e => setApFilterCustomDate(e.target.value)} className="text-xs h-8 max-w-[160px]" />
+                              ) : (
+                                <div className="flex items-center gap-2">
+                                  <Input type="date" value={apFilterCustomFrom} onChange={e => setApFilterCustomFrom(e.target.value)} className="text-xs h-8 max-w-[140px]" />
+                                  <span className="text-[var(--text-muted)] text-xs">até</span>
+                                  <Input type="date" value={apFilterCustomTo} onChange={e => setApFilterCustomTo(e.target.value)} className="text-xs h-8 max-w-[140px]" />
+                                </div>
+                              )}
+                            </div>
+                          )}
+                        </div>
+                      </>
+                    )}
+                  </CardContent>
+                </Card>
+
+                {/* List */}
+                {apFiltered.length === 0 ? (
+                  <Card>
+                    <CardContent className="flex flex-col items-center justify-center py-16">
+                      <BookOpen className="h-12 w-12 text-gray-300 mb-4" />
+                      <p className="text-[var(--text-secondary)]">Nenhuma aposta encontrada</p>
+                    </CardContent>
+                  </Card>
+                ) : (() => {
+                  function formatGroupDate(iso: string) {
+                    return new Date(iso + "T12:00:00").toLocaleDateString("pt-BR", { day: "numeric", month: "short" }).replace(".", "")
+                  }
+                  const map = new Map<string, typeof apFiltered>()
+                  for (const a of apFiltered) {
+                    const key = new Date(a.created_at).toISOString().slice(0, 10)
+                    if (!map.has(key)) map.set(key, [])
+                    map.get(key)!.push(a)
+                  }
+                  const groups = Array.from(map.entries()).sort((a, b) => b[0].localeCompare(a[0]))
+
+                  return (
+                    <>
+                      {/* Desktop */}
+                      <div className="hidden md:block space-y-6">
+                        {groups.map(([dateKey, apostasGroup]) => (
+                          <div key={dateKey}>
+                            <p className="text-xs font-semibold text-[var(--text-muted)] px-1 mb-2">{formatGroupDate(dateKey)}</p>
+                            <div className="space-y-3">
+                              {apostasGroup.map(aposta => {
+                                const legs = (aposta as any).legs ?? []
+                                const d = aposta.data_evento ? new Date(aposta.data_evento) : new Date(aposta.created_at)
+                                const dataStr = d.toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit" })
+                                const horaStr = aposta.data_evento ? d.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" }) : null
+                                const isFinished = aposta.status === "finalizada" && aposta.resultado_real != null
+                                return (
+                                  <Card
+                                    key={aposta.id}
+                                    className="overflow-hidden cursor-pointer hover:border-[#1e3a8a]/40 transition-colors"
+                                    onClick={() => window.location.href = `/apostas/${aposta.id}`}
+                                  >
+                                    <div className="flex items-center justify-between px-5 py-3 border-b border-[var(--border)] bg-[var(--bg-elevated)]">
+                                      <div className="flex items-center gap-3 min-w-0">
+                                        <p className={`font-semibold truncate ${aposta.status === "pendente" ? "text-red-500 dark:text-[var(--text-primary)]" : "text-[var(--text-primary)]"}`}>{aposta.evento}</p>
+                                        {aposta.esporte && <span className="text-xs text-[var(--text-muted)] flex-shrink-0">{aposta.esporte}</span>}
+                                      </div>
+                                      <div className="flex items-center gap-3 flex-shrink-0">
+                                        <span className="text-xs text-[var(--text-secondary)]">{dataStr}{horaStr ? ` · ${horaStr}` : ""}</span>
+                                        {statusBadge(aposta.status)}
+                                        <span className={`font-bold text-base ${isFinished ? ((aposta.resultado_real ?? 0) >= 0 ? "text-green-500" : "text-[#DC2626]") : "text-green-500"}`}>
+                                          {isFinished ? formatCurrency(aposta.resultado_real ?? 0) : formatCurrency(aposta.lucro_garantido)}
+                                        </span>
+                                        <span className="text-xs text-[var(--text-muted)]">{aposta.roi_percentual.toFixed(2)}%</span>
+                                      </div>
+                                    </div>
+                                    <div className="divide-y divide-[var(--border)]">
+                                      {legs.map((leg: any) => {
+                                        const isGreen = isFinished && Math.abs(leg.stake * leg.odd - aposta.investimento_total - (aposta.resultado_real ?? 0)) < 1.5
+                                        const isRed = isFinished && !isGreen
+                                        return (
+                                          <div key={leg.id} className={`flex items-center gap-4 px-5 py-3 ${isGreen ? "bg-green-500/5" : isRed ? "bg-[#DC2626]/5" : ""}`}>
+                                            <div className="w-36 flex-shrink-0">
+                                              <p className="font-semibold text-[var(--text-primary)] text-sm">{leg.profile_bet?.bet?.nome ?? "—"}</p>
+                                            </div>
+                                            <div className="flex-1 min-w-0">
+                                              <p className="text-sm text-[var(--text-secondary)] truncate">{leg.resultado_apostado}</p>
+                                            </div>
+                                            <div className="text-right flex-shrink-0 w-28">
+                                              <p className="text-xs text-[var(--text-muted)]">Stake</p>
+                                              <p className="text-sm font-semibold text-[var(--text-primary)]">{formatCurrency(leg.stake)}</p>
+                                            </div>
+                                            <div className="text-right flex-shrink-0 w-20">
+                                              <p className="text-xs text-[var(--text-muted)]">Odd</p>
+                                              <p className="text-sm font-bold text-[var(--text-primary)]">{Number(leg.odd).toFixed(3)}</p>
+                                            </div>
+                                            {isFinished && (
+                                              <div className="text-right flex-shrink-0 w-28">
+                                                <p className={`text-sm font-bold ${isGreen ? "text-green-600" : "text-[#DC2626]"}`}>
+                                                  {isGreen ? `+${formatCurrency(leg.stake * leg.odd)}` : `-${formatCurrency(leg.stake)}`}
+                                                </p>
+                                                <p className="text-xs text-[var(--text-muted)]">{isGreen ? "Retorno" : "Perda"}</p>
+                                              </div>
+                                            )}
+                                            {isFinished && (
+                                              <span className={`px-2.5 py-1 rounded text-xs font-bold w-14 text-center flex-shrink-0 ${isGreen ? "bg-green-600 text-white" : "bg-[#DC2626] text-white"}`}>
+                                                {isGreen ? "GREEN" : "RED"}
+                                              </span>
+                                            )}
+                                          </div>
+                                        )
+                                      })}
+                                    </div>
+                                  </Card>
+                                )
+                              })}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+
+                      {/* Mobile */}
+                      <div className="md:hidden space-y-6">
+                        {groups.map(([dateKey, apostasGroup]) => (
+                          <div key={dateKey}>
+                            <p className="text-xs font-semibold text-[var(--text-muted)] px-1 mb-2">{formatGroupDate(dateKey)}</p>
+                            <div className="space-y-3">
+                              {apostasGroup.map(aposta => {
+                                const legs = (aposta as any).legs ?? []
+                                const detectedGreenId = aposta.status === "finalizada" && aposta.resultado_real != null
+                                  ? legs.find((l: any) => Math.abs(l.stake * l.odd - aposta.investimento_total - aposta.resultado_real!) < 0.5)?.id ?? null
+                                  : null
+                                return (
+                                  <Link key={aposta.id} href={`/apostas/${aposta.id}`}>
+                                    <Card className="hover:border-[#1e3a8a]/40 transition-colors cursor-pointer overflow-hidden">
+                                      <CardContent className="p-4">
+                                        <div className="flex items-center gap-2 flex-wrap mb-1 min-w-0">
+                                          <p className="font-medium text-[var(--text-primary)] truncate">{aposta.evento}</p>
+                                          {statusBadge(aposta.status)}
+                                        </div>
+                                        <p className="text-xs text-[var(--text-muted)] mb-3 flex items-center gap-1">
+                                          <CalendarIcon className="h-3 w-3" />
+                                          {(() => {
+                                            const d = aposta.data_evento ? new Date(aposta.data_evento) : new Date(aposta.created_at)
+                                            const dateStr = d.toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit", year: "numeric" })
+                                            const timeStr = aposta.data_evento ? ` às ${d.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" })}` : ""
+                                            return dateStr + timeStr
+                                          })()}
+                                        </p>
+                                        {legs.length > 0 && (
+                                          <div className="space-y-1.5 mb-3">
+                                            {legs.map((leg: any) => {
+                                              const isGreen = detectedGreenId === leg.id
+                                              const isRed = detectedGreenId !== null && detectedGreenId !== leg.id
+                                              return (
+                                                <div key={leg.id} className={`rounded-xl px-3 py-3 flex items-center gap-3 ${isGreen ? "bg-green-500/10" : isRed ? "bg-[#DC2626]/5" : "bg-[var(--bg-elevated)]"}`}>
+                                                  <div className="flex-1 min-w-0 space-y-1">
+                                                    <p className={`text-base font-bold leading-tight ${isGreen ? "text-green-600" : isRed ? "text-[#DC2626]" : "text-[var(--accent-text)]"}`}>
+                                                      {leg.profile_bet?.bet?.nome ?? "Casa"}
+                                                    </p>
+                                                    <p className="text-sm text-[var(--text-secondary)] leading-snug">{leg.resultado_apostado}</p>
+                                                    <p className="text-sm text-[var(--text-secondary)]">@{Number(leg.odd).toFixed(2)} · {formatCurrency(leg.stake)}</p>
+                                                    {(isGreen || isRed) && (
+                                                      <p className={`text-sm font-bold ${isGreen ? "text-green-600" : "text-[#DC2626]"}`}>
+                                                        {isGreen ? `Retorno: +${formatCurrency(leg.stake * leg.odd)}` : `Perda: -${formatCurrency(leg.stake)}`}
+                                                      </p>
+                                                    )}
+                                                  </div>
+                                                  {(isGreen || isRed) && (
+                                                    <span className={`px-2.5 py-1 rounded text-xs font-bold flex-shrink-0 ${isGreen ? "bg-green-600 text-white" : "bg-[#DC2626] text-white"}`}>
+                                                      {isGreen ? "GREEN" : "RED"}
+                                                    </span>
+                                                  )}
+                                                </div>
+                                              )
+                                            })}
+                                          </div>
+                                        )}
+                                        <div className="flex items-end justify-between gap-2 pt-2 border-t border-[var(--border)]">
+                                          <div>
+                                            <p className="text-xs text-[var(--text-muted)]">Investimento</p>
+                                            <p className="text-sm font-bold text-[var(--text-primary)]">{formatCurrency(aposta.investimento_total)}</p>
+                                          </div>
+                                          {aposta.status !== "cancelada" && (
+                                            <div className="text-right">
+                                              <p className="text-xs text-[var(--text-muted)]">{aposta.status === "finalizada" ? "Lucro" : "Lucro esperado"}</p>
+                                              {aposta.status === "finalizada" ? (
+                                                <p className={`text-sm font-bold ${(aposta.resultado_real ?? 0) >= 0 ? "text-[var(--accent-text)]" : "text-[#DC2626]"}`}>
+                                                  {formatCurrency(aposta.resultado_real ?? 0)}
+                                                </p>
+                                              ) : (
+                                                <>
+                                                  <p className="text-sm font-bold text-[#D97706]">{formatCurrency(aposta.lucro_garantido)}</p>
+                                                  <Button
+                                                    size="sm"
+                                                    variant="outline"
+                                                    className="mt-2"
+                                                    onClick={e => {
+                                                      e.preventDefault()
+                                                      setFinalizarDialog(aposta)
+                                                      setResultadoReal("")
+                                                    }}
+                                                  >
+                                                    Finalizar
+                                                  </Button>
+                                                </>
+                                              )}
+                                            </div>
+                                          )}
+                                        </div>
+                                      </CardContent>
+                                    </Card>
+                                  </Link>
+                                )
+                              })}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </>
+                  )
+                })()}
+              </>
+            )
+          })()}
         </TabsContent>
 
         {/* Casas Tab */}
