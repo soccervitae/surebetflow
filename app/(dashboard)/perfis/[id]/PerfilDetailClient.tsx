@@ -392,11 +392,14 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
             </Avatar>
             <div className="min-w-0">
               <h1 className="text-lg font-bold text-[var(--text-primary)] truncate">
-                {currentProfile.nome} {currentProfile.sobrenome}
+                {currentProfile.apelido || `${currentProfile.nome} ${currentProfile.sobrenome}`}
               </h1>
-              {currentProfile.apelido && (
-                <p className="text-sm text-[var(--text-secondary)] truncate">{currentProfile.apelido}</p>
-              )}
+              <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium ${
+                currentProfile.ativo ? "bg-green-500/10 text-green-600" : "bg-red-500/10 text-red-500"
+              }`}>
+                <span className={`w-1.5 h-1.5 rounded-full ${currentProfile.ativo ? "bg-green-500" : "bg-red-500"}`} />
+                {currentProfile.ativo ? "Ativo" : "Inativo"}
+              </span>
             </div>
           </div>
         </div>
