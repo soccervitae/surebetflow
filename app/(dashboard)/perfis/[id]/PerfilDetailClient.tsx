@@ -523,11 +523,7 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
             ))}
             <div className="ml-auto pb-0 flex items-center gap-2 mb-2">
               <Button
-                onClick={async () => {
-                  const { data } = await createClient().from("profile_bets").select("id").eq("profile_id", currentProfile.id)
-                  if (!data || data.length < 2) setMinBetsAlertOpen(true)
-                  else setShowCalculadoraModal(true)
-                }}
+                onClick={() => setShowCalculadoraModal(true)}
                 size="sm"
                 className="bg-[#1a237e] hover:bg-[#283593] text-white"
               >
