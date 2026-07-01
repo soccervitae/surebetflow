@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from "react"
 import Link from "next/link"
+import { useRouter } from "next/navigation"
 import { createClient } from "@/lib/supabase/client"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -102,6 +103,7 @@ export default function ApostasClient({ apostas: initialApostas, profiles, betCo
   const [deletando, setDeletando] = useState(false)
   const { toast } = useToast()
   const supabase = createClient()
+  const router = useRouter()
 
   // Real-time: sync apostas list across devices
   useEffect(() => {
@@ -264,6 +266,7 @@ export default function ApostasClient({ apostas: initialApostas, profiles, betCo
       setFinalizarDialog(null)
       setGreenLegId(null)
       setResultadoReal("")
+      router.refresh()
     }
     setFinalizando(false)
   }

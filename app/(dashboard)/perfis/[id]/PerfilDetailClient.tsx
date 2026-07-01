@@ -363,6 +363,7 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
       setFinalizarDialog(null)
       setGreenLegId(null)
       setResultadoReal("")
+      router.refresh()
     }
     setFinalizando(false)
   }

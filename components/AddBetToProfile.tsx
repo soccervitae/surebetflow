@@ -68,6 +68,24 @@ export default function AddBetToProfile({ profileId }: Props) {
     loadData()
   }, [loadData])
 
+  // Re-fetch profile_bets whenever saldo is updated externally (e.g. after bet finalization)
+  useEffect(() => {
+    const channel = supabase
+      .channel(`profile-bets-saldo-${profileId}`)
+      .on("postgres_changes", {
+        event: "UPDATE",
+        schema: "public",
+        table: "profile_bets",
+        filter: `profile_id=eq.${profileId}`,
+      }, (payload) => {
+        setProfileBets(prev => prev.map(pb =>
+          pb.id === payload.new.id ? { ...pb, saldo: payload.new.saldo, ativo: payload.new.ativo } : pb
+        ))
+      })
+      .subscribe()
+    return () => { supabase.removeChannel(channel) }
+  }, [profileId, supabase])
+
   function handleLogoError(e: React.SyntheticEvent<HTMLImageElement>) {
     const img = e.target as HTMLImageElement
     const src = img.src
