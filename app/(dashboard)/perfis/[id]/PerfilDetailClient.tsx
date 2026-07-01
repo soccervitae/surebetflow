@@ -38,8 +38,6 @@ function statusBadge(status: string) {
 
 export default function PerfilDetailClient({ profile, dashboard, apostas, userToken }: Props) {
   const [currentProfile, setCurrentProfile] = useState(profile)
-  const [togglingAtivo, setTogglingAtivo] = useState(false)
-  const [confirmAtivoOpen, setConfirmAtivoOpen] = useState(false)
   const [currentApostas, setCurrentApostas] = useState(apostas)
   const [showCalculadoraSheet, setShowCalculadoraSheet] = useState(false)
   const [showCalculadoraModal, setShowCalculadoraModal] = useState(false)
@@ -144,21 +142,6 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
   }
   const supabase = createClient()
 
-  async function handleToggleAtivo() {
-    setTogglingAtivo(true)
-    const novoAtivo = !currentProfile.ativo
-    const { error } = await supabase
-      .from("profiles")
-      .update({ ativo: novoAtivo, updated_at: new Date().toISOString() })
-      .eq("id", currentProfile.id)
-    if (error) {
-      toast({ title: "Erro ao atualizar status", variant: "destructive" })
-    } else {
-      setCurrentProfile(prev => ({ ...prev, ativo: novoAtivo }))
-      toast({ title: novoAtivo ? "Perfil ativado" : "Perfil desativado" })
-    }
-    setTogglingAtivo(false)
-  }
 
   async function loadMovimentacoes() {
     const [movRes, betsRes, bonusRes] = await Promise.all([
@@ -455,18 +438,6 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
           >
             <Calculator className="h-4 w-4 mr-2" />
             Nova Aposta
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => setConfirmAtivoOpen(true)}
-            className={`flex-1 sm:flex-none ${currentProfile.ativo
-              ? "text-[var(--accent-text)] border-[#1e3a8a]/40 hover:bg-[#1e3a8a]/5"
-              : "text-[#DC2626] border-[#DC2626]/40 hover:bg-[#DC2626]/5"
-            }`}
-          >
-            <span className={`w-2 h-2 rounded-full mr-2 ${currentProfile.ativo ? "bg-[#1e3a8a]" : "bg-[#DC2626]"}`} />
-            {currentProfile.ativo ? "Ativo" : "Inativo"}
           </Button>
           <Link href={`/perfis/${profile.id}/editar`} className="flex-1 sm:flex-none">
             <Button variant="outline" size="sm" className="w-full">
@@ -1002,35 +973,6 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
 
         </div> {/* end swipe wrapper */}
       </Tabs>
-
-      {/* Confirmar Ativo/Inativo Dialog */}
-      <Dialog open={confirmAtivoOpen} onOpenChange={setConfirmAtivoOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>
-              {currentProfile.ativo ? "Desativar perfil?" : "Ativar perfil?"}
-            </DialogTitle>
-          </DialogHeader>
-          <p className="text-sm text-[var(--text-secondary)]">
-            {currentProfile.ativo
-              ? `O perfil "${currentProfile.apelido ?? `${currentProfile.nome} ${currentProfile.sobrenome}`}" será marcado como inativo. Ele não será excluído e pode ser reativado a qualquer momento.`
-              : `O perfil "${currentProfile.apelido ?? `${currentProfile.nome} ${currentProfile.sobrenome}`}" será marcado como ativo novamente.`}
-          </p>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setConfirmAtivoOpen(false)}>Cancelar</Button>
-            <Button
-              disabled={togglingAtivo}
-              className={currentProfile.ativo ? "bg-[#DC2626] hover:bg-red-700" : "bg-[#1e3a8a] hover:bg-[#1e40af]"}
-              onClick={async () => {
-                await handleToggleAtivo()
-                setConfirmAtivoOpen(false)
-              }}
-            >
-              {togglingAtivo ? "Salvando..." : currentProfile.ativo ? "Desativar" : "Ativar"}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
 
       {/* Alerta mínimo de bets */}
       <Dialog open={minBetsAlertOpen} onOpenChange={setMinBetsAlertOpen}>
