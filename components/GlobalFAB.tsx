@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, useRef } from "react"
+import { useState, useEffect } from "react"
 import { usePathname } from "next/navigation"
 import { createClient } from "@/lib/supabase/client"
 import { Plus, Calculator, DollarSign, Wallet, Loader2 } from "lucide-react"
@@ -46,10 +46,7 @@ export default function GlobalFAB() {
   const [betsProfile, setBetsProfile] = useState<Profile | null>(null)
   const [betsPickStep, setBetsPickStep] = useState(false)
 
-  const fabRef = useRef<HTMLDivElement>(null)
-
-  const visible = FAB_PAGES.some(p => pathname === p || pathname.startsWith(p + "/"))
-  if (!visible) return null
+  const [mobileOpen, setMobileOpen] = useState(false)
 
   async function loadProfiles() {
     if (profilesLoaded) return
@@ -57,6 +54,16 @@ export default function GlobalFAB() {
     setProfiles(data ?? [])
     setProfilesLoaded(true)
   }
+
+  const visible = FAB_PAGES.some(p => pathname === p || pathname.startsWith(p + "/"))
+
+  useEffect(() => {
+    const handler = () => { loadProfiles(); setMobileOpen(true) }
+    window.addEventListener("open-mobile-fab", handler)
+    return () => window.removeEventListener("open-mobile-fab", handler)
+  }, [])
+
+  if (!visible) return null
 
   async function loadMovBets(profileId: string) {
     const { data } = await supabase
@@ -136,8 +143,30 @@ export default function GlobalFAB() {
 
   return (
     <>
-      {/* FAB */}
-      <div ref={fabRef} className="fixed bottom-8 right-8 hidden lg:flex flex-col items-end gap-3 z-50">
+      {/* Mobile action sheet */}
+      {mobileOpen && (
+        <div className="fixed inset-0 z-50 lg:hidden flex flex-col justify-end">
+          <div className="absolute inset-0 bg-black/40" onClick={() => setMobileOpen(false)} />
+          <div className="relative bg-[var(--bg-surface)] rounded-t-2xl shadow-xl p-4 pb-8 space-y-2">
+            <div className="w-10 h-1 rounded-full bg-[var(--border)] mx-auto mb-4" />
+            {fabItems.map(({ label, icon: Icon, color, onClick }) => (
+              <button
+                key={label}
+                onClick={() => { setMobileOpen(false); onClick() }}
+                className="w-full flex items-center gap-4 px-4 py-3.5 rounded-xl border border-[var(--border)] hover:bg-[var(--bg-elevated)] transition-colors"
+              >
+                <div className={`w-10 h-10 rounded-full ${color} flex items-center justify-center flex-shrink-0`}>
+                  <Icon className="w-5 h-5 text-white" />
+                </div>
+                <span className="font-semibold text-sm text-[var(--text-primary)]">{label}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Desktop FAB */}
+      <div className="fixed bottom-8 right-8 hidden lg:flex flex-col items-end gap-3 z-50">
         {/* Options (expand upward) */}
         {open && (
           <div className="flex flex-col items-end gap-2 mb-1">

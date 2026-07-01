@@ -1,16 +1,17 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
 import { createClient } from "@/lib/supabase/client"
 import { cn } from "@/lib/utils"
 import {
   Home, Users, BookOpen, DollarSign,
-  CreditCard, Settings, LogOut, Menu, X, HelpCircle
+  CreditCard, Settings, LogOut, Menu, X, HelpCircle, Plus, MessageCircle, UserCircle
 } from "lucide-react"
 import Logo from "@/components/Logo"
 import GlobalFAB from "@/components/GlobalFAB"
+
 const navItems = [
   { href: "/dashboard", label: "Início", icon: Home },
   { href: "/perfis", label: "Perfis", icon: Users },
@@ -18,18 +19,39 @@ const navItems = [
   { href: "/financeiro", label: "Financeiro", icon: DollarSign },
   { href: "/assinatura", label: "Assinatura", icon: CreditCard },
   { href: "/tutorial", label: "Tutorial", icon: HelpCircle },
+  { href: "/suporte", label: "Suporte", icon: MessageCircle },
   { href: "/configuracoes", label: "Configurações", icon: Settings },
+]
+
+const BOTTOM_NAV = [
+  { href: "/dashboard", label: "Início", icon: Home },
+  { href: "/perfis", label: "Perfis", icon: Users },
+  null, // FAB placeholder
+  { href: "/apostas", label: "Apostas", icon: BookOpen },
+  { href: "/financeiro", label: "Financeiro", icon: DollarSign },
 ]
 
 export default function DashboardLayoutClient({ children }: { children: React.ReactNode }) {
   const [sidebarOpen, setSidebarOpen] = useState(false)
+  const [userEmail, setUserEmail] = useState<string | null>(null)
   const pathname = usePathname()
   const router = useRouter()
+
+  useEffect(() => {
+    const supabase = createClient()
+    supabase.auth.getUser().then(({ data }) => setUserEmail(data.user?.email ?? null))
+  }, [])
+
+  const userInitials = userEmail ? userEmail.slice(0, 2).toUpperCase() : "?"
 
   async function handleLogout() {
     const supabase = createClient()
     await supabase.auth.signOut()
     router.push("/login")
+  }
+
+  function openMobileFAB() {
+    window.dispatchEvent(new Event("open-mobile-fab"))
   }
 
   function isActive(href: string) {
@@ -61,7 +83,21 @@ export default function DashboardLayoutClient({ children }: { children: React.Re
             </Link>
           ))}
         </nav>
-        <div className="p-4 border-t border-[var(--border)]">
+        <div className="p-4 border-t border-[var(--border)] space-y-1">
+          <Link
+            href="/configuracoes"
+            className={cn(
+              "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors",
+              isActive("/configuracoes")
+                ? "bg-[#1e3a8a]/10 text-[var(--accent-text)]"
+                : "text-[var(--text-secondary)] hover:bg-[var(--bg-elevated)] hover:text-[var(--text-primary)]"
+            )}
+          >
+            <div className="w-5 h-5 rounded-full bg-[#1e3a8a] flex items-center justify-center flex-shrink-0">
+              <span className="text-[9px] font-bold text-white">{userInitials}</span>
+            </div>
+            Minha Conta
+          </Link>
           <button
             onClick={handleLogout}
             className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-[var(--text-secondary)] hover:bg-[var(--bg-elevated)] hover:text-[var(--text-primary)] transition-colors w-full"
@@ -101,7 +137,22 @@ export default function DashboardLayoutClient({ children }: { children: React.Re
                 </Link>
               ))}
             </nav>
-            <div className="p-4 border-t border-[var(--border)]">
+            <div className="p-4 border-t border-[var(--border)] space-y-1">
+              <Link
+                href="/configuracoes"
+                onClick={() => setSidebarOpen(false)}
+                className={cn(
+                  "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors",
+                  isActive("/configuracoes")
+                    ? "bg-[#1e3a8a]/10 text-[var(--accent-text)]"
+                    : "text-[var(--text-secondary)] hover:bg-[var(--bg-elevated)] hover:text-[var(--text-primary)]"
+                )}
+              >
+                <div className="w-5 h-5 rounded-full bg-[#1e3a8a] flex items-center justify-center flex-shrink-0">
+                  <span className="text-[9px] font-bold text-white">{userInitials}</span>
+                </div>
+                Minha Conta
+              </Link>
               <button
                 onClick={handleLogout}
                 className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-[var(--text-secondary)] hover:bg-[var(--bg-elevated)] w-full"
@@ -135,19 +186,31 @@ export default function DashboardLayoutClient({ children }: { children: React.Re
         {/* Mobile bottom nav */}
         <nav className="lg:hidden bg-[var(--bg-surface)] border-t border-[var(--border)] px-2 py-2 safe-area-bottom">
           <div className="flex items-center justify-around">
-            {navItems.slice(0, 5).map(item => (
-              <Link
-                key={item.href}
-                href={item.href}
-                className={cn(
-                  "flex flex-col items-center gap-1 px-2 py-1.5 rounded-lg transition-colors min-w-0",
-                  isActive(item.href) ? "text-[var(--accent-text)]" : "text-[var(--text-secondary)]"
-                )}
-              >
-                <item.icon className="h-5 w-5 flex-shrink-0" />
-                <span className="text-[10px] font-medium truncate">{item.label}</span>
-              </Link>
-            ))}
+            {BOTTOM_NAV.map((item, i) =>
+              item === null ? (
+                <button
+                  key="fab"
+                  onClick={openMobileFAB}
+                  className="flex flex-col items-center gap-1 px-2 py-1.5 rounded-lg transition-colors min-w-0"
+                >
+                  <div className="w-9 h-9 rounded-full bg-[#0f172a] flex items-center justify-center shadow-md -mt-5">
+                    <Plus className="h-5 w-5 text-white" />
+                  </div>
+                </button>
+              ) : (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className={cn(
+                    "flex flex-col items-center gap-1 px-2 py-1.5 rounded-lg transition-colors min-w-0",
+                    isActive(item.href) ? "text-[var(--accent-text)]" : "text-[var(--text-secondary)]"
+                  )}
+                >
+                  <item.icon className="h-5 w-5 flex-shrink-0" />
+                  <span className="text-[10px] font-medium truncate">{item.label}</span>
+                </Link>
+              )
+            )}
           </div>
         </nav>
       </div>
