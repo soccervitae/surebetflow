@@ -17,9 +17,10 @@ import AddBetToProfile from "@/components/AddBetToProfile"
 import { formatCurrency } from "@/lib/utils"
 import { useToast } from "@/hooks/useToast"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { DollarSign, TrendingUp, Clock, ArrowUpRight, Pencil, Calculator, Gift, ArrowDownLeft, Wallet, SlidersHorizontal, X, Check, Filter, ChevronDown, CalendarIcon, BookOpen, Download } from "lucide-react"
+import { DollarSign, TrendingUp, Clock, ArrowUpRight, Pencil, Calculator, Gift, ArrowDownLeft, Wallet, SlidersHorizontal, X, Check, Filter, ChevronDown, CalendarIcon, BookOpen, Download, Target, CheckCircle2, ClipboardList, ChevronRight } from "lucide-react"
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts"
 import SurebetCalculator from "@/components/SurebetCalculator"
-import type { Profile, ProfileDashboard, Aposta, MovimentacaoFinanceira, ProfileBet } from "@/lib/types"
+import type { Profile, ProfileDashboard, Aposta, ApostaLeg, MovimentacaoFinanceira, ProfileBet } from "@/lib/types"
 
 interface Props {
   profile: Profile
@@ -565,206 +566,308 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
 
         {/* Dashboard Tab */}
         <TabsContent value="dashboard" className="space-y-6">
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-            <Card className="overflow-hidden">
-              <CardContent className="p-4">
-                <div className="flex items-center gap-2 min-w-0">
-                  <div className="p-2 bg-[#2563EB]/10 rounded-lg flex-shrink-0">
-                    <DollarSign className="h-4 w-4 text-[#2563EB]" />
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <p className="text-xs text-[var(--text-secondary)] truncate">Saldo Total</p>
-                    <p className="text-sm font-bold text-[var(--text-primary)] truncate">{formatCurrency(dashboard?.saldo_total ?? 0)}</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-            <Card className="overflow-hidden">
-              <CardContent className="p-4">
-                <div className="flex items-center gap-2 min-w-0">
-                  <div className="p-2 bg-[#1e3a8a]/10 rounded-lg flex-shrink-0">
-                    <TrendingUp className="h-4 w-4 text-[var(--accent-text)]" />
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <p className="text-xs text-[var(--text-secondary)] truncate">Lucro</p>
-                    <p className="text-sm font-bold text-[var(--accent-text)] truncate">{formatCurrency(dashboard?.lucro_realizado ?? 0)}</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-            <Card className="overflow-hidden">
-              <CardContent className="p-4">
-                <div className="flex items-center gap-2 min-w-0">
-                  <div className="p-2 bg-[#D97706]/10 rounded-lg flex-shrink-0">
-                    <Clock className="h-4 w-4 text-[#D97706]" />
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <p className="text-xs text-[var(--text-secondary)] truncate">Lucro Pendente</p>
-                    <p className="text-sm font-bold text-[#D97706] truncate">{formatCurrency(dashboard?.lucro_pendente ?? 0)}</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-            <Card className="overflow-hidden">
-              <CardContent className="p-4">
-                <div className="flex items-center gap-2 min-w-0">
-                  <div className="p-2 bg-[#7C3AED]/10 rounded-lg flex-shrink-0">
-                    <ArrowUpRight className="h-4 w-4 text-[#7C3AED]" />
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <p className="text-xs text-[var(--text-secondary)] truncate">ROI</p>
-                    <p className="text-sm font-bold text-[#7C3AED] truncate">{(dashboard?.roi_percentual ?? 0).toFixed(2)}%</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
+          {(() => {
+            // Chart data: finalized apostas sorted by date
+            const finalizadas = [...currentApostas]
+              .filter(a => a.status === "finalizada" && a.finalizada_at)
+              .sort((a, b) => new Date(a.finalizada_at!).getTime() - new Date(b.finalizada_at!).getTime())
+            let cumulative = 0
+            const chartData = finalizadas.map(a => {
+              cumulative += parseFloat(String(a.resultado_real ?? a.lucro_garantido))
+              return {
+                date: new Date(a.finalizada_at!).toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit" }),
+                lucro: parseFloat(cumulative.toFixed(2)),
+              }
+            })
+            const totalFinalizadas = finalizadas.length
+            const wins = finalizadas.filter(a => parseFloat(String(a.resultado_real ?? 0)) > 0).length
+            const winRate = totalFinalizadas > 0 ? (wins / totalFinalizadas) * 100 : 0
+            const pendentesCount = currentApostas.filter(a => a.status === "pendente").length
+            const recentApostas = currentApostas.slice(0, 8)
 
-          {/* Apostas do período */}
-          <div>
-            <div className="flex flex-col gap-2 mb-3">
-              <div className="flex items-center gap-2">
-                <h2 className="text-sm font-semibold text-[var(--text-primary)] uppercase tracking-wide">Apostas</h2>
-                <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-[#1e3a8a]/10 text-[var(--accent-text)]">
-                  {apostasFiltradasPeriodo.length}
-                </span>
-              </div>
-              <div className="flex flex-wrap items-center gap-2">
-                {casasUnicas.length > 0 && (
-                  <select
-                    value={casaFiltro}
-                    onChange={e => setCasaFiltro(e.target.value)}
-                    className="h-8 px-2 rounded-lg border border-[var(--border)] bg-[var(--bg-surface)] text-[var(--text-primary)] text-xs"
-                  >
-                    <option value="todas">Todas as casas</option>
-                    {casasUnicas.map(c => (
-                      <option key={c.id} value={c.id}>{c.nome}</option>
-                    ))}
-                  </select>
-                )}
-                <div className="flex gap-1 bg-[var(--bg-elevated)] rounded-lg p-1">
-                  {([
-                    { value: "dia", label: "Dia" },
-                    { value: "semana", label: "Sem" },
-                    { value: "mes", label: "Mês" },
-                    { value: "ano", label: "Ano" },
-                  ] as { value: "dia" | "semana" | "mes" | "ano"; label: string }[]).map(({ value, label }) => (
-                    <button
-                      key={value}
-                      onClick={() => setPeriodoFiltro(value)}
-                      className={`px-2 py-1 rounded-md text-xs font-medium transition-colors ${
-                        periodoFiltro === value
-                          ? "bg-[var(--bg-surface)] text-[var(--accent-text)] shadow-sm border border-[var(--border)]"
-                          : "text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
-                      }`}
-                    >
-                      {label}
-                    </button>
+            function detectGreen(legs: ApostaLeg[], inv: number, res: number | null | undefined): string | null {
+              if (res == null || !legs.length) return null
+              const invF = parseFloat(String(inv)), resF = parseFloat(String(res))
+              let minDiff = Infinity, minId: string | null = null
+              for (const l of legs) {
+                const diff = Math.abs(parseFloat(String(l.stake)) * parseFloat(String(l.odd)) - invF - resF)
+                if (diff < minDiff) { minDiff = diff; minId = l.id }
+              }
+              return minDiff < 5 ? minId : null
+            }
+
+            return (
+              <>
+                {/* Financial stats */}
+                <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+                  {[
+                    { label: "Saldo Total", value: formatCurrency(dashboard?.saldo_total ?? 0), icon: DollarSign, color: "text-[#3b82f6]", bg: "bg-[#3b82f6]/10", border: "border-[#3b82f6]/20" },
+                    { label: "Lucro", value: formatCurrency(dashboard?.lucro_realizado ?? 0), icon: TrendingUp, color: "text-green-500", bg: "bg-green-500/10", border: "border-green-500/20" },
+                    { label: "Lucro Pendente", value: formatCurrency(dashboard?.lucro_pendente ?? 0), icon: Clock, color: "text-yellow-500", bg: "bg-yellow-500/10", border: "border-yellow-500/20" },
+                    { label: "ROI", value: `${parseFloat(String(dashboard?.roi_percentual ?? 0)).toFixed(2)}%`, icon: ArrowUpRight, color: "text-[#a855f7]", bg: "bg-[#a855f7]/10", border: "border-[#a855f7]/20" },
+                  ].map(({ label, value, icon: Icon, color, bg, border }) => (
+                    <div key={label} className={`rounded-xl border ${border} bg-[var(--bg-surface)] p-4`}>
+                      <div className="flex items-center gap-2 min-w-0">
+                        <div className={`p-2 ${bg} rounded-lg flex-shrink-0`}><Icon className={`h-4 w-4 ${color}`} /></div>
+                        <div className="min-w-0">
+                          <p className="text-xs text-[var(--text-secondary)] truncate">{label}</p>
+                          <p className={`text-sm font-bold ${color} truncate`}>{value}</p>
+                        </div>
+                      </div>
+                    </div>
                   ))}
                 </div>
-              </div>
-            </div>
-            {apostasFiltradasPeriodo.length === 0 ? (
-              <Card>
-                <CardContent className="py-8 text-center text-[var(--text-secondary)] text-sm">
-                  Nenhuma aposta registrada neste período
-                </CardContent>
-              </Card>
-            ) : (
-              <div className="space-y-2">
-                {apostasFiltradasPeriodo.map(aposta => {
-                  type LegWithBet = { id: string; resultado_apostado: string; odd: number; stake: number; profile_bet?: { bet?: { nome: string } } }
-                  const legs = (aposta as Aposta & { legs?: LegWithBet[] }).legs ?? []
-                  const greenLegId = (() => {
-                    if (aposta.status !== "finalizada" || aposta.resultado_real == null) return null
-                    const inv = parseFloat(String(aposta.investimento_total))
-                    const res = parseFloat(String(aposta.resultado_real))
-                    let minDiff = Infinity, minId: string | null = null
-                    for (const l of legs) {
-                      const diff = Math.abs(parseFloat(String(l.stake)) * parseFloat(String(l.odd)) - inv - res)
-                      if (diff < minDiff) { minDiff = diff; minId = l.id }
-                    }
-                    return minDiff < 5 ? minId : null
-                  })()
 
-                  return (
-                  <Link key={aposta.id} href={`/apostas/${aposta.id}`}>
-                    <Card className="hover:border-[#1e3a8a]/40 transition-colors cursor-pointer overflow-hidden">
-                      <CardContent className="p-4">
-                        {/* Linha 1: evento + badges */}
-                        <div className="flex items-center gap-2 flex-wrap mb-1 min-w-0">
-                          <p className="font-medium text-[var(--text-primary)] truncate">{aposta.evento}</p>
-                          {statusBadge(aposta.status)}
-                          <Badge variant="secondary">{aposta.tipo}</Badge>
+                {/* Apostas stats */}
+                <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+                  {[
+                    { label: "Total Apostas", value: String(dashboard?.total_apostas ?? 0), icon: ClipboardList, color: "text-[var(--text-primary)]", bg: "bg-[var(--bg-elevated)]", border: "border-[var(--border)]" },
+                    { label: "Finalizadas", value: String(totalFinalizadas), icon: CheckCircle2, color: "text-green-500", bg: "bg-green-500/10", border: "border-green-500/20" },
+                    { label: "Pendentes", value: String(pendentesCount), icon: Clock, color: "text-yellow-500", bg: "bg-yellow-500/10", border: "border-yellow-500/20" },
+                    { label: "Taxa de Acerto", value: `${winRate.toFixed(1)}%`, icon: Target, color: "text-[#a855f7]", bg: "bg-[#a855f7]/10", border: "border-[#a855f7]/20" },
+                  ].map(({ label, value, icon: Icon, color, bg, border }) => (
+                    <div key={label} className={`rounded-xl border ${border} bg-[var(--bg-surface)] p-4`}>
+                      <div className="flex items-center gap-2 min-w-0">
+                        <div className={`p-2 ${bg} rounded-lg flex-shrink-0`}><Icon className={`h-4 w-4 ${color}`} /></div>
+                        <div className="min-w-0">
+                          <p className="text-xs text-[var(--text-secondary)] truncate">{label}</p>
+                          <p className={`text-sm font-bold ${color} truncate`}>{value}</p>
                         </div>
-                        <p className="text-xs text-[var(--text-secondary)] mb-2">
-                          {new Date(aposta.created_at).toLocaleDateString("pt-BR")}
-                        </p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
 
-                        {/* Legs */}
-                        {legs.length > 0 && (
-                          <div className="space-y-1.5 mb-3">
-                            {legs.map(leg => {
-                              const isGreen = greenLegId === leg.id
-                              const isRed = greenLegId !== null && greenLegId !== leg.id
-                              return (
-                                <div key={leg.id} className={`rounded-xl px-3 py-3 flex items-center gap-3 ${
-                                  isGreen ? "bg-green-500/10" : isRed ? "bg-[#DC2626]/5" : "bg-[var(--bg-elevated)]"
-                                }`}>
-                                  <div className="flex-1 min-w-0 space-y-1">
-                                    <p className={`text-base font-bold leading-tight ${isGreen ? "text-green-600" : isRed ? "text-[#DC2626]" : "text-[var(--accent-text)]"}`}>
-                                      {leg.profile_bet?.bet?.nome ?? "Casa"}
-                                    </p>
-                                    <p className="text-sm text-[var(--text-secondary)] leading-snug">{leg.resultado_apostado}</p>
-                                    <p className="text-sm text-[var(--text-secondary)]">@{Number(leg.odd).toFixed(2)} · {formatCurrency(leg.stake)}</p>
-                                    {(isGreen || isRed) && (
-                                      <p className={`text-sm font-bold ${isGreen ? "text-green-600" : "text-[#DC2626]"}`}>
-                                        {isGreen ? `Retorno: +${formatCurrency(leg.stake * leg.odd)}` : `Perda: -${formatCurrency(leg.stake)}`}
-                                      </p>
+                {/* Chart + Resumo Financeiro */}
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                  <div className="lg:col-span-2 rounded-xl border border-[var(--border)] bg-[var(--bg-surface)] p-5">
+                    <div className="flex items-center justify-between mb-4">
+                      <h2 className="text-sm font-semibold text-[var(--text-primary)] uppercase tracking-wide">Lucro Acumulado</h2>
+                      <span className="text-xs text-[var(--text-secondary)]">Apostas finalizadas</span>
+                    </div>
+                    {chartData.length === 0 ? (
+                      <div className="flex items-center justify-center h-[200px] text-[var(--text-secondary)] text-sm">Nenhuma aposta finalizada ainda</div>
+                    ) : (
+                      <ResponsiveContainer width="100%" height={200}>
+                        <LineChart data={chartData}>
+                          <CartesianGrid strokeDasharray="3 3" stroke="var(--border-subtle)" />
+                          <XAxis dataKey="date" tick={{ fontSize: 10, fill: "var(--text-muted)" }} axisLine={false} tickLine={false} />
+                          <YAxis tick={{ fontSize: 10, fill: "var(--text-muted)" }} axisLine={false} tickLine={false} tickFormatter={v => `R$${v}`} />
+                          <Tooltip
+                            contentStyle={{ backgroundColor: "var(--bg-elevated)", border: "1px solid var(--border)", borderRadius: "8px", color: "var(--text-primary)" }}
+                            formatter={(v: unknown) => [formatCurrency(v as number), "Lucro"]}
+                          />
+                          <Line type="monotone" dataKey="lucro" stroke="#1e3a8a" strokeWidth={2.5} dot={{ fill: "#1e3a8a", r: 3 }} activeDot={{ r: 5 }} />
+                        </LineChart>
+                      </ResponsiveContainer>
+                    )}
+                  </div>
+
+                  <div className="rounded-xl border border-[var(--border)] bg-[var(--bg-surface)] p-5 flex flex-col">
+                    <h2 className="text-sm font-semibold text-[var(--text-primary)] uppercase tracking-wide mb-4">Resumo Financeiro</h2>
+                    <div className="flex-1 space-y-3">
+                      {[
+                        { label: "Total Investido", value: formatCurrency(dashboard?.total_investido ?? 0), cls: "text-[var(--text-primary)]" },
+                        { label: "Lucro", value: formatCurrency(dashboard?.lucro_realizado ?? 0), cls: "text-green-500" },
+                        { label: "Lucro Pendente", value: formatCurrency(dashboard?.lucro_pendente ?? 0), cls: "text-yellow-500" },
+                        { label: "Bônus", value: formatCurrency(dashboard?.bonus_total ?? 0), cls: "text-[#f97316]" },
+                        { label: "Total Apostas", value: String(dashboard?.total_apostas ?? 0), cls: "text-[var(--text-primary)]" },
+                      ].map(({ label, value, cls }) => (
+                        <div key={label} className="flex items-center justify-between py-2 border-b border-[var(--border-subtle)] last:border-0">
+                          <span className="text-sm text-[var(--text-secondary)]">{label}</span>
+                          <span className={`text-sm font-semibold ${cls}`}>{value}</span>
+                        </div>
+                      ))}
+                    </div>
+                    <button
+                      onClick={() => changeTab("financeiro")}
+                      className="mt-4 flex items-center justify-center gap-2 w-full py-2.5 rounded-lg border border-[#1e3a8a]/40 text-[var(--accent-text)] text-sm font-medium hover:bg-[#1e3a8a]/10 transition-colors"
+                    >
+                      <Wallet className="w-4 h-4" />
+                      Ver Financeiro
+                    </button>
+                  </div>
+                </div>
+
+                {/* Quick Access */}
+                <div className="rounded-xl border border-[var(--border)] bg-[var(--bg-surface)] p-5">
+                  <h2 className="text-sm font-semibold text-[var(--text-primary)] uppercase tracking-wide mb-4">Acesso Rápido</h2>
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                    {[
+                      { label: "Nova Aposta", sub: "Registrar", icon: Calculator, color: "text-[var(--accent-text)]", bg: "bg-[#1e3a8a]/10 border-[#1e3a8a]/20", onClick: () => setShowCalculadoraModal(true) },
+                      { label: "Apostas", sub: "Ver todas", icon: ClipboardList, color: "text-[#a855f7]", bg: "bg-[#a855f7]/10 border-[#a855f7]/20", onClick: () => changeTab("apostas") },
+                      { label: "Bets", sub: "Gerenciar", icon: Wallet, color: "text-[#f97316]", bg: "bg-[#f97316]/10 border-[#f97316]/20", onClick: () => changeTab("casas") },
+                      { label: "Financeiro", sub: "Movimentações", icon: TrendingUp, color: "text-green-500", bg: "bg-green-500/10 border-green-500/20", onClick: () => changeTab("financeiro") },
+                    ].map(({ label, sub, icon: Icon, color, bg, onClick }) => (
+                      <button
+                        key={label}
+                        onClick={onClick}
+                        className={`flex flex-col items-center gap-2 p-3 rounded-xl border ${bg} hover:scale-[1.02] transition-transform`}
+                      >
+                        <div className={`p-2 rounded-lg ${bg}`}><Icon className={`h-5 w-5 ${color}`} /></div>
+                        <div className="text-center">
+                          <p className={`text-xs font-semibold ${color}`}>{label}</p>
+                          <p className="text-[10px] text-[var(--text-secondary)]">{sub}</p>
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Apostas Recentes */}
+                <div>
+                  <div className="flex items-center justify-between mb-4">
+                    <h2 className="text-sm font-semibold text-[var(--text-primary)] uppercase tracking-wide">Apostas Recentes</h2>
+                    <button onClick={() => changeTab("apostas")} className="text-xs text-[var(--accent-text)] hover:underline flex items-center gap-1">
+                      Ver todas <ChevronRight className="w-3 h-3" />
+                    </button>
+                  </div>
+
+                  {recentApostas.length === 0 ? (
+                    <Card><CardContent className="flex flex-col items-center justify-center py-16">
+                      <BookOpen className="h-12 w-12 text-gray-300 mb-4" />
+                      <p className="text-[var(--text-secondary)]">Nenhuma aposta registrada</p>
+                    </CardContent></Card>
+                  ) : (
+                    <>
+                      {/* Desktop table */}
+                      <div className="hidden md:block space-y-3">
+                        {recentApostas.map(aposta => {
+                          const legs = (aposta.legs ?? []) as ApostaLeg[]
+                          const d = aposta.data_evento ? new Date(aposta.data_evento) : new Date(aposta.created_at)
+                          const dataStr = d.toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit" })
+                          const horaStr = aposta.data_evento ? d.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" }) : null
+                          const isFinished = aposta.status === "finalizada" && aposta.resultado_real != null
+                          const detectedGreenLegId = isFinished ? detectGreen(legs, aposta.investimento_total, aposta.resultado_real) : null
+                          return (
+                            <Card key={aposta.id} className="overflow-hidden cursor-pointer hover:border-[#1e3a8a]/40 transition-colors" onClick={() => window.location.href = `/apostas/${aposta.id}`}>
+                              <div className="flex items-center justify-between px-5 py-3 border-b border-[var(--border)] bg-[var(--bg-elevated)]">
+                                <div className="flex items-center gap-3 min-w-0">
+                                  <p className="font-semibold truncate text-[var(--text-primary)]">{aposta.evento}</p>
+                                  {aposta.esporte && <span className="text-xs text-[var(--text-muted)] flex-shrink-0">{aposta.esporte}</span>}
+                                </div>
+                                <div className="flex items-center gap-3 flex-shrink-0">
+                                  <span className="text-xs text-[var(--text-secondary)]">{dataStr}{horaStr ? ` · ${horaStr}` : ""}</span>
+                                  {statusBadge(aposta.status)}
+                                  <span className={`font-bold text-base ${isFinished ? ((aposta.resultado_real ?? 0) >= 0 ? "text-green-500" : "text-[#DC2626]") : "text-green-500"}`}>
+                                    {isFinished ? formatCurrency(aposta.resultado_real ?? 0) : formatCurrency(aposta.lucro_garantido)}
+                                  </span>
+                                  <span className="text-xs text-[var(--text-muted)]">{parseFloat(String(aposta.roi_percentual)).toFixed(2)}%</span>
+                                </div>
+                              </div>
+                              <div className="divide-y divide-[var(--border)]">
+                                {legs.map(leg => {
+                                  const isGreen = detectedGreenLegId === leg.id
+                                  const isRed = isFinished && detectedGreenLegId !== null && !isGreen
+                                  return (
+                                    <div key={leg.id} className={`flex items-center gap-4 px-5 py-3 ${isGreen ? "bg-green-500/5" : isRed ? "bg-[#DC2626]/5" : ""}`}>
+                                      <div className="w-36 flex-shrink-0">
+                                        <p className="font-semibold text-[var(--text-primary)] text-sm">{leg.profile_bet?.bet?.nome ?? "—"}</p>
+                                      </div>
+                                      <div className="flex-1 min-w-0">
+                                        <p className="text-sm text-[var(--text-secondary)] truncate">{leg.resultado_apostado}</p>
+                                      </div>
+                                      <div className="text-right flex-shrink-0 w-28">
+                                        <p className="text-xs text-[var(--text-muted)]">Stake</p>
+                                        <p className="text-sm font-semibold text-[var(--text-primary)]">{formatCurrency(leg.stake)}</p>
+                                      </div>
+                                      <div className="text-right flex-shrink-0 w-20">
+                                        <p className="text-xs text-[var(--text-muted)]">Odd</p>
+                                        <p className="text-sm font-bold text-[var(--text-primary)]">{parseFloat(String(leg.odd)).toFixed(3)}</p>
+                                      </div>
+                                      {isFinished && (
+                                        <div className="text-right flex-shrink-0 w-28">
+                                          <p className="text-xs text-[var(--text-muted)]">{isGreen ? "Retorno" : "Perda"}</p>
+                                          <p className={`text-sm font-bold ${isGreen ? "text-green-600" : "text-[#DC2626]"}`}>
+                                            {isGreen ? `+${formatCurrency(parseFloat(String(leg.stake)) * parseFloat(String(leg.odd)))}` : `-${formatCurrency(parseFloat(String(leg.stake)))}`}
+                                          </p>
+                                        </div>
+                                      )}
+                                      {isFinished && (
+                                        <span className={`px-2.5 py-1 rounded text-xs font-bold w-14 text-center flex-shrink-0 ${isGreen ? "bg-green-600 text-white" : "bg-[#DC2626] text-white"}`}>
+                                          {isGreen ? "GREEN" : "RED"}
+                                        </span>
+                                      )}
+                                    </div>
+                                  )
+                                })}
+                              </div>
+                            </Card>
+                          )
+                        })}
+                      </div>
+
+                      {/* Mobile cards */}
+                      <div className="md:hidden space-y-3">
+                        {recentApostas.map(aposta => {
+                          const legs = (aposta.legs ?? []) as ApostaLeg[]
+                          const isFinished = aposta.status === "finalizada" && aposta.resultado_real != null
+                          const detectedGreenLegId = isFinished ? detectGreen(legs, aposta.investimento_total, aposta.resultado_real) : null
+                          return (
+                            <Link key={aposta.id} href={`/apostas/${aposta.id}`}>
+                              <Card className="hover:border-[#1e3a8a]/40 transition-colors cursor-pointer overflow-hidden">
+                                <CardContent className="p-4">
+                                  <div className="flex items-center gap-2 flex-wrap mb-1">
+                                    <p className="font-medium text-[var(--text-primary)] truncate">{aposta.evento}</p>
+                                    {statusBadge(aposta.status)}
+                                  </div>
+                                  <p className="text-xs text-[var(--text-muted)] mb-3 flex items-center gap-1">
+                                    <CalendarIcon className="h-3 w-3" />
+                                    {(aposta.data_evento ? new Date(aposta.data_evento) : new Date(aposta.created_at)).toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit", year: "numeric" })}
+                                  </p>
+                                  {legs.length > 0 && (
+                                    <div className="space-y-1.5 mb-3">
+                                      {legs.map(leg => {
+                                        const isGreen = detectedGreenLegId === leg.id
+                                        const isRed = detectedGreenLegId !== null && !isGreen
+                                        return (
+                                          <div key={leg.id} className={`rounded-xl px-3 py-3 flex items-center gap-3 ${isGreen ? "bg-green-500/10" : isRed ? "bg-[#DC2626]/5" : "bg-[var(--bg-elevated)]"}`}>
+                                            <div className="flex-1 min-w-0 space-y-1">
+                                              <p className={`text-base font-bold leading-tight ${isGreen ? "text-green-600" : isRed ? "text-[#DC2626]" : "text-[var(--accent-text)]"}`}>{leg.profile_bet?.bet?.nome ?? "Casa"}</p>
+                                              <p className="text-sm text-[var(--text-secondary)]">{leg.resultado_apostado}</p>
+                                              <p className="text-sm text-[var(--text-secondary)]">@{parseFloat(String(leg.odd)).toFixed(2)} · {formatCurrency(leg.stake)}</p>
+                                              {(isGreen || isRed) && (
+                                                <p className={`text-sm font-bold ${isGreen ? "text-green-600" : "text-[#DC2626]"}`}>
+                                                  {isGreen ? `Retorno: +${formatCurrency(parseFloat(String(leg.stake)) * parseFloat(String(leg.odd)))}` : `Perda: -${formatCurrency(parseFloat(String(leg.stake)))}`}
+                                                </p>
+                                              )}
+                                            </div>
+                                            {(isGreen || isRed) && (
+                                              <span className={`px-2.5 py-1 rounded text-xs font-bold flex-shrink-0 ${isGreen ? "bg-green-600 text-white" : "bg-[#DC2626] text-white"}`}>
+                                                {isGreen ? "GREEN" : "RED"}
+                                              </span>
+                                            )}
+                                          </div>
+                                        )
+                                      })}
+                                    </div>
+                                  )}
+                                  <div className="flex items-end justify-between gap-2 pt-2 border-t border-[var(--border)]">
+                                    <div>
+                                      <p className="text-xs text-[var(--text-muted)]">Investimento</p>
+                                      <p className="text-sm font-bold text-[var(--text-primary)]">{formatCurrency(aposta.investimento_total)}</p>
+                                    </div>
+                                    {aposta.status !== "cancelada" && (
+                                      <div className="text-right">
+                                        <p className="text-xs text-[var(--text-muted)]">{aposta.status === "finalizada" ? "Lucro" : "Lucro esperado"}</p>
+                                        <p className={`text-sm font-bold ${aposta.status === "finalizada" ? ((aposta.resultado_real ?? 0) >= 0 ? "text-[var(--accent-text)]" : "text-[#DC2626]") : "text-[#D97706]"}`}>
+                                          {aposta.status === "finalizada" ? formatCurrency(aposta.resultado_real ?? 0) : formatCurrency(aposta.lucro_garantido)}
+                                        </p>
+                                      </div>
                                     )}
                                   </div>
-                                  {(isGreen || isRed) && (
-                                    <span className={`px-2.5 py-1 rounded text-xs font-bold flex-shrink-0 ${
-                                      isGreen ? "bg-green-600 text-white" : "bg-[#DC2626] text-white"
-                                    }`}>
-                                      {isGreen ? "GREEN" : "RED"}
-                                    </span>
-                                  )}
-                                </div>
-                              )
-                            })}
-                          </div>
-                        )}
-
-                        {/* Linha final: Investimento + Lucro lado a lado */}
-                        <div className="flex items-end justify-between gap-2 pt-2 border-t border-[var(--border)]">
-                          <div>
-                            <p className="text-xs text-[var(--text-muted)]">Investimento</p>
-                            <p className="text-sm font-bold text-[var(--text-primary)]">{formatCurrency(aposta.investimento_total)}</p>
-                          </div>
-                          {aposta.status !== "cancelada" && (
-                            <div className="text-right">
-                              <p className="text-xs text-[var(--text-muted)]">
-                                {aposta.status === "finalizada" ? "Lucro" : "Lucro esperado"}
-                              </p>
-                              {aposta.status === "finalizada" ? (
-                                <p className={`text-sm font-bold ${(aposta.resultado_real ?? 0) >= 0 ? "text-[var(--accent-text)]" : "text-[#DC2626]"}`}>
-                                  {formatCurrency(aposta.resultado_real ?? 0)}
-                                </p>
-                              ) : (
-                                <p className="text-sm font-bold text-[#D97706]">{formatCurrency(aposta.lucro_garantido)}</p>
-                              )}
-                            </div>
-                          )}
-                        </div>
-                      </CardContent>
-                    </Card>
-                  </Link>
-                  )
-                })}
-              </div>
-            )}
-          </div>
+                                </CardContent>
+                              </Card>
+                            </Link>
+                          )
+                        })}
+                      </div>
+                    </>
+                  )}
+                </div>
+              </>
+            )
+          })()}
         </TabsContent>
 
         {/* Apostas Tab */}
