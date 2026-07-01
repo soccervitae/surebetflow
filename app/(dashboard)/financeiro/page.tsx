@@ -93,7 +93,7 @@ export default function FinanceiroPage() {
   const [movimentacoes, setMovimentacoes] = useState<Movimentacao[]>([])
 
   const [showFilter, setShowFilter] = useState(false)
-  const [filterPeriodo, setFilterPeriodo] = useState<Periodo>("mes")
+  const [filterPeriodo, setFilterPeriodo] = useState<Periodo>("todos")
   const [filterTipo, setFilterTipo] = useState<"todos" | "deposito" | "saque" | "lucro" | "perda" | "bonus">("todos")
   const [filterProfile, setFilterProfile] = useState("")
   const [filterBet, setFilterBet] = useState("")

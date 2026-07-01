@@ -52,7 +52,7 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
   const [movimentacoes, setMovimentacoes] = useState<MovimentacaoFinanceira[]>([])
   const [movLoaded, setMovLoaded] = useState(false)
   const [profileBetsFinanceiro, setProfileBetsFinanceiro] = useState<(ProfileBet & { bet?: { id: string; nome: string } })[]>([])
-  const [finPeriodo, setFinPeriodo] = useState<"hoje" | "semana" | "mes" | "ano" | "todos">("mes")
+  const [finPeriodo, setFinPeriodo] = useState<"hoje" | "semana" | "mes" | "ano" | "todos">("todos")
   const [finTipo, setFinTipo] = useState<"todos" | "deposito" | "saque" | "bonus" | "lucro" | "perda">("todos")
   const [finCasa, setFinCasa] = useState("todos")
   const [bonusEntries, setBonusEntries] = useState<{ id: string; profile_bet_id: string | null; valor: number; descricao: string | null; created_at: string; _tipo: "bonus" }[]>([])
@@ -1131,9 +1131,9 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
               <CardContent className="p-4 space-y-3">
                 <div className="flex items-center justify-between">
                   <p className="text-xs font-semibold text-[var(--text-muted)] uppercase tracking-wide">Período</p>
-                  {(finTipo !== "todos" || finCasa !== "todos" || finPeriodo !== "mes") && (
+                  {(finTipo !== "todos" || finCasa !== "todos" || finPeriodo !== "todos") && (
                     <button
-                      onClick={() => { setFinTipo("todos"); setFinCasa("todos"); setFinPeriodo("mes") }}
+                      onClick={() => { setFinTipo("todos"); setFinCasa("todos"); setFinPeriodo("todos") }}
                       className="flex items-center gap-1 text-xs text-[var(--text-muted)] hover:text-[#DC2626] transition-colors"
                     >
                       <X className="h-3 w-3" /> Limpar
