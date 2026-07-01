@@ -651,6 +651,11 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
                                     </p>
                                     <p className="text-sm text-[var(--text-secondary)] leading-snug">{leg.resultado_apostado}</p>
                                     <p className="text-sm text-[var(--text-secondary)]">@{Number(leg.odd).toFixed(2)} · {formatCurrency(leg.stake)}</p>
+                                    {(isGreen || isRed) && (
+                                      <p className={`text-sm font-bold ${isGreen ? "text-green-600" : "text-[#DC2626]"}`}>
+                                        {isGreen ? `Retorno: +${formatCurrency(leg.stake * leg.odd)}` : `Perda: -${formatCurrency(leg.stake)}`}
+                                      </p>
+                                    )}
                                   </div>
                                   {(isGreen || isRed) && (
                                     <span className={`px-2.5 py-1 rounded text-xs font-bold flex-shrink-0 ${

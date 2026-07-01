@@ -580,6 +580,14 @@ export default function ApostasClient({ apostas: initialApostas, profiles, betCo
                             <p className="text-sm font-bold text-[var(--text-primary)]">{Number(leg.odd).toFixed(3)}</p>
                           </div>
                           {isFinished && (
+                            <div className="text-right flex-shrink-0 w-28">
+                              <p className={`text-sm font-bold ${isGreen ? "text-green-600" : "text-[#DC2626]"}`}>
+                                {isGreen ? `+${formatCurrency(leg.stake * leg.odd)}` : `-${formatCurrency(leg.stake)}`}
+                              </p>
+                              <p className="text-xs text-[var(--text-muted)]">{isGreen ? "Retorno" : "Perda"}</p>
+                            </div>
+                          )}
+                          {isFinished && (
                             <span className={`px-2.5 py-1 rounded text-xs font-bold w-14 text-center flex-shrink-0 ${isGreen ? "bg-green-600 text-white" : "bg-[#DC2626] text-white"}`}>
                               {isGreen ? "GREEN" : "RED"}
                             </span>
@@ -658,6 +666,11 @@ export default function ApostasClient({ apostas: initialApostas, profiles, betCo
                               </p>
                               <p className="text-sm text-[var(--text-secondary)] leading-snug">{leg.resultado_apostado}</p>
                               <p className="text-sm text-[var(--text-secondary)]">@{Number(leg.odd).toFixed(2)} · {formatCurrency(leg.stake)}</p>
+                              {(isGreen || isRed) && (
+                                <p className={`text-sm font-bold ${isGreen ? "text-green-600" : "text-[#DC2626]"}`}>
+                                  {isGreen ? `Retorno: +${formatCurrency(leg.stake * leg.odd)}` : `Perda: -${formatCurrency(leg.stake)}`}
+                                </p>
+                              )}
                             </div>
                             {(isGreen || isRed) && (
                               <span className={`px-2.5 py-1 rounded text-xs font-bold flex-shrink-0 ${
