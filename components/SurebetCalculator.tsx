@@ -9,7 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { formatCurrency } from "@/lib/utils"
 import { useToast } from "@/hooks/useToast"
-import { Calculator, Check, X, Loader2, ClipboardPaste, Sparkles, ImageIcon, ChevronLeft, ChevronRight, Plus } from "lucide-react"
+import { Calculator, Check, X, Loader2, ClipboardPaste, Sparkles, ImageIcon, ChevronLeft, ChevronRight, Plus, AlertTriangle } from "lucide-react"
 import type { Profile, ProfileBet } from "@/lib/types"
 
 interface Leg {
@@ -670,7 +670,14 @@ export default function SurebetCalculator({ profiles, defaultProfileId, profileN
         )}
       </div>
       <div className="space-y-3">
-        {legs.slice(0, numLegs).map((leg, i) => (
+        {legs.slice(0, numLegs).map((leg, i) => {
+          const allPBs = Object.values(profileBets).flat() as (ProfileBet & { bet?: { nome: string } })[]
+          const selectedPB = allPBs.find(pb => pb.id === leg.profileBetId)
+          const saldo = selectedPB ? parseFloat(String(selectedPB.saldo)) || 0 : 0
+          const stake = stakes[i] ?? 0
+          const showSaldoWarning = selectedPB && saldo > 0 && stake > 0 && stake < saldo
+
+          return (
           <Card key={i}>
             <CardContent className="p-4">
               {/* Label row */}
@@ -756,9 +763,23 @@ export default function SurebetCalculator({ profiles, defaultProfileId, profileN
                   />
                 </div>
               </div>
+
+              {showSaldoWarning && (
+                <div className="mt-3 flex items-start gap-2.5 px-3 py-2.5 rounded-lg bg-amber-50 border border-amber-200">
+                  <AlertTriangle className="h-4 w-4 text-amber-500 flex-shrink-0 mt-0.5" />
+                  <p className="text-xs text-amber-800 leading-relaxed">
+                    O saldo atual da <span className="font-semibold">{selectedPB.bet?.nome ?? "casa"}</span> é{" "}
+                    <span className="font-semibold">{formatCurrency(saldo)}</span>, mas a stake é apenas{" "}
+                    <span className="font-semibold">{formatCurrency(stake)}</span>. Após salvar a aposta, registre o saldo
+                    de <span className="font-semibold">{formatCurrency(saldo - stake)}</span> que permanece na conta
+                    como uma nova movimentação.
+                  </p>
+                </div>
+              )}
             </CardContent>
           </Card>
-        ))}
+          )
+        })}
       </div>
 
       {/* Round stakes */}
