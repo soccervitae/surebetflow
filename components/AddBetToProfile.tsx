@@ -12,7 +12,8 @@ import { formatCurrency } from "@/lib/utils"
 import { useToast } from "@/hooks/useToast"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetFooter } from "@/components/ui/sheet"
-import { Plus, Eye, EyeOff, Loader2, Trash2, Search, Check, PlusCircle, ChevronDown } from "lucide-react"
+import Link from "next/link"
+import { Plus, Loader2, Search, Check } from "lucide-react"
 import { useMediaQuery } from "@/hooks/useMediaQuery"
 import type { Bet, ProfileBet } from "@/lib/types"
 
@@ -31,12 +32,10 @@ export default function AddBetToProfile({ profileId }: Props) {
   const [email, setEmail] = useState("")
   const [senha, setSenha] = useState("")
   const [loading, setLoading] = useState(false)
-  const [revealedPasswords, setRevealedPasswords] = useState<Record<string, boolean>>({})
   const [betSearch, setBetSearch] = useState("")
   const [deletarDialog, setDeletarDialog] = useState<ProfileBetWithBet | null>(null)
   const [deletando, setDeletando] = useState(false)
   const [saldoNaoZeradoDialog, setSaldoNaoZeradoDialog] = useState<ProfileBetWithBet | null>(null)
-  const [menuOpenId, setMenuOpenId] = useState<string | null>(null)
   const [ativoDialog, setAtivoDialog] = useState<ProfileBetWithBet | null>(null)
   const [togglingAtivo, setTogglingAtivo] = useState(false)
   // Movimentação
@@ -543,119 +542,51 @@ export default function AddBetToProfile({ profileId }: Props) {
       ) : (
         <div className="space-y-3">
           {profileBets.map(pb => (
-            <Card key={pb.id} className={!pb.ativo ? "opacity-60" : ""}>
-              <CardContent className="p-4">
-                <div className="flex items-center gap-3">
-                  {/* Logo — hidden on mobile */}
-                  {pb.bet?.logo_url ? (
-                    <div className="hidden sm:flex w-9 h-9 rounded-lg border border-[var(--border)] bg-white items-center justify-center flex-shrink-0 overflow-hidden p-0.5">
-                      <img src={pb.bet.logo_url} alt={pb.bet.nome} className="w-full h-full object-contain" onError={handleLogoError} />
-                    </div>
-                  ) : (
-                    <div className="hidden sm:flex w-9 h-9 rounded-lg border border-[var(--border)] bg-[var(--bg-elevated)] items-center justify-center flex-shrink-0 text-xs font-bold text-[var(--text-secondary)]">
-                      {(pb.bet?.nome ?? "?").charAt(0)}
-                    </div>
-                  )}
-
-                  {/* Info — left column */}
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 flex-wrap">
-                      <p className="font-semibold text-[var(--accent-text)]">{pb.bet?.nome ?? "Bet"}</p>
-                      <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium ${pb.ativo ? "bg-green-500/10 text-green-600" : "bg-red-500/10 text-red-500"}`}>
-                        <span className={`w-1.5 h-1.5 rounded-full ${pb.ativo ? "bg-green-500" : "bg-red-500"}`} />
-                        {pb.ativo ? "Ativa" : "Inativa"}
-                      </span>
-                    </div>
-                    <p className={`text-sm font-bold mt-0.5 ${pb.saldo > 0 ? "text-[var(--accent-text)]" : pb.saldo < 0 ? "text-[#DC2626]" : "text-[var(--text-secondary)]"}`}>
-                      {formatCurrency(pb.saldo)}
-                    </p>
-                    {(pb as ProfileBetWithBet & { saldo_bonus?: number }).saldo_bonus != null && (pb as ProfileBetWithBet & { saldo_bonus?: number }).saldo_bonus! > 0 && (
-                      <p className="text-xs font-semibold text-purple-500 mt-0.5">
-                        Bônus: {formatCurrency((pb as ProfileBetWithBet & { saldo_bonus?: number }).saldo_bonus!)}
-                      </p>
-                    )}
-                  </div>
-
-                  {/* Right: + circle button */}
-                  <button
-                    className="w-9 h-9 rounded-full border-2 border-[#1e3a8a]/40 flex items-center justify-center text-[var(--accent-text)] hover:bg-[#1e3a8a]/10 transition-colors flex-shrink-0"
-                    onClick={() => { setMovDialog(pb); setMovTipo("deposito"); setMovValor(""); setMovDescricao("") }}
-                  >
-                    <Plus className="h-4 w-4" />
-                  </button>
-
-                  {/* Chevron expand */}
-                  <button
-                    className="p-1 rounded-lg text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-elevated)] transition-colors flex-shrink-0"
-                    onClick={() => setMenuOpenId(menuOpenId === pb.id ? null : pb.id)}
-                  >
-                    <ChevronDown className={`h-4 w-4 transition-transform duration-200 ${menuOpenId === pb.id ? "rotate-180" : ""}`} />
-                  </button>
-                </div>
-
-                {/* Expanded section */}
-                {menuOpenId === pb.id && (
-                  <div className="mt-3 pt-3 border-t border-[var(--border)] space-y-3">
-                    {/* Email */}
-                    <div className="space-y-0.5">
-                      <p className="text-xs text-[var(--text-muted)] font-medium uppercase tracking-wide">Email</p>
-                      <p className="text-sm text-[var(--text-primary)] break-all">{pb.email || "—"}</p>
-                    </div>
-
-                    {/* Senha */}
-                    <div className="space-y-1">
-                      <p className="text-xs text-[var(--text-muted)] font-medium uppercase tracking-wide">Senha</p>
-                      <div className="flex items-center gap-2">
-                        <p className="text-sm text-[var(--text-primary)] font-mono flex-1">
-                          {revealedPasswords[pb.id]
-                            ? ((pb as any).senha_texto || "—")
-                            : "••••••••"}
-                        </p>
-                        <button
-                          className="p-1 rounded text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors"
-                          onClick={() => setRevealedPasswords(prev =>
-                            prev[pb.id] ? Object.fromEntries(Object.entries(prev).filter(([k]) => k !== pb.id)) : { ...prev, [pb.id]: true }
-                          )}
-                        >
-                          {revealedPasswords[pb.id] ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                        </button>
+            <Link key={pb.id} href={`/perfis/${profileId}/bets/${pb.id}`}>
+              <Card className={`hover:border-[#1e3a8a]/40 transition-colors cursor-pointer ${!pb.ativo ? "opacity-60" : ""}`}>
+                <CardContent className="p-4">
+                  <div className="flex items-center gap-3">
+                    {/* Logo */}
+                    {pb.bet?.logo_url ? (
+                      <div className="hidden sm:flex w-9 h-9 rounded-lg border border-[var(--border)] bg-white items-center justify-center flex-shrink-0 overflow-hidden p-0.5">
+                        <img src={pb.bet.logo_url} alt={pb.bet.nome} className="w-full h-full object-contain" onError={handleLogoError} />
                       </div>
+                    ) : (
+                      <div className="hidden sm:flex w-9 h-9 rounded-lg border border-[var(--border)] bg-[var(--bg-elevated)] items-center justify-center flex-shrink-0 text-xs font-bold text-[var(--text-secondary)]">
+                        {(pb.bet?.nome ?? "?").charAt(0)}
+                      </div>
+                    )}
+
+                    {/* Info */}
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <p className="font-semibold text-[var(--accent-text)]">{pb.bet?.nome ?? "Bet"}</p>
+                        <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium ${pb.ativo ? "bg-green-500/10 text-green-600" : "bg-red-500/10 text-red-500"}`}>
+                          <span className={`w-1.5 h-1.5 rounded-full ${pb.ativo ? "bg-green-500" : "bg-red-500"}`} />
+                          {pb.ativo ? "Ativa" : "Inativa"}
+                        </span>
+                      </div>
+                      <p className={`text-sm font-bold mt-0.5 ${pb.saldo > 0 ? "text-[var(--accent-text)]" : pb.saldo < 0 ? "text-[#DC2626]" : "text-[var(--text-secondary)]"}`}>
+                        {formatCurrency(pb.saldo)}
+                      </p>
+                      {(pb as ProfileBetWithBet & { saldo_bonus?: number }).saldo_bonus != null && (pb as ProfileBetWithBet & { saldo_bonus?: number }).saldo_bonus! > 0 && (
+                        <p className="text-xs font-semibold text-purple-500 mt-0.5">
+                          Bônus: {formatCurrency((pb as ProfileBetWithBet & { saldo_bonus?: number }).saldo_bonus!)}
+                        </p>
+                      )}
                     </div>
 
-                    {/* Actions */}
-                    <div className="flex items-center gap-2 pt-1 flex-wrap">
-                      <button
-                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium bg-[#1e3a8a]/10 text-[var(--accent-text)] hover:bg-[#1e3a8a]/20 transition-colors"
-                        onClick={() => {
-                          setEditEmail(pb.email ?? "")
-                          setEditSenha("")
-                          setEditDialog(pb)
-                          setMenuOpenId(null)
-                        }}
-                      >
-                        Editar
-                      </button>
-                      <button
-                        className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${pb.ativo ? "bg-orange-500/10 text-orange-500 hover:bg-orange-500/20" : "bg-green-500/10 text-green-600 hover:bg-green-500/20"}`}
-                        onClick={() => { setAtivoDialog(pb); setMenuOpenId(null) }}
-                      >
-                        <span className={`w-1.5 h-1.5 rounded-full ${pb.ativo ? "bg-orange-400" : "bg-green-500"}`} />
-                        {pb.ativo ? "Desativar" : "Ativar"}
-                      </button>
-                      <button
-                        className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${pb.saldo !== 0 ? "text-red-300 cursor-not-allowed bg-red-50/50" : "text-red-500 hover:bg-red-50"}`}
-                        onClick={() => { if (pb.saldo !== 0) return; setDeletarDialog(pb); setMenuOpenId(null) }}
-                        title={pb.saldo !== 0 ? "Zere o saldo antes de remover" : undefined}
-                      >
-                        <Trash2 className="h-3.5 w-3.5" />
-                        Remover
-                        {pb.saldo !== 0 && <span className="text-xs text-red-300">(saldo ≠ 0)</span>}
-                      </button>
-                    </div>
+                    {/* + button (stops propagation so it doesn't navigate) */}
+                    <button
+                      className="w-9 h-9 rounded-full border-2 border-[#1e3a8a]/40 flex items-center justify-center text-[var(--accent-text)] hover:bg-[#1e3a8a]/10 transition-colors flex-shrink-0"
+                      onClick={e => { e.preventDefault(); setMovDialog(pb); setMovTipo("deposito"); setMovValor(""); setMovDescricao("") }}
+                    >
+                      <Plus className="h-4 w-4" />
+                    </button>
                   </div>
-                )}
-              </CardContent>
-            </Card>
+                </CardContent>
+              </Card>
+            </Link>
           ))}
         </div>
       )}
