@@ -143,10 +143,18 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
   if (!ready) {
     return (
-      <div className="min-h-screen bg-[var(--bg-base)] flex items-center justify-center">
-        <div className="flex items-center gap-3">
-          <div className="w-2 h-2 bg-[#1e3a8a] rounded-full animate-pulse" />
-          <p className="text-[var(--text-secondary)] text-sm">Carregando...</p>
+      <div className="min-h-screen bg-white flex items-center justify-center">
+        <div className="flex flex-col items-center gap-4">
+          <img
+            src="https://gkkuttabavwxjuibmrnr.supabase.co/storage/v1/object/public/logos/SUREBETFLOW%20LOGOSS%20LIGHT.png"
+            alt="SurebetFlow"
+            className="h-12 w-auto"
+          />
+          <div className="flex items-center gap-1.5">
+            <div className="w-1.5 h-1.5 bg-[#000066] rounded-full animate-bounce" style={{ animationDelay: "0ms" }} />
+            <div className="w-1.5 h-1.5 bg-[#000066] rounded-full animate-bounce" style={{ animationDelay: "150ms" }} />
+            <div className="w-1.5 h-1.5 bg-[#000066] rounded-full animate-bounce" style={{ animationDelay: "300ms" }} />
+          </div>
         </div>
       </div>
     )
