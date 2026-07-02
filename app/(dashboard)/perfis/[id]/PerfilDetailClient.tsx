@@ -1214,6 +1214,26 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
                                           </div>
                                         )
                                       })}
+                                      {/* Summary footer */}
+                                      <div className="flex items-center gap-4 px-5 py-2 bg-[var(--bg-elevated)]">
+                                        <div className="w-36 flex-shrink-0" />
+                                        <div className="flex-1 min-w-0" />
+                                        <div className="text-right flex-shrink-0 w-28">
+                                          <p className="text-xs text-[var(--text-muted)]">Investimento</p>
+                                          <p className="text-sm font-semibold text-[var(--text-primary)]">{formatCurrency(aposta.investimento_total)}</p>
+                                        </div>
+                                        <div className="text-right flex-shrink-0 w-20">
+                                          <p className="text-xs text-[var(--text-muted)]">ROI</p>
+                                          <p className="text-sm font-bold text-[#a855f7]">{aposta.roi_percentual.toFixed(2)}%</p>
+                                        </div>
+                                        <div className="text-right flex-shrink-0 w-28">
+                                          <p className="text-xs text-[var(--text-muted)]">{isFinished ? "Lucro" : "Lucro esperado"}</p>
+                                          <p className={`text-sm font-bold ${isFinished ? ((aposta.resultado_real ?? 0) >= 0 ? "text-green-500" : "text-[#DC2626]") : "text-[#D97706]"}`}>
+                                            {isFinished ? formatCurrency(aposta.resultado_real ?? 0) : formatCurrency(aposta.lucro_garantido)}
+                                          </p>
+                                        </div>
+                                        {isFinished && <div className="w-14 flex-shrink-0" />}
+                                      </div>
                                     </div>
                                   </Card>
                                 )
