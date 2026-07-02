@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import { createPortal } from "react-dom"
 import { usePathname } from "next/navigation"
 import { createClient } from "@/lib/supabase/client"
 import { Plus, Calculator, DollarSign, Wallet, Loader2 } from "lucide-react"
@@ -47,6 +48,9 @@ export default function GlobalFAB() {
   const [betsPickStep, setBetsPickStep] = useState(false)
 
   const [mobileOpen, setMobileOpen] = useState(false)
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => { setMounted(true) }, [])
 
   async function loadProfiles() {
     if (profilesLoaded) return
@@ -141,7 +145,9 @@ export default function GlobalFAB() {
     { label: "Adicionar Bet", icon: Wallet, color: "bg-[#a855f7]", onClick: openBets },
   ]
 
-  return (
+  if (!mounted) return null
+
+  return createPortal(
     <>
       {/* Mobile action sheet */}
       {mobileOpen && (
@@ -333,6 +339,7 @@ export default function GlobalFAB() {
           )}
         </DialogContent>
       </Dialog>
-    </>
+    </>,
+    document.body
   )
 }
