@@ -1265,8 +1265,8 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
 
         {/* Financeiro Tab */}
         <TabsContent value="financeiro" className="space-y-4">
-          {/* Header com botão Filtrar + Nova Movimentação */}
-          <div className="flex items-center justify-between gap-2">
+          {/* Header com botão Filtrar */}
+          <div className="flex items-center gap-2">
             <button
               onClick={() => setFinShowFilter(v => !v)}
               className={`flex items-center gap-1.5 px-3 py-2 rounded-xl border text-sm font-medium transition-colors flex-shrink-0 ${
@@ -1277,12 +1277,6 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
             >
               {finShowFilter ? <X className="w-4 h-4" /> : <SlidersHorizontal className="w-4 h-4" />}
               Filtrar{(finTipo !== "todos" || finCasa !== "todos") && !finShowFilter ? " •" : ""}
-            </button>
-            <button
-              onClick={() => setFinShowForm(true)}
-              className="flex items-center gap-1.5 px-3 py-2 rounded-xl border border-[var(--border)] text-sm font-medium text-[var(--text-secondary)] hover:bg-[var(--bg-elevated)] transition-colors"
-            >
-              + Movimentação
             </button>
           </div>
 
