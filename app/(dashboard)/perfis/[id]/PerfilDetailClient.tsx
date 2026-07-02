@@ -416,43 +416,43 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
   return (
     <div className="space-y-0">
       {/* Mobile header */}
-      <div className="md:hidden space-y-3 mb-6">
-        <div className="flex items-center gap-3">
-          <Avatar className="h-10 w-10 flex-shrink-0">
+      <div className="md:hidden flex flex-col items-center text-center space-y-3 mb-6 pt-2">
+        <div className="relative">
+          <Avatar className="h-24 w-24 ring-4 ring-[var(--bg-surface)] shadow-lg">
             {currentProfile.foto_url && <AvatarImage src={currentProfile.foto_url} />}
-            <AvatarFallback>{currentProfile.nome.charAt(0)}{currentProfile.sobrenome.charAt(0)}</AvatarFallback>
+            <AvatarFallback className="text-2xl font-bold">{currentProfile.nome.charAt(0)}{currentProfile.sobrenome.charAt(0)}</AvatarFallback>
           </Avatar>
-          <div className="min-w-0 flex-1">
-            <h1 className="text-lg font-bold text-[var(--text-primary)] truncate">
-              {currentProfile.apelido || `${currentProfile.nome} ${currentProfile.sobrenome}`}
-            </h1>
-            <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium ${currentProfile.ativo ? "bg-green-500/10 text-green-600" : "bg-red-500/10 text-red-500"}`}>
-              <span className={`w-1.5 h-1.5 rounded-full ${currentProfile.ativo ? "bg-green-500" : "bg-red-500"}`} />
-              {currentProfile.ativo ? "Ativo" : "Inativo"}
-            </span>
-          </div>
+          <span className={`absolute bottom-1 right-1 w-4 h-4 rounded-full border-2 border-white ${currentProfile.ativo ? "bg-green-500" : "bg-red-500"}`} />
         </div>
-        <div className="flex items-center gap-2">
+        <div>
+          <h1 className="text-xl font-bold text-[var(--text-primary)]">
+            {currentProfile.apelido || `${currentProfile.nome} ${currentProfile.sobrenome}`}
+          </h1>
+          <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium mt-1 ${currentProfile.ativo ? "bg-green-500/10 text-green-600" : "bg-red-500/10 text-red-500"}`}>
+            <span className={`w-1.5 h-1.5 rounded-full ${currentProfile.ativo ? "bg-green-500" : "bg-red-500"}`} />
+            {currentProfile.ativo ? "Ativo" : "Inativo"}
+          </span>
+        </div>
+        <p className="text-sm text-[var(--text-secondary)] flex items-center gap-1.5">
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          Membro desde {new Date(currentProfile.created_at).toLocaleDateString("pt-BR", { day: "2-digit", month: "long", year: "numeric" })}
+        </p>
+        <div className="flex items-center gap-2 w-full pt-1">
           <Button
-            className="flex-1 md:flex-none"
+            className="flex-1"
             onClick={async () => {
               const { data } = await createClient().from("profile_bets").select("id").eq("profile_id", currentProfile.id)
               if (!data || data.length < 2) setMinBetsAlertOpen(true)
               else setShowCalculadoraSheet(true)
             }}
-            size="sm"
           >
             <Calculator className="h-4 w-4 mr-2" />
             Nova Aposta
           </Button>
-          <Button className="hidden md:flex" variant="outline" size="sm" onClick={() => setFinShowForm(true)}>
-            <DollarSign className="h-4 w-4 mr-2" />
-            Movimentação
-          </Button>
-          <Link href={`/perfis/${profile.id}/editar`} className="md:inline-flex">
-            <Button variant="outline" size="sm" className="w-full md:w-auto">
+          <Link href={`/perfis/${profile.id}/editar`}>
+            <Button variant="outline">
               <Pencil className="h-4 w-4 mr-2" />
-              Editar Perfil
+              Editar perfil
             </Button>
           </Link>
         </div>
