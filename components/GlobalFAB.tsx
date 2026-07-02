@@ -228,7 +228,7 @@ export default function GlobalFAB() {
         {/* Main button */}
         <button
           onClick={handleOpen}
-          className="w-14 h-14 rounded-full bg-[#16a34a] hover:bg-[#15803d] flex items-center justify-center shadow-xl"
+          className="w-14 h-14 rounded-full bg-[#0f172a] hover:bg-[#1e293b] flex items-center justify-center shadow-xl"
           style={{ transition: "transform 0.2s, background-color 0.2s", transform: open ? "rotate(45deg)" : "rotate(0deg)" }}
         >
           <Plus className="w-7 h-7 text-white" />
