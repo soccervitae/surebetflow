@@ -20,14 +20,15 @@ import type { Bet, ProfileBet } from "@/lib/types"
 interface Props {
   profileId: string
   userToken?: string
+  autoOpen?: boolean
 }
 
 type ProfileBetWithBet = ProfileBet & { bet?: { nome: string; logo_url?: string | null }; ativo: boolean }
 
-export default function AddBetToProfile({ profileId }: Props) {
+export default function AddBetToProfile({ profileId, autoOpen = false }: Props) {
   const [bets, setBets] = useState<Bet[]>([])
   const [profileBets, setProfileBets] = useState<ProfileBetWithBet[]>([])
-  const [showForm, setShowForm] = useState(false)
+  const [showForm, setShowForm] = useState(autoOpen)
   const [selectedBet, setSelectedBet] = useState("")
   const [email, setEmail] = useState("")
   const [senha, setSenha] = useState("")
