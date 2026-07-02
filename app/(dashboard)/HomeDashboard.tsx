@@ -250,49 +250,6 @@ export default function HomeDashboard({
           )}
         </div>
 
-        {/* Profiles grid — full detail */}
-        {profiles.length > 0 && (
-          <div className="lg:col-span-2 rounded-xl border border-[var(--border)] bg-[var(--bg-surface)] p-5">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-sm font-semibold text-[var(--text-primary)] uppercase tracking-wide">Perfis</h2>
-              <Link href="/perfis" className="text-xs text-[var(--accent-text)] hover:underline flex items-center gap-1">
-                Ver todos <ChevronRight className="w-3 h-3" />
-              </Link>
-            </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              {profiles.map(p => (
-                <Link
-                  key={p.profile_id}
-                  href={`/perfis/${p.profile_id}`}
-                  className="flex flex-col gap-3 p-4 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-muted)] hover:border-[#1e3a8a]/40 hover:bg-[#1e3a8a]/5 transition-all"
-                >
-                  <div className="flex items-center gap-3">
-                    <Avatar className="h-9 w-9 flex-shrink-0">
-                      <AvatarFallback className="bg-[#1e3a8a]/20 text-[var(--accent-text)] text-sm font-bold">
-                        {p.nome.charAt(0)}{p.sobrenome.charAt(0)}
-                      </AvatarFallback>
-                    </Avatar>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-semibold text-[var(--text-primary)] truncate">{p.apelido ?? `${p.nome} ${p.sobrenome}`}</p>
-                      <p className="text-xs text-[var(--text-secondary)]">{p.total_apostas} aposta{p.total_apostas !== 1 ? "s" : ""}</p>
-                    </div>
-                    <span className="text-sm font-bold text-[#3b82f6]">{formatCurrency(p.saldo_total)}</span>
-                  </div>
-                  <div className="grid grid-cols-2 gap-2">
-                    <div className="rounded-lg bg-[var(--bg-surface)] border border-[var(--border-subtle)] px-3 py-2">
-                      <p className="text-[10px] text-[var(--text-muted)] uppercase tracking-wide flex items-center gap-1"><TrendingUp className="w-3 h-3" /> Lucro</p>
-                      <p className={`text-sm font-bold mt-0.5 ${p.lucro_realizado >= 0 ? "text-green-500" : "text-red-400"}`}>{formatCurrency(p.lucro_realizado)}</p>
-                    </div>
-                    <div className="rounded-lg bg-[var(--bg-surface)] border border-[var(--border-subtle)] px-3 py-2">
-                      <p className="text-[10px] text-[var(--text-muted)] uppercase tracking-wide flex items-center gap-1"><ArrowUpRight className="w-3 h-3" /> ROI</p>
-                      <p className={`text-sm font-bold mt-0.5 ${p.roi_percentual >= 0 ? "text-[#a855f7]" : "text-red-400"}`}>{parseFloat(String(p.roi_percentual)).toFixed(2)}%</p>
-                    </div>
-                  </div>
-                </Link>
-              ))}
-            </div>
-          </div>
-        )}
       </div>
 
       {/* Apostas Recentes */}
