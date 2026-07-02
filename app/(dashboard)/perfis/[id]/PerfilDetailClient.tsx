@@ -438,21 +438,6 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
           Criado em {new Date(currentProfile.created_at).toLocaleDateString("pt-BR", { day: "2-digit", month: "long", year: "numeric" })}
         </p>
         <div className="flex items-center gap-2 w-full pt-1">
-          <Button
-            className="flex-1"
-            onClick={async () => {
-              const { data } = await createClient().from("profile_bets").select("id").eq("profile_id", currentProfile.id)
-              if (!data || data.length < 2) setMinBetsAlertOpen(true)
-              else setShowCalculadoraSheet(true)
-            }}
-          >
-            <Calculator className="h-4 w-4 mr-2" />
-            Nova Aposta
-          </Button>
-          <Button variant="outline" onClick={() => { if (!movLoaded) loadMovimentacoes(); setFinShowForm(true) }}>
-            <DollarSign className="h-4 w-4 mr-2" />
-            Movimentação
-          </Button>
           <Link href={`/perfis/${profile.id}/editar`}>
             <Button variant="outline" size="icon">
               <Pencil className="h-4 w-4" />
