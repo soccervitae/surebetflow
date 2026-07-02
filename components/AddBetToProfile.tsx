@@ -262,7 +262,7 @@ export default function AddBetToProfile({ profileId }: Props) {
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between">
+      <div className="hidden md:flex items-center justify-between">
         <h3 className="font-medium text-[var(--text-primary)]">Bets</h3>
         <Button size="sm" onClick={() => { setShowForm(true); setSelectedBet(""); setEmail(""); setSenha("") }}>
           <Plus className="h-4 w-4 mr-1" />
