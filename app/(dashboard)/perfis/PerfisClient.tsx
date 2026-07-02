@@ -45,10 +45,9 @@ export default function PerfisClient({ profiles: initialProfiles, userId, planLi
           <p className="text-[var(--text-secondary)] text-sm mt-1">Gerencie seus perfis de apostador</p>
         </div>
         <div className="flex flex-col items-end gap-1">
-          <Button onClick={() => !atLimit && setShowCreate(true)} disabled={atLimit}>
+          <Button className="hidden sm:flex" onClick={() => !atLimit && setShowCreate(true)} disabled={atLimit}>
             <Plus className="h-4 w-4 mr-2" />
-            <span className="hidden sm:inline">Novo perfil</span>
-            <span className="sm:hidden">Novo</span>
+            Novo perfil
           </Button>
           {atLimit && (
             <p className="text-xs text-amber-600 text-right max-w-[220px]">

@@ -294,13 +294,6 @@ export default function ApostasClient({ apostas: initialApostas, profiles, betCo
           <p className="text-[var(--text-secondary)] text-sm mt-1">Histórico completo de todas as suas apostas</p>
         </div>
         <div className="flex items-center gap-2">
-          <Link
-            href="/apostas/nova"
-            className="md:hidden flex items-center gap-1.5 px-3 py-2 rounded-xl bg-[#1e3a8a] text-white text-sm font-medium"
-          >
-            <Plus className="h-4 w-4" />
-            Nova
-          </Link>
           <button
             onClick={() => { setSelectedProfileId(""); setSelectedProfileName(""); setSelectProfileModal(true) }}
             className="hidden md:flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#1e3a8a] hover:bg-[#1e40af] text-white text-sm font-medium transition-colors"
