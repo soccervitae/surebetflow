@@ -131,7 +131,6 @@ export default function AddBetToProfile({ profileId, autoOpen = false, onSaved }
     if (d.length === 0) return ""
     if (d.length <= 2) return `(${d}`
     if (d.length <= 6) return `(${d.slice(0, 2)}) ${d.slice(2)}`
-    // Mobile (11 digits with 9 as 5th digit) or landline
     const isMobile = d.length === 11 || (d.length === 10 && d[2] === "9")
     if (isMobile) {
       if (d.length <= 10) return `(${d.slice(0, 2)}) ${d.slice(2, 6)}-${d.slice(6)}`
@@ -253,7 +252,6 @@ export default function AddBetToProfile({ profileId, autoOpen = false, onSaved }
     if (error) {
       toast({ title: "Erro ao registrar movimentação", variant: "destructive" })
     } else {
-      // Busca saldo real calculado do banco
       const { data: movs } = await supabase
         .from("movimentacoes_financeiras")
         .select("tipo, valor")
@@ -262,7 +260,7 @@ export default function AddBetToProfile({ profileId, autoOpen = false, onSaved }
         const val = parseFloat(String(m.valor)) || 0
         if (m.tipo === "deposito" || m.tipo === "lucro") return acc + val
         if (m.tipo === "saque" || m.tipo === "perda") return acc - val
-        return acc // bonus: não afeta saldo real
+        return acc
       }, 0)
       await supabase.from("profile_bets").update({ saldo: saldoReal }).eq("id", movDialog.id)
       setProfileBets(prev => prev.map(pb => pb.id === movDialog.id ? { ...pb, saldo: saldoReal } : pb))
@@ -585,7 +583,6 @@ export default function AddBetToProfile({ profileId, autoOpen = false, onSaved }
         </Dialog>
       )}
 
-      {/* Dialog Deletar */}
       {/* Edit Dialog */}
       <Dialog open={!!editDialog} onOpenChange={open => !open && setEditDialog(null)}>
         <DialogContent>
