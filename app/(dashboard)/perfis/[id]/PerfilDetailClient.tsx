@@ -1265,20 +1265,7 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
 
         {/* Financeiro Tab */}
         <TabsContent value="financeiro" className="space-y-4">
-          {/* Header com botão Filtrar */}
-          <div className="flex items-center gap-2">
-            <button
-              onClick={() => setFinShowFilter(v => !v)}
-              className={`flex items-center gap-1.5 px-3 py-2 rounded-xl border text-sm font-medium transition-colors flex-shrink-0 ${
-                finShowFilter || finTipo !== "todos" || finCasa !== "todos"
-                  ? "bg-[#1e3a8a]/10 border-[#1e3a8a]/30 text-[var(--accent-text)]"
-                  : "border-[var(--border)] text-[var(--text-secondary)] hover:bg-[var(--bg-elevated)]"
-              }`}
-            >
-              {finShowFilter ? <X className="w-4 h-4" /> : <SlidersHorizontal className="w-4 h-4" />}
-              Filtrar{(finTipo !== "todos" || finCasa !== "todos") && !finShowFilter ? " •" : ""}
-            </button>
-          </div>
+          {/* Filtrar inline — aparece junto à primeira data na lista */}
 
           {/* Painel de filtros */}
           {finShowFilter && (
@@ -1499,7 +1486,24 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
             ].sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
 
             if (allItems.length === 0) {
-              return <Card><CardContent className="py-8 text-center text-[var(--text-secondary)] text-sm">Nenhuma movimentação encontrada</CardContent></Card>
+              return (
+                <div className="space-y-2">
+                  <div className="flex justify-end">
+                    <button
+                      onClick={() => setFinShowFilter(v => !v)}
+                      className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg border text-xs font-medium transition-colors ${
+                        finShowFilter || finTipo !== "todos" || finCasa !== "todos"
+                          ? "bg-[#1e3a8a]/10 border-[#1e3a8a]/30 text-[var(--accent-text)]"
+                          : "border-[var(--border)] text-[var(--text-secondary)] hover:bg-[var(--bg-elevated)]"
+                      }`}
+                    >
+                      {finShowFilter ? <X className="w-3 h-3" /> : <SlidersHorizontal className="w-3 h-3" />}
+                      Filtrar{(finTipo !== "todos" || finCasa !== "todos") && !finShowFilter ? " •" : ""}
+                    </button>
+                  </div>
+                  <Card><CardContent className="py-8 text-center text-[var(--text-secondary)] text-sm">Nenhuma movimentação encontrada</CardContent></Card>
+                </div>
+              )
             }
 
             const groupMap = new Map<string, Item[]>()
@@ -1535,9 +1539,24 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
 
             return (
               <div className="space-y-4">
-                {groups.map(([dateKey, items]) => (
+                {groups.map(([dateKey, items], groupIdx) => (
                   <div key={dateKey}>
-                    <p className="text-xs font-semibold text-[var(--text-muted)] px-1 mb-2">{fmtDate(dateKey)}</p>
+                    <div className="flex items-center justify-between px-1 mb-2">
+                      <p className="text-xs font-semibold text-[var(--text-muted)]">{fmtDate(dateKey)}</p>
+                      {groupIdx === 0 && (
+                        <button
+                          onClick={() => setFinShowFilter(v => !v)}
+                          className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg border text-xs font-medium transition-colors ${
+                            finShowFilter || finTipo !== "todos" || finCasa !== "todos"
+                              ? "bg-[#1e3a8a]/10 border-[#1e3a8a]/30 text-[var(--accent-text)]"
+                              : "border-[var(--border)] text-[var(--text-secondary)] hover:bg-[var(--bg-elevated)]"
+                          }`}
+                        >
+                          {finShowFilter ? <X className="w-3 h-3" /> : <SlidersHorizontal className="w-3 h-3" />}
+                          Filtrar{(finTipo !== "todos" || finCasa !== "todos") && !finShowFilter ? " •" : ""}
+                        </button>
+                      )}
+                    </div>
                     <Card>
                       <CardContent className="p-0 divide-y divide-[var(--border)]">
                         {items.map(item => (
