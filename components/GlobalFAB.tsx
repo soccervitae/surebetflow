@@ -214,7 +214,7 @@ export default function GlobalFAB() {
                 className="flex items-center gap-3"
                 style={{ animation: `fabItemIn 0.15s ease both`, animationDelay: `${i * 40}ms` }}
               >
-                <span className="text-sm font-semibold text-[var(--text-primary)] bg-[var(--bg-surface)] px-3 py-1.5 rounded-lg shadow-md whitespace-nowrap">
+                <span className={`text-sm font-semibold text-white ${color} px-3 py-1.5 rounded-lg shadow-md whitespace-nowrap`}>
                   {label}
                 </span>
                 <div className={`w-12 h-12 rounded-full ${color} flex items-center justify-center shadow-lg flex-shrink-0 hover:scale-110 transition-transform`}>
