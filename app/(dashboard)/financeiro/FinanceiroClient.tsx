@@ -5,7 +5,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { formatCurrency } from "@/lib/utils"
-import { ArrowDownLeft, ArrowUpRight, Filter, DollarSign } from "lucide-react"
+import { ArrowDownLeft, ArrowUpRight, DollarSign } from "lucide-react"
 import type { MovimentacaoFinanceira } from "@/lib/types"
 
 interface Props {
@@ -73,7 +73,6 @@ export default function FinanceiroClient({ movimentacoes: initial, profiles, pro
       <Card>
         <CardContent className="p-4">
           <div className="flex items-center gap-2 mb-3">
-            <Filter className="h-4 w-4 text-[var(--text-secondary)]" />
             <span className="text-sm font-medium text-[var(--text-primary)]">Filtros</span>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">

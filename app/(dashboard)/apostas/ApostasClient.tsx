@@ -14,7 +14,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet"
 import { formatCurrency } from "@/lib/utils"
 import { useToast } from "@/hooks/useToast"
-import { BookOpen, Filter, X, Plus, Calculator, CalendarIcon, ChevronDown, AlertTriangle, Download, Check, SlidersHorizontal } from "lucide-react"
+import { BookOpen, Filter, X, Calculator, CalendarIcon, AlertTriangle, Download, Check, SlidersHorizontal } from "lucide-react"
 import type { Aposta, ApostaLeg } from "@/lib/types"
 import SurebetCalculator from "@/components/SurebetCalculator"
 
@@ -93,8 +93,8 @@ export default function ApostasClient({ apostas: initialApostas, profiles, betCo
   const [finalizarDialog, setFinalizarDialog] = useState<Aposta | null>(null)
   const [deletarDialog, setDeletarDialog] = useState<Aposta | null>(null)
   const [showFilter, setShowFilter] = useState(false)
-  const [novaModal, setNovaModal] = useState(false)   // desktop
-  const [selectProfileModal, setSelectProfileModal] = useState(false)   // desktop profile picker
+  const [novaModal, setNovaModal] = useState(false)
+  const [selectProfileModal, setSelectProfileModal] = useState(false)
   const [selectedProfileId, setSelectedProfileId] = useState<string>("")
   const [selectedProfileName, setSelectedProfileName] = useState<string>("")
   const [resultadoReal, setResultadoReal] = useState("")
@@ -105,7 +105,6 @@ export default function ApostasClient({ apostas: initialApostas, profiles, betCo
   const supabase = createClient()
   const router = useRouter()
 
-  // Real-time: sync apostas list across devices
   useEffect(() => {
     const client = createClient()
     const profileIds = profiles.map(p => p.id)
@@ -185,7 +184,6 @@ export default function ApostasClient({ apostas: initialApostas, profiles, betCo
     if (sortBy === "data_asc") return new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
     if (sortBy === "valor_desc") return b.investimento_total - a.investimento_total
     if (sortBy === "roi_desc") return b.roi_percentual - a.roi_percentual
-    // data_desc (default)
     return new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
   })
 
@@ -294,7 +292,7 @@ export default function ApostasClient({ apostas: initialApostas, profiles, betCo
           <p className="text-[var(--text-secondary)] text-sm mt-1">Histórico de todas as suas apostas</p>
         </div>
         <div className="flex items-center gap-2">
-          {/* Filtrar button — always visible */}
+          {/* Filtrar button */}
           {(() => {
             const hasActive = filterStatus !== "todos" || filterProfile !== "todos" || filterPeriod !== "todos" || !!filterEsporte || !!filterCompeticao
             return (
@@ -311,13 +309,6 @@ export default function ApostasClient({ apostas: initialApostas, profiles, betCo
               </button>
             )
           })()}
-          <button
-            onClick={() => { setSelectedProfileId(""); setSelectedProfileName(""); setSelectProfileModal(true) }}
-            className="hidden md:flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#1e3a8a] hover:bg-[#1e40af] text-white text-sm font-medium transition-colors"
-          >
-            <Plus className="h-4 w-4" />
-            Nova aposta
-          </button>
           <button
             onClick={exportCSV}
             className="hidden md:flex items-center gap-1.5 px-4 py-2 rounded-xl border border-[var(--border)] hover:bg-[var(--bg-elevated)] text-[var(--text-primary)] text-sm font-medium transition-colors"
@@ -446,7 +437,6 @@ export default function ApostasClient({ apostas: initialApostas, profiles, betCo
 
             {filterPeriod === "custom" && (
               <div className="mt-2 space-y-2">
-                {/* Mode toggle */}
                 <div className="flex gap-1 p-0.5 bg-[var(--bg-elevated)] rounded-lg w-fit">
                   <button
                     onClick={() => setFilterCustomMode("single")}
@@ -558,7 +548,6 @@ export default function ApostasClient({ apostas: initialApostas, profiles, betCo
                   className="overflow-hidden cursor-pointer hover:border-[#1e3a8a]/40 transition-colors"
                   onClick={() => window.location.href = `/apostas/${aposta.id}`}
                 >
-                  {/* Header da aposta */}
                   <div className="flex items-center justify-between px-5 py-3 border-b border-[var(--border)] bg-[var(--bg-elevated)]">
                     <div className="flex flex-col min-w-0">
                       <p className={`font-semibold truncate ${aposta.status === "pendente" ? "text-red-500 dark:text-[var(--text-primary)]" : "text-[var(--text-primary)]"}`}>{aposta.evento}</p>
@@ -578,7 +567,6 @@ export default function ApostasClient({ apostas: initialApostas, profiles, betCo
                     </div>
                   </div>
 
-                  {/* Legs */}
                   <div className="divide-y divide-[var(--border)]">
                     {legs.map(leg => {
                       const isGreen = detectedGreenLegId === leg.id
@@ -615,7 +603,6 @@ export default function ApostasClient({ apostas: initialApostas, profiles, betCo
                         </div>
                       )
                     })}
-                    {/* Summary footer */}
                     <div className="flex items-center gap-4 px-5 py-2 bg-[var(--bg-elevated)]">
                       <div className="w-36 flex-shrink-0" />
                       <div className="flex-1 min-w-0" />
