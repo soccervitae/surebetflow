@@ -114,6 +114,12 @@ export default function PerfisClient({ profiles: initialProfiles, userId, planLi
           <p className="text-[var(--text-secondary)] text-sm mt-1">Gerencie seus perfis de apostador</p>
         </div>
         <div className="flex items-center gap-2">
+          {/* Novo perfil — desktop only */}
+          <Button className="hidden sm:flex" onClick={() => !atLimit && setShowCreate(true)} disabled={atLimit}>
+            <Plus className="h-4 w-4 mr-2" />
+            Novo perfil
+          </Button>
+
           {/* Filtrar */}
           <button
             onClick={() => setShowFilter(v => !v)}
@@ -126,12 +132,6 @@ export default function PerfisClient({ profiles: initialProfiles, userId, planLi
             {showFilter ? <X className="w-4 h-4" /> : <SlidersHorizontal className="w-4 h-4" />}
             Filtrar{hasActiveFilters && !showFilter ? " •" : ""}
           </button>
-
-          {/* Novo perfil — desktop only */}
-          <Button className="hidden sm:flex" onClick={() => !atLimit && setShowCreate(true)} disabled={atLimit}>
-            <Plus className="h-4 w-4 mr-2" />
-            Novo perfil
-          </Button>
         </div>
       </div>
 
@@ -147,58 +147,49 @@ export default function PerfisClient({ profiles: initialProfiles, userId, planLi
       {/* Filtros */}
       {showFilter && (
         <Card>
-          <CardContent className="p-4 space-y-4">
-            <div className="flex items-center justify-between">
-              <p className="text-xs font-semibold text-[var(--text-muted)] uppercase tracking-wide">Filtros</p>
+          <CardContent className="p-4">
+            <div className="flex flex-wrap items-center gap-3">
+              <p className="text-xs font-semibold text-[var(--text-muted)] uppercase tracking-wide flex-shrink-0">Status</p>
+              {(["todos", "ativo", "inativo"] as FilterStatus[]).map(s => (
+                <button
+                  key={s}
+                  onClick={() => setFilterStatus(s)}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-medium border transition-colors ${
+                    filterStatus === s
+                      ? "bg-[#1e3a8a]/10 border-[#1e3a8a]/30 text-[var(--accent-text)]"
+                      : "border-[var(--border)] text-[var(--text-secondary)]"
+                  }`}
+                >
+                  {s === "todos" ? "Todos" : s === "ativo" ? "Ativos" : "Inativos"}
+                </button>
+              ))}
+
+              <div className="w-px h-4 bg-[var(--border)] hidden sm:block" />
+
+              <p className="text-xs font-semibold text-[var(--text-muted)] uppercase tracking-wide flex-shrink-0">Ordenar</p>
+              {([
+                { value: "default", label: "Padrão" },
+                { value: "lucro",   label: "Maior Lucro" },
+                { value: "roi",     label: "Maior ROI" },
+              ] as { value: SortBy; label: string }[]).map(opt => (
+                <button
+                  key={opt.value}
+                  onClick={() => setSortBy(opt.value)}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-medium border transition-colors ${
+                    sortBy === opt.value
+                      ? "bg-[#1e3a8a]/10 border-[#1e3a8a]/30 text-[var(--accent-text)]"
+                      : "border-[var(--border)] text-[var(--text-secondary)]"
+                  }`}
+                >
+                  {opt.label}
+                </button>
+              ))}
+
               {hasActiveFilters && (
-                <button onClick={clearFilters} className="text-xs text-[var(--accent-text)] font-medium">
+                <button onClick={clearFilters} className="ml-auto text-xs text-[var(--accent-text)] font-medium">
                   Limpar
                 </button>
               )}
-            </div>
-
-            {/* Status */}
-            <div>
-              <p className="text-xs text-[var(--text-muted)] mb-2">Status</p>
-              <div className="flex gap-2 flex-wrap">
-                {(["todos", "ativo", "inativo"] as FilterStatus[]).map(s => (
-                  <button
-                    key={s}
-                    onClick={() => setFilterStatus(s)}
-                    className={`px-3 py-1.5 rounded-lg text-xs font-medium border transition-colors ${
-                      filterStatus === s
-                        ? "bg-[#1e3a8a]/10 border-[#1e3a8a]/30 text-[var(--accent-text)]"
-                        : "border-[var(--border)] text-[var(--text-secondary)]"
-                    }`}
-                  >
-                    {s === "todos" ? "Todos" : s === "ativo" ? "Ativos" : "Inativos"}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Ordenar */}
-            <div>
-              <p className="text-xs text-[var(--text-muted)] mb-2">Ordenar por</p>
-              <div className="flex gap-2 flex-wrap">
-                {([
-                  { value: "default", label: "Padrão" },
-                  { value: "lucro",   label: "Maior Lucro" },
-                  { value: "roi",     label: "Maior ROI" },
-                ] as { value: SortBy; label: string }[]).map(opt => (
-                  <button
-                    key={opt.value}
-                    onClick={() => setSortBy(opt.value)}
-                    className={`px-3 py-1.5 rounded-lg text-xs font-medium border transition-colors ${
-                      sortBy === opt.value
-                        ? "bg-[#1e3a8a]/10 border-[#1e3a8a]/30 text-[var(--accent-text)]"
-                        : "border-[var(--border)] text-[var(--text-secondary)]"
-                    }`}
-                  >
-                    {opt.label}
-                  </button>
-                ))}
-              </div>
             </div>
           </CardContent>
         </Card>
