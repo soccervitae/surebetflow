@@ -435,7 +435,7 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
         </div>
         <p className="text-sm text-[var(--text-secondary)] flex items-center gap-1.5">
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-          Membro desde {new Date(currentProfile.created_at).toLocaleDateString("pt-BR", { day: "2-digit", month: "long", year: "numeric" })}
+          Criado em {new Date(currentProfile.created_at).toLocaleDateString("pt-BR", { day: "2-digit", month: "long", year: "numeric" })}
         </p>
         <div className="flex items-center gap-2 w-full pt-1">
           <Button
@@ -489,7 +489,7 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
                 <div className="flex items-center gap-4 text-sm text-[#3949ab]/70 dark:text-white/60">
                   <span className="flex items-center gap-1.5">
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-                    Membro desde {new Date(currentProfile.created_at).toLocaleDateString("pt-BR", { day: "2-digit", month: "long", year: "numeric" })}
+                    Criado em {new Date(currentProfile.created_at).toLocaleDateString("pt-BR", { day: "2-digit", month: "long", year: "numeric" })}
                   </span>
                 </div>
               </div>
