@@ -17,85 +17,151 @@ type Message = {
 type FAQ = { keywords: string[]; answer: string }
 
 const FAQS: FAQ[] = [
+  // Platform overview
   {
     keywords: ["surebet", "arbitragem", "o que é", "pra que serve", "serve", "plataforma"],
     answer:
       "A SurebetFlow é uma plataforma de gestão de apostas esportivas com foco em surebet (arbitragem esportiva). Ela permite registrar, acompanhar e analisar suas apostas em múltiplas casas, calculando lucro, ROI e investimento automaticamente.",
   },
+
+  // Perfil
   {
-    keywords: ["perfil", "criar perfil", "novo perfil", "banca", "como criar"],
+    keywords: ["perfil", "criar perfil", "novo perfil", "banca", "adicionar perfil", "cadastrar perfil"],
     answer:
-      "Para criar um Perfil de Banca, clique no botão (+) no canto inferior direito da tela e escolha 'Novo Perfil'. Você também pode acessar o menu 'Perfis' e clicar em 'Novo'. Cada perfil representa uma estratégia ou conjunto de casas de apostas.",
+      "Como criar um Perfil de Banca:\n\n1. Clique no botão (+) no canto inferior direito da tela.\n2. Escolha a opção 'Novo Perfil'.\n3. Preencha o nome do perfil e as informações solicitadas.\n4. Clique em 'Salvar'.\n\nVocê também pode acessar o menu 'Perfis' → botão 'Novo Perfil' no topo da página.\n\nCada perfil representa uma estratégia ou conjunto de casas de apostas. Você pode ter quantos perfis quiser.",
   },
+
+  // Aposta
   {
-    keywords: ["aposta", "nova aposta", "registrar aposta", "como adicionar aposta", "adicionar aposta", "cadastrar aposta"],
+    keywords: ["aposta", "nova aposta", "registrar aposta", "como adicionar aposta", "adicionar aposta", "cadastrar aposta", "como registro", "registrar"],
     answer:
-      "Para registrar uma nova aposta, clique no botão (+) → 'Nova Aposta'. Informe o evento, competição, odds e stake de cada leg (ramificação). O sistema calcula automaticamente o investimento total, lucro garantido e ROI.",
+      "Como adicionar uma Nova Aposta:\n\n1. Clique no botão (+) no canto inferior direito → 'Nova Aposta'.\n2. Selecione o perfil de banca.\n3. Preencha os dados do evento: nome, competição, data e tipo de aposta.\n4. Adicione os legs (ramificações): para cada leg informe a casa de apostas, a odd e o valor de stake.\n5. O sistema calcula automaticamente o investimento total, lucro garantido e ROI.\n6. Clique em 'Salvar' para registrar a aposta.\n\nApós o resultado do evento, volte à aposta e registre o resultado de cada leg (Green, Red ou Reembolso).",
   },
+
+  // Bet / Casa de apostas
   {
-    keywords: ["bet", "casa de aposta", "adicionar bet", "nova bet", "casa apostas"],
+    keywords: ["bet", "casa de aposta", "adicionar bet", "nova bet", "casa apostas", "cadastrar bet", "como adiciono bet"],
     answer:
-      "Para adicionar uma casa de apostas a um perfil, acesse o perfil desejado, vá até a aba 'Bets' e clique em 'Adicionar'. Informe o email e senha da conta naquela casa. Você pode adicionar quantas casas quiser.",
+      "Como adicionar uma Casa de Apostas (Bet) ao perfil:\n\n1. Acesse o menu 'Perfis' e clique no perfil desejado.\n2. Vá até a aba 'Bets'.\n3. Clique no botão (+) no canto inferior direito → 'Adicionar Bet'.\n4. Busque e selecione a casa de apostas desejada.\n5. Informe o e-mail e senha da sua conta nessa casa.\n6. Clique em 'Salvar'.\n\nVocê pode adicionar quantas casas quiser ao mesmo perfil. Cada bet terá seu saldo, lucro e ROI rastreados individualmente.",
   },
+
+  // Depósito
+  {
+    keywords: ["deposito", "depósito", "como depositar", "registrar deposito", "adicionar deposito", "como faço deposito"],
+    answer:
+      "Como registrar um Depósito:\n\n1. Acesse o menu 'Perfis' e entre no perfil desejado.\n2. Vá até a aba 'Bets'.\n3. Clique na casa de apostas onde fez o depósito.\n4. Clique em 'Nova Movimentação' → selecione o tipo 'Depósito'.\n5. Informe o valor depositado e uma descrição opcional.\n6. Clique em 'Salvar'.\n\nO saldo da bet será atualizado automaticamente. Você também pode registrar depósitos pelo botão FAB (+) → 'Movimentação'.",
+  },
+
+  // Saque
+  {
+    keywords: ["saque", "como sacar", "registrar saque", "retirada", "como faço saque"],
+    answer:
+      "Como registrar um Saque:\n\n1. Acesse o menu 'Perfis' e entre no perfil desejado.\n2. Vá até a aba 'Bets'.\n3. Clique na casa de apostas de onde fez o saque.\n4. Clique em 'Nova Movimentação' → selecione o tipo 'Saque'.\n5. Informe o valor sacado e uma descrição opcional.\n6. Clique em 'Salvar'.\n\nO valor será subtraído do saldo da bet automaticamente.",
+  },
+
+  // Lucro
+  {
+    keywords: ["lucro", "registrar lucro", "como adiciono lucro", "ganho", "como registro lucro"],
+    answer:
+      "Como registrar um Lucro:\n\n1. Acesse o menu 'Perfis' e entre no perfil desejado.\n2. Vá até a aba 'Bets'.\n3. Clique na casa de apostas onde obteve o lucro.\n4. Clique em 'Nova Movimentação' → selecione o tipo 'Lucro'.\n5. Informe o valor do lucro e uma descrição opcional.\n6. Clique em 'Salvar'.\n\nO lucro será somado ao saldo da bet e contabilizado no ROI do perfil.\n\nDica: você também pode registrar o resultado de uma aposta individualmente acessando a aposta → resultado de cada leg (Green).",
+  },
+
+  // Perda
+  {
+    keywords: ["perda", "registrar perda", "como registro perda", "prejuizo", "prejuízo", "como adiciono perda"],
+    answer:
+      "Como registrar uma Perda:\n\n1. Acesse o menu 'Perfis' e entre no perfil desejado.\n2. Vá até a aba 'Bets'.\n3. Clique na casa de apostas onde ocorreu a perda.\n4. Clique em 'Nova Movimentação' → selecione o tipo 'Perda'.\n5. Informe o valor da perda e uma descrição opcional.\n6. Clique em 'Salvar'.\n\nO valor será subtraído do saldo da bet e contabilizado negativamente no ROI.\n\nDica: ao registrar o resultado de uma aposta como Red (perdeu), o sistema já calcula a perda automaticamente.",
+  },
+
+  // Bônus
+  {
+    keywords: ["bonus", "bônus", "registrar bonus", "como adiciono bonus", "frebet", "freebet"],
+    answer:
+      "Como registrar um Bônus:\n\n1. Acesse o menu 'Perfis' e entre no perfil desejado.\n2. Vá até a aba 'Bets'.\n3. Clique na casa de apostas que forneceu o bônus.\n4. Clique em 'Nova Movimentação' → selecione o tipo 'Bônus'.\n5. Informe o valor do bônus e uma descrição opcional.\n6. Clique em 'Salvar'.\n\nImportante: o valor do bônus é registrado separadamente e não entra no saldo real da conta — ele serve apenas para controle e rastreamento de promoções.",
+  },
+
+  // Movimentação geral
+  {
+    keywords: ["movimentação", "movimentacao", "financeiro", "nova movimentacao", "registrar movimentacao"],
+    answer:
+      "Como registrar uma Movimentação Financeira:\n\n1. Acesse o menu 'Perfis' → perfil desejado → aba 'Bets'.\n2. Clique na casa de apostas desejada.\n3. Clique em 'Nova Movimentação'.\n4. Selecione o tipo: Depósito, Saque, Lucro, Perda ou Bônus.\n5. Informe o valor e uma descrição opcional.\n6. Clique em 'Salvar'.\n\nVocê também pode acessar o módulo 'Financeiro' no menu lateral para ver o histórico completo de todas as movimentações.",
+  },
+
+  // ROI
+  {
+    keywords: ["roi", "retorno sobre investimento", "como calcular roi", "o que e roi", "o que é roi"],
+    answer:
+      "O ROI (Retorno sobre Investimento) é calculado automaticamente pela SurebetFlow.\n\nFórmula: ROI = (Lucro líquido / Total investido) × 100\n\nExemplo: Se você investiu R$ 1.000 e obteve R$ 30 de lucro, o ROI é de 3%.\n\nVocê encontra o ROI em:\n• Cada aposta individualmente (ROI daquela operação)\n• Em cada perfil de banca (ROI acumulado do perfil)\n• Em cada bet/casa de apostas (ROI histórico naquela casa)\n• No Dashboard (visão geral consolidada)",
+  },
+
+  // Leg
+  {
+    keywords: ["leg", "o que é leg", "ramificação", "o que e leg"],
+    answer:
+      "Leg é cada parte de uma surebet. Em uma surebet simples você tem 2 legs: uma aposta na casa A e outra na casa B, com odds complementares que garantem lucro independente do resultado.\n\nCada leg tem:\n• Casa de apostas (bet)\n• Odd negociada\n• Valor de stake (quanto apostar)\n• Resultado (Green/Red/Reembolso)\n\nO sistema suporta múltiplos legs por aposta e calcula automaticamente o lucro garantido considerando todos os legs.",
+  },
+
+  // Resultado / finalizar aposta
+  {
+    keywords: ["resultado", "green", "red", "reembolso", "finalizar aposta", "resultado aposta", "como registro resultado"],
+    answer:
+      "Como registrar o Resultado de uma Aposta:\n\n1. Acesse o menu 'Apostas' e clique na aposta desejada.\n2. Clique em 'Registrar Resultado'.\n3. Para cada leg, selecione o resultado:\n   • Green → ganhou (o lucro é somado ao saldo)\n   • Red → perdeu (a perda é subtraída do saldo)\n   • Reembolso → stake devolvida (sem lucro nem perda)\n4. Clique em 'Salvar'.\n\nApós registrar, o sistema atualiza automaticamente o lucro real, ROI e o saldo das bets envolvidas.",
+  },
+
+  // Saldo
   {
     keywords: ["saldo", "saldo total", "como calcular saldo", "atualizar saldo"],
     answer:
-      "O saldo total do perfil é a soma dos saldos em todas as casas de apostas cadastradas. Para atualizar o saldo de uma casa, acesse o perfil → aba 'Bets' → clique na bet e registre uma movimentação (depósito, saque, lucro ou perda).",
+      "O saldo de cada bet é atualizado automaticamente conforme você registra movimentações:\n• Depósito → soma ao saldo\n• Saque → subtrai do saldo\n• Lucro → soma ao saldo\n• Perda → subtrai do saldo\n• Bônus → registrado separadamente, não afeta o saldo real\n\nO saldo total do perfil é a soma dos saldos de todas as casas de apostas ativas. Você pode ver o saldo de cada bet na aba 'Bets' do perfil.",
   },
-  {
-    keywords: ["roi", "retorno", "lucro", "como calcular roi"],
-    answer:
-      "O ROI (Retorno sobre Investimento) é calculado automaticamente: (Lucro / Investimento) × 100. Você pode ver o ROI de cada aposta individualmente e o ROI consolidado de cada perfil no Dashboard.",
-  },
-  {
-    keywords: ["leg", "o que é leg", "ramificação"],
-    answer:
-      "Leg é cada parte de uma surebet. Em uma surebet simples você tem 2 legs: uma aposta na casa A e outra na casa B, com odds que garantem lucro independente do resultado. O sistema suporta múltiplos legs por aposta.",
-  },
-  {
-    keywords: ["movimentação", "deposito", "depósito", "saque", "financeiro", "registrar deposito"],
-    answer:
-      "Para registrar uma movimentação financeira (depósito, saque, bônus, lucro ou perda), acesse o perfil → aba 'Bets' → clique no ícone (+) ao lado da casa de apostas. Você também pode usar o botão FAB (+) → 'Movimentação'.",
-  },
-  {
-    keywords: ["resultado", "green", "red", "reembolso", "finalizar aposta", "resultado aposta"],
-    answer:
-      "Para finalizar uma aposta com resultado, acesse a aposta e registre o resultado de cada leg: Green (ganhou), Red (perdeu) ou Reembolso (devolvido). O sistema então calcula o lucro/perda real automaticamente.",
-  },
+
+  // Assinatura
   {
     keywords: ["assinatura", "plano", "pagamento", "preço", "valor", "assinar"],
     answer:
       "A SurebetFlow funciona por assinatura. Para ver os planos disponíveis e gerenciar sua assinatura, acesse 'Minha Conta' ou 'Assinatura' no menu. O pagamento é processado com segurança via Stripe.",
   },
+
+  // Cancelar
   {
     keywords: ["cancelar", "cancelar assinatura", "desativar conta"],
     answer:
       "Para cancelar sua assinatura, acesse 'Assinatura' no menu. Se precisar de ajuda com o cancelamento, entre em contato com o suporte humano através da opção no menu.",
   },
+
+  // Senha
   {
     keywords: ["senha", "trocar senha", "esqueci senha", "alterar senha", "redefinir senha"],
     answer:
       "Para trocar sua senha, acesse 'Minha Conta' → 'Configurações' e utilize a opção de alterar senha. Se esqueceu a senha e não consegue entrar, use a opção 'Esqueci minha senha' na tela de login.",
   },
+
+  // Configurações
   {
     keywords: ["configuração", "configuracoes", "configurações", "perfil do usuario", "minha conta", "editar perfil"],
     answer:
       "Acesse 'Minha Conta' no menu lateral para editar seus dados pessoais, trocar senha e gerenciar preferências da conta.",
   },
+
+  // Dashboard
   {
     keywords: ["dashboard", "resumo", "visao geral", "visão geral", "inicio", "início"],
     answer:
       "O Dashboard mostra um resumo geral: saldo total, apostas realizadas, lucro acumulado, ROI e taxa de acerto. Acesse-o clicando em 'Dashboard' no menu lateral.",
   },
+
+  // Tutorial
   {
     keywords: ["tutorial", "como usar", "primeiros passos", "começar", "comecar", "ajuda"],
     answer:
       "Acesse o menu 'Tutorial' para ver um guia passo a passo de como usar a plataforma. Ele cobre desde a criação do perfil até o registro de apostas e análise de resultados.",
   },
+
+  // Erros
   {
     keywords: ["bug", "erro", "problema", "não funciona", "nao funciona", "travou", "falha"],
     answer:
-      "Desculpe pelo inconveniente! Tente atualizar a página (F5) e repetir a ação. Se o problema persistir, entre em contato com o suporte humano para que possamos investigar — clique em 'Abrir ticket de suporte' no menu.",
+      "Desculpe pelo inconveniente! Tente atualizar a página (F5) e repetir a ação. Se o problema persistir, entre em contato com o suporte humano para que possamos investigar.",
   },
 ]
 
