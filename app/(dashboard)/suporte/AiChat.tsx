@@ -28,63 +28,63 @@ const FAQS: FAQ[] = [
   {
     keywords: ["perfil", "criar perfil", "novo perfil", "banca", "adicionar perfil", "cadastrar perfil"],
     answer:
-      "Como criar um Perfil de Banca:\n\n1. Clique no botão (+) no canto inferior direito da tela.\n2. Escolha a opção 'Novo Perfil'.\n3. Preencha o nome do perfil e as informações solicitadas.\n4. Clique em 'Salvar'.\n\nVocê também pode acessar o menu 'Perfis' → botão 'Novo Perfil' no topo da página.\n\nCada perfil representa uma estratégia ou conjunto de casas de apostas. Você pode ter quantos perfis quiser.",
+      "Como criar um Perfil de Banca:\n\n📱 No celular: toque no ícone (+) azul no centro do menu inferior da tela.\n🖥️ No desktop: clique no botão (+) no canto inferior direito da tela.\n\nEm seguida:\n1. Escolha a opção 'Novo Perfil'.\n2. Preencha o nome do perfil e as informações solicitadas.\n3. Clique em 'Salvar'.\n\nCada perfil representa uma estratégia ou conjunto de casas de apostas. Você pode ter quantos perfis quiser.",
   },
 
   // Aposta
   {
     keywords: ["aposta", "nova aposta", "registrar aposta", "como adicionar aposta", "adicionar aposta", "cadastrar aposta", "como registro", "registrar"],
     answer:
-      "Como adicionar uma Nova Aposta:\n\n1. Clique no botão (+) no canto inferior direito → 'Nova Aposta'.\n2. Selecione o perfil de banca.\n3. Preencha os dados do evento: nome, competição, data e tipo de aposta.\n4. Adicione os legs (ramificações): para cada leg informe a casa de apostas, a odd e o valor de stake.\n5. O sistema calcula automaticamente o investimento total, lucro garantido e ROI.\n6. Clique em 'Salvar' para registrar a aposta.\n\nApós o resultado do evento, volte à aposta e registre o resultado de cada leg (Green, Red ou Reembolso).",
+      "Como adicionar uma Nova Aposta:\n\n📱 No celular: toque no ícone (+) azul no centro do menu inferior da tela.\n🖥️ No desktop: clique no botão (+) no canto inferior direito da tela.\n\nEm seguida:\n1. Escolha a opção 'Nova Aposta'.\n2. Selecione o perfil de banca.\n3. Preencha os dados do evento: nome, competição, data e tipo de aposta.\n4. Adicione os legs: para cada leg informe a casa de apostas, a odd e o valor de stake.\n5. O sistema calcula automaticamente o investimento total, lucro garantido e ROI.\n6. Clique em 'Salvar'.\n\nApós o resultado do evento, volte à aposta e registre o resultado de cada leg (Green, Red ou Reembolso).",
   },
 
   // Bet / Casa de apostas
   {
     keywords: ["bet", "casa de aposta", "adicionar bet", "nova bet", "casa apostas", "cadastrar bet", "como adiciono bet"],
     answer:
-      "Como adicionar uma Casa de Apostas (Bet) ao perfil:\n\n1. Acesse o menu 'Perfis' e clique no perfil desejado.\n2. Vá até a aba 'Bets'.\n3. Clique no botão (+) no canto inferior direito → 'Adicionar Bet'.\n4. Busque e selecione a casa de apostas desejada.\n5. Informe o e-mail e senha da sua conta nessa casa.\n6. Clique em 'Salvar'.\n\nVocê pode adicionar quantas casas quiser ao mesmo perfil. Cada bet terá seu saldo, lucro e ROI rastreados individualmente.",
+      "Como adicionar uma Casa de Apostas (Bet) ao perfil:\n\n📱 No celular: toque no ícone (+) azul no centro do menu inferior da tela.\n🖥️ No desktop: clique no botão (+) no canto inferior direito da tela.\n\nEm seguida:\n1. Escolha a opção 'Adicionar Bet'.\n2. Busque e selecione a casa de apostas desejada.\n3. Informe o e-mail e senha da sua conta nessa casa.\n4. Clique em 'Salvar'.\n\nVocê pode adicionar quantas casas quiser ao mesmo perfil. Cada bet terá seu saldo, lucro e ROI rastreados individualmente.",
   },
 
   // Depósito
   {
     keywords: ["deposito", "depósito", "como depositar", "registrar deposito", "adicionar deposito", "como faço deposito"],
     answer:
-      "Como registrar um Depósito:\n\n1. Acesse o menu 'Perfis' e entre no perfil desejado.\n2. Vá até a aba 'Bets'.\n3. Clique na casa de apostas onde fez o depósito.\n4. Clique em 'Nova Movimentação' → selecione o tipo 'Depósito'.\n5. Informe o valor depositado e uma descrição opcional.\n6. Clique em 'Salvar'.\n\nO saldo da bet será atualizado automaticamente. Você também pode registrar depósitos pelo botão FAB (+) → 'Movimentação'.",
+      "Como registrar um Depósito:\n\n📱 No celular: toque no ícone (+) azul no centro do menu inferior da tela.\n🖥️ No desktop: clique no botão (+) no canto inferior direito da tela.\n\nEm seguida:\n1. Escolha a opção 'Nova Movimentação'.\n2. Selecione a bet (casa de apostas) e o tipo 'Depósito'.\n3. Informe o valor depositado e uma descrição opcional.\n4. Clique em 'Salvar'.\n\nO saldo da bet será atualizado automaticamente.",
   },
 
   // Saque
   {
     keywords: ["saque", "como sacar", "registrar saque", "retirada", "como faço saque"],
     answer:
-      "Como registrar um Saque:\n\n1. Acesse o menu 'Perfis' e entre no perfil desejado.\n2. Vá até a aba 'Bets'.\n3. Clique na casa de apostas de onde fez o saque.\n4. Clique em 'Nova Movimentação' → selecione o tipo 'Saque'.\n5. Informe o valor sacado e uma descrição opcional.\n6. Clique em 'Salvar'.\n\nO valor será subtraído do saldo da bet automaticamente.",
+      "Como registrar um Saque:\n\n📱 No celular: toque no ícone (+) azul no centro do menu inferior da tela.\n🖥️ No desktop: clique no botão (+) no canto inferior direito da tela.\n\nEm seguida:\n1. Escolha a opção 'Nova Movimentação'.\n2. Selecione a bet (casa de apostas) e o tipo 'Saque'.\n3. Informe o valor sacado e uma descrição opcional.\n4. Clique em 'Salvar'.\n\nO valor será subtraído do saldo da bet automaticamente.",
   },
 
   // Lucro
   {
     keywords: ["lucro", "registrar lucro", "como adiciono lucro", "ganho", "como registro lucro"],
     answer:
-      "Como registrar um Lucro:\n\n1. Acesse o menu 'Perfis' e entre no perfil desejado.\n2. Vá até a aba 'Bets'.\n3. Clique na casa de apostas onde obteve o lucro.\n4. Clique em 'Nova Movimentação' → selecione o tipo 'Lucro'.\n5. Informe o valor do lucro e uma descrição opcional.\n6. Clique em 'Salvar'.\n\nO lucro será somado ao saldo da bet e contabilizado no ROI do perfil.\n\nDica: você também pode registrar o resultado de uma aposta individualmente acessando a aposta → resultado de cada leg (Green).",
+      "Como registrar um Lucro:\n\n📱 No celular: toque no ícone (+) azul no centro do menu inferior da tela.\n🖥️ No desktop: clique no botão (+) no canto inferior direito da tela.\n\nEm seguida:\n1. Escolha a opção 'Nova Movimentação'.\n2. Selecione a bet (casa de apostas) e o tipo 'Lucro'.\n3. Informe o valor do lucro e uma descrição opcional.\n4. Clique em 'Salvar'.\n\nO lucro será somado ao saldo da bet e contabilizado no ROI do perfil.\n\nDica: você também pode registrar o resultado de uma aposta individualmente acessando a aposta → resultado de cada leg (Green).",
   },
 
   // Perda
   {
     keywords: ["perda", "registrar perda", "como registro perda", "prejuizo", "prejuízo", "como adiciono perda"],
     answer:
-      "Como registrar uma Perda:\n\n1. Acesse o menu 'Perfis' e entre no perfil desejado.\n2. Vá até a aba 'Bets'.\n3. Clique na casa de apostas onde ocorreu a perda.\n4. Clique em 'Nova Movimentação' → selecione o tipo 'Perda'.\n5. Informe o valor da perda e uma descrição opcional.\n6. Clique em 'Salvar'.\n\nO valor será subtraído do saldo da bet e contabilizado negativamente no ROI.\n\nDica: ao registrar o resultado de uma aposta como Red (perdeu), o sistema já calcula a perda automaticamente.",
+      "Como registrar uma Perda:\n\n📱 No celular: toque no ícone (+) azul no centro do menu inferior da tela.\n🖥️ No desktop: clique no botão (+) no canto inferior direito da tela.\n\nEm seguida:\n1. Escolha a opção 'Nova Movimentação'.\n2. Selecione a bet (casa de apostas) e o tipo 'Perda'.\n3. Informe o valor da perda e uma descrição opcional.\n4. Clique em 'Salvar'.\n\nO valor será subtraído do saldo da bet e contabilizado negativamente no ROI.\n\nDica: ao registrar o resultado de uma aposta como Red (perdeu), o sistema já calcula a perda automaticamente.",
   },
 
   // Bônus
   {
     keywords: ["bonus", "bônus", "registrar bonus", "como adiciono bonus", "frebet", "freebet"],
     answer:
-      "Como registrar um Bônus:\n\n1. Acesse o menu 'Perfis' e entre no perfil desejado.\n2. Vá até a aba 'Bets'.\n3. Clique na casa de apostas que forneceu o bônus.\n4. Clique em 'Nova Movimentação' → selecione o tipo 'Bônus'.\n5. Informe o valor do bônus e uma descrição opcional.\n6. Clique em 'Salvar'.\n\nImportante: o valor do bônus é registrado separadamente e não entra no saldo real da conta — ele serve apenas para controle e rastreamento de promoções.",
+      "Como registrar um Bônus:\n\n📱 No celular: toque no ícone (+) azul no centro do menu inferior da tela.\n🖥️ No desktop: clique no botão (+) no canto inferior direito da tela.\n\nEm seguida:\n1. Escolha a opção 'Nova Movimentação'.\n2. Selecione a bet (casa de apostas) e o tipo 'Bônus'.\n3. Informe o valor do bônus e uma descrição opcional.\n4. Clique em 'Salvar'.\n\nImportante: o valor do bônus é registrado separadamente e não entra no saldo real da conta — serve apenas para controle de promoções.",
   },
 
   // Movimentação geral
   {
     keywords: ["movimentação", "movimentacao", "financeiro", "nova movimentacao", "registrar movimentacao"],
     answer:
-      "Como registrar uma Movimentação Financeira:\n\n1. Acesse o menu 'Perfis' → perfil desejado → aba 'Bets'.\n2. Clique na casa de apostas desejada.\n3. Clique em 'Nova Movimentação'.\n4. Selecione o tipo: Depósito, Saque, Lucro, Perda ou Bônus.\n5. Informe o valor e uma descrição opcional.\n6. Clique em 'Salvar'.\n\nVocê também pode acessar o módulo 'Financeiro' no menu lateral para ver o histórico completo de todas as movimentações.",
+      "Como registrar uma Movimentação Financeira:\n\n📱 No celular: toque no ícone (+) azul no centro do menu inferior da tela.\n🖥️ No desktop: clique no botão (+) no canto inferior direito da tela.\n\nEm seguida:\n1. Escolha a opção 'Nova Movimentação'.\n2. Selecione a bet (casa de apostas) e o tipo: Depósito, Saque, Lucro, Perda ou Bônus.\n3. Informe o valor e uma descrição opcional.\n4. Clique em 'Salvar'.\n\nVocê também pode acessar o módulo 'Financeiro' no menu lateral para ver o histórico completo de todas as movimentações.",
   },
 
   // ROI
