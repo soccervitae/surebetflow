@@ -64,7 +64,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         setUserInitials(email.charAt(0).toUpperCase())
       }
 
-      // Admins skip subscription checks and go straight to /admin
       const adminRes = await fetch("/api/auth/is-admin")
       const { isAdmin } = await adminRes.json()
       if (isAdmin) {
@@ -101,17 +100,14 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         .on("postgres_changes", { event: "*", schema: "public", table: "ticket_mensagens" }, fetchUnread)
         .subscribe()
 
-      // Pages allowed without an active plan
       const ALLOWED_WITHOUT_PLAN = ["/assinatura", "/configuracoes", "/tutorial", "/bem-vindo"]
       const isAllowedWithoutPlan = ALLOWED_WITHOUT_PLAN.some(p => pathname.startsWith(p))
 
-      // Redirect brand new users (no subscription record) to /bem-vindo
       if (!subData && !isAllowedWithoutPlan) {
         router.push("/bem-vindo")
         return
       }
 
-      // Redirect to onboarding if subscribed but no profiles yet
       const isActive = subData?.status === "active" || subData?.status === "trialing" || courtesyActive
       const isOnboardingExcluded = pathname.startsWith("/onboarding") || isAllowedWithoutPlan
       if (isActive && !isOnboardingExcluded) {
@@ -487,16 +483,13 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         })}
       </nav>}
 
-      {/* Global realtime sync across devices */}
       {userId && <RealtimeProvider userId={userId} />}
 
       <ScrollToTop />
       <GlobalFAB />
 
-      {/* Modal de plano requerido */}
       <PlanoRequeridoModal open={planoModal} onClose={() => setPlanoModal(false)} />
 
-      {/* Logout confirmation dialog */}
       {confirmLogout && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <div className="bg-[var(--bg-surface)] border border-[var(--border)] rounded-2xl p-6 w-full max-w-sm shadow-xl">
