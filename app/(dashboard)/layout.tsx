@@ -380,11 +380,27 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             {avatarMenu && (
               <>
                 <div className="fixed inset-0 z-30" onClick={() => setAvatarMenu(false)} />
-                <div className="absolute right-0 top-9 z-40 bg-[var(--bg-surface)] border border-[var(--border)] rounded-xl shadow-xl overflow-hidden w-44">
+                <div className="absolute right-0 top-9 z-40 bg-[var(--bg-surface)] border border-[var(--border)] rounded-xl shadow-xl overflow-hidden w-48">
+                  <Link
+                    href="/tutorial"
+                    onClick={() => setAvatarMenu(false)}
+                    className="flex items-center gap-2.5 px-4 py-3 text-sm text-[var(--text-primary)] hover:bg-[var(--bg-elevated)] transition-colors"
+                  >
+                    <BookOpen className="w-4 h-4 text-[var(--text-muted)]" />
+                    Tutorial
+                  </Link>
+                  <Link
+                    href="/suporte"
+                    onClick={() => setAvatarMenu(false)}
+                    className="flex items-center gap-2.5 px-4 py-3 text-sm text-[var(--text-primary)] hover:bg-[var(--bg-elevated)] transition-colors border-t border-[var(--border)]"
+                  >
+                    <MessageCircle className="w-4 h-4 text-[var(--text-muted)]" />
+                    Suporte
+                  </Link>
                   <Link
                     href="/configuracoes"
                     onClick={() => setAvatarMenu(false)}
-                    className="flex items-center gap-2.5 px-4 py-3 text-sm text-[var(--text-primary)] hover:bg-[var(--bg-elevated)] transition-colors"
+                    className="flex items-center gap-2.5 px-4 py-3 text-sm text-[var(--text-primary)] hover:bg-[var(--bg-elevated)] transition-colors border-t border-[var(--border)]"
                   >
                     <Settings className="w-4 h-4 text-[var(--text-muted)]" />
                     Minha Conta
