@@ -449,10 +449,13 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
             <Calculator className="h-4 w-4 mr-2" />
             Nova Aposta
           </Button>
+          <Button variant="outline" onClick={() => setFinShowForm(true)}>
+            <DollarSign className="h-4 w-4 mr-2" />
+            Movimentação
+          </Button>
           <Link href={`/perfis/${profile.id}/editar`}>
-            <Button variant="outline">
-              <Pencil className="h-4 w-4 mr-2" />
-              Editar perfil
+            <Button variant="outline" size="icon">
+              <Pencil className="h-4 w-4" />
             </Button>
           </Link>
         </div>
