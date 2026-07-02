@@ -919,8 +919,8 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
 
             return (
               <>
-                {/* Filter card — desktop only; mobile uses inline button on first date */}
-                <Card className="hidden md:block">
+                {/* Filter card — hidden; filter button is inline with date groups */}
+                <Card className="hidden">
                   <CardContent className="p-4 space-y-4">
                     <div className="flex items-center justify-between">
                       <button
@@ -1037,9 +1037,9 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
                   </CardContent>
                 </Card>
 
-                {/* Mobile filter panel — shown when inline Filtrar button is active */}
+                {/* Filter panel — shown when inline Filtrar button is active */}
                 {apShowFilter && (
-                  <Card className="md:hidden">
+                  <Card>
                     <CardContent className="p-4 space-y-4">
                       <div className="flex items-center justify-between">
                         <span className="text-xs font-semibold text-[var(--text-muted)] uppercase tracking-wide">Filtros</span>
@@ -1121,9 +1121,24 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
                     <>
                       {/* Desktop */}
                       <div className="hidden md:block space-y-6">
-                        {groups.map(([dateKey, apostasGroup]) => (
+                        {groups.map(([dateKey, apostasGroup], groupIdx) => (
                           <div key={dateKey}>
-                            <p className="text-xs font-semibold text-[var(--text-muted)] px-1 mb-2">{formatGroupDate(dateKey)}</p>
+                            <div className="flex items-center justify-between px-1 mb-2">
+                              <p className="text-xs font-semibold text-[var(--text-muted)]">{formatGroupDate(dateKey)}</p>
+                              {groupIdx === groups.length - 1 && (
+                                <button
+                                  onClick={() => setApShowFilter(v => !v)}
+                                  className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg border text-xs font-medium transition-colors ${
+                                    apShowFilter || hasActiveFilter
+                                      ? "bg-[#1e3a8a]/10 border-[#1e3a8a]/30 text-[var(--accent-text)]"
+                                      : "border-[var(--border)] text-[var(--text-secondary)] hover:bg-[var(--bg-elevated)]"
+                                  }`}
+                                >
+                                  {apShowFilter ? <X className="w-3 h-3" /> : <SlidersHorizontal className="w-3 h-3" />}
+                                  Filtrar{hasActiveFilter && !apShowFilter ? " •" : ""}
+                                </button>
+                              )}
+                            </div>
                             <div className="space-y-3">
                               {apostasGroup.map(aposta => {
                                 const legs = (aposta as any).legs ?? []
