@@ -663,10 +663,13 @@ export default function ApostasClient({ apostas: initialApostas, profiles, betCo
               <Link key={aposta.id} href={`/apostas/${aposta.id}`}>
               <Card className="hover:border-[#1e3a8a]/40 transition-colors cursor-pointer overflow-hidden">
                 <CardContent className="p-4">
-                  <div className="flex items-center gap-2 flex-wrap mb-1 min-w-0">
+                  <div className="flex items-center justify-between gap-2 mb-0.5 min-w-0">
                     <p className="font-medium text-[var(--text-primary)] truncate">{aposta.evento}</p>
-                    {statusBadge(aposta.status)}
+                    <div className="flex-shrink-0">{statusBadge(aposta.status)}</div>
                   </div>
+                  {aposta.competicao && (
+                    <p className="text-xs text-[var(--text-muted)] truncate mb-1">{aposta.competicao}</p>
+                  )}
                   <p className="text-xs text-[var(--text-secondary)] mb-1">
                     Perfil: {aposta.profile ? (aposta.profile.apelido || `${aposta.profile.nome} ${aposta.profile.sobrenome}`) : "—"}
                   </p>
