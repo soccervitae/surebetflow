@@ -318,47 +318,46 @@ export default function ApostaDetailClient({ aposta: initial }: { aposta: Aposta
       </div>
 
       {/* Métricas */}
-      <div className="grid grid-cols-2 gap-3">
+      <div className="grid grid-cols-3 md:grid-cols-3 gap-2 md:gap-3">
         <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center gap-2 mb-1">
-              <div className="p-1.5 bg-[#2563EB]/10 rounded-lg flex-shrink-0">
-                <DollarSign className="h-3.5 w-3.5 text-[#2563EB]" />
+          <CardContent className="p-3 md:p-4">
+            <div className="flex items-center gap-1.5 mb-1">
+              <div className="p-1 md:p-1.5 bg-[#2563EB]/10 rounded-lg flex-shrink-0">
+                <DollarSign className="h-3 w-3 md:h-3.5 md:w-3.5 text-[#2563EB]" />
               </div>
-              <p className="text-xs text-[var(--text-secondary)]">Investimento</p>
+              <p className="text-xs text-[var(--text-secondary)] truncate">Investimento</p>
             </div>
-            <p className="text-base font-bold text-[var(--text-primary)]">{formatCurrency(aposta.investimento_total)}</p>
+            <p className="text-sm md:text-base font-bold text-[var(--text-primary)]">{formatCurrency(aposta.investimento_total)}</p>
           </CardContent>
         </Card>
 
         <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center gap-2 mb-1">
-              <div className={`p-1.5 rounded-lg flex-shrink-0 ${aposta.status === "finalizada" ? "bg-green-500/10" : "bg-[#D97706]/10"}`}>
-                <TrendingUp className={`h-3.5 w-3.5 ${aposta.status === "finalizada" ? "text-green-600" : "text-[#D97706]"}`} />
+          <CardContent className="p-3 md:p-4">
+            <div className="flex items-center gap-1.5 mb-1">
+              <div className="p-1 md:p-1.5 bg-[#7C3AED]/10 rounded-lg flex-shrink-0">
+                <BarChart2 className="h-3 w-3 md:h-3.5 md:w-3.5 text-[#7C3AED]" />
               </div>
-              <p className="text-xs text-[var(--text-secondary)]">
-                {aposta.status === "finalizada" ? "Lucro Real" : "Lucro Esperado"}
+              <p className="text-xs text-[var(--text-secondary)]">ROI</p>
+            </div>
+            <p className="text-sm md:text-base font-bold text-[#7C3AED]">{aposta.roi_percentual.toFixed(2)}%</p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardContent className="p-3 md:p-4">
+            <div className="flex items-center gap-1.5 mb-1">
+              <div className={`p-1 md:p-1.5 rounded-lg flex-shrink-0 ${aposta.status === "finalizada" ? "bg-green-500/10" : "bg-[#D97706]/10"}`}>
+                <TrendingUp className={`h-3 w-3 md:h-3.5 md:w-3.5 ${aposta.status === "finalizada" ? "text-green-600" : "text-[#D97706]"}`} />
+              </div>
+              <p className="text-xs text-[var(--text-secondary)] truncate">
+                {aposta.status === "finalizada" ? "Lucro Real" : "Lucro Esp."}
               </p>
             </div>
-            <p className={`text-base font-bold ${aposta.status === "finalizada" ? "text-green-600" : "text-[#D97706]"}`}>
+            <p className={`text-sm md:text-base font-bold ${aposta.status === "finalizada" ? "text-green-600" : "text-[#D97706]"}`}>
               {formatCurrency(lucroExibido)}
             </p>
           </CardContent>
         </Card>
-
-        <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center gap-2 mb-1">
-              <div className="p-1.5 bg-[#7C3AED]/10 rounded-lg flex-shrink-0">
-                <BarChart2 className="h-3.5 w-3.5 text-[#7C3AED]" />
-              </div>
-              <p className="text-xs text-[var(--text-secondary)]">ROI</p>
-            </div>
-            <p className="text-base font-bold text-[#7C3AED]">{aposta.roi_percentual.toFixed(2)}%</p>
-          </CardContent>
-        </Card>
-
       </div>
 
       {/* Legs */}
