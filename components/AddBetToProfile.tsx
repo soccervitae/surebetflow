@@ -359,13 +359,6 @@ export default function AddBetToProfile({ profileId, autoOpen = false, onSaved }
 
   return (
     <div className="space-y-4">
-      <div className="hidden md:flex items-center justify-end">
-        <Button size="sm" onClick={() => { setShowForm(true); setSelectedBet(""); setEmail(""); setSenha("") }}>
-          <Plus className="h-4 w-4 mr-1" />
-          Adicionar
-        </Button>
-      </div>
-
       {/* Dialog Adicionar */}
       <Dialog open={showForm} onOpenChange={open => { if (!open) { setShowForm(false); setSelectedBet(""); setEmail(""); setSenha(""); setTelefone(""); setBetSearch("") } }}>
         <DialogContent className="max-w-2xl p-0 gap-0 flex flex-col max-h-[90vh]">
@@ -702,13 +695,6 @@ export default function AddBetToProfile({ profileId, autoOpen = false, onSaved }
                       )}
                     </div>
 
-                    {/* + button (stops propagation so it doesn't navigate) */}
-                    <button
-                      className="w-9 h-9 rounded-full border-2 border-[#1e3a8a]/40 flex items-center justify-center text-[var(--accent-text)] hover:bg-[#1e3a8a]/10 transition-colors flex-shrink-0"
-                      onClick={e => { e.preventDefault(); setMovDialog(pb); setMovTipo("deposito"); setMovValor(""); setMovDescricao("") }}
-                    >
-                      <Plus className="h-4 w-4" />
-                    </button>
                   </div>
                 </CardContent>
               </Card>
