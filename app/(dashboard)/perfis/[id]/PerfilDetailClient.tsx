@@ -919,8 +919,8 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
 
             return (
               <>
-                {/* Filter card — identical to /apostas page, minus perfil select */}
-                <Card>
+                {/* Filter card — desktop only; mobile uses inline button on first date */}
+                <Card className="hidden md:block">
                   <CardContent className="p-4 space-y-4">
                     <div className="flex items-center justify-between">
                       <button
@@ -1037,14 +1037,74 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
                   </CardContent>
                 </Card>
 
-                {/* List */}
-                {apFiltered.length === 0 ? (
-                  <Card>
-                    <CardContent className="flex flex-col items-center justify-center py-16">
-                      <BookOpen className="h-12 w-12 text-gray-300 mb-4" />
-                      <p className="text-[var(--text-secondary)]">Nenhuma aposta encontrada</p>
+                {/* Mobile filter panel — shown when inline Filtrar button is active */}
+                {apShowFilter && (
+                  <Card className="md:hidden">
+                    <CardContent className="p-4 space-y-4">
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs font-semibold text-[var(--text-muted)] uppercase tracking-wide">Filtros</span>
+                        {hasActiveFilter && (
+                          <button
+                            onClick={() => { setApFilterStatus("todos"); setApFilterPeriod("todos"); setApFilterCustomDate(""); setApFilterCustomFrom(""); setApFilterCustomTo(""); setApFilterEsporte(""); setApFilterCompeticao("") }}
+                            className="text-xs text-[var(--text-secondary)] hover:text-[var(--text-primary)] flex items-center gap-1 transition-colors"
+                          >
+                            <X className="h-3 w-3" /> Limpar
+                          </button>
+                        )}
+                      </div>
+                      <div className="grid grid-cols-2 gap-3">
+                        <div className="space-y-1.5">
+                          <Label className="text-xs">Status</Label>
+                          <Select value={apFilterStatus} onValueChange={setApFilterStatus}>
+                            <SelectTrigger><SelectValue /></SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="todos">Todos</SelectItem>
+                              <SelectItem value="pendente">Pendente</SelectItem>
+                              <SelectItem value="finalizada">Finalizada</SelectItem>
+                              <SelectItem value="cancelada">Cancelada</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        <div className="space-y-1.5">
+                          <Label className="text-xs">Ordenar</Label>
+                          <Select value={apSortBy} onValueChange={v => setApSortBy(v as typeof apSortBy)}>
+                            <SelectTrigger><SelectValue /></SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="data_desc">Mais recente</SelectItem>
+                              <SelectItem value="data_asc">Mais antiga</SelectItem>
+                              <SelectItem value="valor_desc">Maior valor</SelectItem>
+                              <SelectItem value="roi_desc">Maior ROI</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                      </div>
                     </CardContent>
                   </Card>
+                )}
+
+                {/* List */}
+                {apFiltered.length === 0 ? (
+                  <div className="space-y-2">
+                    <div className="flex justify-end md:hidden">
+                      <button
+                        onClick={() => setApShowFilter(v => !v)}
+                        className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg border text-xs font-medium transition-colors ${
+                          apShowFilter || hasActiveFilter
+                            ? "bg-[#1e3a8a]/10 border-[#1e3a8a]/30 text-[var(--accent-text)]"
+                            : "border-[var(--border)] text-[var(--text-secondary)] hover:bg-[var(--bg-elevated)]"
+                        }`}
+                      >
+                        {apShowFilter ? <X className="w-3 h-3" /> : <SlidersHorizontal className="w-3 h-3" />}
+                        Filtrar{hasActiveFilter && !apShowFilter ? " •" : ""}
+                      </button>
+                    </div>
+                    <Card>
+                      <CardContent className="flex flex-col items-center justify-center py-16">
+                        <BookOpen className="h-12 w-12 text-gray-300 mb-4" />
+                        <p className="text-[var(--text-secondary)]">Nenhuma aposta encontrada</p>
+                      </CardContent>
+                    </Card>
+                  </div>
                 ) : (() => {
                   function formatGroupDate(iso: string) {
                     return new Date(iso + "T12:00:00").toLocaleDateString("pt-BR", { day: "numeric", month: "short" }).replace(".", "")
@@ -1150,9 +1210,24 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
 
                       {/* Mobile */}
                       <div className="md:hidden space-y-6">
-                        {groups.map(([dateKey, apostasGroup]) => (
+                        {groups.map(([dateKey, apostasGroup], groupIdx) => (
                           <div key={dateKey}>
-                            <p className="text-xs font-semibold text-[var(--text-muted)] px-1 mb-2">{formatGroupDate(dateKey)}</p>
+                            <div className="flex items-center justify-between px-1 mb-2">
+                              <p className="text-xs font-semibold text-[var(--text-muted)]">{formatGroupDate(dateKey)}</p>
+                              {groupIdx === 0 && (
+                                <button
+                                  onClick={() => setApShowFilter(v => !v)}
+                                  className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg border text-xs font-medium transition-colors ${
+                                    apShowFilter || hasActiveFilter
+                                      ? "bg-[#1e3a8a]/10 border-[#1e3a8a]/30 text-[var(--accent-text)]"
+                                      : "border-[var(--border)] text-[var(--text-secondary)] hover:bg-[var(--bg-elevated)]"
+                                  }`}
+                                >
+                                  {apShowFilter ? <X className="w-3 h-3" /> : <SlidersHorizontal className="w-3 h-3" />}
+                                  Filtrar{hasActiveFilter && !apShowFilter ? " •" : ""}
+                                </button>
+                              )}
+                            </div>
                             <div className="space-y-3">
                               {apostasGroup.map(aposta => {
                                 const legs = (aposta as any).legs ?? []
