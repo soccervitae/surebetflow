@@ -37,6 +37,8 @@ export default function GlobalFAB() {
   const [apostaPickStep, setApostaPickStep] = useState(false) // picking profile
 
   const [movModal, setMovModal] = useState(false)
+  const [movProfile, setMovProfile] = useState<Profile | null>(null)
+  const [movPickStep, setMovPickStep] = useState(false)
   const [movProfileId, setMovProfileId] = useState("")
   const [movBets, setMovBets] = useState<ProfileBet[]>([])
   const [movBetId, setMovBetId] = useState("")
@@ -102,10 +104,16 @@ export default function GlobalFAB() {
 
   function openMov() {
     setOpen(false)
-    setMovProfileId(profiles.length === 1 ? profiles[0].id : "")
-    if (profiles.length === 1) loadMovBets(profiles[0].id)
     setMovTipo("deposito"); setMovValor(""); setMovDesc(""); setMovBetId("")
-    setMovModal(true)
+    if (profiles.length === 1) {
+      const p = profiles[0]
+      setMovProfile(p)
+      setMovProfileId(p.id)
+      loadMovBets(p.id)
+      setMovModal(true)
+    } else {
+      setMovPickStep(true)
+    }
   }
 
   function openBets() {
@@ -272,31 +280,40 @@ export default function GlobalFAB() {
         </DialogContent>
       </Dialog>
 
+      {/* Profile picker for Movimentação */}
+      <Dialog open={movPickStep} onOpenChange={v => { if (!v) setMovPickStep(false) }}>
+        <DialogContent className="max-w-sm">
+          <DialogHeader><DialogTitle>Escolha o perfil</DialogTitle></DialogHeader>
+          <div className="space-y-2 mt-2">
+            {profiles.map(p => (
+              <button key={p.id} onClick={() => {
+                setMovProfile(p); setMovProfileId(p.id); loadMovBets(p.id)
+                setMovPickStep(false); setMovModal(true)
+              }}
+                className="w-full text-left px-4 py-3 rounded-xl border border-[var(--border)] hover:border-[#f97316]/60 hover:bg-[#f97316]/5 transition-colors">
+                <span className="font-semibold text-sm text-[var(--text-primary)]">{profileName(p)}</span>
+              </button>
+            ))}
+          </div>
+        </DialogContent>
+      </Dialog>
+
       {/* Movimentação modal */}
-      <Dialog open={movModal} onOpenChange={v => { if (!v) setMovModal(false) }}>
+      <Dialog open={movModal} onOpenChange={v => { if (!v) { setMovModal(false); setMovProfile(null) } }}>
         <DialogContent className="max-w-md">
-          <DialogHeader><DialogTitle>Nova Movimentação</DialogTitle></DialogHeader>
+          <DialogHeader>
+            <DialogTitle>Nova Movimentação{movProfile ? ` — ${profileName(movProfile)}` : ""}</DialogTitle>
+          </DialogHeader>
           <div className="space-y-4 mt-2">
             <div className="space-y-1.5">
-              <Label>Perfil</Label>
-              <Select value={movProfileId} onValueChange={v => { setMovProfileId(v); loadMovBets(v) }}>
-                <SelectTrigger><SelectValue placeholder="Selecione o perfil" /></SelectTrigger>
+              <Label>Casa de apostas</Label>
+              <Select value={movBetId} onValueChange={setMovBetId}>
+                <SelectTrigger><SelectValue placeholder="Selecione a casa" /></SelectTrigger>
                 <SelectContent>
-                  {profiles.map(p => <SelectItem key={p.id} value={p.id}>{profileName(p)}</SelectItem>)}
+                  {movBets.map(b => <SelectItem key={b.id} value={b.id}>{b.bet?.nome ?? b.id}</SelectItem>)}
                 </SelectContent>
               </Select>
             </div>
-            {movProfileId && (
-              <div className="space-y-1.5">
-                <Label>Casa de apostas</Label>
-                <Select value={movBetId} onValueChange={setMovBetId}>
-                  <SelectTrigger><SelectValue placeholder="Selecione a casa" /></SelectTrigger>
-                  <SelectContent>
-                    {movBets.map(b => <SelectItem key={b.id} value={b.id}>{b.bet?.nome ?? b.id}</SelectItem>)}
-                  </SelectContent>
-                </Select>
-              </div>
-            )}
             <div className="space-y-1.5">
               <Label>Tipo</Label>
               <Select value={movTipo} onValueChange={v => setMovTipo(v as typeof movTipo)}>
