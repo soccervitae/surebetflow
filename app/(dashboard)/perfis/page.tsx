@@ -34,7 +34,6 @@ export default async function PerfisPage() {
       profiles={currentProfiles}
       userId={user!.id}
       planLimit={planLimit}
-      currentCount={currentProfiles.length}
     />
   )
 }
