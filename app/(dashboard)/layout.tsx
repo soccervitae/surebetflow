@@ -15,6 +15,7 @@ import { cn } from "@/lib/utils"
 import RealtimeProvider from "@/components/RealtimeProvider"
 import PlanoRequeridoModal from "@/components/PlanoRequeridoModal"
 import GlobalFAB from "@/components/GlobalFAB"
+import ScrollToTop from "@/components/ScrollToTop"
 
 const navItems = [
   { href: "/dashboard", icon: Home, label: "Dashboard" },
@@ -481,6 +482,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       {/* Global realtime sync across devices */}
       {userId && <RealtimeProvider userId={userId} />}
 
+      <ScrollToTop />
       <GlobalFAB />
 
       {/* Modal de plano requerido */}
