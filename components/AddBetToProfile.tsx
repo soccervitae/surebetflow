@@ -24,7 +24,7 @@ interface Props {
   onSaved?: () => void
 }
 
-type ProfileBetWithBet = ProfileBet & { bet?: { nome: string; logo_url?: string | null }; ativo: boolean }
+type ProfileBetWithBet = ProfileBet & { bet?: { nome: string; logo_url?: string | null }; ativo: boolean; lucro?: number; roi?: number }
 
 export default function AddBetToProfile({ profileId, autoOpen = false, onSaved }: Props) {
   const [bets, setBets] = useState<Bet[]>([])
@@ -60,12 +60,25 @@ export default function AddBetToProfile({ profileId, autoOpen = false, onSaved }
   const isMobile = !useMediaQuery("(min-width: 768px)")
 
   const loadData = useCallback(async function loadData() {
-    const [betsRes, pbRes] = await Promise.all([
+    const [betsRes, pbRes, movRes] = await Promise.all([
       supabase.from("bets").select("*").order("nome"),
       supabase.from("profile_bets").select("*, bet:bets(nome, logo_url)").eq("profile_id", profileId),
+      supabase.from("movimentacoes_financeiras").select("profile_bet_id, tipo, valor").eq("profile_id", profileId),
     ])
     if (betsRes.data) setBets(betsRes.data)
-    if (pbRes.data) setProfileBets(pbRes.data as ProfileBetWithBet[])
+    if (pbRes.data) {
+      const movs = movRes.data ?? []
+      const enriched = (pbRes.data as ProfileBetWithBet[]).map(pb => {
+        const pbMovs = movs.filter(m => m.profile_bet_id === pb.id)
+        const deposito = pbMovs.filter(m => m.tipo === "deposito" || m.tipo === "bonus").reduce((s, m) => s + (parseFloat(String(m.valor)) || 0), 0)
+        const lucro = pbMovs.filter(m => m.tipo === "lucro").reduce((s, m) => s + (parseFloat(String(m.valor)) || 0), 0)
+        const perda = pbMovs.filter(m => m.tipo === "perda").reduce((s, m) => s + (parseFloat(String(m.valor)) || 0), 0)
+        const lucroLiq = lucro - perda
+        const roi = deposito > 0 ? (lucroLiq / deposito) * 100 : 0
+        return { ...pb, lucro: lucroLiq, roi }
+      })
+      setProfileBets(enriched)
+    }
   }, [profileId, supabase])
 
   useEffect(() => {
@@ -670,36 +683,54 @@ export default function AddBetToProfile({ profileId, autoOpen = false, onSaved }
       {profileBets.length === 0 ? (
         <p className="text-sm text-[var(--text-secondary)] text-center py-6">Nenhuma bet adicionada</p>
       ) : (
-        <div className="space-y-3">
-          {profileBets.map(pb => (
-            <Link key={pb.id} href={`/perfis/${profileId}/bets/${pb.id}`}>
-              <Card className={`hover:border-[#1e3a8a]/40 transition-colors cursor-pointer ${!pb.ativo ? "opacity-60" : ""}`}>
-                <CardContent className="p-4">
-                  <div className="flex items-center gap-3">
-                    {/* Info */}
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 flex-wrap">
-                        <p className="font-semibold text-[var(--accent-text)]">{pb.bet?.nome ?? "Bet"}</p>
-                        <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium ${pb.ativo ? "bg-green-500/10 text-green-600" : "bg-red-500/10 text-red-500"}`}>
-                          <span className={`w-1.5 h-1.5 rounded-full ${pb.ativo ? "bg-green-500" : "bg-red-500"}`} />
-                          {pb.ativo ? "Ativa" : "Inativa"}
-                        </span>
-                      </div>
-                      <p className={`text-sm font-bold mt-0.5 ${pb.saldo > 0 ? "text-[var(--accent-text)]" : pb.saldo < 0 ? "text-[#DC2626]" : "text-[var(--text-secondary)]"}`}>
-                        {formatCurrency(pb.saldo)}
-                      </p>
-                      {(pb as ProfileBetWithBet & { saldo_bonus?: number }).saldo_bonus != null && (pb as ProfileBetWithBet & { saldo_bonus?: number }).saldo_bonus! > 0 && (
-                        <p className="text-xs font-semibold text-purple-500 mt-0.5">
-                          Bônus: {formatCurrency((pb as ProfileBetWithBet & { saldo_bonus?: number }).saldo_bonus!)}
-                        </p>
-                      )}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+          {profileBets.map(pb => {
+            const lucro = pb.lucro ?? 0
+            const roi = pb.roi ?? 0
+            const bonus = (pb as ProfileBetWithBet & { saldo_bonus?: number }).saldo_bonus
+            return (
+              <Link key={pb.id} href={`/perfis/${profileId}/bets/${pb.id}`}>
+                <Card className={`hover:border-[#1e3a8a]/40 transition-colors cursor-pointer h-full ${!pb.ativo ? "opacity-60" : ""}`}>
+                  <CardContent className="p-4 flex flex-col gap-3">
+                    {/* Name + status */}
+                    <div className="flex items-center justify-between gap-2">
+                      <p className="font-semibold text-[var(--accent-text)] truncate">{pb.bet?.nome ?? "Bet"}</p>
+                      <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium flex-shrink-0 ${pb.ativo ? "bg-green-500/10 text-green-600" : "bg-red-500/10 text-red-500"}`}>
+                        <span className={`w-1.5 h-1.5 rounded-full ${pb.ativo ? "bg-green-500" : "bg-red-500"}`} />
+                        {pb.ativo ? "Ativa" : "Inativa"}
+                      </span>
                     </div>
-
-                  </div>
-                </CardContent>
-              </Card>
-            </Link>
-          ))}
+                    {/* Stats row */}
+                    <div className="grid grid-cols-3 gap-2">
+                      <div>
+                        <p className="text-[10px] text-[var(--text-muted)] uppercase tracking-wide mb-0.5">Saldo</p>
+                        <p className={`text-sm font-bold ${pb.saldo > 0 ? "text-[var(--accent-text)]" : pb.saldo < 0 ? "text-[#DC2626]" : "text-[var(--text-secondary)]"}`}>
+                          {formatCurrency(pb.saldo)}
+                        </p>
+                      </div>
+                      <div>
+                        <p className="text-[10px] text-[var(--text-muted)] uppercase tracking-wide mb-0.5">Lucro</p>
+                        <p className={`text-sm font-bold ${lucro > 0 ? "text-green-500" : lucro < 0 ? "text-[#DC2626]" : "text-[var(--text-secondary)]"}`}>
+                          {formatCurrency(lucro)}
+                        </p>
+                      </div>
+                      <div>
+                        <p className="text-[10px] text-[var(--text-muted)] uppercase tracking-wide mb-0.5">ROI</p>
+                        <p className={`text-sm font-bold ${roi > 0 ? "text-[#a855f7]" : roi < 0 ? "text-[#DC2626]" : "text-[var(--text-secondary)]"}`}>
+                          {roi.toFixed(1)}%
+                        </p>
+                      </div>
+                    </div>
+                    {bonus != null && bonus > 0 && (
+                      <p className="text-xs font-semibold text-purple-500">
+                        Bônus: {formatCurrency(bonus)}
+                      </p>
+                    )}
+                  </CardContent>
+                </Card>
+              </Link>
+            )
+          })}
         </div>
       )}
     </div>
