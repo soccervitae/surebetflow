@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from "react"
 import { createPortal } from "react-dom"
 import { usePathname } from "next/navigation"
 import { createClient } from "@/lib/supabase/client"
-import { Plus, Calculator, DollarSign, Wallet, Loader2 } from "lucide-react"
+import { Plus, Calculator, DollarSign, Wallet, Loader2, User } from "lucide-react"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -12,6 +12,7 @@ import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import SurebetCalculator from "@/components/SurebetCalculator"
 import AddBetToProfile from "@/components/AddBetToProfile"
+import { ProfileForm } from "@/components/ProfileForm"
 import { formatCurrency } from "@/lib/utils"
 import { useToast } from "@/hooks/useToast"
 
@@ -47,10 +48,16 @@ export default function GlobalFAB() {
   const [betsProfile, setBetsProfile] = useState<Profile | null>(null)
   const [betsPickStep, setBetsPickStep] = useState(false)
 
+  const [perfilModal, setPerfilModal] = useState(false)
+  const [userId, setUserId] = useState<string | null>(null)
+
   const [mobileOpen, setMobileOpen] = useState(false)
   const [mounted, setMounted] = useState(false)
 
-  useEffect(() => { setMounted(true) }, [])
+  useEffect(() => {
+    setMounted(true)
+    supabase.auth.getUser().then(({ data }) => setUserId(data.user?.id ?? null))
+  }, [])
 
   async function loadProfiles() {
     if (profilesLoaded) return
@@ -106,6 +113,11 @@ export default function GlobalFAB() {
     else { setBetsPickStep(true) }
   }
 
+  function openPerfil() {
+    setOpen(false)
+    setPerfilModal(true)
+  }
+
   async function handleSaveMov() {
     const valor = parseFloat(movValor.replace(/\./g, "").replace(",", "."))
     if (!movProfileId || !movBetId || !valor) {
@@ -141,9 +153,10 @@ export default function GlobalFAB() {
   }
 
   const fabItems = [
-    { label: "Nova Aposta", icon: Calculator, color: "bg-[#1e3a8a]", onClick: openAposta },
-    { label: "Movimentação", icon: DollarSign, color: "bg-[#f97316]", onClick: openMov },
-    { label: "Adicionar Bet", icon: Wallet, color: "bg-[#a855f7]", onClick: openBets },
+    { label: "Nova Aposta",    icon: Calculator, color: "bg-[#1e3a8a]", onClick: openAposta },
+    { label: "Movimentação",   icon: DollarSign, color: "bg-[#f97316]", onClick: openMov },
+    { label: "Novo Perfil",    icon: User,       color: "bg-[#16a34a]", onClick: openPerfil },
+    { label: "Adicionar Bet",  icon: Wallet,     color: "bg-[#a855f7]", onClick: openBets },
   ]
 
   if (!mounted) return null
@@ -337,6 +350,27 @@ export default function GlobalFAB() {
           </DialogHeader>
           {betsProfile && (
             <AddBetToProfile profileId={betsProfile.id} />
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Novo Perfil modal */}
+      <Dialog open={perfilModal} onOpenChange={v => { if (!v) setPerfilModal(false) }}>
+        <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <User className="h-5 w-5 text-[#16a34a]" />
+              Novo Perfil
+            </DialogTitle>
+          </DialogHeader>
+          {userId && (
+            <ProfileForm
+              userId={userId}
+              onSuccess={() => {
+                setPerfilModal(false)
+                toast({ title: "Perfil criado com sucesso!" })
+              }}
+            />
           )}
         </DialogContent>
       </Dialog>
