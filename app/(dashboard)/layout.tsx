@@ -419,7 +419,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 onClick={() => window.dispatchEvent(new Event("open-mobile-fab"))}
                 className="flex-1 flex flex-col items-center py-2 text-xs gap-1"
               >
-                <div className="w-9 h-9 rounded-full bg-[#0f172a] flex items-center justify-center shadow-md -mt-4">
+                <div className="w-9 h-9 rounded-full bg-[#16a34a] flex items-center justify-center shadow-md">
                   <Plus className="w-5 h-5 text-white" />
                 </div>
               </button>
