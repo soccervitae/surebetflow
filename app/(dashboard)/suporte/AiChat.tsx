@@ -1,9 +1,11 @@
 "use client"
 
 import { useState, useRef, useEffect } from "react"
-import { Send, Bot, User } from "lucide-react"
+import { Send, Bot, User, Trash2, Loader2 } from "lucide-react"
+import { createClient } from "@/lib/supabase/client"
 
 type Message = {
+  id?: string
   role: "user" | "assistant"
   content: string
 }
@@ -129,13 +131,46 @@ function getAnswer(text: string): string {
 export default function AiChat() {
   const [messages, setMessages] = useState<Message[]>([])
   const [input, setInput] = useState("")
+  const [loading, setLoading] = useState(true)
+  const [clearing, setClearing] = useState(false)
   const bottomRef = useRef<HTMLDivElement>(null)
+  const supabase = createClient()
+
+  useEffect(() => {
+    async function loadHistory() {
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) { setLoading(false); return }
+      const { data } = await supabase
+        .from("support_chat_messages")
+        .select("id, role, content")
+        .eq("user_id", user.id)
+        .order("created_at", { ascending: true })
+      setMessages((data ?? []) as Message[])
+      setLoading(false)
+    }
+    loadHistory()
+  }, [])
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" })
   }, [messages])
 
-  function handleSubmit(e: React.FormEvent) {
+  async function saveMessages(msgs: Message[]) {
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return
+    const rows = msgs.map(m => ({ user_id: user.id, role: m.role, content: m.content }))
+    await supabase.from("support_chat_messages").insert(rows)
+  }
+
+  async function handleClear() {
+    setClearing(true)
+    const { data: { user } } = await supabase.auth.getUser()
+    if (user) await supabase.from("support_chat_messages").delete().eq("user_id", user.id)
+    setMessages([])
+    setClearing(false)
+  }
+
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     const text = input.trim()
     if (!text) return
@@ -146,24 +181,41 @@ export default function AiChat() {
 
     setMessages(prev => [...prev, userMsg, assistantMsg])
     setInput("")
+    saveMessages([userMsg, assistantMsg])
   }
 
   return (
     <div className="flex flex-col h-[600px] bg-[var(--bg-surface)] border border-[var(--border)] rounded-2xl overflow-hidden">
       {/* Header */}
       <div className="flex items-center gap-3 px-5 py-4 border-b border-[var(--border)] flex-shrink-0">
-        <div className="w-8 h-8 rounded-full bg-[#1e3a8a]/20 flex items-center justify-center">
+        <div className="w-8 h-8 rounded-full bg-[#1e3a8a]/20 flex items-center justify-center flex-shrink-0">
           <Bot className="w-4 h-4 text-[#3b82f6]" />
         </div>
-        <div>
+        <div className="flex-1 min-w-0">
           <p className="text-sm font-semibold text-[var(--text-primary)]">Assistente SurebetFlow</p>
           <p className="text-xs text-[var(--text-muted)]">Tire suas dúvidas sobre o sistema</p>
         </div>
+        {messages.length > 0 && (
+          <button
+            onClick={handleClear}
+            disabled={clearing}
+            title="Limpar conversa"
+            className="flex items-center gap-1.5 text-xs text-[var(--text-muted)] hover:text-red-400 transition-colors px-2 py-1 rounded-lg hover:bg-red-500/10"
+          >
+            {clearing ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Trash2 className="w-3.5 h-3.5" />}
+            Limpar
+          </button>
+        )}
       </div>
 
       {/* Messages */}
       <div className="flex-1 overflow-y-auto p-4 space-y-4">
-        {messages.length === 0 && (
+        {loading && (
+          <div className="flex items-center justify-center h-full">
+            <Loader2 className="w-5 h-5 animate-spin text-[var(--text-muted)]" />
+          </div>
+        )}
+        {!loading && messages.length === 0 && (
           <div className="text-center py-10">
             <Bot className="w-10 h-10 text-[var(--text-muted)] mx-auto mb-3" />
             <p className="text-sm text-[var(--text-secondary)]">Olá! Como posso ajudar?</p>
@@ -185,7 +237,7 @@ export default function AiChat() {
             </div>
           </div>
         )}
-        {messages.map((msg, i) => (
+        {!loading && messages.map((msg, i) => (
           <div key={i} className={`flex gap-3 ${msg.role === "user" ? "flex-row-reverse" : "flex-row"}`}>
             <div className={`w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5 ${
               msg.role === "user" ? "bg-[#1e3a8a]" : "bg-[#1e3a8a]/20"
