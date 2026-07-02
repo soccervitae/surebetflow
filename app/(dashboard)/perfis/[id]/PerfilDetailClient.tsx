@@ -1165,9 +1165,9 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
                                     onClick={() => window.location.href = `/apostas/${aposta.id}`}
                                   >
                                     <div className="flex items-center justify-between px-5 py-3 border-b border-[var(--border)] bg-[var(--bg-elevated)]">
-                                      <div className="flex items-center gap-3 min-w-0">
+                                      <div className="flex flex-col min-w-0">
                                         <p className={`font-semibold truncate ${aposta.status === "pendente" ? "text-red-500 dark:text-[var(--text-primary)]" : "text-[var(--text-primary)]"}`}>{aposta.evento}</p>
-                                        {aposta.esporte && <span className="text-xs text-[var(--text-muted)] flex-shrink-0">{aposta.esporte}</span>}
+                                        {aposta.competicao && <span className="text-xs text-[var(--text-muted)] truncate">{aposta.competicao}</span>}
                                       </div>
                                       <div className="flex items-center gap-3 flex-shrink-0">
                                         <span className="text-xs text-[var(--text-secondary)]">{dataStr}{horaStr ? ` · ${horaStr}` : ""}</span>
