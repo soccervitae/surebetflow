@@ -434,6 +434,7 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
         </div>
         <div className="flex items-center gap-2">
           <Button
+            className="hidden md:flex"
             onClick={async () => {
               const { data } = await createClient().from("profile_bets").select("id").eq("profile_id", currentProfile.id)
               if (!data || data.length < 2) setMinBetsAlertOpen(true)
@@ -444,12 +445,15 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
             <Calculator className="h-4 w-4 mr-2" />
             Nova Aposta
           </Button>
-          <Button variant="outline" size="sm" onClick={() => setFinShowForm(true)}>
+          <Button className="hidden md:flex" variant="outline" size="sm" onClick={() => setFinShowForm(true)}>
             <DollarSign className="h-4 w-4 mr-2" />
             Movimentação
           </Button>
           <Link href={`/perfis/${profile.id}/editar`}>
-            <Button variant="outline" size="sm"><Pencil className="h-4 w-4" /></Button>
+            <Button variant="outline" size="sm">
+              <Pencil className="h-4 w-4 md:mr-2" />
+              <span className="hidden md:inline">Editar Perfil</span>
+            </Button>
           </Link>
         </div>
       </div>
