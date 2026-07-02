@@ -449,7 +449,7 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
             <Calculator className="h-4 w-4 mr-2" />
             Nova Aposta
           </Button>
-          <Button variant="outline" onClick={() => setFinShowForm(true)}>
+          <Button variant="outline" onClick={() => { if (!movLoaded) loadMovimentacoes(); setFinShowForm(true) }}>
             <DollarSign className="h-4 w-4 mr-2" />
             Movimentação
           </Button>
@@ -1469,76 +1469,6 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
             </Card>
           </div>
 
-          {/* Modal nova movimentação */}
-          <Dialog open={finShowForm} onOpenChange={open => { if (!open) { setFinShowForm(false); setFinFormBet(""); setFinFormTipo("deposito"); setFinFormValor(""); setFinFormDescricao("") } }}>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>Nova Movimentação</DialogTitle>
-              </DialogHeader>
-              <div className="space-y-4">
-                <div className="grid grid-cols-2 gap-3">
-                  <div className="space-y-1.5">
-                    <Label>Tipo</Label>
-                    <Select value={finFormTipo} onValueChange={v => setFinFormTipo(v as "deposito" | "saque" | "bonus" | "lucro" | "perda")}>
-                      <SelectTrigger><SelectValue /></SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="deposito">Depósito</SelectItem>
-                        <SelectItem value="saque">Saque</SelectItem>
-                        <SelectItem value="lucro">Lucro externo</SelectItem>
-                        <SelectItem value="perda">Perda</SelectItem>
-                        <SelectItem value="bonus">Bônus</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div className="space-y-1.5">
-                    <Label>Valor (R$)</Label>
-                    <Input placeholder="0,00" value={finFormValor} onChange={e => setFinFormValor(formatBRL(e.target.value))} />
-                  </div>
-                </div>
-                {finFormTipo === "perda" && (
-                  <div className="flex items-start gap-2.5 rounded-xl bg-orange-500/10 border border-orange-500/20 px-4 py-3">
-                    <ArrowDownLeft className="h-4 w-4 text-orange-400 shrink-0 mt-0.5" />
-                    <p className="text-xs text-orange-300 leading-relaxed">Registre perdas que <strong>não vieram de surebets</strong>. O valor é <strong>subtraído</strong> do saldo da casa selecionada.</p>
-                  </div>
-                )}
-                {finFormTipo === "lucro" && (
-                  <div className="flex items-start gap-2.5 rounded-xl bg-green-500/10 border border-green-500/20 px-4 py-3">
-                    <TrendingUp className="h-4 w-4 text-green-400 shrink-0 mt-0.5" />
-                    <p className="text-xs text-green-300 leading-relaxed">Registre lucros que <strong>não vieram de surebets</strong>. O valor é somado ao saldo da casa selecionada.</p>
-                  </div>
-                )}
-                {finFormTipo === "bonus" && (
-                  <div className="flex items-start gap-2.5 rounded-xl bg-purple-500/10 border border-purple-500/20 px-4 py-3">
-                    <Gift className="h-4 w-4 text-purple-400 shrink-0 mt-0.5" />
-                    <p className="text-xs text-purple-300 leading-relaxed">O bônus é registrado <strong>separadamente</strong> e não entra no cálculo do saldo líquido.</p>
-                  </div>
-                )}
-                {profileBetsFinanceiro.length > 0 && (
-                  <div className="space-y-1.5">
-                    <Label>Bet (opcional)</Label>
-                    <Select value={finFormBet} onValueChange={setFinFormBet}>
-                      <SelectTrigger><SelectValue placeholder="Selecione..." /></SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="">Nenhuma</SelectItem>
-                        {profileBetsFinanceiro.map(pb => (
-                          <SelectItem key={pb.id} value={pb.id}>{pb.bet?.nome ?? pb.id}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                )}
-                <div className="space-y-1.5">
-                  <Label>Descrição (opcional)</Label>
-                  <Input placeholder="Ex: Depósito inicial" value={finFormDescricao} onChange={e => setFinFormDescricao(e.target.value)} />
-                </div>
-              </div>
-              <DialogFooter>
-                <Button variant="outline" onClick={() => setFinShowForm(false)}>Cancelar</Button>
-                <Button onClick={handleFinSave} disabled={finSaving}>{finSaving ? "Salvando..." : "Salvar"}</Button>
-              </DialogFooter>
-            </DialogContent>
-          </Dialog>
-
           {/* Extrato bancário */}
           {!movLoaded ? (
             <Card><CardContent className="py-8 text-center text-[var(--text-secondary)] text-sm">Carregando...</CardContent></Card>
@@ -1671,6 +1601,76 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
 
         </div> {/* end swipe wrapper */}
       </Tabs>
+
+      {/* Modal nova movimentação — fora dos tabs para funcionar em qualquer aba */}
+      <Dialog open={finShowForm} onOpenChange={open => { if (!open) { setFinShowForm(false); setFinFormBet(""); setFinFormTipo("deposito"); setFinFormValor(""); setFinFormDescricao("") } }}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Nova Movimentação</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-1.5">
+                <Label>Tipo</Label>
+                <Select value={finFormTipo} onValueChange={v => setFinFormTipo(v as "deposito" | "saque" | "bonus" | "lucro" | "perda")}>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="deposito">Depósito</SelectItem>
+                    <SelectItem value="saque">Saque</SelectItem>
+                    <SelectItem value="lucro">Lucro externo</SelectItem>
+                    <SelectItem value="perda">Perda</SelectItem>
+                    <SelectItem value="bonus">Bônus</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-1.5">
+                <Label>Valor (R$)</Label>
+                <Input placeholder="0,00" value={finFormValor} onChange={e => setFinFormValor(formatBRL(e.target.value))} />
+              </div>
+            </div>
+            {finFormTipo === "perda" && (
+              <div className="flex items-start gap-2.5 rounded-xl bg-orange-500/10 border border-orange-500/20 px-4 py-3">
+                <ArrowDownLeft className="h-4 w-4 text-orange-400 shrink-0 mt-0.5" />
+                <p className="text-xs text-orange-300 leading-relaxed">Registre perdas que <strong>não vieram de surebets</strong>. O valor é <strong>subtraído</strong> do saldo da casa selecionada.</p>
+              </div>
+            )}
+            {finFormTipo === "lucro" && (
+              <div className="flex items-start gap-2.5 rounded-xl bg-green-500/10 border border-green-500/20 px-4 py-3">
+                <TrendingUp className="h-4 w-4 text-green-400 shrink-0 mt-0.5" />
+                <p className="text-xs text-green-300 leading-relaxed">Registre lucros que <strong>não vieram de surebets</strong>. O valor é somado ao saldo da casa selecionada.</p>
+              </div>
+            )}
+            {finFormTipo === "bonus" && (
+              <div className="flex items-start gap-2.5 rounded-xl bg-purple-500/10 border border-purple-500/20 px-4 py-3">
+                <Gift className="h-4 w-4 text-purple-400 shrink-0 mt-0.5" />
+                <p className="text-xs text-purple-300 leading-relaxed">O bônus é registrado <strong>separadamente</strong> e não entra no cálculo do saldo líquido.</p>
+              </div>
+            )}
+            {profileBetsFinanceiro.length > 0 && (
+              <div className="space-y-1.5">
+                <Label>Bet (opcional)</Label>
+                <Select value={finFormBet} onValueChange={setFinFormBet}>
+                  <SelectTrigger><SelectValue placeholder="Selecione..." /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="">Nenhuma</SelectItem>
+                    {profileBetsFinanceiro.map(pb => (
+                      <SelectItem key={pb.id} value={pb.id}>{pb.bet?.nome ?? pb.id}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
+            <div className="space-y-1.5">
+              <Label>Descrição (opcional)</Label>
+              <Input placeholder="Ex: Depósito inicial" value={finFormDescricao} onChange={e => setFinFormDescricao(e.target.value)} />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setFinShowForm(false)}>Cancelar</Button>
+            <Button onClick={handleFinSave} disabled={finSaving}>{finSaving ? "Salvando..." : "Salvar"}</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       {/* Alerta mínimo de bets */}
       <Dialog open={minBetsAlertOpen} onOpenChange={setMinBetsAlertOpen}>
