@@ -104,7 +104,8 @@ const FALLBACK =
 
 const GREETING_TRIGGERS = ["oi", "olá", "ola", "bom dia", "boa tarde", "boa noite", "hello", "hi", "opa", "eai", "e aí"]
 
-function getAnswer(text: string): string {
+function getAnswer(text: string, name?: string): string {
+  const hi = name ? `, ${name}` : ""
   const normalized = text
     .toLowerCase()
     .normalize("NFD")
@@ -114,7 +115,7 @@ function getAnswer(text: string): string {
     g => normalized.trim() === g || normalized.trim().startsWith(g + " ") || normalized.trim().endsWith(" " + g)
   )
   if (isGreeting) {
-    return "Olá! Sou o assistente da SurebetFlow. Como posso ajudar você hoje? Pode perguntar sobre perfis, apostas, casas de apostas (bets), saldo, ROI, movimentações financeiras ou assinatura."
+    return `Olá${hi}! Sou o assistente da SurebetFlow. Como posso ajudar você hoje? Pode perguntar sobre perfis, apostas, casas de apostas (bets), saldo, ROI, movimentações financeiras ou assinatura.`
   }
 
   let best: { score: number; answer: string } = { score: 0, answer: FALLBACK }
@@ -138,6 +139,7 @@ export default function AiChat() {
   const [imageFile, setImageFile] = useState<File | null>(null)
   const [imagePreview, setImagePreview] = useState<string | null>(null)
   const [uploading, setUploading] = useState(false)
+  const [firstName, setFirstName] = useState("")
   const bottomRef = useRef<HTMLDivElement>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const supabase = createClient()
@@ -146,12 +148,18 @@ export default function AiChat() {
     async function loadHistory() {
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) { setLoading(false); return }
-      const { data } = await supabase
-        .from("support_chat_messages")
-        .select("id, role, content, image_url")
-        .eq("user_id", user.id)
-        .order("created_at", { ascending: true })
-      setMessages((data ?? []) as Message[])
+
+      const [{ data: profile }, { data: msgs }] = await Promise.all([
+        supabase.from("profiles").select("nome").eq("user_id", user.id).single(),
+        supabase
+          .from("support_chat_messages")
+          .select("id, role, content, image_url")
+          .eq("user_id", user.id)
+          .order("created_at", { ascending: true }),
+      ])
+
+      if (profile?.nome) setFirstName(profile.nome.split(" ")[0])
+      setMessages((msgs ?? []) as Message[])
       setLoading(false)
     }
     loadHistory()
@@ -210,7 +218,7 @@ export default function AiChat() {
     if (imageFile && user) uploadedUrl = await uploadImage(imageFile, user.id)
 
     const userMsg: Message = { role: "user", content: text, image_url: uploadedUrl }
-    const answer = text ? getAnswer(text) : "Imagem recebida! Se quiser, descreva sua dúvida em texto para que eu possa ajudar melhor."
+    const answer = text ? getAnswer(text, firstName) : "Imagem recebida! Se quiser, descreva sua dúvida em texto para que eu possa ajudar melhor."
     const assistantMsg: Message = { role: "assistant", content: answer }
 
     setMessages(prev => [...prev, userMsg, assistantMsg])
@@ -258,14 +266,14 @@ export default function AiChat() {
         {!loading && messages.length === 0 && (
           <div className="text-center py-10">
             <Bot className="w-10 h-10 text-[var(--text-muted)] mx-auto mb-3" />
-            <p className="text-sm text-[var(--text-secondary)]">Olá! Como posso ajudar?</p>
+            <p className="text-sm text-[var(--text-secondary)]">{firstName ? `Olá, ${firstName}! Como posso ajudar?` : "Olá! Como posso ajudar?"}</p>
             <p className="text-xs text-[var(--text-muted)] mt-1">Pergunte sobre qualquer funcionalidade da SurebetFlow.</p>
             <div className="mt-4 flex flex-wrap gap-2 justify-center">
               {["Como criar um perfil?", "Como registrar uma aposta?", "O que é ROI?", "Como adicionar uma bet?"].map(q => (
                 <button
                   key={q}
                   onClick={() => {
-                    const answer = getAnswer(q)
+                    const answer = getAnswer(q, firstName)
                     const msgs = [{ role: "user" as const, content: q }, { role: "assistant" as const, content: answer }]
                     setMessages(msgs)
                     saveMessages(msgs)
