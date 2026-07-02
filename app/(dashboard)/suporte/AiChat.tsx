@@ -211,6 +211,11 @@ export default function AiChat() {
   const supabase = createClient()
 
   useEffect(() => {
+    document.body.style.overflow = "hidden"
+    return () => { document.body.style.overflow = "" }
+  }, [])
+
+  useEffect(() => {
     async function loadHistory() {
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) { setLoading(false); return }
@@ -297,9 +302,7 @@ export default function AiChat() {
   const canSend = (input.trim() || imageFile) && !uploading
 
   return (
-    <div
-      className="flex flex-col bg-[var(--bg-surface)] border border-[var(--border)] rounded-2xl overflow-hidden"
-      style={{ height: "calc(100dvh - 56px - env(safe-area-inset-top) - 5rem)", minHeight: "400px" }}>
+    <div className="flex flex-col flex-1 min-h-0 bg-[var(--bg-surface)] border border-[var(--border)] rounded-2xl overflow-hidden">
 
       {/* Header */}
       <div className="flex items-center gap-3 px-5 py-4 border-b border-[var(--border)] flex-shrink-0">
