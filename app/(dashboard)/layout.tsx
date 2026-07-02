@@ -348,7 +348,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         </header>
 
         {/* Main */}
-        <main className="flex-1 p-4 md:p-6 md:pt-4 md:pb-6" style={{ paddingTop: "calc(56px + env(safe-area-inset-top) + 1rem)", paddingBottom: "calc(96px + env(safe-area-inset-bottom))" }}>
+        <main className="flex-1 p-4 md:p-6 md:pt-4 md:pb-6" style={{ paddingTop: "calc(56px + env(safe-area-inset-top) + 1rem)", paddingBottom: pathname === "/suporte" ? "env(safe-area-inset-bottom)" : "calc(96px + env(safe-area-inset-bottom))" }}>
           {children}
         </main>
       </div>
@@ -429,7 +429,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       </header>
 
       {/* Bottom nav mobile */}
-      {hasActivePlan && <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-[var(--bg-surface)] border-t border-[var(--border)] z-20 flex" style={{ paddingBottom: "env(safe-area-inset-bottom)" }}>
+      {hasActivePlan && pathname !== "/suporte" && <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-[var(--bg-surface)] border-t border-[var(--border)] z-20 flex" style={{ paddingBottom: "env(safe-area-inset-bottom)" }}>
         {([
           { href: "/dashboard",  icon: Home,          label: "Dashboard" },
           { href: "/perfis",     icon: Users,         label: "Perfis" },
