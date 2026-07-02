@@ -71,6 +71,20 @@ export default function GlobalFAB() {
 
   const visible = FAB_PAGES.some(p => pathname === p || pathname.startsWith(p + "/"))
 
+  // Detect if we're on a profile detail page and extract the profile ID
+  const perfilPageMatch = pathname.match(/^\/perfis\/([^/]+)$/)
+  const currentPerfilId = perfilPageMatch?.[1] ?? null
+
+  async function getOrLoadCurrentPerfil(): Promise<Profile | null> {
+    if (!currentPerfilId) return null
+    // Check if already in loaded profiles
+    const found = profiles.find(p => p.id === currentPerfilId)
+    if (found) return found
+    // Fetch it directly
+    const { data } = await supabase.from("profiles").select("id, nome, sobrenome, apelido").eq("id", currentPerfilId).single()
+    return data ?? null
+  }
+
   const loadProfilesRef = useRef(loadProfiles)
   loadProfilesRef.current = loadProfiles
 
@@ -96,17 +110,20 @@ export default function GlobalFAB() {
     loadProfiles()
   }
 
-  function openAposta() {
+  async function openAposta() {
     setOpen(false)
-    if (profiles.length === 1) { setApostaProfile(profiles[0]); setApostaModal(true) }
+    const perfil = await getOrLoadCurrentPerfil()
+    if (perfil) { setApostaProfile(perfil); setApostaModal(true) }
+    else if (profiles.length === 1) { setApostaProfile(profiles[0]); setApostaModal(true) }
     else { setApostaPickStep(true) }
   }
 
-  function openMov() {
+  async function openMov() {
     setOpen(false)
     setMovTipo("deposito"); setMovValor(""); setMovDesc(""); setMovBetId("")
-    if (profiles.length === 1) {
-      const p = profiles[0]
+    const perfil = await getOrLoadCurrentPerfil()
+    const p = perfil ?? (profiles.length === 1 ? profiles[0] : null)
+    if (p) {
       setMovProfile(p)
       setMovProfileId(p.id)
       loadMovBets(p.id)
@@ -116,9 +133,11 @@ export default function GlobalFAB() {
     }
   }
 
-  function openBets() {
+  async function openBets() {
     setOpen(false)
-    if (profiles.length === 1) { setBetsProfile(profiles[0]); setBetsModal(true) }
+    const perfil = await getOrLoadCurrentPerfil()
+    if (perfil) { setBetsProfile(perfil); setBetsModal(true) }
+    else if (profiles.length === 1) { setBetsProfile(profiles[0]); setBetsModal(true) }
     else { setBetsPickStep(true) }
   }
 
