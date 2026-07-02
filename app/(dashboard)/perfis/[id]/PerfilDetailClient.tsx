@@ -521,16 +521,7 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
                 {tab.label}
               </button>
             ))}
-            <div className="ml-auto pb-0 flex items-center gap-2 mb-2">
-              <Button
-                onClick={() => setShowCalculadoraModal(true)}
-                size="sm"
-                className="bg-[#1a237e] hover:bg-[#283593] text-white"
-              >
-                <Calculator className="h-4 w-4 mr-2" />
-                Nova Aposta
-              </Button>
-            </div>
+            <div className="ml-auto pb-0 mb-2" />
           </div>
         </div>
       </div>
