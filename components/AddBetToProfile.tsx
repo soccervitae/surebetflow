@@ -21,11 +21,12 @@ interface Props {
   profileId: string
   userToken?: string
   autoOpen?: boolean
+  onSaved?: () => void
 }
 
 type ProfileBetWithBet = ProfileBet & { bet?: { nome: string; logo_url?: string | null }; ativo: boolean }
 
-export default function AddBetToProfile({ profileId, autoOpen = false }: Props) {
+export default function AddBetToProfile({ profileId, autoOpen = false, onSaved }: Props) {
   const [bets, setBets] = useState<Bet[]>([])
   const [profileBets, setProfileBets] = useState<ProfileBetWithBet[]>([])
   const [showForm, setShowForm] = useState(autoOpen)
@@ -155,6 +156,7 @@ export default function AddBetToProfile({ profileId, autoOpen = false }: Props) 
       setSenha("")
       setTelefone("")
       await loadData()
+      onSaved?.()
     } catch (err: unknown) {
       toast({ title: (err as Error)?.message ?? "Erro ao adicionar", variant: "destructive" })
     } finally {
@@ -259,6 +261,100 @@ export default function AddBetToProfile({ profileId, autoOpen = false }: Props) 
       router.refresh()
     }
     setMovSaving(false)
+  }
+
+  // When autoOpen=true (FAB context), render form inline — no nested dialog
+  if (autoOpen) {
+    const alreadyAdded = new Set(profileBets.map(pb => pb.bet_id))
+    const filtered = bets.filter(b => b.nome.toLowerCase().includes(betSearch.toLowerCase()))
+    return (
+      <div className="flex flex-col gap-0 -mx-6 -mb-6" style={{ maxHeight: "70vh", minHeight: 0 }}>
+        {/* Search */}
+        <div className="px-6 pt-2 pb-2 flex-shrink-0">
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--text-muted)]" />
+            <Input
+              className="pl-9"
+              placeholder="Buscar bet..."
+              value={betSearch}
+              onChange={e => setBetSearch(e.target.value)}
+              autoComplete="off"
+            />
+          </div>
+        </div>
+        {/* Bet list */}
+        <div className="overflow-y-auto flex-1 px-6 pb-2">
+          {filtered.length === 0 ? (
+            <p className="text-sm text-[var(--text-muted)] text-center py-8">Nenhuma bet encontrada</p>
+          ) : (
+            <div className="flex flex-col gap-1 py-1">
+              {filtered.map(b => {
+                const added = alreadyAdded.has(b.id)
+                const selected = selectedBet === b.id
+                return (
+                  <button
+                    key={b.id}
+                    type="button"
+                    disabled={added}
+                    onClick={() => setSelectedBet(selected ? "" : b.id)}
+                    className={`relative flex items-center justify-between px-3 py-2.5 rounded-xl border transition-all text-left
+                      ${added ? "opacity-40 cursor-not-allowed border-[var(--border)] bg-[var(--bg-muted)]" : selected
+                        ? "border-[#1e3a8a] bg-[#1e3a8a]/5 shadow-sm"
+                        : "border-[var(--border)] bg-[var(--bg-surface)] hover:border-[#1e3a8a]/40 hover:bg-[#1e3a8a]/5"
+                      }`}
+                  >
+                    <span className={`text-sm font-medium ${selected ? "text-[var(--accent-text)]" : "text-[var(--text-primary)]"}`}>{b.nome}</span>
+                    <span className="flex items-center gap-1.5 flex-shrink-0">
+                      {added && <span className="text-xs text-[var(--text-muted)]">Adicionada</span>}
+                      {selected && (
+                        <span className="w-4 h-4 rounded-full bg-[#1e3a8a] flex items-center justify-center">
+                          <Check className="w-2.5 h-2.5 text-white" />
+                        </span>
+                      )}
+                    </span>
+                  </button>
+                )
+              })}
+            </div>
+          )}
+        </div>
+        {/* Form footer */}
+        <form onSubmit={handleSubmit} className="border-t border-[var(--border)] px-6 py-4 flex-shrink-0 space-y-3 bg-[var(--bg-surface)]">
+          {selectedBet && (
+            <p className="text-xs text-[var(--text-secondary)]">
+              Bet selecionada: <strong className="text-[var(--text-primary)]">{bets.find(b => b.id === selectedBet)?.nome}</strong>
+            </p>
+          )}
+          <div className="flex gap-3">
+            <div className="flex-1 space-y-1.5">
+              <Label className="text-xs">E-mail *</Label>
+              <Input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="email@bet.com" autoComplete="off" />
+            </div>
+            <div className="flex-1 space-y-1.5">
+              <Label className="text-xs">Senha da conta *</Label>
+              <Input type="text" value={senha} onChange={e => setSenha(e.target.value)} placeholder="Senha da conta" autoComplete="off" />
+            </div>
+          </div>
+          <div className="space-y-1.5">
+            <Label className="text-xs">Telefone <span className="text-[var(--text-muted)] font-normal">(opcional)</span></Label>
+            <Input
+              type="tel"
+              value={telefone}
+              onChange={e => setTelefone(maskPhone(e.target.value))}
+              placeholder="(11) 99999-9999"
+              maxLength={15}
+              inputMode="numeric"
+              autoComplete="off"
+            />
+          </div>
+          <div className="flex gap-2 justify-end">
+            <Button type="submit" disabled={loading || !selectedBet}>
+              {loading ? <><Loader2 className="h-4 w-4 mr-2 animate-spin" />Salvando...</> : "Salvar"}
+            </Button>
+          </div>
+        </form>
+      </div>
+    )
   }
 
   return (

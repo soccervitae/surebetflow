@@ -394,7 +394,7 @@ export default function GlobalFAB() {
             </DialogTitle>
           </DialogHeader>
           {betsProfile && (
-            <AddBetToProfile profileId={betsProfile.id} autoOpen />
+            <AddBetToProfile profileId={betsProfile.id} autoOpen onSaved={() => setBetsModal(false)} />
           )}
         </DialogContent>
       </Dialog>
