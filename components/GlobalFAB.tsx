@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import { createPortal } from "react-dom"
 import { usePathname } from "next/navigation"
 import { createClient } from "@/lib/supabase/client"
@@ -61,13 +61,14 @@ export default function GlobalFAB() {
 
   const visible = FAB_PAGES.some(p => pathname === p || pathname.startsWith(p + "/"))
 
+  const loadProfilesRef = useRef(loadProfiles)
+  loadProfilesRef.current = loadProfiles
+
   useEffect(() => {
-    const handler = () => { loadProfiles(); setMobileOpen(true) }
+    const handler = () => { loadProfilesRef.current(); setMobileOpen(true) }
     window.addEventListener("open-mobile-fab", handler)
     return () => window.removeEventListener("open-mobile-fab", handler)
   }, [])
-
-  if (!visible) return null
 
   async function loadMovBets(profileId: string) {
     const { data } = await supabase
@@ -151,7 +152,7 @@ export default function GlobalFAB() {
     <>
       {/* Mobile action sheet */}
       {mobileOpen && (
-        <div className="fixed inset-0 z-50 lg:hidden flex flex-col justify-end">
+        <div className="fixed inset-0 z-50 md:hidden flex flex-col justify-end">
           <div className="absolute inset-0 bg-black/40" onClick={() => setMobileOpen(false)} />
           <div className="relative bg-[var(--bg-surface)] rounded-t-2xl shadow-xl p-4 pb-8 space-y-2">
             <div className="w-10 h-1 rounded-full bg-[var(--border)] mx-auto mb-4" />
@@ -172,7 +173,7 @@ export default function GlobalFAB() {
       )}
 
       {/* Desktop FAB */}
-      <div className="fixed bottom-8 right-8 hidden lg:flex flex-col items-end gap-2 z-50">
+      {visible && <div className="fixed bottom-8 right-8 hidden md:flex flex-col items-end gap-2 z-50">
         {/* Options (expand upward) */}
         {open && (
           <div className="flex flex-col items-end gap-3 mb-2">
@@ -202,10 +203,10 @@ export default function GlobalFAB() {
         >
           <Plus className="w-7 h-7 text-white" />
         </button>
-      </div>
+      </div>}
 
-      {/* Click outside to close */}
-      {open && <div className="fixed inset-0 z-40 hidden lg:block" onClick={() => setOpen(false)} />}
+      {/* Click outside to close desktop FAB */}
+      {open && visible && <div className="fixed inset-0 z-40 hidden md:block" onClick={() => setOpen(false)} />}
 
       <style>{`
         @keyframes fabItemIn {
