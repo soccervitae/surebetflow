@@ -8,12 +8,13 @@ import { useTheme } from "@/components/ThemeProvider"
 import {
   Home, Users, Wallet, CreditCard, Settings,
   LogOut, Bell, ChevronLeft, ChevronRight,
-  Circle, Sun, Moon, MessageCircle, BookOpen, ClipboardList
+  Circle, Sun, Moon, MessageCircle, BookOpen, ClipboardList, Plus
 } from "lucide-react"
 import Logo, { LogoIcon } from "@/components/Logo"
 import { cn } from "@/lib/utils"
 import RealtimeProvider from "@/components/RealtimeProvider"
 import PlanoRequeridoModal from "@/components/PlanoRequeridoModal"
+import GlobalFAB from "@/components/GlobalFAB"
 
 const navItems = [
   { href: "/dashboard", icon: Home, label: "Dashboard" },
@@ -407,10 +408,24 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         {([
           { href: "/dashboard",  icon: Home,          label: "Dashboard" },
           { href: "/perfis",     icon: Users,         label: "Perfis" },
+          null,
           { href: "/apostas",    icon: ClipboardList, label: "Apostas" },
           { href: "/financeiro", icon: Wallet,        label: "Financeiro" },
-          { href: "/tutorial",   icon: BookOpen,      label: "Tutorial" },
-        ] as { href: string; icon: React.ElementType; label: string }[]).map(({ href, icon: Icon, label }) => {
+        ] as ({ href: string; icon: React.ElementType; label: string } | null)[]).map((item, i) => {
+          if (item === null) {
+            return (
+              <button
+                key="fab"
+                onClick={() => window.dispatchEvent(new Event("open-mobile-fab"))}
+                className="flex-1 flex flex-col items-center py-2 text-xs gap-1"
+              >
+                <div className="w-9 h-9 rounded-full bg-[#0f172a] flex items-center justify-center shadow-md -mt-4">
+                  <Plus className="w-5 h-5 text-white" />
+                </div>
+              </button>
+            )
+          }
+          const { href, icon: Icon, label } = item
           const active = pathname === href || (href !== "/" && pathname.startsWith(href))
           const ALLOWED_WITHOUT_PLAN_MOB = ["/tutorial", "/configuracoes", "/assinatura", "/bem-vindo"]
           const isLockedMob = !hasActivePlan && !ALLOWED_WITHOUT_PLAN_MOB.some(p => href.startsWith(p))
@@ -449,6 +464,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
       {/* Global realtime sync across devices */}
       {userId && <RealtimeProvider userId={userId} />}
+
+      <GlobalFAB />
 
       {/* Modal de plano requerido */}
       <PlanoRequeridoModal open={planoModal} onClose={() => setPlanoModal(false)} />
