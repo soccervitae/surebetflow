@@ -3,10 +3,11 @@
 import { useState } from "react"
 import Link from "next/link"
 import { createClient } from "@/lib/supabase/client"
-import { Plus, MessageCircle, Clock, CheckCircle } from "lucide-react"
+import { Plus, MessageCircle, Clock, CheckCircle, Bot } from "lucide-react"
 import { useRouter } from "next/navigation"
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet"
+import AiChat from "./AiChat"
 
 type Ticket = {
   id: string
@@ -109,8 +110,9 @@ function TicketForm({
 
 export default function SuporteClient({ tickets: initial, userId }: { tickets: Ticket[]; userId: string }) {
   const [tickets] = useState(initial)
-  const [showSheet, setShowSheet] = useState(false)   // mobile
-  const [showModal, setShowModal] = useState(false)   // desktop
+  const [tab, setTab] = useState<"tickets" | "chat">("tickets")
+  const [showSheet, setShowSheet] = useState(false)
+  const [showModal, setShowModal] = useState(false)
   const [assunto, setAssunto] = useState("")
   const [mensagem, setMensagem] = useState("")
   const [prioridade, setPrioridade] = useState<"baixa" | "normal" | "alta">("normal")
@@ -161,96 +163,130 @@ export default function SuporteClient({ tickets: initial, userId }: { tickets: T
 
   return (
     <div className="space-y-6">
+      {/* Header */}
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-[var(--text-primary)]">Suporte</h1>
           <p className="text-[var(--text-secondary)] text-sm mt-1">Envie mensagens e acompanhe seus tickets</p>
         </div>
-        <div className="flex items-center gap-2">
-          <button
-            onClick={() => { resetForm(); setShowSheet(true) }}
-            className="md:hidden inline-flex items-center gap-2 bg-[#1e3a8a] hover:bg-[#1e40af] text-white text-sm font-medium px-4 py-2 rounded-lg transition-colors"
-          >
-            <Plus className="w-4 h-4" />
-            Novo
-          </button>
-          <button
-            onClick={() => { resetForm(); setShowModal(true) }}
-            className="hidden md:inline-flex items-center gap-2 bg-[#1e3a8a] hover:bg-[#1e40af] text-white text-sm font-medium px-4 py-2 rounded-lg transition-colors"
-          >
-            <Plus className="w-4 h-4" />
-            Novo ticket
-          </button>
-        </div>
-      </div>
-
-      {/* Tickets list */}
-      {tickets.length === 0 ? (
-        <div className="bg-[var(--bg-surface)] border border-[var(--border)] rounded-2xl p-16 text-center">
-          <MessageCircle className="w-12 h-12 text-gray-300 mx-auto mb-4" />
-          <p className="text-[var(--text-secondary)]">Nenhum ticket aberto</p>
-          <div className="mt-4 flex justify-center gap-2">
+        {tab === "tickets" && (
+          <div className="flex items-center gap-2">
             <button
               onClick={() => { resetForm(); setShowSheet(true) }}
               className="md:hidden inline-flex items-center gap-2 bg-[#1e3a8a] hover:bg-[#1e40af] text-white text-sm font-medium px-4 py-2 rounded-lg transition-colors"
             >
-              <Plus className="w-4 h-4" /> Abrir primeiro ticket
+              <Plus className="w-4 h-4" />
+              Novo
             </button>
             <button
               onClick={() => { resetForm(); setShowModal(true) }}
               className="hidden md:inline-flex items-center gap-2 bg-[#1e3a8a] hover:bg-[#1e40af] text-white text-sm font-medium px-4 py-2 rounded-lg transition-colors"
             >
-              <Plus className="w-4 h-4" /> Abrir primeiro ticket
+              <Plus className="w-4 h-4" />
+              Novo ticket
             </button>
           </div>
-        </div>
-      ) : (
-        <div className="space-y-3">
-          {tickets.map(t => {
-            const st = STATUS_CONFIG[t.status]
-            const pr = PRIORIDADE_CONFIG[t.prioridade]
-            const unread = unreadCount(t)
-            const StIcon = st.icon
-            return (
-              <Link key={t.id} href={`/suporte/${t.id}`}>
-                <div className="bg-[var(--bg-surface)] border border-[var(--border)] rounded-2xl p-5 hover:border-[#1e3a8a]/30 transition-all cursor-pointer">
-                  <div className="flex items-start justify-between gap-4">
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 flex-wrap mb-2">
-                        <h3 className="font-semibold text-[var(--text-primary)] truncate">{t.assunto}</h3>
-                        {unread > 0 && (
-                          <span className="bg-[#1e3a8a] text-white text-xs font-bold px-2 py-0.5 rounded-full flex-shrink-0">
-                            {unread} nova{unread > 1 ? "s" : ""}
+        )}
+      </div>
+
+      {/* Tabs */}
+      <div className="flex gap-1 bg-[var(--bg-elevated)] p-1 rounded-xl w-fit">
+        <button
+          onClick={() => setTab("tickets")}
+          className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+            tab === "tickets"
+              ? "bg-[var(--bg-surface)] text-[var(--text-primary)] shadow-sm"
+              : "text-[var(--text-muted)] hover:text-[var(--text-secondary)]"
+          }`}
+        >
+          <MessageCircle className="w-4 h-4" />
+          Tickets
+        </button>
+        <button
+          onClick={() => setTab("chat")}
+          className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+            tab === "chat"
+              ? "bg-[var(--bg-surface)] text-[var(--text-primary)] shadow-sm"
+              : "text-[var(--text-muted)] hover:text-[var(--text-secondary)]"
+          }`}
+        >
+          <Bot className="w-4 h-4" />
+          Assistente IA
+        </button>
+      </div>
+
+      {/* AI Chat */}
+      {tab === "chat" && <AiChat />}
+
+      {/* Tickets */}
+      {tab === "tickets" && (
+        tickets.length === 0 ? (
+          <div className="bg-[var(--bg-surface)] border border-[var(--border)] rounded-2xl p-16 text-center">
+            <MessageCircle className="w-12 h-12 text-gray-300 mx-auto mb-4" />
+            <p className="text-[var(--text-secondary)]">Nenhum ticket aberto</p>
+            <div className="mt-4 flex justify-center gap-2">
+              <button
+                onClick={() => { resetForm(); setShowSheet(true) }}
+                className="md:hidden inline-flex items-center gap-2 bg-[#1e3a8a] hover:bg-[#1e40af] text-white text-sm font-medium px-4 py-2 rounded-lg transition-colors"
+              >
+                <Plus className="w-4 h-4" /> Abrir primeiro ticket
+              </button>
+              <button
+                onClick={() => { resetForm(); setShowModal(true) }}
+                className="hidden md:inline-flex items-center gap-2 bg-[#1e3a8a] hover:bg-[#1e40af] text-white text-sm font-medium px-4 py-2 rounded-lg transition-colors"
+              >
+                <Plus className="w-4 h-4" /> Abrir primeiro ticket
+              </button>
+            </div>
+          </div>
+        ) : (
+          <div className="space-y-3">
+            {tickets.map(t => {
+              const st = STATUS_CONFIG[t.status]
+              const pr = PRIORIDADE_CONFIG[t.prioridade]
+              const unread = unreadCount(t)
+              const StIcon = st.icon
+              return (
+                <Link key={t.id} href={`/suporte/${t.id}`}>
+                  <div className="bg-[var(--bg-surface)] border border-[var(--border)] rounded-2xl p-5 hover:border-[#1e3a8a]/30 transition-all cursor-pointer">
+                    <div className="flex items-start justify-between gap-4">
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 flex-wrap mb-2">
+                          <h3 className="font-semibold text-[var(--text-primary)] truncate">{t.assunto}</h3>
+                          {unread > 0 && (
+                            <span className="bg-[#1e3a8a] text-white text-xs font-bold px-2 py-0.5 rounded-full flex-shrink-0">
+                              {unread} nova{unread > 1 ? "s" : ""}
+                            </span>
+                          )}
+                        </div>
+                        <div className="flex items-center gap-3 flex-wrap">
+                          <span className={`inline-flex items-center gap-1.5 text-xs font-medium px-2 py-0.5 rounded-full ${st.bg} ${st.color}`}>
+                            <StIcon className="w-3 h-3" />
+                            {st.label}
                           </span>
-                        )}
+                          <span className={`inline-flex items-center text-xs font-medium px-2 py-0.5 rounded-full ${pr.bg} ${pr.color}`}>
+                            {pr.label}
+                          </span>
+                          <span className="text-xs text-[var(--text-muted)]">
+                            {t.ticket_mensagens.length} mensagem{t.ticket_mensagens.length !== 1 ? "s" : ""}
+                          </span>
+                        </div>
                       </div>
-                      <div className="flex items-center gap-3 flex-wrap">
-                        <span className={`inline-flex items-center gap-1.5 text-xs font-medium px-2 py-0.5 rounded-full ${st.bg} ${st.color}`}>
-                          <StIcon className="w-3 h-3" />
-                          {st.label}
-                        </span>
-                        <span className={`inline-flex items-center text-xs font-medium px-2 py-0.5 rounded-full ${pr.bg} ${pr.color}`}>
-                          {pr.label}
-                        </span>
-                        <span className="text-xs text-[var(--text-muted)]">
-                          {t.ticket_mensagens.length} mensagem{t.ticket_mensagens.length !== 1 ? "s" : ""}
-                        </span>
+                      <div className="text-right flex-shrink-0">
+                        <p className="text-xs text-[var(--text-muted)]">
+                          {new Date(t.updated_at).toLocaleDateString("pt-BR")}
+                        </p>
+                        <p className="text-xs text-[var(--text-muted)]">
+                          {new Date(t.updated_at).toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" })}
+                        </p>
                       </div>
-                    </div>
-                    <div className="text-right flex-shrink-0">
-                      <p className="text-xs text-[var(--text-muted)]">
-                        {new Date(t.updated_at).toLocaleDateString("pt-BR")}
-                      </p>
-                      <p className="text-xs text-[var(--text-muted)]">
-                        {new Date(t.updated_at).toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" })}
-                      </p>
                     </div>
                   </div>
-                </div>
-              </Link>
-            )
-          })}
-        </div>
+                </Link>
+              )
+            })}
+          </div>
+        )
       )}
 
       {/* Sheet — mobile */}

@@ -3,7 +3,7 @@
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { useState, useEffect } from "react"
-import { LayoutDashboard, Users, Building2, ClipboardList, LogOut, MessageCircle, Settings, CreditCard, Camera } from "lucide-react"
+import { LayoutDashboard, Users, Building2, ClipboardList, LogOut, MessageCircle, Settings, CreditCard, Camera, Bot } from "lucide-react"
 import { createClient } from "@/lib/supabase/client"
 import { useRouter } from "next/navigation"
 
@@ -15,6 +15,7 @@ const navItems = [
   { href: "/admin/apostas", label: "Apostas", icon: ClipboardList },
   { href: "/admin/suporte", label: "Suporte", icon: MessageCircle },
   { href: "/admin/prints", label: "Prints Mobile", icon: Camera },
+  { href: "/admin/agente", label: "Agente IA", icon: Bot },
   { href: "/admin/configuracoes", label: "Configurações", icon: Settings },
 ]
 
