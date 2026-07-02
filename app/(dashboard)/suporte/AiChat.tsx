@@ -1,17 +1,18 @@
 "use client"
 
 import { useState, useRef, useEffect } from "react"
-import { Send, Bot, User, Trash2, Loader2 } from "lucide-react"
+import { Send, Bot, User, Trash2, Loader2, Paperclip, X, ImageIcon } from "lucide-react"
 import { createClient } from "@/lib/supabase/client"
 
 type Message = {
   id?: string
   role: "user" | "assistant"
   content: string
+  image_url?: string | null
 }
 
 // ---------------------------------------------------------------------------
-// FAQ engine — keyword matching, returns markdown-free plain text
+// FAQ engine
 // ---------------------------------------------------------------------------
 type FAQ = { keywords: string[]; answer: string }
 
@@ -49,7 +50,7 @@ const FAQS: FAQ[] = [
   {
     keywords: ["leg", "o que é leg", "ramificação"],
     answer:
-      "Leg é cada parte de uma surebet. Em uma surebet simples você tem 2 legs: uma aposta na casa A e outra na casa B, com odds que garantem lucro independente do resultado. O sistema suporta multiple legs por aposta.",
+      "Leg é cada parte de uma surebet. Em uma surebet simples você tem 2 legs: uma aposta na casa A e outra na casa B, com odds que garantem lucro independente do resultado. O sistema suporta múltiplos legs por aposta.",
   },
   {
     keywords: ["movimentação", "deposito", "depósito", "saque", "financeiro", "registrar deposito"],
@@ -109,12 +110,13 @@ function getAnswer(text: string): string {
     .normalize("NFD")
     .replace(/[̀-ͯ]/g, "")
 
-  const isGreeting = GREETING_TRIGGERS.some(g => normalized.trim() === g || normalized.trim().startsWith(g + " ") || normalized.trim().endsWith(" " + g))
+  const isGreeting = GREETING_TRIGGERS.some(
+    g => normalized.trim() === g || normalized.trim().startsWith(g + " ") || normalized.trim().endsWith(" " + g)
+  )
   if (isGreeting) {
     return "Olá! Sou o assistente da SurebetFlow. Como posso ajudar você hoje? Pode perguntar sobre perfis, apostas, casas de apostas (bets), saldo, ROI, movimentações financeiras ou assinatura."
   }
 
-  // Score each FAQ by how many keywords match
   let best: { score: number; answer: string } = { score: 0, answer: FALLBACK }
   for (const faq of FAQS) {
     const score = faq.keywords.filter(kw =>
@@ -133,7 +135,11 @@ export default function AiChat() {
   const [input, setInput] = useState("")
   const [loading, setLoading] = useState(true)
   const [clearing, setClearing] = useState(false)
+  const [imageFile, setImageFile] = useState<File | null>(null)
+  const [imagePreview, setImagePreview] = useState<string | null>(null)
+  const [uploading, setUploading] = useState(false)
   const bottomRef = useRef<HTMLDivElement>(null)
+  const fileInputRef = useRef<HTMLInputElement>(null)
   const supabase = createClient()
 
   useEffect(() => {
@@ -142,7 +148,7 @@ export default function AiChat() {
       if (!user) { setLoading(false); return }
       const { data } = await supabase
         .from("support_chat_messages")
-        .select("id, role, content")
+        .select("id, role, content, image_url")
         .eq("user_id", user.id)
         .order("created_at", { ascending: true })
       setMessages((data ?? []) as Message[])
@@ -155,10 +161,33 @@ export default function AiChat() {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" })
   }, [messages])
 
+  function handleImageSelect(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    if (!file) return
+    setImageFile(file)
+    setImagePreview(URL.createObjectURL(file))
+    e.target.value = ""
+  }
+
+  function removeImage() {
+    setImageFile(null)
+    if (imagePreview) URL.revokeObjectURL(imagePreview)
+    setImagePreview(null)
+  }
+
+  async function uploadImage(file: File, userId: string): Promise<string | null> {
+    const ext = file.name.split(".").pop() ?? "jpg"
+    const path = `${userId}/${Date.now()}.${ext}`
+    const { error } = await supabase.storage.from("support-chat-images").upload(path, file)
+    if (error) return null
+    const { data } = supabase.storage.from("support-chat-images").getPublicUrl(path)
+    return data.publicUrl
+  }
+
   async function saveMessages(msgs: Message[]) {
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return
-    const rows = msgs.map(m => ({ user_id: user.id, role: m.role, content: m.content }))
+    const rows = msgs.map(m => ({ user_id: user.id, role: m.role, content: m.content, image_url: m.image_url ?? null }))
     await supabase.from("support_chat_messages").insert(rows)
   }
 
@@ -173,19 +202,30 @@ export default function AiChat() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     const text = input.trim()
-    if (!text) return
+    if (!text && !imageFile) return
 
-    const userMsg: Message = { role: "user", content: text }
-    const answer = getAnswer(text)
+    setUploading(true)
+    const { data: { user } } = await supabase.auth.getUser()
+    let uploadedUrl: string | null = null
+    if (imageFile && user) uploadedUrl = await uploadImage(imageFile, user.id)
+
+    const userMsg: Message = { role: "user", content: text, image_url: uploadedUrl }
+    const answer = text ? getAnswer(text) : "Imagem recebida! Se quiser, descreva sua dúvida em texto para que eu possa ajudar melhor."
     const assistantMsg: Message = { role: "assistant", content: answer }
 
     setMessages(prev => [...prev, userMsg, assistantMsg])
     setInput("")
+    removeImage()
+    setUploading(false)
     saveMessages([userMsg, assistantMsg])
   }
 
+  const canSend = (input.trim() || imageFile) && !uploading
+
   return (
-    <div className="flex flex-col h-[600px] bg-[var(--bg-surface)] border border-[var(--border)] rounded-2xl overflow-hidden">
+    <div className="flex flex-col bg-[var(--bg-surface)] border border-[var(--border)] rounded-2xl overflow-hidden"
+      style={{ height: "calc(100vh - 180px)", minHeight: "400px" }}>
+
       {/* Header */}
       <div className="flex items-center gap-3 px-5 py-4 border-b border-[var(--border)] flex-shrink-0">
         <div className="w-8 h-8 rounded-full bg-[#1e3a8a]/20 flex items-center justify-center flex-shrink-0">
@@ -208,7 +248,7 @@ export default function AiChat() {
         )}
       </div>
 
-      {/* Messages */}
+      {/* Messages — scrollable */}
       <div className="flex-1 overflow-y-auto p-4 space-y-4">
         {loading && (
           <div className="flex items-center justify-center h-full">
@@ -220,14 +260,15 @@ export default function AiChat() {
             <Bot className="w-10 h-10 text-[var(--text-muted)] mx-auto mb-3" />
             <p className="text-sm text-[var(--text-secondary)]">Olá! Como posso ajudar?</p>
             <p className="text-xs text-[var(--text-muted)] mt-1">Pergunte sobre qualquer funcionalidade da SurebetFlow.</p>
-            {/* Quick suggestions */}
             <div className="mt-4 flex flex-wrap gap-2 justify-center">
               {["Como criar um perfil?", "Como registrar uma aposta?", "O que é ROI?", "Como adicionar uma bet?"].map(q => (
                 <button
                   key={q}
                   onClick={() => {
                     const answer = getAnswer(q)
-                    setMessages([{ role: "user", content: q }, { role: "assistant", content: answer }])
+                    const msgs = [{ role: "user" as const, content: q }, { role: "assistant" as const, content: answer }]
+                    setMessages(msgs)
+                    saveMessages(msgs)
                   }}
                   className="text-xs px-3 py-1.5 rounded-full border border-[var(--border)] text-[var(--text-secondary)] hover:border-[#1e3a8a]/40 hover:text-[var(--text-primary)] transition-colors"
                 >
@@ -247,39 +288,85 @@ export default function AiChat() {
                 : <Bot className="w-3.5 h-3.5 text-[#3b82f6]" />
               }
             </div>
-            <div className={`max-w-[80%] px-4 py-2.5 rounded-2xl text-sm whitespace-pre-wrap leading-relaxed ${
-              msg.role === "user"
-                ? "bg-[#1e3a8a] text-white rounded-tr-sm"
-                : "bg-[var(--bg-elevated)] text-[var(--text-primary)] rounded-tl-sm"
-            }`}>
-              {msg.content}
+            <div className={`max-w-[80%] flex flex-col gap-2 ${msg.role === "user" ? "items-end" : "items-start"}`}>
+              {msg.image_url && (
+                <img
+                  src={msg.image_url}
+                  alt="Imagem anexada"
+                  className="max-w-[260px] max-h-[200px] rounded-xl object-cover border border-[var(--border)]"
+                />
+              )}
+              {msg.content && (
+                <div className={`px-4 py-2.5 rounded-2xl text-sm whitespace-pre-wrap leading-relaxed ${
+                  msg.role === "user"
+                    ? "bg-[#1e3a8a] text-white rounded-tr-sm"
+                    : "bg-[var(--bg-elevated)] text-[var(--text-primary)] rounded-tl-sm"
+                }`}>
+                  {msg.content}
+                </div>
+              )}
             </div>
           </div>
         ))}
         <div ref={bottomRef} />
       </div>
 
-      {/* Input */}
-      <form onSubmit={handleSubmit} className="flex items-end gap-2 p-4 border-t border-[var(--border)] flex-shrink-0">
-        <textarea
-          value={input}
-          onChange={e => setInput(e.target.value)}
-          onKeyDown={e => {
-            if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); handleSubmit(e as any) }
-          }}
-          placeholder="Digite sua dúvida..."
-          rows={1}
-          className="flex-1 bg-[var(--bg-elevated)] border border-[var(--border)] rounded-xl px-4 py-2.5 text-sm text-[var(--text-primary)] placeholder-[var(--text-muted)] focus:outline-none focus:border-[#1e3a8a]/50 resize-none transition-colors"
-          style={{ maxHeight: "120px", overflowY: "auto" }}
-        />
-        <button
-          type="submit"
-          disabled={!input.trim()}
-          className="w-10 h-10 flex-shrink-0 flex items-center justify-center rounded-xl bg-[#1e3a8a] hover:bg-[#1e40af] disabled:opacity-40 transition-colors"
-        >
-          <Send className="w-4 h-4 text-white" />
-        </button>
-      </form>
+      {/* Input — fixed at bottom */}
+      <div className="border-t border-[var(--border)] flex-shrink-0 bg-[var(--bg-surface)]">
+        {/* Image preview */}
+        {imagePreview && (
+          <div className="px-4 pt-3">
+            <div className="relative w-fit">
+              <img src={imagePreview} alt="Preview" className="h-16 w-auto rounded-xl border border-[var(--border)] object-cover" />
+              <button
+                type="button"
+                onClick={removeImage}
+                className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-[var(--bg-elevated)] border border-[var(--border)] flex items-center justify-center hover:bg-red-500 hover:border-red-500 hover:text-white transition-colors"
+              >
+                <X className="w-3 h-3" />
+              </button>
+            </div>
+          </div>
+        )}
+        <form onSubmit={handleSubmit} className="flex items-end gap-2 p-4">
+          {/* Image attach button */}
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/*"
+            className="hidden"
+            onChange={handleImageSelect}
+          />
+          <button
+            type="button"
+            onClick={() => fileInputRef.current?.click()}
+            title="Anexar imagem"
+            className="w-10 h-10 flex-shrink-0 flex items-center justify-center rounded-xl border border-[var(--border)] text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:border-[#1e3a8a]/50 hover:bg-[#1e3a8a]/5 transition-colors"
+          >
+            {imageFile ? <ImageIcon className="w-4 h-4 text-[#3b82f6]" /> : <Paperclip className="w-4 h-4" />}
+          </button>
+
+          <textarea
+            value={input}
+            onChange={e => setInput(e.target.value)}
+            onKeyDown={e => {
+              if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); handleSubmit(e as any) }
+            }}
+            placeholder="Digite sua dúvida..."
+            rows={1}
+            className="flex-1 bg-[var(--bg-elevated)] border border-[var(--border)] rounded-xl px-4 py-2.5 text-sm text-[var(--text-primary)] placeholder-[var(--text-muted)] focus:outline-none focus:border-[#1e3a8a]/50 resize-none transition-colors"
+            style={{ maxHeight: "120px", overflowY: "auto" }}
+          />
+
+          <button
+            type="submit"
+            disabled={!canSend}
+            className="w-10 h-10 flex-shrink-0 flex items-center justify-center rounded-xl bg-[#1e3a8a] hover:bg-[#1e40af] disabled:opacity-40 transition-colors"
+          >
+            {uploading ? <Loader2 className="w-4 h-4 text-white animate-spin" /> : <Send className="w-4 h-4 text-white" />}
+          </button>
+        </form>
+      </div>
     </div>
   )
 }
