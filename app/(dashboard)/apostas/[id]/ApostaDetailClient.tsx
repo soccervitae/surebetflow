@@ -281,8 +281,25 @@ export default function ApostaDetailClient({ aposta: initial }: { aposta: Aposta
 
   return (
     <div className="max-w-2xl md:max-w-4xl mx-auto space-y-6">
-      {/* Cabeçalho */}
-      <div className="flex items-start gap-3">
+      {/* Cabeçalho — mobile centralizado */}
+      <div className="md:hidden relative flex flex-col items-center text-center gap-1 pb-2">
+        <button onClick={() => router.back()} className="absolute left-0 top-0 p-1.5 rounded-lg hover:bg-[var(--bg-elevated)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors">
+          <ArrowLeft className="h-5 w-5" />
+        </button>
+        <h1 className="text-lg font-bold text-[var(--text-primary)] px-10 leading-tight">{aposta.evento}</h1>
+        {aposta.esporte && (
+          <p className="text-sm text-[var(--text-muted)]">{aposta.esporte}</p>
+        )}
+        {perfil && (
+          <Link href={`/perfis/${perfil.id}`} className="text-sm text-[var(--accent-text)] hover:underline transition-colors">
+            {perfil.apelido ?? `${perfil.nome} ${perfil.sobrenome}`}
+          </Link>
+        )}
+        <div className="mt-1">{statusBadge(aposta.status)}</div>
+      </div>
+
+      {/* Cabeçalho — desktop */}
+      <div className="hidden md:flex items-start gap-3">
         <button onClick={() => router.back()} className="mt-0.5 flex-shrink-0 p-1.5 rounded-lg hover:bg-[var(--bg-elevated)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors">
           <ArrowLeft className="h-5 w-5" />
         </button>
