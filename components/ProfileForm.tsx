@@ -148,28 +148,29 @@ export function ProfileForm({ profile, onSuccess, userId }: ProfileFormProps) {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
-      {/* Photo */}
-      <div className="flex flex-col items-center gap-3">
-        <Avatar className="h-20 w-20">
-          {fotoUrl ? <AvatarImage src={fotoUrl} alt="Foto do perfil" /> : null}
-          <AvatarFallback className="text-2xl">{getInitials() || "?"}</AvatarFallback>
-        </Avatar>
-        <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handlePhotoUpload} />
-        <Button type="button" variant="outline" size="sm" onClick={() => fileInputRef.current?.click()} disabled={uploading}>
-          {uploading ? <><Loader2 className="h-4 w-4 mr-2 animate-spin" />Enviando...</> : <><Camera className="h-4 w-4 mr-2" />Alterar foto</>}
-        </Button>
-      </div>
-
-      <div className="grid grid-cols-2 gap-4">
-        <div className="space-y-2">
-          <Label htmlFor="nome">Nome *</Label>
-          <Input id="nome" value={nome} onChange={e => setNome(e.target.value)} placeholder="João" />
-          {errors.nome && <p className="text-xs text-[#DC2626]">{errors.nome}</p>}
+      {/* Photo + Nome/Sobrenome */}
+      <div className="flex flex-col sm:flex-row sm:items-start gap-4">
+        <div className="flex flex-col items-center gap-3 sm:flex-shrink-0">
+          <Avatar className="h-20 w-20">
+            {fotoUrl ? <AvatarImage src={fotoUrl} alt="Foto do perfil" /> : null}
+            <AvatarFallback className="text-2xl">{getInitials() || "?"}</AvatarFallback>
+          </Avatar>
+          <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handlePhotoUpload} />
+          <Button type="button" variant="outline" size="sm" onClick={() => fileInputRef.current?.click()} disabled={uploading}>
+            {uploading ? <><Loader2 className="h-4 w-4 mr-2 animate-spin" />Enviando...</> : <><Camera className="h-4 w-4 mr-2" />Alterar foto</>}
+          </Button>
         </div>
-        <div className="space-y-2">
-          <Label htmlFor="sobrenome">Sobrenome *</Label>
-          <Input id="sobrenome" value={sobrenome} onChange={e => setSobrenome(e.target.value)} placeholder="Silva" />
-          {errors.sobrenome && <p className="text-xs text-[#DC2626]">{errors.sobrenome}</p>}
+        <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="space-y-2">
+            <Label htmlFor="nome">Nome *</Label>
+            <Input id="nome" value={nome} onChange={e => setNome(e.target.value)} placeholder="João" />
+            {errors.nome && <p className="text-xs text-[#DC2626]">{errors.nome}</p>}
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="sobrenome">Sobrenome *</Label>
+            <Input id="sobrenome" value={sobrenome} onChange={e => setSobrenome(e.target.value)} placeholder="Silva" />
+            {errors.sobrenome && <p className="text-xs text-[#DC2626]">{errors.sobrenome}</p>}
+          </div>
         </div>
       </div>
 
