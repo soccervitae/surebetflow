@@ -25,32 +25,95 @@ const SheetOverlay = React.forwardRef<
 ))
 SheetOverlay.displayName = "SheetOverlay"
 
+function BottomSheetSwipeWrapper({
+  children,
+  onClose,
+}: {
+  children: React.ReactNode
+  onClose: () => void
+}) {
+  const startY = React.useRef(0)
+  const ref = React.useRef<HTMLDivElement>(null)
+
+  function onTouchStart(e: React.TouchEvent) {
+    startY.current = e.touches[0].clientY
+    if (ref.current) ref.current.style.transition = "none"
+  }
+
+  function onTouchMove(e: React.TouchEvent) {
+    const delta = e.touches[0].clientY - startY.current
+    if (delta < 0) return
+    if (ref.current) ref.current.style.transform = `translateY(${delta}px)`
+  }
+
+  function onTouchEnd(e: React.TouchEvent) {
+    const delta = e.changedTouches[0].clientY - startY.current
+    if (ref.current) {
+      ref.current.style.transition = "transform 0.2s ease"
+      if (delta >= 72) {
+        ref.current.style.transform = "translateY(100%)"
+        setTimeout(onClose, 180)
+      } else {
+        ref.current.style.transform = "translateY(0)"
+      }
+    }
+  }
+
+  return (
+    <div
+      ref={ref}
+      onTouchStart={onTouchStart}
+      onTouchMove={onTouchMove}
+      onTouchEnd={onTouchEnd}
+      className="contents"
+    >
+      {children}
+    </div>
+  )
+}
+
 const SheetContent = React.forwardRef<
   React.ElementRef<typeof DialogPrimitive.Content>,
   React.ComponentPropsWithoutRef<typeof DialogPrimitive.Content> & { side?: "bottom" | "top" | "left" | "right" }
->(({ className, children, side = "bottom", ...props }, ref) => (
-  <SheetPortal>
-    <SheetOverlay />
-    <DialogPrimitive.Content
-      ref={ref}
-      className={cn(
-        "fixed z-50 bg-[var(--bg-surface)] shadow-xl transition ease-in-out data-[state=open]:animate-in data-[state=closed]:animate-out",
-        side === "bottom" && "inset-x-0 bottom-0 rounded-t-2xl border-t border-[var(--border)] data-[state=closed]:slide-out-to-bottom data-[state=open]:slide-in-from-bottom",
-        side === "top" && "inset-x-0 top-0 rounded-b-2xl border-b border-[var(--border)] data-[state=closed]:slide-out-to-top data-[state=open]:slide-in-from-top",
-        className
-      )}
-      {...props}
-    >
-      {/* Drag handle */}
-      <div className="mx-auto mt-3 mb-1 h-1.5 w-12 rounded-full bg-[var(--border)]" />
-      {children}
-      <DialogPrimitive.Close className="absolute right-4 top-4 rounded-lg p-1 text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-elevated)] transition-colors">
-        <X className="h-4 w-4" />
-        <span className="sr-only">Fechar</span>
-      </DialogPrimitive.Close>
-    </DialogPrimitive.Content>
-  </SheetPortal>
-))
+>(({ className, children, side = "bottom", ...props }, ref) => {
+  const closeRef = React.useRef<HTMLButtonElement>(null)
+
+  return (
+    <SheetPortal>
+      <SheetOverlay />
+      <DialogPrimitive.Content
+        ref={ref}
+        className={cn(
+          "fixed z-50 bg-[var(--bg-surface)] shadow-xl transition ease-in-out data-[state=open]:animate-in data-[state=closed]:animate-out",
+          side === "bottom" && "inset-x-0 bottom-0 rounded-t-2xl border-t border-[var(--border)] data-[state=closed]:slide-out-to-bottom data-[state=open]:slide-in-from-bottom",
+          side === "top" && "inset-x-0 top-0 rounded-b-2xl border-b border-[var(--border)] data-[state=closed]:slide-out-to-top data-[state=open]:slide-in-from-top",
+          className
+        )}
+        {...props}
+      >
+        {side === "bottom" ? (
+          <BottomSheetSwipeWrapper onClose={() => closeRef.current?.click()}>
+            {/* Drag handle */}
+            <div className="mx-auto mt-3 mb-1 h-1.5 w-12 rounded-full bg-[var(--border)]" />
+            {children}
+          </BottomSheetSwipeWrapper>
+        ) : (
+          <>
+            <div className="mx-auto mt-3 mb-1 h-1.5 w-12 rounded-full bg-[var(--border)]" />
+            {children}
+          </>
+        )}
+        <DialogPrimitive.Close
+          ref={closeRef}
+          className="absolute right-4 top-4 rounded-lg p-1 text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-elevated)] transition-colors"
+        >
+          <X className="h-4 w-4" />
+          <span className="sr-only">Fechar</span>
+        </DialogPrimitive.Close>
+      </DialogPrimitive.Content>
+    </SheetPortal>
+  )
+})
 SheetContent.displayName = "SheetContent"
 
 const SheetHeader = ({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) => (

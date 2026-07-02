@@ -15,6 +15,7 @@ import AddBetToProfile from "@/components/AddBetToProfile"
 import { ProfileForm } from "@/components/ProfileForm"
 import { formatCurrency } from "@/lib/utils"
 import { useToast } from "@/hooks/useToast"
+import { useSwipeToDismiss } from "@/hooks/useSwipeToDismiss"
 
 const FAB_PAGES = ["/dashboard", "/perfis", "/apostas", "/financeiro"]
 
@@ -159,6 +160,8 @@ export default function GlobalFAB() {
     { label: "Adicionar Bet",  icon: Wallet,     color: "bg-[#a855f7]", onClick: openBets },
   ]
 
+  const swipe = useSwipeToDismiss(() => setMobileOpen(false))
+
   if (!mounted) return null
 
   return createPortal(
@@ -167,7 +170,13 @@ export default function GlobalFAB() {
       {mobileOpen && (
         <div className="fixed inset-0 z-50 md:hidden flex flex-col justify-end">
           <div className="absolute inset-0 bg-black/40" onClick={() => setMobileOpen(false)} />
-          <div className="relative bg-[var(--bg-surface)] rounded-t-2xl shadow-xl p-4 pb-8 space-y-2">
+          <div
+            ref={swipe.sheetRef}
+            onTouchStart={swipe.onTouchStart}
+            onTouchMove={swipe.onTouchMove}
+            onTouchEnd={swipe.onTouchEnd}
+            className="relative bg-[var(--bg-surface)] rounded-t-2xl shadow-xl p-4 pb-8 space-y-2"
+          >
             <div className="w-10 h-1 rounded-full bg-[var(--border)] mx-auto mb-4" />
             {fabItems.map(({ label, icon: Icon, color, onClick }) => (
               <button
