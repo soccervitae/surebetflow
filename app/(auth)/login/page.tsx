@@ -28,6 +28,8 @@ export default function LoginPage() {
       return
     }
 
+    localStorage.setItem("sbf-theme", "light")
+    document.documentElement.classList.remove("dark")
     router.push("/dashboard")
     router.refresh()
   }
