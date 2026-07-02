@@ -483,7 +483,14 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
               </div>
             </div>
 
-            <div className="pb-6 flex-shrink-0" />
+            <div className="pb-6 flex-shrink-0">
+              <Link href={`/perfis/${profile.id}/editar`}>
+                <Button variant="outline" size="sm" className="flex items-center gap-1.5 bg-white/60 hover:bg-white/80 border-white/40 text-[#1a237e] dark:text-white dark:bg-white/10 dark:hover:bg-white/20">
+                  <Pencil className="h-3.5 w-3.5" />
+                  Editar Perfil
+                </Button>
+              </Link>
+            </div>
           </div>
 
           {/* Tabs row */}
