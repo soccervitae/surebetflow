@@ -14,7 +14,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet"
 import { formatCurrency } from "@/lib/utils"
 import { useToast } from "@/hooks/useToast"
-import { BookOpen, Filter, X, Plus, Calculator, CalendarIcon, ChevronDown, AlertTriangle, Download, Check } from "lucide-react"
+import { BookOpen, Filter, X, Plus, Calculator, CalendarIcon, ChevronDown, AlertTriangle, Download, Check, SlidersHorizontal } from "lucide-react"
 import type { Aposta, ApostaLeg } from "@/lib/types"
 import SurebetCalculator from "@/components/SurebetCalculator"
 
@@ -287,13 +287,30 @@ export default function ApostasClient({ apostas: initialApostas, profiles, betCo
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       <div className="flex items-center justify-between gap-2">
         <div>
           <h1 className="text-2xl font-bold text-[var(--text-primary)]">Apostas</h1>
-          <p className="text-[var(--text-secondary)] text-sm mt-1">Histórico completo de todas as suas apostas</p>
+          <p className="text-[var(--text-secondary)] text-sm mt-1">Histórico de todas as suas apostas</p>
         </div>
         <div className="flex items-center gap-2">
+          {/* Filtrar button — always visible */}
+          {(() => {
+            const hasActive = filterStatus !== "todos" || filterProfile !== "todos" || filterPeriod !== "todos" || !!filterEsporte || !!filterCompeticao
+            return (
+              <button
+                onClick={() => setShowFilter(v => !v)}
+                className={`flex items-center gap-1.5 px-3 py-2 rounded-xl border text-sm font-medium transition-colors flex-shrink-0 ${
+                  showFilter || hasActive
+                    ? "bg-[#1e3a8a]/10 border-[#1e3a8a]/30 text-[var(--accent-text)]"
+                    : "border-[var(--border)] text-[var(--text-secondary)] hover:bg-[var(--bg-elevated)]"
+                }`}
+              >
+                {showFilter ? <X className="w-4 h-4" /> : <SlidersHorizontal className="w-4 h-4" />}
+                Filtrar{hasActive && !showFilter ? " •" : ""}
+              </button>
+            )
+          })()}
           <button
             onClick={() => { setSelectedProfileId(""); setSelectedProfileName(""); setSelectProfileModal(true) }}
             className="hidden md:flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#1e3a8a] hover:bg-[#1e40af] text-white text-sm font-medium transition-colors"
@@ -311,30 +328,22 @@ export default function ApostasClient({ apostas: initialApostas, profiles, betCo
         </div>
       </div>
 
-      {/* Filters */}
-      <Card>
+      {/* Filters panel */}
+      {showFilter && <Card>
         <CardContent className="p-4 space-y-4">
           <div className="flex items-center justify-between">
-            <button
-              onClick={() => setShowFilter(v => !v)}
-              className="flex items-center gap-2 text-sm font-medium text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors"
-            >
-              <Filter className="h-4 w-4" />
-              Filtrar
-              <ChevronDown className={`h-3.5 w-3.5 transition-transform ${showFilter ? "rotate-180" : ""}`} />
-            </button>
+            <p className="text-xs font-semibold text-[var(--text-muted)] uppercase tracking-wide">Filtros</p>
             {(filterStatus !== "todos" || filterProfile !== "todos" || filterPeriod !== "todos" || filterEsporte || filterCompeticao) && (
               <button
                 onClick={() => { setFilterStatus("todos"); setFilterProfile("todos"); setFilterPeriod("todos"); setFilterCustomDate(""); setFilterCustomFrom(""); setFilterCustomTo(""); setFilterEsporte(""); setFilterCompeticao("") }}
-                className="text-xs text-[var(--text-secondary)] hover:text-[var(--text-primary)] flex items-center gap-1 transition-colors"
+                className="text-xs text-[var(--accent-text)] font-medium"
               >
-                <X className="h-3 w-3" />
                 Limpar
               </button>
             )}
           </div>
 
-          {showFilter && <>
+          <>
 
           {/* Status + Perfil */}
           <div className="grid grid-cols-2 gap-3">
@@ -490,9 +499,9 @@ export default function ApostasClient({ apostas: initialApostas, profiles, betCo
             )}
           </div>
 
-          </>}
+          </>
         </CardContent>
-      </Card>
+      </Card>}
 
       {/* List */}
       {filtered.length === 0 ? (
