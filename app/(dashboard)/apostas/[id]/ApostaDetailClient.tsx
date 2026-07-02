@@ -287,8 +287,8 @@ export default function ApostaDetailClient({ aposta: initial }: { aposta: Aposta
           <ArrowLeft className="h-5 w-5" />
         </button>
         <h1 className="text-lg font-bold text-[var(--text-primary)] px-10 leading-tight">{aposta.evento}</h1>
-        {aposta.esporte && (
-          <p className="text-sm text-[var(--text-muted)]">{aposta.esporte}</p>
+        {(aposta.competicao || aposta.esporte) && (
+          <p className="text-sm text-[var(--text-muted)]">{aposta.competicao || aposta.esporte}</p>
         )}
         {perfil && (
           <Link href={`/perfis/${perfil.id}`} className="text-sm text-[var(--accent-text)] hover:underline transition-colors">
