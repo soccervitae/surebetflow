@@ -3,13 +3,9 @@
 import { useState, useMemo, useEffect } from "react"
 import Link from "next/link"
 import { Card, CardContent } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
-import { ProfileForm } from "@/components/ProfileForm"
-import { useToast } from "@/hooks/useToast"
 import { createClient } from "@/lib/supabase/client"
-import { Plus, User, SlidersHorizontal, X } from "lucide-react"
+import { User, SlidersHorizontal, X } from "lucide-react"
 import type { Profile } from "@/lib/types"
 
 function maskCpf(cpf: string) {
@@ -30,13 +26,10 @@ interface Props {
   profiles: Profile[]
   userId: string
   planLimit: number
-  currentCount: number
 }
 
-export default function PerfisClient({ profiles: initialProfiles, userId, planLimit, currentCount }: Props) {
+export default function PerfisClient({ profiles: initialProfiles, planLimit }: Props) {
   const [profiles, setProfiles] = useState(initialProfiles)
-  const [showCreate, setShowCreate] = useState(false)
-  const { toast } = useToast()
 
   const [showFilter, setShowFilter] = useState(false)
   const [filterStatus, setFilterStatus] = useState<FilterStatus>("todos")
@@ -55,11 +48,6 @@ export default function PerfisClient({ profiles: initialProfiles, userId, planLi
       .from("movimentacoes_financeiras")
       .select("profile_id, tipo, valor")
       .in("profile_id", profiles.map(p => p.id))
-    const map: Record<string, ProfileStats> = {}
-    for (const m of data ?? []) {
-      if (!map[m.profile_id]) map[m.profile_id] = { lucro: 0, roi: 0 }
-    }
-    // compute per profile
     const acc: Record<string, { depositos: number; lucro: number; perda: number }> = {}
     for (const m of data ?? []) {
       if (!acc[m.profile_id]) acc[m.profile_id] = { depositos: 0, lucro: 0, perda: 0 }
@@ -99,12 +87,6 @@ export default function PerfisClient({ profiles: initialProfiles, userId, planLi
     setSortBy("default")
   }
 
-  function handleCreated(profile: Profile) {
-    setProfiles(prev => [profile, ...prev])
-    setShowCreate(false)
-    toast({ title: "Perfil criado com sucesso!" })
-  }
-
   return (
     <div className="space-y-4">
       {/* Header */}
@@ -114,12 +96,6 @@ export default function PerfisClient({ profiles: initialProfiles, userId, planLi
           <p className="text-[var(--text-secondary)] text-sm mt-1">Gerencie seus perfis de apostador</p>
         </div>
         <div className="flex items-center gap-2">
-          {/* Novo perfil — desktop only */}
-          <Button className="hidden sm:flex" onClick={() => !atLimit && setShowCreate(true)} disabled={atLimit}>
-            <Plus className="h-4 w-4 mr-2" />
-            Novo perfil
-          </Button>
-
           {/* Filtrar */}
           <button
             onClick={() => setShowFilter(v => !v)}
@@ -203,10 +179,7 @@ export default function PerfisClient({ profiles: initialProfiles, userId, planLi
               {hasActiveFilters ? "Nenhum perfil encontrado com os filtros aplicados" : "Nenhum perfil cadastrado"}
             </p>
             {!hasActiveFilters && (
-              <Button className="mt-4" onClick={() => setShowCreate(true)}>
-                <Plus className="h-4 w-4 mr-2" />
-                Criar primeiro perfil
-              </Button>
+              <p className="text-xs text-[var(--text-muted)] mt-2">Use o botão (+) para criar seu primeiro perfil.</p>
             )}
           </CardContent>
         </Card>
@@ -249,14 +222,6 @@ export default function PerfisClient({ profiles: initialProfiles, userId, planLi
         </div>
       )}
 
-      <Dialog open={showCreate} onOpenChange={setShowCreate}>
-        <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>Novo Perfil</DialogTitle>
-          </DialogHeader>
-          <ProfileForm userId={userId} onSuccess={handleCreated} />
-        </DialogContent>
-      </Dialog>
     </div>
   )
 }
