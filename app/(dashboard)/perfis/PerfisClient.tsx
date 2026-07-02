@@ -114,10 +114,10 @@ export default function PerfisClient({ profiles: initialProfiles, userId, planLi
           <p className="text-[var(--text-secondary)] text-sm mt-1">Gerencie seus perfis de apostador</p>
         </div>
         <div className="flex items-center gap-2">
-          {/* Filtrar — mobile only */}
+          {/* Filtrar */}
           <button
             onClick={() => setShowFilter(v => !v)}
-            className={`md:hidden flex items-center gap-1.5 px-3 py-2 rounded-xl border text-sm font-medium transition-colors flex-shrink-0 ${
+            className={`flex items-center gap-1.5 px-3 py-2 rounded-xl border text-sm font-medium transition-colors flex-shrink-0 ${
               showFilter || hasActiveFilters
                 ? "bg-[#1e3a8a]/10 border-[#1e3a8a]/30 text-[var(--accent-text)]"
                 : "border-[var(--border)] text-[var(--text-secondary)] hover:bg-[var(--bg-elevated)]"
@@ -144,9 +144,9 @@ export default function PerfisClient({ profiles: initialProfiles, userId, planLi
         </p>
       )}
 
-      {/* Filtros — mobile only */}
+      {/* Filtros */}
       {showFilter && (
-        <Card className="md:hidden">
+        <Card>
           <CardContent className="p-4 space-y-4">
             <div className="flex items-center justify-between">
               <p className="text-xs font-semibold text-[var(--text-muted)] uppercase tracking-wide">Filtros</p>
