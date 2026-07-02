@@ -202,6 +202,10 @@ export default function BetDetailClient({ profile, profileBet: initial, moviment
                   <Input value={editEmail} onChange={e => setEditEmail(e.target.value)} placeholder="email@exemplo.com" />
                 </div>
                 <div className="space-y-1.5">
+                  <Label>Nova senha <span className="text-[var(--text-muted)] font-normal">(deixe em branco para não alterar)</span></Label>
+                  <Input type="text" value={editSenha} onChange={e => setEditSenha(e.target.value)} placeholder="Senha da conta" autoComplete="off" />
+                </div>
+                <div className="space-y-1.5">
                   <Label>Telefone <span className="text-[var(--text-muted)] font-normal">(opcional)</span></Label>
                   <Input
                     type="tel"
@@ -212,10 +216,6 @@ export default function BetDetailClient({ profile, profileBet: initial, moviment
                     inputMode="numeric"
                     autoComplete="off"
                   />
-                </div>
-                <div className="space-y-1.5">
-                  <Label>Nova senha <span className="text-[var(--text-muted)] font-normal">(deixe em branco para não alterar)</span></Label>
-                  <Input type="text" value={editSenha} onChange={e => setEditSenha(e.target.value)} placeholder="Senha da conta" autoComplete="off" />
                 </div>
                 <div className="flex gap-2">
                   <Button variant="outline" className="flex-1" onClick={() => setEditando(false)}>Cancelar</Button>
@@ -230,12 +230,6 @@ export default function BetDetailClient({ profile, profileBet: initial, moviment
                   <p className="text-xs text-[var(--text-muted)] uppercase tracking-wide mb-1">Email</p>
                   <p className="text-sm text-[var(--text-primary)]">{pb.email || "—"}</p>
                 </div>
-                {pb.telefone && (
-                  <div>
-                    <p className="text-xs text-[var(--text-muted)] uppercase tracking-wide mb-1">Telefone</p>
-                    <p className="text-sm text-[var(--text-primary)]">{displayPhone(pb.telefone)}</p>
-                  </div>
-                )}
                 <div>
                   <p className="text-xs text-[var(--text-muted)] uppercase tracking-wide mb-1">Senha</p>
                   <div className="flex items-center gap-2">
@@ -250,6 +244,12 @@ export default function BetDetailClient({ profile, profileBet: initial, moviment
                     </button>
                   </div>
                 </div>
+                {pb.telefone && (
+                  <div>
+                    <p className="text-xs text-[var(--text-muted)] uppercase tracking-wide mb-1">Telefone</p>
+                    <p className="text-sm text-[var(--text-primary)]">{displayPhone(pb.telefone)}</p>
+                  </div>
+                )}
               </>
             )}
           </CardContent>
