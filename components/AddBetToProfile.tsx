@@ -131,6 +131,7 @@ export default function AddBetToProfile({ profileId, autoOpen = false, onSaved }
     if (d.length === 0) return ""
     if (d.length <= 2) return `(${d}`
     if (d.length <= 6) return `(${d.slice(0, 2)}) ${d.slice(2)}`
+    // Mobile (11 digits with 9 as 5th digit) or landline
     const isMobile = d.length === 11 || (d.length === 10 && d[2] === "9")
     if (isMobile) {
       if (d.length <= 10) return `(${d.slice(0, 2)}) ${d.slice(2, 6)}-${d.slice(6)}`
@@ -252,6 +253,7 @@ export default function AddBetToProfile({ profileId, autoOpen = false, onSaved }
     if (error) {
       toast({ title: "Erro ao registrar movimentação", variant: "destructive" })
     } else {
+      // Busca saldo real calculado do banco
       const { data: movs } = await supabase
         .from("movimentacoes_financeiras")
         .select("tipo, valor")
@@ -260,7 +262,7 @@ export default function AddBetToProfile({ profileId, autoOpen = false, onSaved }
         const val = parseFloat(String(m.valor)) || 0
         if (m.tipo === "deposito" || m.tipo === "lucro") return acc + val
         if (m.tipo === "saque" || m.tipo === "perda") return acc - val
-        return acc
+        return acc // bonus: não afeta saldo real
       }, 0)
       await supabase.from("profile_bets").update({ saldo: saldoReal }).eq("id", movDialog.id)
       setProfileBets(prev => prev.map(pb => pb.id === movDialog.id ? { ...pb, saldo: saldoReal } : pb))
@@ -392,7 +394,7 @@ export default function AddBetToProfile({ profileId, autoOpen = false, onSaved }
           </div>
 
           {/* Grid de bets — scrollável */}
-          <div className="overflow-y-auto flex-1 px-5 pb-2">
+          <div className="overflow-y-auto px-5 pb-2 md:h-[320px] flex-1 md:flex-none">
             {(() => {
               const alreadyAdded = new Set(profileBets.map(pb => pb.bet_id))
               const filtered = bets.filter(b => b.nome.toLowerCase().includes(betSearch.toLowerCase()))
@@ -400,7 +402,7 @@ export default function AddBetToProfile({ profileId, autoOpen = false, onSaved }
                 <p className="text-sm text-[var(--text-muted)] text-center py-8">Nenhuma bet encontrada</p>
               )
               return (
-                <div className="flex flex-col gap-1 py-1">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-2 py-1">
                   {filtered.map(b => {
                     const added = alreadyAdded.has(b.id)
                     const selected = selectedBet === b.id
@@ -416,11 +418,11 @@ export default function AddBetToProfile({ profileId, autoOpen = false, onSaved }
                             : "border-[var(--border)] bg-[var(--bg-surface)] hover:border-[#1e3a8a]/40 hover:bg-[#1e3a8a]/5"
                           }`}
                       >
-                        <span className={`text-sm font-medium ${selected ? "text-[var(--accent-text)]" : "text-[var(--text-primary)]"}`}>{b.nome}</span>
-                        <span className="flex items-center gap-1.5 flex-shrink-0">
-                          {added && <span className="text-xs text-[var(--text-muted)]">Adicionada</span>}
+                        <span className={`text-sm font-medium truncate ${selected ? "text-[var(--accent-text)]" : "text-[var(--text-primary)]"}`}>{b.nome}</span>
+                        <span className="flex items-center gap-1.5 flex-shrink-0 ml-1">
+                          {added && <span className="text-xs text-[var(--text-muted)]">✓</span>}
                           {selected && (
-                            <span className="w-4 h-4 rounded-full bg-[#1e3a8a] flex items-center justify-center">
+                            <span className="w-4 h-4 rounded-full bg-[#1e3a8a] flex items-center justify-center flex-shrink-0">
                               <Check className="w-2.5 h-2.5 text-white" />
                             </span>
                           )}
@@ -440,27 +442,27 @@ export default function AddBetToProfile({ profileId, autoOpen = false, onSaved }
                 Bet selecionada: <strong className="text-[var(--text-primary)]">{bets.find(b => b.id === selectedBet)?.nome}</strong>
               </p>
             )}
-            <div className="flex gap-3">
-              <div className="flex-1 space-y-1.5">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+              <div className="space-y-1.5">
                 <Label className="text-xs">E-mail *</Label>
                 <Input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="email@bet.com" autoComplete="off" />
               </div>
-              <div className="flex-1 space-y-1.5">
+              <div className="space-y-1.5">
                 <Label className="text-xs">Senha da conta *</Label>
                 <Input type="text" value={senha} onChange={e => setSenha(e.target.value)} placeholder="Senha da conta" autoComplete="off" />
               </div>
-            </div>
-            <div className="space-y-1.5">
-              <Label className="text-xs">Telefone <span className="text-[var(--text-muted)] font-normal">(opcional)</span></Label>
-              <Input
-                type="tel"
-                value={telefone}
-                onChange={e => setTelefone(maskPhone(e.target.value))}
-                placeholder="(11) 99999-9999"
-                maxLength={15}
-                inputMode="numeric"
-                autoComplete="off"
-              />
+              <div className="space-y-1.5">
+                <Label className="text-xs">Telefone <span className="text-[var(--text-muted)] font-normal">(opcional)</span></Label>
+                <Input
+                  type="tel"
+                  value={telefone}
+                  onChange={e => setTelefone(maskPhone(e.target.value))}
+                  placeholder="(11) 99999-9999"
+                  maxLength={15}
+                  inputMode="numeric"
+                  autoComplete="off"
+                />
+              </div>
             </div>
             <div className="flex gap-2 justify-end">
               <Button type="button" variant="outline" onClick={() => setShowForm(false)}>Cancelar</Button>
@@ -583,6 +585,7 @@ export default function AddBetToProfile({ profileId, autoOpen = false, onSaved }
         </Dialog>
       )}
 
+      {/* Dialog Deletar */}
       {/* Edit Dialog */}
       <Dialog open={!!editDialog} onOpenChange={open => !open && setEditDialog(null)}>
         <DialogContent>
