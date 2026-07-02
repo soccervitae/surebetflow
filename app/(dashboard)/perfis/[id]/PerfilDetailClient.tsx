@@ -851,6 +851,10 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
                                       <p className="text-xs text-[var(--text-muted)]">Investimento</p>
                                       <p className="text-sm font-bold text-[var(--text-primary)]">{formatCurrency(aposta.investimento_total)}</p>
                                     </div>
+                                    <div className="text-center">
+                                      <p className="text-xs text-[var(--text-muted)]">ROI</p>
+                                      <p className="text-sm font-bold text-[#a855f7]">{parseFloat(String(aposta.roi_percentual)).toFixed(2)}%</p>
+                                    </div>
                                     {aposta.status !== "cancelada" && (
                                       <div className="text-right">
                                         <p className="text-xs text-[var(--text-muted)]">{aposta.status === "finalizada" ? "Lucro" : "Lucro esperado"}</p>
@@ -1219,6 +1223,10 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
                                           <div>
                                             <p className="text-xs text-[var(--text-muted)]">Investimento</p>
                                             <p className="text-sm font-bold text-[var(--text-primary)]">{formatCurrency(aposta.investimento_total)}</p>
+                                          </div>
+                                          <div className="text-center">
+                                            <p className="text-xs text-[var(--text-muted)]">ROI</p>
+                                            <p className="text-sm font-bold text-[#a855f7]">{parseFloat(String(aposta.roi_percentual)).toFixed(2)}%</p>
                                           </div>
                                           {aposta.status !== "cancelada" && (
                                             <div className="text-right">
