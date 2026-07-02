@@ -14,7 +14,7 @@ import { formatCurrency } from "@/lib/utils"
 import { useToast } from "@/hooks/useToast"
 import {
   TrendingUp, DollarSign, Clock, BarChart2,
-  CheckCircle2, XCircle, AlertCircle, CalendarDays, Tag, Pencil
+  CheckCircle2, XCircle, AlertCircle, CalendarDays, Tag, Pencil, ArrowLeft
 } from "lucide-react"
 import type { Aposta } from "@/lib/types"
 
@@ -283,6 +283,9 @@ export default function ApostaDetailClient({ aposta: initial }: { aposta: Aposta
     <div className="max-w-2xl md:max-w-4xl mx-auto space-y-6">
       {/* Cabeçalho */}
       <div className="flex items-start gap-3">
+        <button onClick={() => router.back()} className="mt-0.5 flex-shrink-0 p-1.5 rounded-lg hover:bg-[var(--bg-elevated)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors">
+          <ArrowLeft className="h-5 w-5" />
+        </button>
         <div className="flex-1 min-w-0">
           <h1 className="text-xl font-bold text-[var(--text-primary)] truncate">{aposta.evento}</h1>
           {perfil && (
