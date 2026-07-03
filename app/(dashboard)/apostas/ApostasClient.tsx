@@ -569,7 +569,7 @@ export default function ApostasClient({ apostas: initialApostas, profiles, betCo
                               <p className="font-semibold text-[var(--text-primary)] text-sm truncate">{leg.profile_bet?.bet?.nome ?? "—"}</p>
                               {aposta.esporte && <p className="text-xs text-[var(--text-muted)] truncate">{aposta.esporte}</p>}
                             </div>
-                            <div className="flex-1 min-w-0 flex items-center gap-3">
+                            <div className="flex-1 min-w-0 flex items-center gap-8">
                               <div className="min-w-0">
                                 <p className={`text-sm font-medium leading-snug line-clamp-2 ${aposta.status === "pendente" ? "text-red-500 dark:text-[var(--text-secondary)]" : "text-[var(--text-secondary)]"}`}>{aposta.evento}</p>
                                 {aposta.competicao && <p className="text-xs text-[var(--text-muted)] truncate">{aposta.competicao}</p>}
