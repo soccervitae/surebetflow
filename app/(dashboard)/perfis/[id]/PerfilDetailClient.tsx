@@ -741,11 +741,10 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
                                         <div className="w-36 flex-shrink-0">
                                           <p className="font-semibold text-[var(--text-primary)] text-sm truncate">{leg.profile_bet?.bet?.nome ?? "—"}</p>
                                           {aposta.esporte && <p className="text-xs text-[var(--text-muted)] truncate">{aposta.esporte}</p>}
-                                          <p className="text-xs text-[var(--text-muted)] leading-snug line-clamp-2">{aposta.evento}</p>
-                                          {aposta.competicao && <p className="text-xs text-[var(--text-muted)] truncate">{aposta.competicao}</p>}
                                         </div>
                                         <div className="flex-1 min-w-0">
-                                          <p className="text-sm text-[var(--text-secondary)] truncate">{leg.resultado_apostado}</p>
+                                          <p className="text-sm font-medium leading-snug line-clamp-2 text-[var(--text-secondary)]">{aposta.evento}</p>
+                                          {aposta.competicao && <p className="text-xs text-[var(--text-muted)] truncate">{aposta.competicao}</p>}
                                           <p className="text-xs text-[var(--text-muted)]">{dataStr}{horaStr ? ` · ${horaStr}` : ""}</p>
                                         </div>
                                         <div className="text-right flex-shrink-0 w-28">
@@ -1173,11 +1172,10 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
                                               <div className="w-36 flex-shrink-0">
                                                 <p className="font-semibold text-[var(--text-primary)] text-sm truncate">{leg.profile_bet?.bet?.nome ?? "—"}</p>
                                                 {aposta.esporte && <p className="text-xs text-[var(--text-muted)] truncate">{aposta.esporte}</p>}
-                                                <p className={`text-xs leading-snug line-clamp-2 ${aposta.status === "pendente" ? "text-red-500 dark:text-[var(--text-muted)]" : "text-[var(--text-muted)]"}`}>{aposta.evento}</p>
-                                                {aposta.competicao && <p className="text-xs text-[var(--text-muted)] truncate">{aposta.competicao}</p>}
                                               </div>
                                               <div className="flex-1 min-w-0">
-                                                <p className="text-sm text-[var(--text-secondary)] truncate">{leg.resultado_apostado}</p>
+                                                <p className={`text-sm font-medium leading-snug line-clamp-2 ${aposta.status === "pendente" ? "text-red-500 dark:text-[var(--text-secondary)]" : "text-[var(--text-secondary)]"}`}>{aposta.evento}</p>
+                                                {aposta.competicao && <p className="text-xs text-[var(--text-muted)] truncate">{aposta.competicao}</p>}
                                                 <p className="text-xs text-[var(--text-muted)]">{dataStr}{horaStr ? ` · ${horaStr}` : ""}</p>
                                               </div>
                                               <div className="text-right flex-shrink-0 w-28">
