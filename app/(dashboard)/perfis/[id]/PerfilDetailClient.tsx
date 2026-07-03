@@ -733,7 +733,7 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
                               </div>
                               {/* Body: left info column + right legs */}
                               <div className="flex">
-                                <div className="w-48 flex-shrink-0 border-r border-[var(--border)] px-4 py-3 flex flex-col justify-center items-center text-center gap-0.5">
+                                <div className="w-48 flex-shrink-0 border-r border-[var(--border)] px-4 flex flex-col justify-center items-center text-center gap-0.5">
                                   <p className="font-semibold text-sm leading-snug line-clamp-2 text-[var(--text-primary)]">{aposta.evento}</p>
                                   {aposta.competicao && <p className="text-xs text-[var(--text-muted)] truncate">{aposta.competicao}</p>}
                                   {aposta.esporte && <p className="text-xs text-[var(--text-muted)] truncate">{aposta.esporte}</p>}
@@ -1169,7 +1169,7 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
                                     </div>
                                     {/* Body: left info column + right legs */}
                                     <div className="flex">
-                                      <div className="w-48 flex-shrink-0 border-r border-[var(--border)] px-4 py-3 flex flex-col justify-center items-center text-center gap-0.5">
+                                      <div className="w-48 flex-shrink-0 border-r border-[var(--border)] px-4 flex flex-col justify-center items-center text-center gap-0.5">
                                         <p className={`font-semibold text-sm leading-snug line-clamp-2 ${aposta.status === "pendente" ? "text-red-500 dark:text-[var(--text-primary)]" : "text-[var(--text-primary)]"}`}>{aposta.evento}</p>
                                         {aposta.competicao && <p className="text-xs text-[var(--text-muted)] truncate">{aposta.competicao}</p>}
                                         {aposta.esporte && <p className="text-xs text-[var(--text-muted)] truncate">{aposta.esporte}</p>}
