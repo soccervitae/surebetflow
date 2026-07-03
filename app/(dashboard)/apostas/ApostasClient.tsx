@@ -555,10 +555,6 @@ export default function ApostasClient({ apostas: initialApostas, profiles, betCo
                     </div>
                     <div className="flex items-center gap-3 flex-shrink-0">
                       {statusBadge(aposta.status)}
-                      <span className={`font-bold text-base ${isFinished ? ((aposta.resultado_real ?? 0) >= 0 ? "text-green-500" : "text-[#DC2626]") : "text-green-500"}`}>
-                        {isFinished ? formatCurrency(aposta.resultado_real ?? 0) : formatCurrency(aposta.lucro_garantido)}
-                      </span>
-                      <span className="text-xs text-[var(--text-muted)]">{aposta.roi_percentual.toFixed(2)}%</span>
                     </div>
                   </div>
 

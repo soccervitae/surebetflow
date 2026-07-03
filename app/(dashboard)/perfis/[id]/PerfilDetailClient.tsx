@@ -726,10 +726,6 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
                               {/* Thin header: status + result + ROI */}
                               <div className="flex items-center justify-end gap-3 px-5 py-2 border-b border-[var(--border)] bg-[var(--bg-elevated)]">
                                 {statusBadge(aposta.status)}
-                                <span className={`font-bold text-base ${isFinished ? ((aposta.resultado_real ?? 0) >= 0 ? "text-green-500" : "text-[#DC2626]") : "text-green-500"}`}>
-                                  {isFinished ? formatCurrency(aposta.resultado_real ?? 0) : formatCurrency(aposta.lucro_garantido)}
-                                </span>
-                                <span className="text-xs text-[var(--text-muted)]">{parseFloat(String(aposta.roi_percentual)).toFixed(2)}%</span>
                               </div>
                               {/* Body: legs */}
                               <div className="divide-y divide-[var(--border)]">
@@ -1162,10 +1158,6 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
                                     {/* Thin header: status + result + ROI */}
                                     <div className="flex items-center justify-end gap-3 px-5 py-2 border-b border-[var(--border)] bg-[var(--bg-elevated)]">
                                       {statusBadge(aposta.status)}
-                                      <span className={`font-bold text-base ${isFinished ? ((aposta.resultado_real ?? 0) >= 0 ? "text-green-500" : "text-[#DC2626]") : "text-green-500"}`}>
-                                        {isFinished ? formatCurrency(aposta.resultado_real ?? 0) : formatCurrency(aposta.lucro_garantido)}
-                                      </span>
-                                      <span className="text-xs text-[var(--text-muted)]">{aposta.roi_percentual.toFixed(2)}%</span>
                                     </div>
                                     {/* Body: legs */}
                                     <div className="divide-y divide-[var(--border)]">
