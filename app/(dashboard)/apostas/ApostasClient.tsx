@@ -562,28 +562,22 @@ export default function ApostasClient({ apostas: initialApostas, profiles, betCo
                     </div>
                   </div>
 
-                  {/* Body: left info column + right legs */}
-                  <div className="flex">
-                    {/* Left info column */}
-                    <div className="w-48 flex-shrink-0 border-r border-[var(--border)] px-4 flex flex-col justify-center items-center text-center gap-0.5">
-                      <p className={`font-semibold text-sm leading-snug line-clamp-2 ${aposta.status === "pendente" ? "text-red-500 dark:text-[var(--text-primary)]" : "text-[var(--text-primary)]"}`}>{aposta.evento}</p>
-                      {aposta.competicao && <p className="text-xs text-[var(--text-muted)] truncate">{aposta.competicao}</p>}
-                      {aposta.esporte && <p className="text-xs text-[var(--text-muted)] truncate">{aposta.esporte}</p>}
-                      <p className="text-xs text-[var(--text-secondary)] mt-0.5">{dataStr}{horaStr ? ` · ${horaStr}` : ""}</p>
-                    </div>
-
-                    {/* Legs + footer */}
-                    <div className="flex-1 min-w-0 divide-y divide-[var(--border)]">
+                  {/* Body: legs */}
+                  <div className="divide-y divide-[var(--border)]">
                       {legs.map(leg => {
                         const isGreen = detectedGreenLegId === leg.id
                         const isRed = isFinished && detectedGreenLegId !== null && !isGreen
                         return (
                           <div key={leg.id} className={`flex items-center gap-4 px-5 py-3 ${isGreen ? "bg-green-500/5" : isRed ? "bg-[#DC2626]/5" : ""}`}>
-                            <div className="w-28 flex-shrink-0">
+                            <div className="w-36 flex-shrink-0">
                               <p className="font-semibold text-[var(--text-primary)] text-sm truncate">{leg.profile_bet?.bet?.nome ?? "—"}</p>
+                              {aposta.esporte && <p className="text-xs text-[var(--text-muted)] truncate">{aposta.esporte}</p>}
+                              <p className={`text-xs leading-snug line-clamp-2 ${aposta.status === "pendente" ? "text-red-500 dark:text-[var(--text-muted)]" : "text-[var(--text-muted)]"}`}>{aposta.evento}</p>
+                              {aposta.competicao && <p className="text-xs text-[var(--text-muted)] truncate">{aposta.competicao}</p>}
                             </div>
                             <div className="flex-1 min-w-0">
                               <p className="text-sm text-[var(--text-secondary)] truncate">{leg.resultado_apostado}</p>
+                              <p className="text-xs text-[var(--text-muted)]">{dataStr}{horaStr ? ` · ${horaStr}` : ""}</p>
                             </div>
                             <div className="text-right flex-shrink-0 w-28">
                               <p className="text-xs text-[var(--text-muted)]">Stake</p>
@@ -610,7 +604,7 @@ export default function ApostasClient({ apostas: initialApostas, profiles, betCo
                         )
                       })}
                       <div className="flex items-center gap-4 px-5 py-2 bg-[var(--bg-elevated)]">
-                        <div className="w-28 flex-shrink-0" />
+                        <div className="w-36 flex-shrink-0" />
                         <div className="flex-1 min-w-0" />
                         <div className="text-right flex-shrink-0 w-28">
                           <p className="text-xs text-[var(--text-muted)]">Investimento</p>
@@ -628,7 +622,6 @@ export default function ApostasClient({ apostas: initialApostas, profiles, betCo
                         </div>
                         {isFinished && <div className="w-14 flex-shrink-0" />}
                       </div>
-                    </div>
                   </div>
                 </Card>
               )
