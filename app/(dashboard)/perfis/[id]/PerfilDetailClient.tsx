@@ -742,13 +742,15 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
                                           <p className="font-semibold text-[var(--text-primary)] text-sm truncate">{leg.profile_bet?.bet?.nome ?? "—"}</p>
                                           {aposta.esporte && <p className="text-xs text-[var(--text-muted)] truncate">{aposta.esporte}</p>}
                                         </div>
-                                        <div className="flex-1 min-w-0">
-                                          <p className="text-sm font-medium leading-snug line-clamp-2 text-[var(--text-secondary)]">{aposta.evento}</p>
-                                          {aposta.competicao && <p className="text-xs text-[var(--text-muted)] truncate">{aposta.competicao}</p>}
-                                        </div>
-                                        <div className="flex-shrink-0 w-20 text-center">
-                                          <p className="text-xs font-medium text-[var(--text-secondary)]">{dataStr}</p>
-                                          {horaStr && <p className="text-xs text-[var(--text-muted)]">{horaStr}</p>}
+                                        <div className="flex-1 min-w-0 flex items-center gap-3">
+                                          <div className="min-w-0">
+                                            <p className="text-sm font-medium leading-snug line-clamp-2 text-[var(--text-secondary)]">{aposta.evento}</p>
+                                            {aposta.competicao && <p className="text-xs text-[var(--text-muted)] truncate">{aposta.competicao}</p>}
+                                          </div>
+                                          <div className="flex-shrink-0 text-center">
+                                            <p className="text-xs font-medium text-[var(--text-secondary)]">{dataStr}</p>
+                                            {horaStr && <p className="text-xs text-[var(--text-muted)]">{horaStr}</p>}
+                                          </div>
                                         </div>
                                         <div className="text-right flex-shrink-0 w-28">
                                           <p className="text-xs text-[var(--text-muted)]">Stake</p>
@@ -1176,13 +1178,15 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
                                                 <p className="font-semibold text-[var(--text-primary)] text-sm truncate">{leg.profile_bet?.bet?.nome ?? "—"}</p>
                                                 {aposta.esporte && <p className="text-xs text-[var(--text-muted)] truncate">{aposta.esporte}</p>}
                                               </div>
-                                              <div className="flex-1 min-w-0">
-                                                <p className={`text-sm font-medium leading-snug line-clamp-2 ${aposta.status === "pendente" ? "text-red-500 dark:text-[var(--text-secondary)]" : "text-[var(--text-secondary)]"}`}>{aposta.evento}</p>
-                                                {aposta.competicao && <p className="text-xs text-[var(--text-muted)] truncate">{aposta.competicao}</p>}
-                                              </div>
-                                              <div className="flex-shrink-0 w-20 text-center">
-                                                <p className="text-xs font-medium text-[var(--text-secondary)]">{dataStr}</p>
-                                                {horaStr && <p className="text-xs text-[var(--text-muted)]">{horaStr}</p>}
+                                              <div className="flex-1 min-w-0 flex items-center gap-3">
+                                                <div className="min-w-0">
+                                                  <p className={`text-sm font-medium leading-snug line-clamp-2 ${aposta.status === "pendente" ? "text-red-500 dark:text-[var(--text-secondary)]" : "text-[var(--text-secondary)]"}`}>{aposta.evento}</p>
+                                                  {aposta.competicao && <p className="text-xs text-[var(--text-muted)] truncate">{aposta.competicao}</p>}
+                                                </div>
+                                                <div className="flex-shrink-0 text-center">
+                                                  <p className="text-xs font-medium text-[var(--text-secondary)]">{dataStr}</p>
+                                                  {horaStr && <p className="text-xs text-[var(--text-muted)]">{horaStr}</p>}
+                                                </div>
                                               </div>
                                               <div className="text-right flex-shrink-0 w-28">
                                                 <p className="text-xs text-[var(--text-muted)]">Stake</p>
@@ -1212,7 +1216,6 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
                                         <div className="flex items-center gap-4 px-5 py-2 bg-[var(--bg-elevated)]">
                                           <div className="w-36 flex-shrink-0" />
                                           <div className="flex-1 min-w-0" />
-                                          <div className="w-20 flex-shrink-0" />
                                           <div className="text-right flex-shrink-0 w-28">
                                             <p className="text-xs text-[var(--text-muted)]">Investimento</p>
                                             <p className="text-sm font-semibold text-[var(--text-primary)]">{formatCurrency(aposta.investimento_total)}</p>
