@@ -119,7 +119,7 @@ export default function TicketDetailClient({ ticket: initial, mensagens: initial
 
       {/* Messages */}
       <div className="bg-[var(--bg-surface)] border border-[var(--border)] rounded-2xl overflow-hidden">
-        <div className="p-4 space-y-4 min-h-[400px] max-h-[520px] overflow-y-auto">
+        <div className="p-4 space-y-4 h-[calc(100vh-280px)] overflow-y-auto">
           {mensagens.map(m => {
             const isMe = !m.is_admin
             return (
