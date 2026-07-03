@@ -17,7 +17,7 @@ export default function SuporteClient() {
           <ArrowLeft className="w-4 h-4" />
         </button>
         <div>
-          <h1 className="text-2xl font-bold text-[var(--text-primary)]">Suporte</h1>
+          <h1 className="text-2xl font-bold text-[var(--text-primary)]">SureBet AI</h1>
           <p className="text-[var(--text-secondary)] text-sm">Tire suas dúvidas sobre a SurebetFlow</p>
         </div>
       </div>

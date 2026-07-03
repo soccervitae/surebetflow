@@ -4,7 +4,7 @@ import { redirect } from "next/navigation"
 import SuporteClient from "./SuporteClient"
 
 export const metadata: Metadata = {
-  title: "Suporte",
+  title: "SureBet AI",
   description: "Tire suas dúvidas sobre a SurebetFlow com nosso assistente virtual.",
 }
 
