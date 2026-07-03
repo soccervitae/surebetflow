@@ -302,7 +302,7 @@ export default function AiChat() {
   const canSend = (input.trim() || imageFile) && !uploading
 
   return (
-    <div className="flex flex-col flex-1 min-h-0 bg-[var(--bg-surface)] border border-[var(--border)] rounded-2xl overflow-hidden">
+    <div className="flex flex-col flex-1 min-h-0 overflow-hidden bg-[var(--bg-surface)] border border-[var(--border)] rounded-2xl">
 
       {/* Header */}
       <div className="flex items-center gap-3 px-5 py-4 border-b border-[var(--border)] flex-shrink-0">

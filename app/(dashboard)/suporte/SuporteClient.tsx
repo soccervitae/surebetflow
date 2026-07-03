@@ -8,7 +8,7 @@ export default function SuporteClient() {
   const router = useRouter()
 
   return (
-    <div className="flex flex-col gap-4 h-full">
+    <div className="flex flex-col gap-4 h-[calc(100vh-120px)] md:h-[calc(100vh-100px)]">
       <div className="flex items-center gap-3">
         <button
           onClick={() => router.back()}
