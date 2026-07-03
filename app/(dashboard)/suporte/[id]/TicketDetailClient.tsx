@@ -119,7 +119,7 @@ export default function TicketDetailClient({ ticket: initial, mensagens: initial
 
       {/* Messages */}
       <div className="bg-[var(--bg-surface)] border border-[var(--border)] rounded-2xl overflow-hidden">
-        <div className="p-4 space-y-4 h-[calc(100vh-280px)] overflow-y-auto">
+        <div className="p-4 space-y-4 h-[calc(100vh-280px)] overflow-y-auto pb-6">
           {mensagens.map(m => {
             const isMe = !m.is_admin
             return (
@@ -149,9 +149,11 @@ export default function TicketDetailClient({ ticket: initial, mensagens: initial
           })}
           <div ref={bottomRef} />
         </div>
+      </div>
 
-        {/* Input */}
-        <div className="border-t border-[var(--border)] p-4">
+      {/* Input — sticky to bottom on desktop, static on mobile */}
+      <div className="md:sticky md:bottom-0 md:z-10 md:bg-[var(--bg-base)] md:border-t md:border-[var(--border)] md:py-4">
+        <div>
           {ticket.status === "fechado" ? (
             <div className="flex items-center justify-center gap-2 py-3 text-[var(--text-muted)] text-sm">
               <Lock className="w-4 h-4" />
