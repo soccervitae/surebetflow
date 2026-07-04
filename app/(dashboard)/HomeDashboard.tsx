@@ -294,7 +294,7 @@ export default function HomeDashboard({
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-sm font-semibold text-[var(--text-primary)] uppercase tracking-wide">Apostas Recentes</h2>
           <Link href="/apostas" className="text-xs text-[var(--accent-text)] hover:underline flex items-center gap-1">
-            Ver todas <ChevronRight className="w-3 h-3" />
+            Ver Apostas <ChevronRight className="w-3 h-3" />
           </Link>
         </div>
 

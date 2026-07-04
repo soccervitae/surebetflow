@@ -35,7 +35,7 @@ export default async function HomePage() {
       .select("*, profile:profiles(nome, sobrenome, apelido), legs:aposta_legs(*, profile_bet:profile_bets(*, bet:bets(*)))")
       .eq("profiles.user_id", user!.id)
       .order("created_at", { ascending: false })
-      .limit(10),
+      .limit(5),
     supabase
       .from("apostas")
       .select("id", { count: "exact", head: true })
