@@ -13,6 +13,7 @@ import {
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts"
 import type { DashboardGeral, ProfileDashboard, Aposta, ApostaLeg } from "@/lib/types"
 import ApostaDesktopCard from "@/components/ApostaDesktopCard"
+import ApostaMobileCard from "@/components/ApostaMobileCard"
 
 interface Props {
   dashboard: DashboardGeral | null
@@ -285,95 +286,15 @@ export default function HomeDashboard({
 
             {/* Mobile cards */}
             <div className="md:hidden space-y-3">
-              {recentApostas.map(aposta => {
-                const legs = (aposta.legs ?? []) as ApostaLeg[]
-                const isFinished = aposta.status === "finalizada" && aposta.resultado_real != null
-                const detectedGreenLegId = isFinished
-                  ? detectGreenLegId(legs, aposta.investimento_total, aposta.resultado_real)
-                  : null
-
-                return (
-                  <Link key={aposta.id} href={`/apostas/${aposta.id}`}>
-                    <Card className="hover:border-[#1e3a8a]/40 transition-colors cursor-pointer overflow-hidden">
-                      <CardContent className="p-4">
-                        <div className="flex items-center gap-2 flex-wrap mb-1 min-w-0">
-                          <p className="font-medium text-[var(--text-primary)] truncate">{aposta.evento}</p>
-                          {statusBadge(aposta.status)}
-                        </div>
-                        {aposta.profile && (
-                          <p className="text-xs text-[var(--text-secondary)] mb-1">
-                            {aposta.profile.apelido ?? `${aposta.profile.nome} ${aposta.profile.sobrenome}`}
-                          </p>
-                        )}
-                        <p className="text-xs text-[var(--text-muted)] mb-3 flex items-center gap-1">
-                          <CalendarIcon className="h-3 w-3" />
-                          {(() => {
-                            const d = aposta.data_evento ? new Date(aposta.data_evento) : new Date(aposta.created_at)
-                            return d.toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit", year: "numeric" })
-                          })()}
-                        </p>
-
-                        {legs.length > 0 && (
-                          <div className="space-y-1.5 mb-3">
-                            {legs.map(leg => {
-                              const isGreen = detectedGreenLegId === leg.id
-                              const isRed = detectedGreenLegId !== null && !isGreen
-                              return (
-                                <div key={leg.id} className={`rounded-xl px-3 py-3 flex items-center gap-3 ${
-                                  isGreen ? "bg-green-500/10" : isRed ? "bg-[#DC2626]/5" : "bg-[var(--bg-elevated)]"
-                                }`}>
-                                  <div className="flex-1 min-w-0 space-y-1">
-                                    <p className={`text-base font-bold leading-tight ${isGreen ? "text-green-600" : isRed ? "text-[#DC2626]" : "text-[var(--accent-text)]"}`}>
-                                      {leg.profile_bet?.bet?.nome ?? "Casa"}
-                                    </p>
-                                    <p className="text-sm text-[var(--text-secondary)] leading-snug">{leg.resultado_apostado}</p>
-                                    <p className="text-sm text-[var(--text-secondary)]">@{parseFloat(String(leg.odd)).toFixed(2)} · {formatCurrency(leg.stake)}</p>
-                                    {(isGreen || isRed) && (
-                                      <p className={`text-sm font-bold ${isGreen ? "text-green-600" : "text-[#DC2626]"}`}>
-                                        {isGreen
-                                          ? `Retorno: +${formatCurrency(parseFloat(String(leg.stake)) * parseFloat(String(leg.odd)))}`
-                                          : `Perda: -${formatCurrency(parseFloat(String(leg.stake)))}`}
-                                      </p>
-                                    )}
-                                  </div>
-                                  {(isGreen || isRed) && (
-                                    <span className={`px-2.5 py-1 rounded text-xs font-bold flex-shrink-0 ${
-                                      isGreen ? "bg-green-600 text-white" : "bg-[#DC2626] text-white"
-                                    }`}>
-                                      {isGreen ? "GREEN" : "RED"}
-                                    </span>
-                                  )}
-                                </div>
-                              )
-                            })}
-                          </div>
-                        )}
-
-                        <div className="flex items-end justify-between gap-2 pt-2 border-t border-[var(--border)]">
-                          <div>
-                            <p className="text-xs text-[var(--text-muted)]">Investimento</p>
-                            <p className="text-sm font-bold text-[var(--text-primary)]">{formatCurrency(aposta.investimento_total)}</p>
-                          </div>
-                          {aposta.status !== "cancelada" && (
-                            <div className="text-right">
-                              <p className="text-xs text-[var(--text-muted)]">{aposta.status === "finalizada" ? "Lucro" : "Lucro esperado"}</p>
-                              <p className={`text-sm font-bold ${
-                                aposta.status === "finalizada"
-                                  ? (aposta.resultado_real ?? 0) >= 0 ? "text-[var(--accent-text)]" : "text-[#DC2626]"
-                                  : "text-[#D97706]"
-                              }`}>
-                                {aposta.status === "finalizada"
-                                  ? formatCurrency(aposta.resultado_real ?? 0)
-                                  : formatCurrency(aposta.lucro_garantido)}
-                              </p>
-                            </div>
-                          )}
-                        </div>
-                      </CardContent>
-                    </Card>
-                  </Link>
-                )
-              })}
+              {recentApostas.map(aposta => (
+                <ApostaMobileCard
+                  key={aposta.id}
+                  aposta={aposta as any}
+                  statusBadge={statusBadge}
+                  detectGreen={detectGreenLegId as any}
+                  showProfile
+                />
+              ))}
             </div>
           </>
         )}
