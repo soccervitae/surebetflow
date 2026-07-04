@@ -16,6 +16,8 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sh
 import AddBetToProfile from "@/components/AddBetToProfile"
 import ApostaDesktopCard from "@/components/ApostaDesktopCard"
 import ApostaMobileCard from "@/components/ApostaMobileCard"
+import MovimentacaoRow, { fmtGroupDate } from "@/components/MovimentacaoRow"
+import type { MovimentacaoItem } from "@/components/MovimentacaoRow"
 import { formatCurrency } from "@/lib/utils"
 import { useToast } from "@/hooks/useToast"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
@@ -1227,8 +1229,7 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
           {!movLoaded ? (
             <Card><CardContent className="py-8 text-center text-[var(--text-secondary)] text-sm">Carregando...</CardContent></Card>
           ) : (() => {
-            type Item = { id: string; created_at: string; tipo: string; valor: number; betNome?: string; descricao?: string | null }
-            const allItems: Item[] = [
+            const allItems: MovimentacaoItem[] = [
               ...finFiltered.map(m => ({
                 id: m.id,
                 created_at: m.created_at,
@@ -1268,7 +1269,7 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
               )
             }
 
-            const groupMap = new Map<string, Item[]>()
+            const groupMap = new Map<string, MovimentacaoItem[]>()
             for (const item of allItems) {
               const key = item.created_at.slice(0, 10)
               if (!groupMap.has(key)) groupMap.set(key, [])
@@ -1276,35 +1277,12 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
             }
             const groups = Array.from(groupMap.entries()).sort((a, b) => b[0].localeCompare(a[0]))
 
-            function fmtDate(iso: string) {
-              return new Date(iso + "T12:00:00").toLocaleDateString("pt-BR", { day: "numeric", month: "short" }).replace(".", "")
-            }
-            function fmtHora(iso: string) {
-              return new Date(iso).toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" })
-            }
-            function tLabel(tipo: string) {
-              return tipo === "deposito" ? "Depósito" : tipo === "saque" ? "Saque" : tipo === "lucro" ? "Lucro" : tipo === "perda" ? "Perda" : "Bônus"
-            }
-            function tColor(tipo: string) {
-              return tipo === "saque" ? "text-[#DC2626]" : tipo === "perda" ? "text-orange-500" : tipo === "lucro" ? "text-green-500" : tipo === "bonus" ? "text-purple-500" : "text-[var(--accent-text)]"
-            }
-            function tBg(tipo: string) {
-              return tipo === "saque" ? "bg-[#DC2626]/10" : tipo === "perda" ? "bg-orange-500/10" : tipo === "lucro" ? "bg-green-500/10" : tipo === "bonus" ? "bg-purple-500/10" : "bg-[#1e3a8a]/10"
-            }
-            function tIcon(tipo: string) {
-              if (tipo === "deposito") return <ArrowDownLeft className="h-5 w-5 text-[var(--accent-text)]" />
-              if (tipo === "lucro")    return <TrendingUp    className="h-5 w-5 text-green-500" />
-              if (tipo === "perda")   return <ArrowUpRight  className="h-5 w-5 text-orange-500" />
-              if (tipo === "bonus")   return <Gift          className="h-5 w-5 text-purple-500" />
-              return                         <ArrowUpRight  className="h-5 w-5 text-[#DC2626]" />
-            }
-
             return (
               <div className="space-y-4">
                 {groups.map(([dateKey, items], groupIdx) => (
                   <div key={dateKey}>
                     <div className="flex items-center justify-between px-1 mb-2">
-                      <p className="text-xs font-semibold text-[var(--text-muted)]">{fmtDate(dateKey)}</p>
+                      <p className="text-xs font-semibold text-[var(--text-muted)]">{fmtGroupDate(dateKey)}</p>
                       {groupIdx === 0 && (
                         <button
                           onClick={() => setFinShowFilter(v => !v)}
@@ -1322,26 +1300,7 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
                     <Card>
                       <CardContent className="p-0 divide-y divide-[var(--border)]">
                         {items.map(item => (
-                          <div key={item.id} className="flex items-center gap-3 px-4 py-3.5">
-                            <div className={`w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 ${tBg(item.tipo)}`}>
-                              {tIcon(item.tipo)}
-                            </div>
-                            <div className="flex-1 min-w-0">
-                              <p className="text-sm font-semibold text-[var(--text-primary)] truncate">{item.betNome ?? "—"}</p>
-                              {item.tipo === "perda" && item.descricao?.startsWith("Aposta: ") && (
-                                <p className="text-xs text-[var(--text-secondary)] truncate">{item.descricao.replace("Aposta: ", "")}</p>
-                              )}
-                              <p className="text-xs text-[var(--text-muted)] truncate">
-                                {fmtHora(item.created_at)}{item.descricao && !item.descricao.startsWith("Aposta: ") ? ` · ${item.descricao}` : ""}
-                              </p>
-                            </div>
-                            <div className="text-right flex-shrink-0">
-                              <p className={`text-sm font-bold ${tColor(item.tipo)}`}>
-                                {item.tipo === "saque" || item.tipo === "perda" ? "-" : "+"}{formatCurrency(item.valor)}
-                              </p>
-                              <p className="text-xs text-[var(--text-muted)]">{tLabel(item.tipo)}</p>
-                            </div>
-                          </div>
+                          <MovimentacaoRow key={item.id} item={item} />
                         ))}
                       </CardContent>
                     </Card>

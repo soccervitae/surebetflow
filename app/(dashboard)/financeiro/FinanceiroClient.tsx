@@ -2,11 +2,12 @@
 
 import { useState } from "react"
 import { Card, CardContent } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { formatCurrency } from "@/lib/utils"
 import { ArrowDownLeft, ArrowUpRight, DollarSign } from "lucide-react"
 import type { MovimentacaoFinanceira } from "@/lib/types"
+import MovimentacaoRow, { fmtGroupDate } from "@/components/MovimentacaoRow"
+import type { MovimentacaoItem } from "@/components/MovimentacaoRow"
 
 interface Props {
   movimentacoes: (MovimentacaoFinanceira & {
@@ -103,49 +104,52 @@ export default function FinanceiroClient({ movimentacoes: initial, profiles, pro
         </CardContent>
       </Card>
 
-      {/* Table */}
+      {/* List */}
       {filtered.length === 0 ? (
         <Card>
           <CardContent className="py-12 text-center text-[var(--text-secondary)]">
             Nenhuma movimentação encontrada
           </CardContent>
         </Card>
-      ) : (
-        <div className="space-y-2">
-          {filtered.map(mov => (
-            <Card key={mov.id}>
-              <CardContent className="p-4">
-                <div className="flex items-center gap-4">
-                  <div className={`p-2 rounded-lg ${mov.tipo === "deposito" ? "bg-[#1e3a8a]/10" : "bg-[#DC2626]/10"}`}>
-                    {mov.tipo === "deposito"
-                      ? <ArrowDownLeft className="h-4 w-4 text-[var(--accent-text)]" />
-                      : <ArrowUpRight className="h-4 w-4 text-[#DC2626]" />
-                    }
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2">
-                      <p className="font-medium text-[var(--text-primary)] text-sm">
-                        {mov.tipo === "deposito" ? "Depósito" : "Saque"}
-                      </p>
-                      {mov.profile_bet?.bet && (
-                        <Badge variant="secondary">{mov.profile_bet.bet.nome}</Badge>
-                      )}
-                    </div>
-                    <p className="text-xs text-[var(--text-secondary)]">
-                      {mov.profile ? (mov.profile.apelido || `${mov.profile.nome} ${mov.profile.sobrenome}`) : "—"}
-                      {mov.descricao && ` · ${mov.descricao}`}
-                      {" · "}{new Date(mov.created_at).toLocaleDateString("pt-BR")}
-                    </p>
-                  </div>
-                  <p className={`font-bold text-base flex-shrink-0 ${mov.tipo === "deposito" ? "text-[var(--accent-text)]" : "text-[#DC2626]"}`}>
-                    {mov.tipo === "deposito" ? "+" : "-"}{formatCurrency(mov.valor)}
-                  </p>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      )}
+      ) : (() => {
+        const items: MovimentacaoItem[] = filtered.map(mov => ({
+          id: mov.id,
+          created_at: mov.created_at,
+          tipo: mov.tipo,
+          valor: mov.valor,
+          betNome: (mov as any).profile_bet?.bet?.nome ?? null,
+          descricao: mov.descricao,
+          profileNome: (mov as any).profile
+            ? ((mov as any).profile.apelido || `${(mov as any).profile.nome} ${(mov as any).profile.sobrenome}`)
+            : null,
+        }))
+        const groupMap = new Map<string, MovimentacaoItem[]>()
+        for (const item of items) {
+          const key = item.created_at.slice(0, 10)
+          if (!groupMap.has(key)) groupMap.set(key, [])
+          groupMap.get(key)!.push(item)
+        }
+        const groups = Array.from(groupMap.entries()).sort((a, b) => b[0].localeCompare(a[0]))
+        return (
+          <div className="space-y-4">
+            {groups.map(([dateKey, groupItems]) => (
+              <div key={dateKey}>
+                <p className="text-xs font-semibold text-[var(--text-muted)] px-1 mb-2">{fmtGroupDate(dateKey)}</p>
+                <Card>
+                  <CardContent className="p-0 divide-y divide-[var(--border)]">
+                    {groupItems.map(item => (
+                      <MovimentacaoRow key={item.id} item={item} />
+                    ))}
+                  </CardContent>
+                </Card>
+              </div>
+            ))}
+            <p className="text-xs text-[var(--text-muted)] text-center pb-2">
+              {items.length} movimentaç{items.length !== 1 ? "ões" : "ão"}
+            </p>
+          </div>
+        )
+      })()}
     </div>
   )
 }
