@@ -175,7 +175,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         )}>
           {collapsed
             ? <LogoIcon size="sm" />
-            : <Logo size="sm" />
+            : <Logo size="sm" forceDark />
           }
         </div>
 

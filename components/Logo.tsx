@@ -22,9 +22,15 @@ export function LogoIcon({ size = "md" }: { size?: "sm" | "md" | "lg" }) {
   )
 }
 
-export default function Logo({ size = "md", showText = true }: LogoProps) {
+interface LogoProps {
+  size?: "sm" | "md" | "lg"
+  showText?: boolean
+  forceDark?: boolean
+}
+
+export default function Logo({ size = "md", showText = true, forceDark = false }: LogoProps) {
   const { theme } = useTheme()
-  const isDark = theme === "dark"
+  const isDark = forceDark || theme === "dark"
 
   const logoH = size === "sm" ? 28 : size === "lg" ? 56 : 44
 
