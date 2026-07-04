@@ -448,7 +448,7 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
 
       {/* Desktop banner */}
       <div className="hidden md:block -mx-6 -mt-6 mb-0">
-        <div className="relative overflow-hidden bg-gradient-to-br from-[#e8eaf6] to-[#c5cae9] dark:from-[#1e1e3a] dark:to-[#12122a] px-8 pt-8 pb-0">
+        <div className="relative overflow-hidden bg-gradient-to-br from-[#e8eaf6] to-[#c5cae9] dark:from-[#1e1e3a] dark:to-[#12122a] px-8 pt-4 pb-0">
           {/* Decorative curves */}
           <svg className="absolute right-0 top-0 h-full w-1/3 opacity-30" viewBox="0 0 400 300" fill="none" preserveAspectRatio="xMidYMid slice">
             <ellipse cx="350" cy="80" rx="220" ry="180" fill="#7986cb" opacity="0.4" />
