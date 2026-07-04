@@ -428,8 +428,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       {/* Bottom nav mobile */}
       {hasActivePlan && pathname !== "/suporte" && <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-[var(--bg-surface)] border-t border-[var(--border)] z-20 flex" style={{ paddingBottom: "env(safe-area-inset-bottom)" }}>
         {([
-          { href: "/dashboard",  icon: Home,          label: "Início" },
-          { href: "/surebet",    icon: Zap,           label: "Surebets" },
+          { href: "/dashboard",  icon: Home,          label: "Dashboard" },
+          { href: "/perfis",     icon: Users,         label: "Perfis" },
           null,
           { href: "/apostas",    icon: ClipboardList, label: "Apostas" },
           { href: "/financeiro", icon: Wallet,        label: "Financeiro" },
