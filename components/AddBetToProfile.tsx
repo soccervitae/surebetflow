@@ -51,6 +51,10 @@ export default function AddBetToProfile({ profileId, autoOpen = false, onSaved }
   const [editDialog, setEditDialog] = useState<ProfileBetWithBet | null>(null)
   const [editEmail, setEditEmail] = useState("")
   const [editSenha, setEditSenha] = useState("")
+
+  // Filtros da aba bets (desktop)
+  const [betSort, setBetSort] = useState<"saldo_desc" | "saldo_asc" | "lucro_desc" | "lucro_asc" | "roi_desc" | "roi_asc">("saldo_desc")
+  const [betStatusFilter, setBetStatusFilter] = useState<"todos" | "ativa" | "inativa">("todos")
   const [editTelefone, setEditTelefone] = useState("")
   const [editSaving, setEditSaving] = useState(false)
 
@@ -683,8 +687,56 @@ export default function AddBetToProfile({ profileId, autoOpen = false, onSaved }
       {profileBets.length === 0 ? (
         <p className="text-sm text-[var(--text-secondary)] text-center py-6">Nenhuma bet adicionada</p>
       ) : (
+        <>
+          {/* Filtros desktop */}
+          <div className="hidden md:flex items-center gap-2 flex-wrap mb-1">
+            {/* Status */}
+            {(["todos", "ativa", "inativa"] as const).map(s => (
+              <button key={s} onClick={() => setBetStatusFilter(s)}
+                className={`px-3 py-1.5 rounded-lg border text-xs font-medium transition-colors ${
+                  betStatusFilter === s
+                    ? s === "ativa" ? "bg-green-500/10 border-green-500/40 text-green-600"
+                      : s === "inativa" ? "bg-red-500/10 border-red-500/40 text-red-500"
+                      : "bg-[#1e3a8a] border-[#1e3a8a] text-white"
+                    : "border-[var(--border)] text-[var(--text-secondary)] hover:bg-[var(--bg-elevated)]"
+                }`}>
+                {{ todos: "Todas", ativa: "Ativas", inativa: "Inativas" }[s]}
+              </button>
+            ))}
+            <div className="w-px h-4 bg-[var(--border)]" />
+            {/* Ordenação */}
+            {([
+              { value: "saldo_desc", label: "Maior saldo" },
+              { value: "saldo_asc",  label: "Menor saldo" },
+              { value: "lucro_desc", label: "Maior lucro" },
+              { value: "lucro_asc",  label: "Menor lucro" },
+              { value: "roi_desc",   label: "Maior ROI" },
+              { value: "roi_asc",    label: "Menor ROI" },
+            ] as { value: typeof betSort; label: string }[]).map(({ value, label }) => (
+              <button key={value} onClick={() => setBetSort(value)}
+                className={`px-3 py-1.5 rounded-lg border text-xs font-medium transition-colors ${
+                  betSort === value
+                    ? "bg-[#1e3a8a] border-[#1e3a8a] text-white"
+                    : "border-[var(--border)] text-[var(--text-secondary)] hover:bg-[var(--bg-elevated)]"
+                }`}>
+                {label}
+              </button>
+            ))}
+          </div>
+
         <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-          {profileBets.map(pb => {
+          {profileBets
+            .filter(pb => betStatusFilter === "todos" || (betStatusFilter === "ativa" ? pb.ativo : !pb.ativo))
+            .sort((a, b) => {
+              if (betSort === "saldo_desc") return b.saldo - a.saldo
+              if (betSort === "saldo_asc")  return a.saldo - b.saldo
+              if (betSort === "lucro_desc") return (b.lucro ?? 0) - (a.lucro ?? 0)
+              if (betSort === "lucro_asc")  return (a.lucro ?? 0) - (b.lucro ?? 0)
+              if (betSort === "roi_desc")   return (b.roi ?? 0) - (a.roi ?? 0)
+              if (betSort === "roi_asc")    return (a.roi ?? 0) - (b.roi ?? 0)
+              return 0
+            })
+            .map(pb => {
             const lucro = pb.lucro ?? 0
             const roi = pb.roi ?? 0
             const bonus = (pb as ProfileBetWithBet & { saldo_bonus?: number }).saldo_bonus
@@ -732,6 +784,7 @@ export default function AddBetToProfile({ profileId, autoOpen = false, onSaved }
             )
           })}
         </div>
+        </>
       )}
     </div>
   )
