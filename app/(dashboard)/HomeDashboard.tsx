@@ -215,12 +215,7 @@ export default function HomeDashboard({
         }))
         return (
           <div>
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-sm font-semibold text-[var(--text-primary)] uppercase tracking-wide">Financeiro Recente</h2>
-              <Link href="/financeiro" className="text-xs text-[var(--accent-text)] hover:underline flex items-center gap-1">
-                Saber mais <ChevronRight className="w-3 h-3" />
-              </Link>
-            </div>
+            <h2 className="text-sm font-semibold text-[var(--text-primary)] uppercase tracking-wide mb-4">Financeiro Recente</h2>
             <Card>
               <CardContent className="p-0 divide-y divide-[var(--border)]">
                 {items.map(item => (
@@ -228,6 +223,11 @@ export default function HomeDashboard({
                 ))}
               </CardContent>
             </Card>
+            <div className="mt-3 flex justify-end">
+              <Link href="/financeiro" className="text-xs text-[var(--accent-text)] hover:underline flex items-center gap-1">
+                Saiba Mais <ChevronRight className="w-3 h-3" />
+              </Link>
+            </div>
           </div>
         )
       })()}
@@ -291,12 +291,7 @@ export default function HomeDashboard({
 
       {/* Apostas Recentes */}
       <div>
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-sm font-semibold text-[var(--text-primary)] uppercase tracking-wide">Apostas Recentes</h2>
-          <Link href="/apostas" className="text-xs text-[var(--accent-text)] hover:underline flex items-center gap-1">
-            Ver Apostas <ChevronRight className="w-3 h-3" />
-          </Link>
-        </div>
+        <h2 className="text-sm font-semibold text-[var(--text-primary)] uppercase tracking-wide mb-4">Apostas Recentes</h2>
 
         {recentApostas.length === 0 ? (
           <Card>
@@ -330,6 +325,12 @@ export default function HomeDashboard({
                   showProfile
                 />
               ))}
+            </div>
+
+            <div className="mt-3 flex justify-end">
+              <Link href="/apostas" className="text-xs text-[var(--accent-text)] hover:underline flex items-center gap-1">
+                Ver Apostas <ChevronRight className="w-3 h-3" />
+              </Link>
             </div>
           </>
         )}
