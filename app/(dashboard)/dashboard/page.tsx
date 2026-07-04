@@ -20,7 +20,7 @@ export default async function HomePage() {
 
   const threeDaysAgo = new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString()
 
-  const [dashResult, profilesResult, apostasResult, apostasPendentesResult, pendentesCountResult] = await Promise.all([
+  const [dashResult, profilesResult, apostasResult, apostasPendentesResult, pendentesCountResult, movimentacoesResult] = await Promise.all([
     supabase
       .from("dashboard_geral")
       .select("*")
@@ -45,6 +45,11 @@ export default async function HomePage() {
       .from("apostas")
       .select("id", { count: "exact", head: true })
       .eq("status", "pendente"),
+    supabase
+      .from("movimentacoes_financeiras")
+      .select("*, profile:profiles(nome, sobrenome, apelido), profile_bet:profile_bets(*, bet:bets(*))")
+      .order("created_at", { ascending: false })
+      .limit(5),
   ])
 
   // Get finalized apostas for chart + win rate
@@ -62,6 +67,7 @@ export default async function HomePage() {
       apostasFinalizadas={apostasFinalizadas ?? []}
       apostasPendentesAntigas={apostasPendentesResult.count ?? 0}
       pendentesCount={pendentesCountResult.count ?? 0}
+      recentMovimentacoes={movimentacoesResult.data ?? []}
     />
   )
 }

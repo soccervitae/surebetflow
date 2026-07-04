@@ -14,6 +14,8 @@ import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContai
 import type { DashboardGeral, ProfileDashboard, Aposta, ApostaLeg } from "@/lib/types"
 import ApostaDesktopCard from "@/components/ApostaDesktopCard"
 import ApostaMobileCard from "@/components/ApostaMobileCard"
+import MovimentacaoRow from "@/components/MovimentacaoRow"
+import type { MovimentacaoItem } from "@/components/MovimentacaoRow"
 
 interface Props {
   dashboard: DashboardGeral | null
@@ -22,6 +24,7 @@ interface Props {
   apostasFinalizadas: { lucro_garantido: number; resultado_real?: number | null; finalizada_at?: string | null }[]
   apostasPendentesAntigas?: number
   pendentesCount?: number
+  recentMovimentacoes?: any[]
 }
 
 function statusBadge(status: string) {
@@ -52,7 +55,7 @@ const quickActions = [
 
 export default function HomeDashboard({
   dashboard, profiles, recentApostas, apostasFinalizadas,
-  apostasPendentesAntigas = 0, pendentesCount = 0,
+  apostasPendentesAntigas = 0, pendentesCount = 0, recentMovimentacoes = [],
 }: Props) {
   // Chart data
   let cumulative = 0
@@ -196,6 +199,38 @@ export default function HomeDashboard({
           </Link>
         </div>
       </div>
+
+      {/* Financeiro Recente */}
+      {recentMovimentacoes.length > 0 && (() => {
+        const items: MovimentacaoItem[] = recentMovimentacoes.map(mov => ({
+          id: mov.id,
+          created_at: mov.created_at,
+          tipo: mov.tipo,
+          valor: mov.valor,
+          betNome: mov.profile_bet?.bet?.nome ?? null,
+          descricao: mov.descricao ?? null,
+          profileNome: mov.profile
+            ? (mov.profile.apelido || `${mov.profile.nome} ${mov.profile.sobrenome}`)
+            : null,
+        }))
+        return (
+          <div>
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-sm font-semibold text-[var(--text-primary)] uppercase tracking-wide">Financeiro Recente</h2>
+              <Link href="/financeiro" className="text-xs text-[var(--accent-text)] hover:underline flex items-center gap-1">
+                Saber mais <ChevronRight className="w-3 h-3" />
+              </Link>
+            </div>
+            <Card>
+              <CardContent className="p-0 divide-y divide-[var(--border)]">
+                {items.map(item => (
+                  <MovimentacaoRow key={item.id} item={item} />
+                ))}
+              </CardContent>
+            </Card>
+          </div>
+        )
+      })()}
 
       {/* Quick Access + Profiles */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
