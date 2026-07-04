@@ -1,7 +1,8 @@
+import Link from "next/link"
 import type { SurebetRow as SurebetRowType } from "@/lib/types/surebet"
 import ProfitBadge from "./ProfitBadge"
 import LegDisplay from "./LegDisplay"
-import { Clock, CalendarDays, Zap } from "lucide-react"
+import { Clock, CalendarDays, Zap, Calculator } from "lucide-react"
 import { Card, CardContent } from "@/components/ui/card"
 
 function relativeTime(iso: string): string {
@@ -91,6 +92,16 @@ export default function SurebetRow({ surebet: s, isNew }: Props) {
           <div className="flex gap-2">
             <LegDisplay leg={s.leg_a} label="A" />
             <LegDisplay leg={s.leg_b} label="B" />
+          </div>
+
+          {/* Actions */}
+          <div className="flex justify-end">
+            <Link
+              href={`/calculadora?odds_a=${s.leg_a.odds}&odds_b=${s.leg_b.odds}&book_a=${encodeURIComponent(s.leg_a.bookmaker_name)}&book_b=${encodeURIComponent(s.leg_b.bookmaker_name)}&sel_a=${encodeURIComponent(s.leg_a.selection)}&sel_b=${encodeURIComponent(s.leg_b.selection)}`}
+              className="flex items-center gap-1.5 text-xs font-medium text-[var(--accent-text)] hover:underline"
+            >
+              <Calculator className="w-3.5 h-3.5" /> Calculadora
+            </Link>
           </div>
         </div>
       </CardContent>

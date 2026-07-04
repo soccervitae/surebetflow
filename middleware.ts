@@ -59,7 +59,8 @@ export async function middleware(request: NextRequest) {
       pathname.startsWith('/perfis') ||
       pathname.startsWith('/financeiro') ||
       pathname.startsWith('/suporte') ||
-      pathname.startsWith('/calculadora')
+      pathname.startsWith('/calculadora') ||
+      pathname.startsWith('/surebet')
 
     if (isDashboardRoute) {
       const adminEmails = (process.env.ADMIN_EMAILS ?? "").split(",").map(e => e.trim()).filter(Boolean)
