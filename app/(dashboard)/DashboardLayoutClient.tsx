@@ -27,7 +27,7 @@ const navItems = [
 
 const BOTTOM_NAV = [
   { href: "/dashboard", label: "Início", icon: Home },
-  { href: "/perfis", label: "Perfis", icon: Users },
+  { href: "/surebet", label: "Surebets", icon: Zap },
   null, // FAB placeholder
   { href: "/apostas", label: "Apostas", icon: BookOpen },
   { href: "/financeiro", label: "Financeiro", icon: DollarSign },

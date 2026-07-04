@@ -30,7 +30,7 @@ export default function LoginPage() {
 
     localStorage.setItem("sbf-theme", "light")
     document.documentElement.classList.remove("dark")
-    router.push("/dashboard")
+    router.push("/surebet")
     router.refresh()
   }
 

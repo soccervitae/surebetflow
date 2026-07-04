@@ -42,7 +42,7 @@ export async function middleware(request: NextRequest) {
   if (user && (pathname === '/login' || pathname === '/cadastro')) {
     const adminEmails = (process.env.ADMIN_EMAILS ?? "").split(",").map(e => e.trim()).filter(Boolean)
     const isAdmin = adminEmails.includes(user.email ?? "")
-    return redirect(request, isAdmin ? '/admin' : '/dashboard')
+    return redirect(request, isAdmin ? '/admin' : '/surebet')
   }
 
   // Check email verification for protected routes
