@@ -7,8 +7,8 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import {
   AlertTriangle, DollarSign, TrendingUp, Clock, ArrowUpRight,
-  Users, ClipboardList, Wallet, ChevronRight, Gift, Target,
-  CheckCircle2, CalendarIcon, BookOpen,
+  ClipboardList, Wallet, ChevronRight, Target,
+  CheckCircle2, BookOpen,
 } from "lucide-react"
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts"
 import type { DashboardGeral, ProfileDashboard, Aposta, ApostaLeg } from "@/lib/types"
@@ -47,11 +47,6 @@ function detectGreenLegId(legs: ApostaLeg[], investimento_total: number, resulta
   return minDiff < 5 ? minId : null
 }
 
-const quickActions = [
-  { href: "/perfis", icon: Users, label: "Perfis", sub: "Gerenciar", color: "text-[#a855f7]", bg: "bg-[#a855f7]/10 border-[#a855f7]/20" },
-  { href: "/apostas", icon: ClipboardList, label: "Apostas", sub: "Registrar", color: "text-[var(--accent-text)]", bg: "bg-[#1e3a8a]/10 border-[#1e3a8a]/20" },
-  { href: "/financeiro", icon: Wallet, label: "Financeiro", sub: "Movimentar", color: "text-[#f97316]", bg: "bg-[#f97316]/10 border-[#f97316]/20" },
-]
 
 export default function HomeDashboard({
   dashboard, profiles, recentApostas, apostasFinalizadas,
@@ -232,62 +227,52 @@ export default function HomeDashboard({
         )
       })()}
 
-      {/* Quick Access + Profiles */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-        {/* Acesso Rápido */}
+      {/* Perfis */}
+      {profiles.length > 0 && (
         <div className="rounded-xl border border-[var(--border)] bg-[var(--bg-surface)] p-5">
-          <h2 className="text-sm font-semibold text-[var(--text-primary)] uppercase tracking-wide mb-4">Acesso Rápido</h2>
-          <div className="grid grid-cols-3 gap-3">
-            {quickActions.map(({ href, icon: Icon, label, sub, color, bg }) => (
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-sm font-semibold text-[var(--text-primary)] uppercase tracking-wide">Perfis</h2>
+            <Link href="/perfis" className="text-xs text-[var(--accent-text)] hover:underline flex items-center gap-1">
+              Ver todos <ChevronRight className="w-3 h-3" />
+            </Link>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+            {profiles.map(p => (
               <Link
-                key={href}
-                href={href}
-                className={`flex flex-col items-center gap-2 p-3 rounded-xl border ${bg} hover:scale-[1.02] transition-transform`}
+                key={p.profile_id}
+                href={`/perfis/${p.profile_id}`}
+                className="flex flex-col gap-3 p-4 rounded-xl border border-[var(--border-subtle)] hover:border-[#1e3a8a]/40 hover:bg-[#1e3a8a]/5 transition-all"
               >
-                <div className={`p-2 rounded-lg ${bg}`}>
-                  <Icon className={`h-5 w-5 ${color}`} />
+                <div className="flex items-center gap-3">
+                  <Avatar className="h-9 w-9 flex-shrink-0">
+                    <AvatarFallback className="bg-[#1e3a8a]/20 text-[var(--accent-text)] text-sm font-bold">
+                      {p.nome.charAt(0)}{p.sobrenome.charAt(0)}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-semibold text-[var(--text-primary)] truncate">{p.apelido ?? `${p.nome} ${p.sobrenome}`}</p>
+                    <p className="text-xs text-[var(--text-secondary)]">{p.total_apostas} aposta{p.total_apostas !== 1 ? "s" : ""}</p>
+                  </div>
                 </div>
-                <div className="text-center">
-                  <p className={`text-xs font-semibold ${color}`}>{label}</p>
-                  <p className="text-[10px] text-[var(--text-secondary)]">{sub}</p>
+                <div className="grid grid-cols-3 gap-2 pt-2 border-t border-[var(--border-subtle)]">
+                  <div>
+                    <p className="text-[10px] text-[var(--text-muted)] uppercase tracking-wide">Saldo</p>
+                    <p className="text-xs font-bold text-[#3b82f6] truncate">{formatCurrency(p.saldo_total)}</p>
+                  </div>
+                  <div>
+                    <p className="text-[10px] text-[var(--text-muted)] uppercase tracking-wide">Lucro</p>
+                    <p className={`text-xs font-bold truncate ${p.lucro_realizado >= 0 ? "text-green-500" : "text-red-500"}`}>{formatCurrency(p.lucro_realizado)}</p>
+                  </div>
+                  <div>
+                    <p className="text-[10px] text-[var(--text-muted)] uppercase tracking-wide">ROI</p>
+                    <p className={`text-xs font-bold truncate ${p.roi_percentual >= 0 ? "text-[#a855f7]" : "text-red-500"}`}>{parseFloat(String(p.roi_percentual)).toFixed(1)}%</p>
+                  </div>
                 </div>
               </Link>
             ))}
           </div>
-
-          {/* Perfis summary */}
-          {profiles.length > 0 && (
-            <div className="mt-4 pt-4 border-t border-[var(--border)]">
-              <div className="flex items-center justify-between mb-3">
-                <p className="text-xs font-semibold text-[var(--text-muted)] uppercase tracking-wide">Perfis</p>
-                <Link href="/perfis" className="text-xs text-[var(--accent-text)] hover:underline flex items-center gap-1">
-                  Ver todos <ChevronRight className="w-3 h-3" />
-                </Link>
-              </div>
-              <div className="space-y-2">
-                {profiles.slice(0, 3).map(p => (
-                  <Link
-                    key={p.profile_id}
-                    href={`/perfis/${p.profile_id}`}
-                    className="flex items-center gap-3 p-2.5 rounded-lg border border-[var(--border-subtle)] hover:border-[#1e3a8a]/40 hover:bg-[#1e3a8a]/5 transition-all"
-                  >
-                    <Avatar className="h-7 w-7 flex-shrink-0">
-                      <AvatarFallback className="bg-[#1e3a8a]/20 text-[var(--accent-text)] text-xs font-bold">
-                        {p.nome.charAt(0)}{p.sobrenome.charAt(0)}
-                      </AvatarFallback>
-                    </Avatar>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-xs font-semibold text-[var(--text-primary)] truncate">{p.apelido ?? `${p.nome} ${p.sobrenome}`}</p>
-                    </div>
-                    <span className="text-xs font-bold text-[#3b82f6] flex-shrink-0">{formatCurrency(p.saldo_total)}</span>
-                  </Link>
-                ))}
-              </div>
-            </div>
-          )}
         </div>
-
-      </div>
+      )}
 
       {/* Apostas Recentes */}
       <div>
