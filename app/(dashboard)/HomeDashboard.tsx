@@ -195,38 +195,6 @@ export default function HomeDashboard({
         </div>
       </div>
 
-      {/* Financeiro Recente */}
-      {recentMovimentacoes.length > 0 && (() => {
-        const items: MovimentacaoItem[] = recentMovimentacoes.map(mov => ({
-          id: mov.id,
-          created_at: mov.created_at,
-          tipo: mov.tipo,
-          valor: mov.valor,
-          betNome: mov.profile_bet?.bet?.nome ?? null,
-          descricao: mov.descricao ?? null,
-          profileNome: mov.profile
-            ? (mov.profile.apelido || `${mov.profile.nome} ${mov.profile.sobrenome}`)
-            : null,
-        }))
-        return (
-          <div>
-            <h2 className="text-sm font-semibold text-[var(--text-primary)] uppercase tracking-wide mb-4">Financeiro Recente</h2>
-            <Card>
-              <CardContent className="p-0 divide-y divide-[var(--border)]">
-                {items.map(item => (
-                  <MovimentacaoRow key={item.id} item={item} />
-                ))}
-              </CardContent>
-            </Card>
-            <div className="mt-3 flex justify-end">
-              <Link href="/financeiro" className="text-xs text-[var(--accent-text)] hover:underline flex items-center gap-1">
-                Saiba Mais <ChevronRight className="w-3 h-3" />
-              </Link>
-            </div>
-          </div>
-        )
-      })()}
-
       {/* Perfis */}
       {profiles.length > 0 && (
         <div className="rounded-xl border border-[var(--border)] bg-[var(--bg-surface)] p-5">
@@ -273,6 +241,38 @@ export default function HomeDashboard({
           </div>
         </div>
       )}
+
+      {/* Financeiro Recente */}
+      {recentMovimentacoes.length > 0 && (() => {
+        const items: MovimentacaoItem[] = recentMovimentacoes.map(mov => ({
+          id: mov.id,
+          created_at: mov.created_at,
+          tipo: mov.tipo,
+          valor: mov.valor,
+          betNome: mov.profile_bet?.bet?.nome ?? null,
+          descricao: mov.descricao ?? null,
+          profileNome: mov.profile
+            ? (mov.profile.apelido || `${mov.profile.nome} ${mov.profile.sobrenome}`)
+            : null,
+        }))
+        return (
+          <div>
+            <h2 className="text-sm font-semibold text-[var(--text-primary)] uppercase tracking-wide mb-4">Financeiro Recente</h2>
+            <Card>
+              <CardContent className="p-0 divide-y divide-[var(--border)]">
+                {items.map(item => (
+                  <MovimentacaoRow key={item.id} item={item} />
+                ))}
+              </CardContent>
+            </Card>
+            <div className="mt-3 flex justify-end">
+              <Link href="/financeiro" className="text-xs text-[var(--accent-text)] hover:underline flex items-center gap-1">
+                Saiba Mais <ChevronRight className="w-3 h-3" />
+              </Link>
+            </div>
+          </div>
+        )
+      })()}
 
       {/* Apostas Recentes */}
       <div>
