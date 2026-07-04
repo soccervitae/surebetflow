@@ -8,7 +8,7 @@ import { useTheme } from "@/components/ThemeProvider"
 import {
   Home, Users, Wallet, CreditCard, Settings,
   LogOut, Bell, ChevronLeft, ChevronRight,
-  Circle, Sun, Moon, MessageCircle, BookOpen, ClipboardList, Plus
+  Circle, Sun, Moon, MessageCircle, BookOpen, ClipboardList, Plus, Zap
 } from "lucide-react"
 import Logo, { LogoIcon } from "@/components/Logo"
 import { cn } from "@/lib/utils"
@@ -19,6 +19,7 @@ import ScrollToTop from "@/components/ScrollToTop"
 
 const navItems = [
   { href: "/dashboard", icon: Home, label: "Dashboard" },
+  { href: "/surebet", icon: Zap, label: "Surebets" },
   { href: "/perfis", icon: Users, label: "Perfis" },
   { href: "/apostas", icon: ClipboardList, label: "Apostas" },
   { href: "/financeiro", icon: Wallet, label: "Financeiro" },
@@ -427,8 +428,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       {/* Bottom nav mobile */}
       {hasActivePlan && pathname !== "/suporte" && <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-[var(--bg-surface)] border-t border-[var(--border)] z-20 flex" style={{ paddingBottom: "env(safe-area-inset-bottom)" }}>
         {([
-          { href: "/dashboard",  icon: Home,          label: "Dashboard" },
-          { href: "/perfis",     icon: Users,         label: "Perfis" },
+          { href: "/dashboard",  icon: Home,          label: "Início" },
+          { href: "/surebet",    icon: Zap,           label: "Surebets" },
           null,
           { href: "/apostas",    icon: ClipboardList, label: "Apostas" },
           { href: "/financeiro", icon: Wallet,        label: "Financeiro" },
