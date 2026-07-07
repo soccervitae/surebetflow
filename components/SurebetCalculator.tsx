@@ -750,6 +750,7 @@ export default function SurebetCalculator({ profiles, defaultProfileId, profileN
         {legs.slice(0, numLegs).map((leg, i) => {
           const allPBs = Object.values(profileBets).flat() as (ProfileBet & { bet?: { nome: string } })[]
           const selectedPB = allPBs.find(pb => pb.id === leg.profileBetId)
+          const usedProfileBetIds = legs.slice(0, numLegs).map((l, k) => k !== i ? l.profileBetId : null).filter(Boolean)
           const saldo = selectedPB ? parseFloat(String(selectedPB.saldo)) || 0 : 0
           const stake = stakes[i] ?? 0
           const showSaldoWarning = selectedPB && saldo > 0 && stake > 0 && stake > saldo
@@ -772,11 +773,13 @@ export default function SurebetCalculator({ profiles, defaultProfileId, profileN
                       {filteredProfiles.map(profile => {
                         const bets = profileBets[profile.id] ?? []
                         if (bets.length === 0) return null
-                        return bets.map(pb => (
-                          <SelectItem key={pb.id} value={pb.id}>
-                            {(pb as ProfileBet & { bet?: { nome: string } }).bet?.nome ?? "Casa"}
-                          </SelectItem>
-                        ))
+                        return bets
+                          .filter(pb => !usedProfileBetIds.includes(pb.id))
+                          .map(pb => (
+                            <SelectItem key={pb.id} value={pb.id}>
+                              {(pb as ProfileBet & { bet?: { nome: string } }).bet?.nome ?? "Casa"}
+                            </SelectItem>
+                          ))
                       })}
                     </SelectContent>
                   </Select>
