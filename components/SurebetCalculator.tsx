@@ -152,6 +152,7 @@ export default function SurebetCalculator({ profiles, defaultProfileId, profileN
   const imageInputRef = useRef<HTMLInputElement>(null)
   const [userStakes, setUserStakes] = useState<(number | null)[]>([null, null, null])
   const [roundStakes, setRoundStakes] = useState(false)
+  const [roundTo, setRoundTo] = useState(1)
   const [unmatchedBookmakers, setUnmatchedBookmakers] = useState<string[]>([])
   const { toast } = useToast()
   const supabase = createClient()
@@ -353,7 +354,7 @@ export default function SurebetCalculator({ profiles, defaultProfileId, profileN
 
   const stakes = computedStakes.map((computed, i) => {
     const raw = userStakes[i] ?? computed
-    return roundStakes ? Math.round(raw) : raw
+    return roundStakes ? Math.round(raw / roundTo) * roundTo : raw
   })
 
   const guaranteedReturn = isArbitrage && stakes.length > 0 && odds[0] > 0
@@ -851,7 +852,21 @@ export default function SurebetCalculator({ profiles, defaultProfileId, profileN
         <label htmlFor="round-stakes" className="font-medium text-[var(--text-primary)] cursor-pointer select-none flex-1">
           Arredondar aposta até:
         </label>
-        <span className="text-[var(--text-secondary)] text-sm font-mono">1</span>
+        <div className="flex items-center gap-1">
+          <button
+            type="button"
+            disabled={!roundStakes || roundTo <= 1}
+            onClick={() => setRoundTo(v => Math.max(1, v - 1))}
+            className="w-7 h-7 rounded-lg border border-[var(--border)] flex items-center justify-center text-[var(--text-secondary)] hover:bg-[var(--bg-elevated)] disabled:opacity-30 transition-colors text-base leading-none"
+          >−</button>
+          <span className="w-8 text-center text-sm font-mono font-semibold text-[var(--text-primary)]">{roundTo}</span>
+          <button
+            type="button"
+            disabled={!roundStakes || roundTo >= 100}
+            onClick={() => setRoundTo(v => Math.min(100, v + 1))}
+            className="w-7 h-7 rounded-lg border border-[var(--border)] flex items-center justify-center text-[var(--text-secondary)] hover:bg-[var(--bg-elevated)] disabled:opacity-30 transition-colors text-base leading-none"
+          >+</button>
+        </div>
       </div>
 
       {/* Result */}
