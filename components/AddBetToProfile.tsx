@@ -755,22 +755,22 @@ export default function AddBetToProfile({ profileId, autoOpen = false, onSaved, 
                       </span>
                     </div>
                     {/* Stats row */}
-                    <div className="grid grid-cols-3 gap-2">
-                      <div>
+                    <div className="grid grid-cols-3 w-full pt-2 border-t border-[var(--border-subtle)]">
+                      <div className="flex flex-col items-center text-center">
                         <p className="text-[10px] text-[var(--text-muted)] uppercase tracking-wide mb-0.5">Saldo</p>
-                        <p className={`text-sm font-bold ${pb.saldo > 0 ? "text-[var(--accent-text)]" : pb.saldo < 0 ? "text-[#DC2626]" : "text-[var(--text-secondary)]"}`}>
+                        <p className={`text-xs font-bold truncate ${pb.saldo > 0 ? "text-[#3b82f6]" : pb.saldo < 0 ? "text-[#DC2626]" : "text-[var(--text-secondary)]"}`}>
                           {formatCurrency(pb.saldo)}
                         </p>
                       </div>
-                      <div>
+                      <div className="flex flex-col items-center text-center border-x border-[var(--border-subtle)]">
                         <p className="text-[10px] text-[var(--text-muted)] uppercase tracking-wide mb-0.5">Lucro</p>
-                        <p className={`text-sm font-bold ${lucro > 0 ? "text-green-500" : lucro < 0 ? "text-[#DC2626]" : "text-[var(--text-secondary)]"}`}>
+                        <p className={`text-xs font-bold truncate ${lucro > 0 ? "text-green-500" : lucro < 0 ? "text-[#DC2626]" : "text-[var(--text-secondary)]"}`}>
                           {formatCurrency(lucro)}
                         </p>
                       </div>
-                      <div>
+                      <div className="flex flex-col items-center text-center">
                         <p className="text-[10px] text-[var(--text-muted)] uppercase tracking-wide mb-0.5">ROI</p>
-                        <p className={`text-sm font-bold ${roi > 0 ? "text-[#a855f7]" : roi < 0 ? "text-[#DC2626]" : "text-[var(--text-secondary)]"}`}>
+                        <p className={`text-xs font-bold truncate ${roi > 0 ? "text-[#a855f7]" : roi < 0 ? "text-[#DC2626]" : "text-[var(--text-secondary)]"}`}>
                           {roi.toFixed(1)}%
                         </p>
                       </div>
