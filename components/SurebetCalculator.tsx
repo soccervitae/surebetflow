@@ -10,6 +10,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { formatCurrency } from "@/lib/utils"
 import { useToast } from "@/hooks/useToast"
 import { Calculator, Check, X, Loader2, ClipboardPaste, Sparkles, ImageIcon, ChevronLeft, ChevronRight, Plus, AlertTriangle } from "lucide-react"
+import Link from "next/link"
 import type { Profile, ProfileBet } from "@/lib/types"
 
 interface Leg {
@@ -43,7 +44,9 @@ interface AiLeg {
 
 interface AiSurebet {
   evento: string
+  competicao: string | null
   esporte: string
+  data: string | null
   tipo: "2-way" | "3-way"
   roi: number | null
   legs: AiLeg[]
@@ -149,6 +152,7 @@ export default function SurebetCalculator({ profiles, defaultProfileId, profileN
   const imageInputRef = useRef<HTMLInputElement>(null)
   const [userStakes, setUserStakes] = useState<(number | null)[]>([null, null, null])
   const [roundStakes, setRoundStakes] = useState(false)
+  const [unmatchedBookmakers, setUnmatchedBookmakers] = useState<string[]>([])
   const { toast } = useToast()
   const supabase = createClient()
 
@@ -202,6 +206,17 @@ export default function SurebetCalculator({ profiles, defaultProfileId, profileN
   function applyAiSurebet(sb: AiSurebet) {
     if (sb.evento) setEvento(sb.evento)
     if (sb.esporte) setEsporte(sb.esporte)
+    if (sb.competicao) setCompeticao(sb.competicao)
+    if (sb.data) {
+      // Normalize date: accept DD/MM or DD/MM/AAAA, fill current year if missing
+      const parts = sb.data.split("/")
+      if (parts.length >= 2) {
+        const d = parts[0].padStart(2, "0")
+        const m = parts[1].padStart(2, "0")
+        const y = parts[2] ?? String(new Date().getFullYear())
+        setDataEvento(`${d}/${m}/${y}`)
+      }
+    }
     setNumLegs(sb.legs.length >= 3 ? 3 : 2)
 
     const allProfileBets = Object.values(profileBets).flat() as (ProfileBet & { bet?: { nome: string } })[]
@@ -222,10 +237,13 @@ export default function SurebetCalculator({ profiles, defaultProfileId, profileN
     setPasteText("")
     setAiSurebets(null)
 
-    const unmatched = sb.legs.filter((_, i) => !newLegs[i].profileBetId).map(l => l.bookmaker).filter(Boolean)
-    if (unmatched.length > 0) {
-      toast({ title: `Preenchido! Selecione manualmente: ${unmatched.join(", ")}`, variant: "destructive" })
-    } else {
+    const unmatched = sb.legs
+      .filter((_, i) => !newLegs[i].profileBetId)
+      .map(l => l.bookmaker)
+      .filter(Boolean) as string[]
+
+    setUnmatchedBookmakers(unmatched)
+    if (unmatched.length === 0) {
       toast({ title: "Aposta preenchida automaticamente!" })
     }
   }
@@ -581,6 +599,45 @@ export default function SurebetCalculator({ profiles, defaultProfileId, profileN
           )}
         </CardContent>
       </Card>
+
+      {/* Unmatched bookmakers warning */}
+      {unmatchedBookmakers.length > 0 && (
+        <div className="rounded-xl border border-amber-400/40 bg-amber-50 dark:bg-amber-950/20 p-4 space-y-3">
+          <div className="flex items-start gap-3">
+            <AlertTriangle className="h-5 w-5 text-amber-500 flex-shrink-0 mt-0.5" />
+            <div className="flex-1 space-y-1">
+              <p className="text-sm font-semibold text-amber-800 dark:text-amber-300">
+                {unmatchedBookmakers.length === 1
+                  ? "Casa de apostas não encontrada no perfil"
+                  : "Casas de apostas não encontradas no perfil"}
+              </p>
+              <p className="text-xs text-amber-700 dark:text-amber-400">
+                A IA identificou {unmatchedBookmakers.length === 1 ? "a bet" : "as bets"}{" "}
+                <span className="font-semibold">{unmatchedBookmakers.join(", ")}</span>{" "}
+                mas {unmatchedBookmakers.length === 1 ? "ela não está" : "elas não estão"} cadastrada{unmatchedBookmakers.length > 1 ? "s" : ""} neste perfil.
+                Adicione-{unmatchedBookmakers.length === 1 ? "a" : "as"} ao perfil para continuar.
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={() => setUnmatchedBookmakers([])}
+              className="text-amber-500 hover:text-amber-700 flex-shrink-0"
+            >
+              <X className="h-4 w-4" />
+            </button>
+          </div>
+          {filteredProfiles.map(p => (
+            <Link
+              key={p.id}
+              href={`/perfis/${p.id}?tab=bets`}
+              className="flex items-center justify-center gap-2 w-full px-4 py-2.5 rounded-lg bg-amber-500 hover:bg-amber-600 text-white text-sm font-semibold transition-colors"
+            >
+              <Plus className="h-4 w-4" />
+              Adicionar bet no perfil {(p as Profile & { apelido?: string }).apelido || p.nome}
+            </Link>
+          ))}
+        </div>
+      )}
 
       {/* Config */}
       <Card>

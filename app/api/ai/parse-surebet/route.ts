@@ -26,14 +26,16 @@ Retorne um JSON com a seguinte estrutura exata:
 {
   "surebets": [
     {
-      "evento": "Nome do evento (ex: Flamengo x Corinthians)",
+      "evento": "Nome do evento (ex: Flamengo x Corinthians ou Djokovic x Alcaraz)",
+      "competicao": "Nome da competição/liga (ex: Copa do Mundo 2026, Premier League, Roland Garros)",
       "esporte": "Futebol|Tênis|Basquete|Vôlei|Futebol Americano|Hockey no Gelo|Beisebol|Handebol|Rugby|MMA/UFC|Boxe|Ciclismo|Fórmula 1|Outros",
+      "data": "DD/MM/AAAA ou DD/MM se o ano não aparecer — apenas a data, sem horário",
       "tipo": "2-way" ou "3-way",
       "roi": número percentual ou null,
       "legs": [
         {
-          "bookmaker": "Nome da casa de apostas",
-          "mercado": "Resultado apostado (ex: Casa, Visitante, Empate, Over 2.5, etc)",
+          "bookmaker": "Nome da casa de apostas exatamente como aparece",
+          "mercado": "Resultado apostado (ex: Casa, Visitante, Empate, Over 2.5, 1 realizará 1º arremesso lateral, etc)",
           "odd": número decimal
         }
       ]
@@ -43,7 +45,9 @@ Retorne um JSON com a seguinte estrutura exata:
 
 Regras:
 - Extraia TODAS as surebets visíveis, não apenas a primeira
-- Se houver múltiplas oportunidades, inclua todas no array "surebets"
+- "evento": para futebol use "Time A x Time B"; para esportes individuais use "Atleta A x Atleta B"
+- "competicao": a liga ou torneio que aparece abaixo do nome do evento (ex: Copa do Mundo 2026, Brasileirão Série A)
+- "data": extraia apenas DD/MM ou DD/MM/AAAA — NÃO inclua o horário
 - "tipo" é "3-way" se tiver 3 legs, caso contrário "2-way"
 - "odd" deve ser número decimal (ex: 2.15, não "2,15")
 - "roi" é o percentual de lucro garantido (ex: 3.5 para 3.5%)
