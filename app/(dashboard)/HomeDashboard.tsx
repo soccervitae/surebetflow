@@ -4,7 +4,7 @@ import Link from "next/link"
 import { formatCurrency } from "@/lib/utils"
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent } from "@/components/ui/card"
-import { Avatar, AvatarFallback } from "@/components/ui/avatar"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import {
   AlertTriangle, DollarSign, TrendingUp, Clock, ArrowUpRight,
   ClipboardList, Wallet, ChevronRight, Target,
@@ -213,6 +213,7 @@ export default function HomeDashboard({
               >
                 <div className="flex items-center gap-3">
                   <Avatar className="h-9 w-9 flex-shrink-0">
+                    {p.foto_url && <AvatarImage src={p.foto_url} alt={p.apelido ?? p.nome} />}
                     <AvatarFallback className="bg-[#1e3a8a]/20 text-[var(--accent-text)] text-sm font-bold">
                       {p.nome.charAt(0)}{p.sobrenome.charAt(0)}
                     </AvatarFallback>
