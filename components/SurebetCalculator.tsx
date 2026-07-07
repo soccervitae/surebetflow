@@ -155,6 +155,8 @@ export default function SurebetCalculator({ profiles, defaultProfileId, profileN
   const [userStakes, setUserStakes] = useState<(number | null)[]>([null, null, null])
   const [roundStakes, setRoundStakes] = useState(false)
   const [roundTo, setRoundTo] = useState(1)
+  const [lastRoundBtn, setLastRoundBtn] = useState<number | null>(null)
+  const [roundBtnCount, setRoundBtnCount] = useState(0)
   const [unmatchedBookmakers, setUnmatchedBookmakers] = useState<string[]>([])
   const { toast } = useToast()
   const supabase = createClient()
@@ -876,26 +878,49 @@ export default function SurebetCalculator({ profiles, defaultProfileId, profileN
           type="checkbox"
           id="round-stakes"
           checked={roundStakes}
-          onChange={e => setRoundStakes(e.target.checked)}
+          onChange={e => {
+            setRoundStakes(e.target.checked)
+            if (!e.target.checked) { setRoundTo(1); setLastRoundBtn(null); setRoundBtnCount(0) }
+          }}
           className="w-4 h-4 accent-[#1e3a8a] cursor-pointer flex-shrink-0"
         />
         <label htmlFor="round-stakes" className="font-medium text-[var(--text-primary)] cursor-pointer select-none flex-1">
-          Arredondar aposta até:
+          Arredondar:
         </label>
-        <div className="flex items-center gap-1">
-          <button
-            type="button"
-            disabled={!roundStakes || roundTo <= 1}
-            onClick={() => setRoundTo(v => Math.max(1, v - 1))}
-            className="w-7 h-7 rounded-lg border border-[var(--border)] flex items-center justify-center text-[var(--text-secondary)] hover:bg-[var(--bg-elevated)] disabled:opacity-30 transition-colors text-base leading-none"
-          >−</button>
-          <span className="w-8 text-center text-sm font-mono font-semibold text-[var(--text-primary)]">{roundTo}</span>
-          <button
-            type="button"
-            disabled={!roundStakes || roundTo >= 100}
-            onClick={() => setRoundTo(v => Math.min(100, v + 1))}
-            className="w-7 h-7 rounded-lg border border-[var(--border)] flex items-center justify-center text-[var(--text-secondary)] hover:bg-[var(--bg-elevated)] disabled:opacity-30 transition-colors text-base leading-none"
-          >+</button>
+        <div className="flex items-center gap-1.5">
+          {[1, 5, 10].map(base => {
+            const isActive = roundStakes && lastRoundBtn === base
+            const count = isActive ? roundBtnCount : 0
+            const value = base * (count || 1)
+            return (
+              <button
+                key={base}
+                type="button"
+                disabled={!roundStakes}
+                onClick={() => {
+                  if (lastRoundBtn === base) {
+                    const next = roundBtnCount + 1
+                    setRoundBtnCount(next)
+                    setRoundTo(base * next)
+                  } else {
+                    setLastRoundBtn(base)
+                    setRoundBtnCount(1)
+                    setRoundTo(base)
+                  }
+                }}
+                className={`px-3 py-1.5 rounded-lg border text-xs font-semibold transition-all disabled:opacity-30 ${
+                  isActive
+                    ? "border-[#1e3a8a] bg-[#1e3a8a] text-white"
+                    : "border-[var(--border)] text-[var(--text-secondary)] hover:border-[#1e3a8a]/40 hover:text-[var(--text-primary)]"
+                }`}
+              >
+                {isActive && count > 1 ? `${value}` : `${base}`}
+              </button>
+            )
+          })}
+          {roundStakes && roundTo > 1 && (
+            <span className="text-xs text-[var(--text-muted)] font-mono">= {roundTo}</span>
+          )}
         </div>
       </div>
 
