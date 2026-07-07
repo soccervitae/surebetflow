@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from "react"
 import { createPortal } from "react-dom"
-import { usePathname } from "next/navigation"
+import { usePathname, useRouter } from "next/navigation"
 import { createClient } from "@/lib/supabase/client"
 import { Plus, Calculator, DollarSign, Wallet, Loader2, User } from "lucide-react"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
@@ -24,6 +24,7 @@ type ProfileBet = { id: string; profile_id: string; bet?: { id: string; nome: st
 
 export default function GlobalFAB() {
   const pathname = usePathname()
+  const router = useRouter()
   const { toast } = useToast()
   const supabase = createClient()
 
@@ -414,6 +415,7 @@ export default function GlobalFAB() {
               onSuccess={() => {
                 setPerfilModal(false)
                 toast({ title: "Perfil criado com sucesso!" })
+                router.push("/perfis")
               }}
             />
           )}
