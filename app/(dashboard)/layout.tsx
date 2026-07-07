@@ -8,7 +8,7 @@ import { useTheme } from "@/components/ThemeProvider"
 import {
   Home, Users, Wallet, CreditCard, Settings,
   LogOut, Bell, ChevronLeft, ChevronRight,
-  Circle, Sun, Moon, MessageCircle, BookOpen, ClipboardList, Plus, Zap
+  Circle, Sun, Moon, MessageCircle, BookOpen, ClipboardList, Plus
 } from "lucide-react"
 import Logo, { LogoIcon } from "@/components/Logo"
 import { cn } from "@/lib/utils"
@@ -19,7 +19,6 @@ import ScrollToTop from "@/components/ScrollToTop"
 
 const navItems = [
   { href: "/dashboard", icon: Home, label: "Dashboard" },
-  { href: "/surebet", icon: Zap, label: "Surebets" },
   { href: "/perfis", icon: Users, label: "Perfis" },
   { href: "/apostas", icon: ClipboardList, label: "Apostas" },
   { href: "/financeiro", icon: Wallet, label: "Financeiro" },
