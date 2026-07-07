@@ -4,7 +4,7 @@ import Link from "next/link"
 import {
   ShieldCheck, Calculator, Wallet, Lock, BarChart3, TrendingUp,
   CheckCircle, ArrowRight, Zap, Users, Target, RefreshCw, ChevronDown, Gift,
-  Sparkles, ClipboardPaste, ImageIcon, Bot
+  Sparkles, ClipboardPaste, ImageIcon, Bot, Play
 } from "lucide-react"
 import Image from "next/image"
 
@@ -79,8 +79,9 @@ export default async function LandingPage() {
           <Link href="/cadastro" className="inline-flex items-center justify-center gap-2 bg-[#1e3a8a] hover:bg-[#1e40af] text-white font-semibold px-8 py-3.5 rounded-xl text-base transition-colors">
             Começar agora <ArrowRight className="w-4 h-4" />
           </Link>
-          <Link href="/login" className="inline-flex items-center justify-center gap-2 border border-white/10 bg-white/5 hover:bg-white/10 text-gray-300 font-semibold px-8 py-3.5 rounded-xl text-base transition-colors">
-            Já sou assinante
+          <Link href="/demo" className="inline-flex items-center justify-center gap-2 border border-white/10 bg-white/5 hover:bg-white/10 text-gray-300 font-semibold px-8 py-3.5 rounded-xl text-base transition-colors">
+            <Play className="w-4 h-4" />
+            Ver demo
           </Link>
         </div>
       </section>
