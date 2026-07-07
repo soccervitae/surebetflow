@@ -331,96 +331,99 @@ export default function ApostasClient({ apostas: initialApostas, profiles, betCo
         </div>
       </div>
 
-      {/* Filters panel */}
-      {showFilter && <Card>
-        <CardContent className="p-4 space-y-4">
-          <div className="flex items-center justify-between">
-            <p className="text-xs font-semibold text-[var(--text-muted)] uppercase tracking-wide">Filtros</p>
-            {(filterStatus !== "todos" || filterProfile !== "todos" || filterPeriod !== "todos" || filterEsporte || filterCompeticao) && (
-              <button
-                onClick={() => { setFilterStatus("todos"); setFilterProfile("todos"); setFilterPeriod("todos"); setFilterCustomDate(""); setFilterCustomFrom(""); setFilterCustomTo(""); setFilterEsporte(""); setFilterCompeticao("") }}
-                className="text-xs text-[var(--accent-text)] font-medium"
-              >
-                Limpar
-              </button>
+      {/* Filters panel — inline chips */}
+      {showFilter && (
+        <Card>
+          <CardContent className="p-4 space-y-3">
+            <div className="flex items-center justify-between">
+              <p className="text-xs font-semibold text-[var(--text-muted)] uppercase tracking-wide">Filtros</p>
+              {(filterStatus !== "todos" || filterProfile !== "todos" || filterPeriod !== "todos" || filterEsporte || filterCompeticao) && (
+                <button
+                  onClick={() => { setFilterStatus("todos"); setFilterProfile("todos"); setFilterPeriod("todos"); setFilterCustomDate(""); setFilterCustomFrom(""); setFilterCustomTo(""); setFilterEsporte(""); setFilterCompeticao("") }}
+                  className="text-xs text-[var(--accent-text)] font-medium"
+                >
+                  Limpar
+                </button>
+              )}
+            </div>
+
+            {/* Status */}
+            <div className="flex items-center gap-2 flex-wrap">
+              <p className="text-xs font-semibold text-[var(--text-muted)] uppercase tracking-wide w-16 flex-shrink-0">Status</p>
+              {(["todos", "pendente", "finalizada", "cancelada"] as const).map(s => (
+                <button
+                  key={s}
+                  onClick={() => setFilterStatus(s)}
+                  className={`px-3 py-1.5 rounded-lg border text-xs font-medium transition-colors ${
+                    filterStatus === s
+                      ? s === "pendente" ? "bg-yellow-500/10 border-yellow-500/40 text-yellow-600"
+                        : s === "finalizada" ? "bg-green-500/10 border-green-500/40 text-green-600"
+                        : s === "cancelada" ? "bg-red-500/10 border-red-500/40 text-red-500"
+                        : "bg-[#1e3a8a] border-[#1e3a8a] text-white"
+                      : "border-[var(--border)] text-[var(--text-secondary)] hover:bg-[var(--bg-elevated)]"
+                  }`}
+                >
+                  {{ todos: "Todos", pendente: "Pendentes", finalizada: "Finalizadas", cancelada: "Canceladas" }[s]}
+                </button>
+              ))}
+            </div>
+
+            {/* Ordenar */}
+            <div className="flex items-center gap-2 flex-wrap">
+              <p className="text-xs font-semibold text-[var(--text-muted)] uppercase tracking-wide w-16 flex-shrink-0">Ordenar</p>
+              {([
+                { value: "data_desc",  label: "Mais recente" },
+                { value: "data_asc",   label: "Mais antigo" },
+                { value: "valor_desc", label: "Maior invest." },
+                { value: "roi_desc",   label: "Maior ROI" },
+              ] as { value: typeof sortBy; label: string }[]).map(({ value, label }) => (
+                <button
+                  key={value}
+                  onClick={() => setSortBy(value)}
+                  className={`px-3 py-1.5 rounded-lg border text-xs font-medium transition-colors ${
+                    sortBy === value
+                      ? "bg-[#1e3a8a]/10 border-[#1e3a8a]/30 text-[var(--accent-text)]"
+                      : "border-[var(--border)] text-[var(--text-secondary)] hover:bg-[var(--bg-elevated)]"
+                  }`}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+
+            {/* Perfil */}
+            {profiles.length > 1 && (
+              <div className="flex items-center gap-2 flex-wrap">
+                <p className="text-xs font-semibold text-[var(--text-muted)] uppercase tracking-wide w-16 flex-shrink-0">Perfil</p>
+                <button
+                  onClick={() => setFilterProfile("todos")}
+                  className={`px-3 py-1.5 rounded-lg border text-xs font-medium transition-colors ${
+                    filterProfile === "todos"
+                      ? "bg-[#1e3a8a] border-[#1e3a8a] text-white"
+                      : "border-[var(--border)] text-[var(--text-secondary)] hover:bg-[var(--bg-elevated)]"
+                  }`}
+                >
+                  Todos
+                </button>
+                {profiles.map(p => (
+                  <button
+                    key={p.id}
+                    onClick={() => setFilterProfile(p.id)}
+                    className={`px-3 py-1.5 rounded-lg border text-xs font-medium transition-colors ${
+                      filterProfile === p.id
+                        ? "bg-[#1e3a8a]/10 border-[#1e3a8a]/30 text-[var(--accent-text)]"
+                        : "border-[var(--border)] text-[var(--text-secondary)] hover:bg-[var(--bg-elevated)]"
+                    }`}
+                  >
+                    {p.apelido || `${p.nome} ${p.sobrenome}`}
+                  </button>
+                ))}
+              </div>
             )}
-          </div>
 
-          <>
-
-          {/* Status + Perfil */}
-          <div className="grid grid-cols-2 gap-3">
-            <div className="space-y-1.5">
-              <Label className="text-xs">Status</Label>
-              <Select value={filterStatus} onValueChange={setFilterStatus}>
-                <SelectTrigger><SelectValue /></SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="todos">Todos</SelectItem>
-                  <SelectItem value="pendente">Pendentes</SelectItem>
-                  <SelectItem value="finalizada">Finalizadas</SelectItem>
-                  <SelectItem value="cancelada">Canceladas</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="space-y-1.5">
-              <Label className="text-xs">Perfil</Label>
-              <Select value={filterProfile} onValueChange={setFilterProfile}>
-                <SelectTrigger><SelectValue /></SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="todos">Todos os perfis</SelectItem>
-                  {profiles.map(p => (
-                    <SelectItem key={p.id} value={p.id}>
-                      {p.apelido || `${p.nome} ${p.sobrenome}`}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-
-          {/* Esporte + Competição */}
-          <div className="grid grid-cols-2 gap-3">
-            <div className="space-y-1.5">
-              <Label className="text-xs">Esporte</Label>
-              <Input
-                value={filterEsporte}
-                onChange={e => setFilterEsporte(e.target.value)}
-                placeholder="ex: Futebol"
-                className="text-xs h-9"
-              />
-            </div>
-            <div className="space-y-1.5">
-              <Label className="text-xs">Competição</Label>
-              <Input
-                value={filterCompeticao}
-                onChange={e => setFilterCompeticao(e.target.value)}
-                placeholder="ex: Champions League"
-                className="text-xs h-9"
-              />
-            </div>
-          </div>
-
-          {/* Ordenação */}
-          <div className="space-y-1.5">
-            <Label className="text-xs">Ordenar por</Label>
-            <Select value={sortBy} onValueChange={v => setSortBy(v as typeof sortBy)}>
-              <SelectTrigger className="text-xs h-9"><SelectValue /></SelectTrigger>
-              <SelectContent>
-                <SelectItem value="data_desc">Data (mais recente)</SelectItem>
-                <SelectItem value="data_asc">Data (mais antigo)</SelectItem>
-                <SelectItem value="valor_desc">Maior investimento</SelectItem>
-                <SelectItem value="roi_desc">Maior ROI</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          {/* Period pills */}
-          <div className="space-y-2">
-            <Label className="text-xs flex items-center gap-1">
-              <CalendarIcon className="h-3 w-3" />
-              Período
-            </Label>
-            <div className="flex flex-wrap gap-2">
+            {/* Período */}
+            <div className="flex items-center gap-2 flex-wrap">
+              <p className="text-xs font-semibold text-[var(--text-muted)] uppercase tracking-wide w-16 flex-shrink-0">Período</p>
               {(["todos", "dia", "semana", "mes"] as const).map(p => (
                 <button
                   key={p}
@@ -448,62 +451,32 @@ export default function ApostasClient({ apostas: initialApostas, profiles, betCo
             </div>
 
             {filterPeriod === "custom" && (
-              <div className="mt-2 space-y-2">
+              <div className="pl-[4.5rem] space-y-2">
                 <div className="flex gap-1 p-0.5 bg-[var(--bg-elevated)] rounded-lg w-fit">
-                  <button
-                    onClick={() => setFilterCustomMode("single")}
-                    className={`px-3 py-1 rounded-md text-xs font-medium transition-colors ${
-                      filterCustomMode === "single"
-                        ? "bg-[var(--bg-surface)] text-[var(--text-primary)] shadow-sm"
-                        : "text-[var(--text-secondary)]"
-                    }`}
-                  >
-                    Data
-                  </button>
-                  <button
-                    onClick={() => setFilterCustomMode("range")}
-                    className={`px-3 py-1 rounded-md text-xs font-medium transition-colors ${
-                      filterCustomMode === "range"
-                        ? "bg-[var(--bg-surface)] text-[var(--text-primary)] shadow-sm"
-                        : "text-[var(--text-secondary)]"
-                    }`}
-                  >
-                    Intervalo
-                  </button>
+                  <button onClick={() => setFilterCustomMode("single")} className={`px-3 py-1 rounded-md text-xs font-medium transition-colors ${filterCustomMode === "single" ? "bg-[var(--bg-surface)] text-[var(--text-primary)] shadow-sm" : "text-[var(--text-secondary)]"}`}>Data</button>
+                  <button onClick={() => setFilterCustomMode("range")} className={`px-3 py-1 rounded-md text-xs font-medium transition-colors ${filterCustomMode === "range" ? "bg-[var(--bg-surface)] text-[var(--text-primary)] shadow-sm" : "text-[var(--text-secondary)]"}`}>Intervalo</button>
                 </div>
                 {filterCustomMode === "single" ? (
-                  <Input
-                    type="date"
-                    value={filterCustomDate}
-                    onChange={e => setFilterCustomDate(e.target.value)}
-                    className="text-xs h-8 max-w-[160px]"
-                  />
+                  <Input type="date" value={filterCustomDate} onChange={e => setFilterCustomDate(e.target.value)} className="text-xs h-8 max-w-[160px]" />
                 ) : (
                   <div className="flex items-center gap-2">
-                    <Input
-                      type="date"
-                      value={filterCustomFrom}
-                      onChange={e => setFilterCustomFrom(e.target.value)}
-                      className="text-xs h-8 max-w-[140px]"
-                      placeholder="Início"
-                    />
+                    <Input type="date" value={filterCustomFrom} onChange={e => setFilterCustomFrom(e.target.value)} className="text-xs h-8 max-w-[140px]" />
                     <span className="text-[var(--text-muted)] text-xs">até</span>
-                    <Input
-                      type="date"
-                      value={filterCustomTo}
-                      onChange={e => setFilterCustomTo(e.target.value)}
-                      className="text-xs h-8 max-w-[140px]"
-                      placeholder="Fim"
-                    />
+                    <Input type="date" value={filterCustomTo} onChange={e => setFilterCustomTo(e.target.value)} className="text-xs h-8 max-w-[140px]" />
                   </div>
                 )}
               </div>
             )}
-          </div>
 
-          </>
-        </CardContent>
-      </Card>}
+            {/* Esporte + Competição */}
+            <div className="flex items-center gap-2 flex-wrap">
+              <p className="text-xs font-semibold text-[var(--text-muted)] uppercase tracking-wide w-16 flex-shrink-0">Busca</p>
+              <Input value={filterEsporte} onChange={e => setFilterEsporte(e.target.value)} placeholder="Esporte" className="text-xs h-8 w-32" />
+              <Input value={filterCompeticao} onChange={e => setFilterCompeticao(e.target.value)} placeholder="Competição" className="text-xs h-8 w-40" />
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {/* List */}
       {filtered.length === 0 ? (
