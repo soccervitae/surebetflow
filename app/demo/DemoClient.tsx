@@ -473,11 +473,16 @@ export default function DemoClient() {
   return (
     <div className="min-h-screen bg-[#0f172a] text-white flex flex-col">
 
-      {/* Banner */}
-      <div className="bg-[#1e3a8a] text-white text-center text-xs py-2 px-4 flex items-center justify-center gap-2 flex-shrink-0">
-        <Play className="w-3 h-3" />
-        <span>Modo demonstração — dados ficam apenas nesta sessão.</span>
-        <Link href="/cadastro" className="font-semibold underline underline-offset-2 hover:opacity-80 ml-1">Criar conta grátis</Link>
+      {/* Demo Banner */}
+      <div className="bg-amber-500 text-amber-950 py-2.5 px-4 flex items-center justify-center gap-3 flex-shrink-0 flex-wrap">
+        <div className="flex items-center gap-2 font-semibold text-sm">
+          <Play className="w-4 h-4 fill-amber-950" />
+          MODO DEMO
+        </div>
+        <span className="text-xs font-medium">Você está visualizando o painel em modo demonstração. Os dados são fictícios e serão apagados ao recarregar a página.</span>
+        <Link href="/cadastro" className="bg-amber-950 text-amber-400 text-xs font-bold px-3 py-1 rounded-full hover:bg-amber-900 transition-colors whitespace-nowrap">
+          Criar conta grátis →
+        </Link>
       </div>
 
       <div className="flex flex-1 overflow-hidden">
