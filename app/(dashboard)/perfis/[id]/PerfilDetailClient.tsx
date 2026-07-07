@@ -400,7 +400,7 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
   const searchParams = useSearchParams()
   const initialTab = searchParams.get("tab") === "bets" ? "casas" : "dashboard"
   const [activeTab, setActiveTab] = useState(initialTab)
-  const TABS = ["dashboard", "casas", "financeiro"]
+  const TABS = ["dashboard", "apostas", "casas", "financeiro"]
 
   function changeTab(v: string) {
     setActiveTab(v)
@@ -1094,7 +1094,11 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
 
         {/* Casas Tab */}
         <TabsContent value="casas" className="overflow-hidden">
-          <AddBetToProfile profileId={profile.id} userToken={userToken} />
+          <AddBetToProfile
+            profileId={profile.id}
+            userToken={userToken}
+            onMovimentacaoSaved={() => changeTab("financeiro")}
+          />
         </TabsContent>
 
         {/* Financeiro Tab */}
@@ -1442,6 +1446,7 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
                   .eq("profile_id", currentProfile.id)
                   .order("created_at", { ascending: false })
                 if (data) setCurrentApostas(data)
+                changeTab("apostas")
               }}
             />
           </div>
@@ -1470,6 +1475,7 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
                 .eq("profile_id", currentProfile.id)
                 .order("created_at", { ascending: false })
               if (data) setCurrentApostas(data)
+              changeTab("apostas")
             }}
           />
         </DialogContent>

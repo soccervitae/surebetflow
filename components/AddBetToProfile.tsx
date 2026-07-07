@@ -22,11 +22,12 @@ interface Props {
   userToken?: string
   autoOpen?: boolean
   onSaved?: () => void
+  onMovimentacaoSaved?: () => void
 }
 
 type ProfileBetWithBet = ProfileBet & { bet?: { nome: string; logo_url?: string | null }; ativo: boolean; lucro?: number; roi?: number }
 
-export default function AddBetToProfile({ profileId, autoOpen = false, onSaved }: Props) {
+export default function AddBetToProfile({ profileId, autoOpen = false, onSaved, onMovimentacaoSaved }: Props) {
   const [bets, setBets] = useState<Bet[]>([])
   const [profileBets, setProfileBets] = useState<ProfileBetWithBet[]>([])
   const [showForm, setShowForm] = useState(autoOpen)
@@ -276,6 +277,7 @@ export default function AddBetToProfile({ profileId, autoOpen = false, onSaved }
       setMovValor("")
       setMovDescricao("")
       router.refresh()
+      onMovimentacaoSaved?.()
     }
     setMovSaving(false)
   }
