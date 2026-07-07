@@ -24,7 +24,7 @@ export async function middleware(request: NextRequest) {
   const { data: { user } } = await supabase.auth.getUser()
   const { pathname } = request.nextUrl
 
-  const publicRoutes = ['/', '/login', '/cadastro', '/verificar-email', '/privacidade', '/termos', '/demo']
+  const publicRoutes = ['/', '/login', '/cadastro', '/verificar-email', '/privacidade', '/termos']
   const isPublicRoute = publicRoutes.some(r => pathname === r || pathname.startsWith(r + '/'))
 
   // Admin routes: require auth + admin email
