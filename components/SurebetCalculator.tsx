@@ -352,10 +352,24 @@ export default function SurebetCalculator({ profiles, defaultProfileId, profileN
     ? impliedProbs.map(p => parseFloat(((p / sumProbs) * investment).toFixed(2)))
     : odds.map(() => 0)
 
-  const stakes = computedStakes.map((computed, i) => {
-    const raw = userStakes[i] ?? computed
-    return roundStakes ? Math.round(raw / roundTo) * roundTo : raw
-  })
+  const stakes = (() => {
+    const rawStakes = computedStakes.map((computed, i) => userStakes[i] ?? computed)
+    if (!roundStakes || roundTo <= 1) return rawStakes
+    const total = rawStakes.reduce((a, b) => a + b, 0)
+    const result: number[] = []
+    let allocated = 0
+    for (let i = 0; i < rawStakes.length; i++) {
+      if (i < rawStakes.length - 1) {
+        const rounded = Math.round(rawStakes[i] / roundTo) * roundTo
+        result.push(rounded)
+        allocated += rounded
+      } else {
+        // Last leg gets the remainder to keep total constant
+        result.push(parseFloat((total - allocated).toFixed(2)))
+      }
+    }
+    return result
+  })()
 
   // Após arredondamento os stakes podem ser desiguais, então:
   // retorno garantido = pior payout entre todas as pernas
