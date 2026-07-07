@@ -102,7 +102,7 @@ export default function ApostasClient({ apostas: initialApostas, profiles, betCo
   const [filterCustomTo, setFilterCustomTo] = useState("")
   const [filterEsporte, setFilterEsporte] = useState("")
   const [filterCompeticao, setFilterCompeticao] = useState("")
-  const [sortBy, setSortBy] = useState<"data_desc" | "data_asc" | "inv_desc" | "inv_asc" | "roi_desc" | "roi_asc" | "stake_desc" | "stake_asc" | "lucro_desc" | "lucro_asc" | "ganhos_desc" | "ganhos_asc" | "perda_desc" | "perda_asc">("data_desc")
+  const [sortBy, setSortBy] = useState<"data_desc" | "data_asc" | "valor_desc" | "roi_desc">("data_desc")
   const [finalizarDialog, setFinalizarDialog] = useState<Aposta | null>(null)
   const [deletarDialog, setDeletarDialog] = useState<Aposta | null>(null)
   const [showFilter, setShowFilter] = useState(false)
@@ -195,18 +195,8 @@ export default function ApostasClient({ apostas: initialApostas, profiles, betCo
     return true
   }).sort((a, b) => {
     if (sortBy === "data_asc") return new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
-    if (sortBy === "inv_desc") return b.investimento_total - a.investimento_total
-    if (sortBy === "inv_asc") return a.investimento_total - b.investimento_total
+    if (sortBy === "valor_desc") return b.investimento_total - a.investimento_total
     if (sortBy === "roi_desc") return b.roi_percentual - a.roi_percentual
-    if (sortBy === "roi_asc") return a.roi_percentual - b.roi_percentual
-    if (sortBy === "stake_desc") return parseFloat(String(b.lucro_garantido ?? 0)) - parseFloat(String(a.lucro_garantido ?? 0))
-    if (sortBy === "stake_asc") return parseFloat(String(a.lucro_garantido ?? 0)) - parseFloat(String(b.lucro_garantido ?? 0))
-    if (sortBy === "lucro_desc") return parseFloat(String(b.resultado_real ?? b.lucro_garantido ?? 0)) - parseFloat(String(a.resultado_real ?? a.lucro_garantido ?? 0))
-    if (sortBy === "lucro_asc") return parseFloat(String(a.resultado_real ?? a.lucro_garantido ?? 0)) - parseFloat(String(b.resultado_real ?? b.lucro_garantido ?? 0))
-    if (sortBy === "ganhos_desc") return Math.max(0, parseFloat(String(b.resultado_real ?? 0))) - Math.max(0, parseFloat(String(a.resultado_real ?? 0)))
-    if (sortBy === "ganhos_asc") return Math.max(0, parseFloat(String(a.resultado_real ?? 0))) - Math.max(0, parseFloat(String(b.resultado_real ?? 0)))
-    if (sortBy === "perda_desc") return Math.min(0, parseFloat(String(a.resultado_real ?? 0))) - Math.min(0, parseFloat(String(b.resultado_real ?? 0)))
-    if (sortBy === "perda_asc") return Math.min(0, parseFloat(String(b.resultado_real ?? 0))) - Math.min(0, parseFloat(String(a.resultado_real ?? 0)))
     return new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
   })
 
@@ -314,96 +304,64 @@ export default function ApostasClient({ apostas: initialApostas, profiles, betCo
           <h1 className="text-2xl font-bold text-[var(--text-primary)]">Apostas</h1>
           <p className="text-[var(--text-secondary)] text-sm mt-1">Histórico de todas as suas apostas</p>
         </div>
-        <button
-          onClick={exportCSV}
-          className="hidden md:flex items-center gap-1.5 px-4 py-2 rounded-xl border border-[var(--border)] hover:bg-[var(--bg-elevated)] text-[var(--text-primary)] text-sm font-medium transition-colors"
-        >
-          <Download className="h-4 w-4" />
-          Exportar CSV
-        </button>
+        <div className="flex items-center gap-2">
+          {(() => {
+            const hasActive = filterStatus !== "todos" || filterProfile !== "todos" || filterPeriod !== "todos" || !!filterEsporte || !!filterCompeticao
+            return (
+              <button
+                onClick={() => setShowFilter(v => !v)}
+                className={`flex items-center gap-1.5 px-3 py-2 rounded-xl border text-sm font-medium transition-colors flex-shrink-0 ${
+                  showFilter || hasActive
+                    ? "bg-[#1e3a8a]/10 border-[#1e3a8a]/30 text-[var(--accent-text)]"
+                    : "border-[var(--border)] text-[var(--text-secondary)] hover:bg-[var(--bg-elevated)]"
+                }`}
+              >
+                {showFilter ? <X className="w-4 h-4" /> : <SlidersHorizontal className="w-4 h-4" />}
+                Filtrar{hasActive && !showFilter ? " •" : ""}
+              </button>
+            )
+          })()}
+          <button
+            onClick={exportCSV}
+            className="hidden md:flex items-center gap-1.5 px-4 py-2 rounded-xl border border-[var(--border)] hover:bg-[var(--bg-elevated)] text-[var(--text-primary)] text-sm font-medium transition-colors"
+          >
+            <Download className="h-4 w-4" />
+            Exportar CSV
+          </button>
+        </div>
       </div>
 
-      {/* Fixed filter bar */}
-      <div className="flex items-center gap-2 flex-wrap">
-        {(["todos", "pendente", "finalizada", "cancelada"] as const).map(s => (
-          <button
-            key={s}
-            onClick={() => setFilterStatus(s)}
-            className={`px-3 py-1.5 rounded-lg border text-xs font-medium transition-colors ${
-              filterStatus === s
-                ? s === "pendente" ? "bg-yellow-500/10 border-yellow-500/40 text-yellow-600"
-                  : s === "finalizada" ? "bg-green-500/10 border-green-500/40 text-green-600"
-                  : s === "cancelada" ? "bg-red-500/10 border-red-500/40 text-red-500"
-                  : "bg-[#1e3a8a] border-[#1e3a8a] text-white"
-                : "border-[var(--border)] text-[var(--text-secondary)] hover:bg-[var(--bg-elevated)]"
-            }`}
-          >
-            {{ todos: "Todos", pendente: "Pendentes", finalizada: "Finalizadas", cancelada: "Canceladas" }[s]}
-          </button>
-        ))}
+      {/* Filters panel */}
+      {showFilter && <Card>
+        <CardContent className="p-4 space-y-4">
+          <div className="flex items-center justify-between">
+            <p className="text-xs font-semibold text-[var(--text-muted)] uppercase tracking-wide">Filtros</p>
+            {(filterStatus !== "todos" || filterProfile !== "todos" || filterPeriod !== "todos" || filterEsporte || filterCompeticao) && (
+              <button
+                onClick={() => { setFilterStatus("todos"); setFilterProfile("todos"); setFilterPeriod("todos"); setFilterCustomDate(""); setFilterCustomFrom(""); setFilterCustomTo(""); setFilterEsporte(""); setFilterCompeticao("") }}
+                className="text-xs text-[var(--accent-text)] font-medium"
+              >
+                Limpar
+              </button>
+            )}
+          </div>
 
-        <div className="w-px h-4 bg-[var(--border)]" />
+          <>
 
-        {([
-          { value: "inv_desc",    label: "Maior invest." },
-          { value: "inv_asc",     label: "Menor invest." },
-          { value: "roi_desc",    label: "Maior ROI" },
-          { value: "roi_asc",     label: "Menor ROI" },
-          { value: "stake_desc",  label: "Maior stake" },
-          { value: "stake_asc",   label: "Menor stake" },
-          { value: "lucro_desc",  label: "Maior lucro" },
-          { value: "lucro_asc",   label: "Menor lucro" },
-          { value: "ganhos_desc", label: "Maior ganhos" },
-          { value: "ganhos_asc",  label: "Menor ganhos" },
-          { value: "perda_desc",  label: "Maior perda" },
-          { value: "perda_asc",   label: "Menor perda" },
-        ] as { value: typeof sortBy; label: string }[]).map(({ value, label }) => (
-          <button
-            key={value}
-            onClick={() => setSortBy(value)}
-            className={`px-3 py-1.5 rounded-lg border text-xs font-medium transition-colors ${
-              sortBy === value
-                ? "bg-[#1e3a8a]/10 border-[#1e3a8a]/30 text-[var(--accent-text)]"
-                : "border-[var(--border)] text-[var(--text-secondary)] hover:bg-[var(--bg-elevated)]"
-            }`}
-          >
-            {label}
-          </button>
-        ))}
-
-        <div className="w-px h-4 bg-[var(--border)]" />
-
-        {/* Advanced filters toggle */}
-        <button
-          onClick={() => setShowFilter(v => !v)}
-          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-xs font-medium transition-colors ${
-            showFilter || filterProfile !== "todos" || filterPeriod !== "todos" || !!filterEsporte || !!filterCompeticao
-              ? "bg-[#1e3a8a]/10 border-[#1e3a8a]/30 text-[var(--accent-text)]"
-              : "border-[var(--border)] text-[var(--text-secondary)] hover:bg-[var(--bg-elevated)]"
-          }`}
-        >
-          <SlidersHorizontal className="w-3 h-3" />
-          Mais filtros{(filterProfile !== "todos" || filterPeriod !== "todos" || !!filterEsporte || !!filterCompeticao) ? " •" : ""}
-        </button>
-      </div>
-
-      {/* Advanced filter panel */}
-      {showFilter && (
-        <Card>
-          <CardContent className="p-4 space-y-4">
-            <div className="flex items-center justify-between">
-              <p className="text-xs font-semibold text-[var(--text-muted)] uppercase tracking-wide">Filtros avançados</p>
-              {(filterProfile !== "todos" || filterPeriod !== "todos" || filterEsporte || filterCompeticao) && (
-                <button
-                  onClick={() => { setFilterProfile("todos"); setFilterPeriod("todos"); setFilterCustomDate(""); setFilterCustomFrom(""); setFilterCustomTo(""); setFilterEsporte(""); setFilterCompeticao("") }}
-                  className="text-xs text-[var(--accent-text)] font-medium"
-                >
-                  Limpar
-                </button>
-              )}
+          {/* Status + Perfil */}
+          <div className="grid grid-cols-2 gap-3">
+            <div className="space-y-1.5">
+              <Label className="text-xs">Status</Label>
+              <Select value={filterStatus} onValueChange={setFilterStatus}>
+                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="todos">Todos</SelectItem>
+                  <SelectItem value="pendente">Pendentes</SelectItem>
+                  <SelectItem value="finalizada">Finalizadas</SelectItem>
+                  <SelectItem value="cancelada">Canceladas</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
-
-            {/* Perfil */}
             <div className="space-y-1.5">
               <Label className="text-xs">Perfil</Label>
               <Select value={filterProfile} onValueChange={setFilterProfile}>
@@ -418,72 +376,134 @@ export default function ApostasClient({ apostas: initialApostas, profiles, betCo
                 </SelectContent>
               </Select>
             </div>
+          </div>
 
-            {/* Esporte + Competição */}
-            <div className="grid grid-cols-2 gap-3">
-              <div className="space-y-1.5">
-                <Label className="text-xs">Esporte</Label>
-                <Input value={filterEsporte} onChange={e => setFilterEsporte(e.target.value)} placeholder="ex: Futebol" className="text-xs h-9" />
-              </div>
-              <div className="space-y-1.5">
-                <Label className="text-xs">Competição</Label>
-                <Input value={filterCompeticao} onChange={e => setFilterCompeticao(e.target.value)} placeholder="ex: Champions League" className="text-xs h-9" />
-              </div>
+          {/* Esporte + Competição */}
+          <div className="grid grid-cols-2 gap-3">
+            <div className="space-y-1.5">
+              <Label className="text-xs">Esporte</Label>
+              <Input
+                value={filterEsporte}
+                onChange={e => setFilterEsporte(e.target.value)}
+                placeholder="ex: Futebol"
+                className="text-xs h-9"
+              />
             </div>
+            <div className="space-y-1.5">
+              <Label className="text-xs">Competição</Label>
+              <Input
+                value={filterCompeticao}
+                onChange={e => setFilterCompeticao(e.target.value)}
+                placeholder="ex: Champions League"
+                className="text-xs h-9"
+              />
+            </div>
+          </div>
 
-            {/* Period pills */}
-            <div className="space-y-2">
-              <Label className="text-xs flex items-center gap-1">
-                <CalendarIcon className="h-3 w-3" />
-                Período
-              </Label>
-              <div className="flex flex-wrap gap-2">
-                {(["todos", "dia", "semana", "mes"] as const).map(p => (
-                  <button
-                    key={p}
-                    onClick={() => setFilterPeriod(p)}
-                    className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors border ${
-                      filterPeriod === p
-                        ? "bg-[#1e3a8a] border-[#1e3a8a] text-white"
-                        : "border-[var(--border)] text-[var(--text-secondary)] hover:bg-[var(--bg-elevated)]"
-                    }`}
-                  >
-                    {{ todos: "Todos", dia: "Hoje", semana: "Semana", mes: "Mês" }[p]}
-                  </button>
-                ))}
+          {/* Ordenação */}
+          <div className="space-y-1.5">
+            <Label className="text-xs">Ordenar por</Label>
+            <Select value={sortBy} onValueChange={v => setSortBy(v as typeof sortBy)}>
+              <SelectTrigger className="text-xs h-9"><SelectValue /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="data_desc">Data (mais recente)</SelectItem>
+                <SelectItem value="data_asc">Data (mais antigo)</SelectItem>
+                <SelectItem value="valor_desc">Maior investimento</SelectItem>
+                <SelectItem value="roi_desc">Maior ROI</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* Period pills */}
+          <div className="space-y-2">
+            <Label className="text-xs flex items-center gap-1">
+              <CalendarIcon className="h-3 w-3" />
+              Período
+            </Label>
+            <div className="flex flex-wrap gap-2">
+              {(["todos", "dia", "semana", "mes"] as const).map(p => (
                 <button
-                  onClick={() => setFilterPeriod("custom")}
-                  title="Data personalizada"
-                  className={`flex items-center justify-center w-[34px] h-[34px] rounded-lg transition-colors border ${
-                    filterPeriod === "custom"
+                  key={p}
+                  onClick={() => setFilterPeriod(p)}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors border ${
+                    filterPeriod === p
                       ? "bg-[#1e3a8a] border-[#1e3a8a] text-white"
                       : "border-[var(--border)] text-[var(--text-secondary)] hover:bg-[var(--bg-elevated)]"
                   }`}
                 >
-                  <CalendarIcon className="h-3.5 w-3.5" />
+                  {{ todos: "Todos", dia: "Hoje", semana: "Semana", mes: "Mês" }[p]}
                 </button>
-              </div>
-              {filterPeriod === "custom" && (
-                <div className="mt-2 space-y-2">
-                  <div className="flex gap-1 p-0.5 bg-[var(--bg-elevated)] rounded-lg w-fit">
-                    <button onClick={() => setFilterCustomMode("single")} className={`px-3 py-1 rounded-md text-xs font-medium transition-colors ${filterCustomMode === "single" ? "bg-[var(--bg-surface)] text-[var(--text-primary)] shadow-sm" : "text-[var(--text-secondary)]"}`}>Data</button>
-                    <button onClick={() => setFilterCustomMode("range")} className={`px-3 py-1 rounded-md text-xs font-medium transition-colors ${filterCustomMode === "range" ? "bg-[var(--bg-surface)] text-[var(--text-primary)] shadow-sm" : "text-[var(--text-secondary)]"}`}>Intervalo</button>
-                  </div>
-                  {filterCustomMode === "single" ? (
-                    <Input type="date" value={filterCustomDate} onChange={e => setFilterCustomDate(e.target.value)} className="text-xs h-8 max-w-[160px]" />
-                  ) : (
-                    <div className="flex items-center gap-2">
-                      <Input type="date" value={filterCustomFrom} onChange={e => setFilterCustomFrom(e.target.value)} className="text-xs h-8 max-w-[140px]" />
-                      <span className="text-[var(--text-muted)] text-xs">até</span>
-                      <Input type="date" value={filterCustomTo} onChange={e => setFilterCustomTo(e.target.value)} className="text-xs h-8 max-w-[140px]" />
-                    </div>
-                  )}
-                </div>
-              )}
+              ))}
+              <button
+                onClick={() => setFilterPeriod("custom")}
+                title="Data personalizada"
+                className={`flex items-center justify-center w-[34px] h-[34px] rounded-lg transition-colors border ${
+                  filterPeriod === "custom"
+                    ? "bg-[#1e3a8a] border-[#1e3a8a] text-white"
+                    : "border-[var(--border)] text-[var(--text-secondary)] hover:bg-[var(--bg-elevated)]"
+                }`}
+              >
+                <CalendarIcon className="h-3.5 w-3.5" />
+              </button>
             </div>
-          </CardContent>
-        </Card>
-      )}
+
+            {filterPeriod === "custom" && (
+              <div className="mt-2 space-y-2">
+                <div className="flex gap-1 p-0.5 bg-[var(--bg-elevated)] rounded-lg w-fit">
+                  <button
+                    onClick={() => setFilterCustomMode("single")}
+                    className={`px-3 py-1 rounded-md text-xs font-medium transition-colors ${
+                      filterCustomMode === "single"
+                        ? "bg-[var(--bg-surface)] text-[var(--text-primary)] shadow-sm"
+                        : "text-[var(--text-secondary)]"
+                    }`}
+                  >
+                    Data
+                  </button>
+                  <button
+                    onClick={() => setFilterCustomMode("range")}
+                    className={`px-3 py-1 rounded-md text-xs font-medium transition-colors ${
+                      filterCustomMode === "range"
+                        ? "bg-[var(--bg-surface)] text-[var(--text-primary)] shadow-sm"
+                        : "text-[var(--text-secondary)]"
+                    }`}
+                  >
+                    Intervalo
+                  </button>
+                </div>
+                {filterCustomMode === "single" ? (
+                  <Input
+                    type="date"
+                    value={filterCustomDate}
+                    onChange={e => setFilterCustomDate(e.target.value)}
+                    className="text-xs h-8 max-w-[160px]"
+                  />
+                ) : (
+                  <div className="flex items-center gap-2">
+                    <Input
+                      type="date"
+                      value={filterCustomFrom}
+                      onChange={e => setFilterCustomFrom(e.target.value)}
+                      className="text-xs h-8 max-w-[140px]"
+                      placeholder="Início"
+                    />
+                    <span className="text-[var(--text-muted)] text-xs">até</span>
+                    <Input
+                      type="date"
+                      value={filterCustomTo}
+                      onChange={e => setFilterCustomTo(e.target.value)}
+                      className="text-xs h-8 max-w-[140px]"
+                      placeholder="Fim"
+                    />
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+
+          </>
+        </CardContent>
+      </Card>}
 
       {/* List */}
       {filtered.length === 0 ? (
