@@ -733,7 +733,7 @@ export default function SurebetCalculator({ profiles, defaultProfileId, profileN
           const selectedPB = allPBs.find(pb => pb.id === leg.profileBetId)
           const saldo = selectedPB ? parseFloat(String(selectedPB.saldo)) || 0 : 0
           const stake = stakes[i] ?? 0
-          const showSaldoWarning = selectedPB && saldo > 0 && stake > 0 && stake < saldo
+          const showSaldoWarning = selectedPB && saldo > 0 && stake > 0 && stake > saldo
 
           return (
           <Card key={i}>
@@ -826,9 +826,9 @@ export default function SurebetCalculator({ profiles, defaultProfileId, profileN
                 <div className="mt-3 flex items-start gap-2.5 px-3 py-2.5 rounded-lg bg-amber-50 border border-amber-200">
                   <AlertTriangle className="h-4 w-4 text-amber-500 flex-shrink-0 mt-0.5" />
                   <p className="text-xs text-amber-800 leading-relaxed">
-                    A stake desta aposta na <span className="font-semibold">{selectedPB.bet?.nome ?? "casa"}</span> é
-                    menor que o saldo atual da conta. Após salvar a aposta, lembre-se de registrar uma movimentação
-                    com o saldo que havia na conta antes de fazer a aposta.
+                    Saldo insuficiente na <span className="font-semibold">{selectedPB.bet?.nome ?? "casa"}</span>.
+                    A stake de R$ {stake.toLocaleString("pt-BR", { minimumFractionDigits: 2 })} é maior que o saldo disponível de R$ {saldo.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}.
+                    Adicione fundos nesta conta antes de fazer a aposta.
                   </p>
                 </div>
               )}
