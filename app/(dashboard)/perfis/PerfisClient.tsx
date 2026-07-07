@@ -4,14 +4,14 @@ import { useState, useMemo } from "react"
 import Link from "next/link"
 import { Card, CardContent } from "@/components/ui/card"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { User, SlidersHorizontal, X } from "lucide-react"
+import { User } from "lucide-react"
 
 function formatCurrency(value: number | null | undefined) {
   return new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(value ?? 0)
 }
 
 type FilterStatus = "todos" | "ativo" | "inativo"
-type SortBy = "default" | "lucro" | "roi"
+type SortBy = "default" | "saldo_desc" | "saldo_asc" | "lucro_desc" | "lucro_asc" | "roi_desc" | "roi_asc"
 
 interface ProfileDashboard {
   profile_id: string
@@ -20,6 +20,7 @@ interface ProfileDashboard {
   sobrenome: string
   apelido: string | null
   foto_url: string | null
+  ativo: boolean
   saldo_total: number
   lucro_realizado: number
   lucro_pendente: number
@@ -38,25 +39,23 @@ interface Props {
 
 export default function PerfisClient({ profiles: initialProfiles, planLimit }: Props) {
   const [profiles] = useState(initialProfiles)
-
-  const [showFilter, setShowFilter] = useState(false)
   const [filterStatus, setFilterStatus] = useState<FilterStatus>("todos")
   const [sortBy, setSortBy] = useState<SortBy>("default")
 
   const atLimit = profiles.length >= planLimit
-  const hasActiveFilters = filterStatus !== "todos" || sortBy !== "default"
 
   const displayed = useMemo(() => {
     let list = [...profiles]
-    if (sortBy === "lucro") list.sort((a, b) => b.lucro_realizado - a.lucro_realizado)
-    if (sortBy === "roi") list.sort((a, b) => b.roi_percentual - a.roi_percentual)
+    if (filterStatus === "ativo") list = list.filter(p => p.ativo)
+    if (filterStatus === "inativo") list = list.filter(p => !p.ativo)
+    if (sortBy === "saldo_desc") list.sort((a, b) => b.saldo_total - a.saldo_total)
+    if (sortBy === "saldo_asc") list.sort((a, b) => a.saldo_total - b.saldo_total)
+    if (sortBy === "lucro_desc") list.sort((a, b) => b.lucro_realizado - a.lucro_realizado)
+    if (sortBy === "lucro_asc") list.sort((a, b) => a.lucro_realizado - b.lucro_realizado)
+    if (sortBy === "roi_desc") list.sort((a, b) => b.roi_percentual - a.roi_percentual)
+    if (sortBy === "roi_asc") list.sort((a, b) => a.roi_percentual - b.roi_percentual)
     return list
   }, [profiles, filterStatus, sortBy])
-
-  function clearFilters() {
-    setFilterStatus("todos")
-    setSortBy("default")
-  }
 
   return (
     <div className="space-y-4">
@@ -65,20 +64,6 @@ export default function PerfisClient({ profiles: initialProfiles, planLimit }: P
         <div>
           <h1 className="text-2xl font-bold text-[var(--text-primary)]">Perfis</h1>
           <p className="text-[var(--text-secondary)] text-sm mt-1">Gerencie seus perfis de apostador</p>
-        </div>
-        <div className="flex items-center gap-2">
-          {/* Filtrar */}
-          <button
-            onClick={() => setShowFilter(v => !v)}
-            className={`flex items-center gap-1.5 px-3 py-2 rounded-xl border text-sm font-medium transition-colors flex-shrink-0 ${
-              showFilter || hasActiveFilters
-                ? "bg-[#1e3a8a]/10 border-[#1e3a8a]/30 text-[var(--accent-text)]"
-                : "border-[var(--border)] text-[var(--text-secondary)] hover:bg-[var(--bg-elevated)]"
-            }`}
-          >
-            {showFilter ? <X className="w-4 h-4" /> : <SlidersHorizontal className="w-4 h-4" />}
-            Filtrar{hasActiveFilters && !showFilter ? " •" : ""}
-          </button>
         </div>
       </div>
 
@@ -91,48 +76,56 @@ export default function PerfisClient({ profiles: initialProfiles, planLimit }: P
         </p>
       )}
 
-      {/* Filtros */}
-      {showFilter && (
-        <Card>
-          <CardContent className="p-4">
-            <div className="flex flex-wrap items-center gap-3">
-              <p className="text-xs font-semibold text-[var(--text-muted)] uppercase tracking-wide flex-shrink-0">Ordenar</p>
-              {([
-                { value: "default", label: "Padrão" },
-                { value: "lucro",   label: "Maior Lucro" },
-                { value: "roi",     label: "Maior ROI" },
-              ] as { value: SortBy; label: string }[]).map(opt => (
-                <button
-                  key={opt.value}
-                  onClick={() => setSortBy(opt.value)}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-medium border transition-colors ${
-                    sortBy === opt.value
-                      ? "bg-[#1e3a8a]/10 border-[#1e3a8a]/30 text-[var(--accent-text)]"
-                      : "border-[var(--border)] text-[var(--text-secondary)]"
-                  }`}
-                >
-                  {opt.label}
-                </button>
-              ))}
+      {/* Fixed filter bar */}
+      <div className="flex items-center gap-2 flex-wrap">
+        {(["todos", "ativo", "inativo"] as const).map(s => (
+          <button
+            key={s}
+            onClick={() => setFilterStatus(s)}
+            className={`px-3 py-1.5 rounded-lg border text-xs font-medium transition-colors ${
+              filterStatus === s
+                ? s === "ativo" ? "bg-green-500/10 border-green-500/40 text-green-600"
+                  : s === "inativo" ? "bg-red-500/10 border-red-500/40 text-red-500"
+                  : "bg-[#1e3a8a] border-[#1e3a8a] text-white"
+                : "border-[var(--border)] text-[var(--text-secondary)] hover:bg-[var(--bg-elevated)]"
+            }`}
+          >
+            {{ todos: "Todos", ativo: "Ativos", inativo: "Inativos" }[s]}
+          </button>
+        ))}
 
-              {hasActiveFilters && (
-                <button onClick={clearFilters} className="ml-auto text-xs text-[var(--accent-text)] font-medium">
-                  Limpar
-                </button>
-              )}
-            </div>
-          </CardContent>
-        </Card>
-      )}
+        <div className="w-px h-4 bg-[var(--border)]" />
+
+        {([
+          { value: "saldo_desc", label: "Maior saldo" },
+          { value: "saldo_asc",  label: "Menor saldo" },
+          { value: "lucro_desc", label: "Maior lucro" },
+          { value: "lucro_asc",  label: "Menor lucro" },
+          { value: "roi_desc",   label: "Maior ROI" },
+          { value: "roi_asc",    label: "Menor ROI" },
+        ] as { value: SortBy; label: string }[]).map(({ value, label }) => (
+          <button
+            key={value}
+            onClick={() => setSortBy(value)}
+            className={`px-3 py-1.5 rounded-lg border text-xs font-medium transition-colors ${
+              sortBy === value
+                ? "bg-[#1e3a8a]/10 border-[#1e3a8a]/30 text-[var(--accent-text)]"
+                : "border-[var(--border)] text-[var(--text-secondary)] hover:bg-[var(--bg-elevated)]"
+            }`}
+          >
+            {label}
+          </button>
+        ))}
+      </div>
 
       {displayed.length === 0 ? (
         <Card>
           <CardContent className="flex flex-col items-center justify-center py-16 text-center">
             <User className="h-12 w-12 text-gray-300 mb-4" />
             <p className="text-[var(--text-secondary)]">
-              {hasActiveFilters ? "Nenhum perfil encontrado com os filtros aplicados" : "Nenhum perfil cadastrado"}
+              {filterStatus !== "todos" ? "Nenhum perfil encontrado com os filtros aplicados" : "Nenhum perfil cadastrado"}
             </p>
-            {!hasActiveFilters && (
+            {filterStatus === "todos" && (
               <p className="text-xs text-[var(--text-muted)] mt-2">Use o botão (+) para criar seu primeiro perfil.</p>
             )}
           </CardContent>
@@ -156,6 +149,9 @@ export default function PerfisClient({ profiles: initialProfiles, planLimit }: P
                   <p className="text-sm font-semibold text-[var(--text-primary)] truncate">{p.apelido ?? `${p.nome} ${p.sobrenome}`}</p>
                   <p className="text-xs text-[var(--text-secondary)]">{p.total_apostas} aposta{p.total_apostas !== 1 ? "s" : ""}</p>
                 </div>
+                <span className={`text-[10px] font-semibold px-1.5 py-0.5 rounded-full flex-shrink-0 ${p.ativo ? "bg-green-500/10 text-green-500" : "bg-red-500/10 text-red-400"}`}>
+                  {p.ativo ? "Ativo" : "Inativo"}
+                </span>
               </div>
               <div className="grid grid-cols-3 gap-2 pt-2 border-t border-[var(--border-subtle)] w-full">
                 <div className="flex flex-col items-center text-center">
@@ -175,7 +171,6 @@ export default function PerfisClient({ profiles: initialProfiles, planLimit }: P
           ))}
         </div>
       )}
-
     </div>
   )
 }
