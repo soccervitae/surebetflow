@@ -357,11 +357,16 @@ export default function SurebetCalculator({ profiles, defaultProfileId, profileN
     return roundStakes ? Math.round(raw / roundTo) * roundTo : raw
   })
 
-  const guaranteedReturn = isArbitrage && stakes.length > 0 && odds[0] > 0
-    ? stakes[0] * odds[0]
+  // Após arredondamento os stakes podem ser desiguais, então:
+  // retorno garantido = pior payout entre todas as pernas
+  // lucro/ROI calculados sobre a soma real dos stakes (não o investimento digitado)
+  const totalStaked = stakes.slice(0, numLegs).reduce((a, b) => a + b, 0)
+  const payouts = stakes.slice(0, numLegs).map((s, i) => s * (odds[i] || 0))
+  const guaranteedReturn = isArbitrage && totalStaked > 0
+    ? Math.min(...payouts.filter(p => p > 0))
     : 0
-  const lucroGarantido = guaranteedReturn - investment
-  const roi = investment > 0 && isArbitrage ? ((lucroGarantido / investment) * 100) : 0
+  const lucroGarantido = guaranteedReturn > 0 ? guaranteedReturn - totalStaked : 0
+  const roi = totalStaked > 0 && isArbitrage ? ((lucroGarantido / totalStaked) * 100) : 0
 
   async function handleSave() {
     if (!evento.trim()) {
@@ -407,7 +412,7 @@ export default function SurebetCalculator({ profiles, defaultProfileId, profileN
             const iso = `${y}-${m.padStart(2,"0")}-${d.padStart(2,"0")}`
             return `${iso}${horaEvento ? `T${horaEvento}:00` : "T00:00:00"}`
           })(),
-          investimento_total: investment,
+          investimento_total: totalStaked || investment,
           lucro_garantido: parseFloat(lucroGarantido.toFixed(2)),
           roi_percentual: parseFloat(roi.toFixed(4)),
           status: "pendente",
