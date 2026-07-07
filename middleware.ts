@@ -42,7 +42,7 @@ export async function middleware(request: NextRequest) {
   if (user && (pathname === '/login' || pathname === '/cadastro')) {
     const adminEmails = (process.env.ADMIN_EMAILS ?? "").split(",").map(e => e.trim()).filter(Boolean)
     const isAdmin = adminEmails.includes(user.email ?? "")
-    return redirect(request, isAdmin ? '/admin' : '/surebet')
+    return redirect(request, isAdmin ? '/admin' : '/dashboard')
   }
 
   // Check email verification for protected routes
@@ -59,8 +59,7 @@ export async function middleware(request: NextRequest) {
       pathname.startsWith('/perfis') ||
       pathname.startsWith('/financeiro') ||
       pathname.startsWith('/suporte') ||
-      pathname.startsWith('/calculadora') ||
-      pathname.startsWith('/surebet')
+      pathname.startsWith('/calculadora')
 
     if (isDashboardRoute) {
       const adminEmails = (process.env.ADMIN_EMAILS ?? "").split(",").map(e => e.trim()).filter(Boolean)
