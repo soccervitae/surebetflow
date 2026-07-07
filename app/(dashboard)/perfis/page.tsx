@@ -1,5 +1,6 @@
 import type { Metadata } from "next"
 import { createClient } from "@/lib/supabase/server"
+import { getPlanLimits } from "@/lib/stripe"
 import PerfisClient from "./PerfisClient"
 
 export const metadata: Metadata = {
@@ -23,9 +24,8 @@ export default async function PerfisPage() {
     .eq("user_id", user!.id)
     .single()
 
-  const plan = (subData?.status === "active" || subData?.status === "trialing") ? (subData?.plan ?? "") : ""
-  const planLimits: Record<string, number> = { trader_pro: 20, trader: 5, pro: 5 }
-  const planLimit = planLimits[plan] ?? 5
+  const limits = getPlanLimits(subData?.plan, subData?.status)
+  const planLimit = limits.maxProfiles
 
   const currentProfiles = profiles ?? []
 

@@ -24,6 +24,8 @@ interface Props {
   defaultProfileId?: string
   profileName?: string
   onSaved?: () => void
+  maxApostas?: number
+  totalApostas?: number
 }
 
 function normalizeName(s: string) {
@@ -127,7 +129,7 @@ function parseSurebetText(text: string): { event: string; sport: string; legs: P
   return { event, sport, legs: parsedLegs }
 }
 
-export default function SurebetCalculator({ profiles, defaultProfileId, profileName, onSaved }: Props) {
+export default function SurebetCalculator({ profiles, defaultProfileId, profileName, onSaved, maxApostas = Infinity, totalApostas = 0 }: Props) {
   const filteredProfiles = defaultProfileId ? profiles.filter(p => p.id === defaultProfileId) : profiles
   const [numLegs, setNumLegs] = useState(2)
   const tipo = numLegs >= 3 ? "3-way" : "2-way"
@@ -382,7 +384,13 @@ export default function SurebetCalculator({ profiles, defaultProfileId, profileN
   const lucroGarantido = guaranteedReturn > 0 ? guaranteedReturn - totalStaked : 0
   const roi = totalStaked > 0 && isArbitrage ? ((lucroGarantido / totalStaked) * 100) : 0
 
+  const atApostasLimit = isFinite(maxApostas) && totalApostas >= maxApostas
+
   async function handleSave() {
+    if (atApostasLimit) {
+      toast({ title: `Limite de ${maxApostas} apostas atingido. Faça upgrade para continuar.`, variant: "destructive" })
+      return
+    }
     if (!evento.trim()) {
       toast({ title: "Informe o nome do evento", variant: "destructive" })
       return
@@ -933,11 +941,32 @@ export default function SurebetCalculator({ profiles, defaultProfileId, profileN
         </CardContent>
       </Card>
 
+      {atApostasLimit && (
+        <div className="rounded-xl border border-amber-400/40 bg-amber-50 dark:bg-amber-950/20 p-4 flex items-start gap-3">
+          <AlertTriangle className="h-5 w-5 text-amber-500 flex-shrink-0 mt-0.5" />
+          <div className="flex-1">
+            <p className="text-sm font-semibold text-amber-800 dark:text-amber-300">
+              Limite do plano gratuito atingido
+            </p>
+            <p className="text-xs text-amber-700 dark:text-amber-400 mt-0.5">
+              Você já registrou {totalApostas} de {maxApostas} apostas permitidas.
+              Faça upgrade para continuar registrando.
+            </p>
+            <Link
+              href="/assinatura"
+              className="inline-flex items-center gap-1.5 mt-2 px-3 py-1.5 rounded-lg bg-amber-500 hover:bg-amber-600 text-white text-xs font-semibold transition-colors"
+            >
+              Ver planos
+            </Link>
+          </div>
+        </div>
+      )}
+
       <Button
         className="w-full"
         size="lg"
         onClick={handleSave}
-        disabled={!isArbitrage || saving}
+        disabled={!isArbitrage || saving || atApostasLimit}
       >
         {saving ? (
           <><Loader2 className="h-4 w-4 mr-2 animate-spin" />Salvando aposta...</>

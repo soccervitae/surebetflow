@@ -15,6 +15,20 @@ type Subscription = {
 
 const PLANS = [
   {
+    key: "free",
+    name: "Gratuito",
+    price: "R$ 0",
+    period: "",
+    maxProfiles: 1,
+    icon: Star,
+    features: [
+      "1 perfil de apostador",
+      "Até 10 apostas registradas",
+      "Calculadora de surebet 2-way e 3-way",
+      "Dashboard financeiro básico",
+    ],
+  },
+  {
     key: "trader",
     name: "Trader",
     price: "R$ 99",
@@ -23,6 +37,7 @@ const PLANS = [
     icon: Star,
     features: [
       "Até 5 perfis de apostador",
+      "Apostas ilimitadas",
       "Casas de apostas ilimitadas por perfil",
       "Calculadora de surebet 2-way e 3-way",
       "Dashboard financeiro completo",
@@ -39,6 +54,7 @@ const PLANS = [
     icon: Zap,
     features: [
       "Até 20 perfis de apostador",
+      "Apostas ilimitadas",
       "Casas de apostas ilimitadas por perfil",
       "Calculadora de surebet 2-way e 3-way",
       "Dashboard financeiro completo",
