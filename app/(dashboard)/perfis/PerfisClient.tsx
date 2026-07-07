@@ -157,16 +157,16 @@ export default function PerfisClient({ profiles: initialProfiles, planLimit }: P
                   <p className="text-xs text-[var(--text-secondary)]">{p.total_apostas} aposta{p.total_apostas !== 1 ? "s" : ""}</p>
                 </div>
               </div>
-              <div className="grid grid-cols-3 gap-2 pt-2 border-t border-[var(--border-subtle)]">
-                <div>
+              <div className="grid grid-cols-3 gap-2 pt-2 border-t border-[var(--border-subtle)] w-full">
+                <div className="flex flex-col items-center text-center">
                   <p className="text-[10px] text-[var(--text-muted)] uppercase tracking-wide">Saldo</p>
                   <p className="text-xs font-bold text-[#3b82f6] truncate">{formatCurrency(p.saldo_total)}</p>
                 </div>
-                <div>
+                <div className="flex flex-col items-center text-center border-x border-[var(--border-subtle)]">
                   <p className="text-[10px] text-[var(--text-muted)] uppercase tracking-wide">Lucro</p>
                   <p className={`text-xs font-bold truncate ${p.lucro_realizado >= 0 ? "text-green-500" : "text-red-500"}`}>{formatCurrency(p.lucro_realizado)}</p>
                 </div>
-                <div>
+                <div className="flex flex-col items-center text-center">
                   <p className="text-[10px] text-[var(--text-muted)] uppercase tracking-wide">ROI</p>
                   <p className={`text-xs font-bold truncate ${p.roi_percentual >= 0 ? "text-[#a855f7]" : "text-red-500"}`}>{parseFloat(String(p.roi_percentual)).toFixed(1)}%</p>
                 </div>
