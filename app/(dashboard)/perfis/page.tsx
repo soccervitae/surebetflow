@@ -13,10 +13,9 @@ export default async function PerfisPage() {
   const { data: { user } } = await supabase.auth.getUser()
 
   const { data: profiles } = await supabase
-    .from("profiles")
+    .from("profile_dashboard")
     .select("*")
     .eq("user_id", user!.id)
-    .order("created_at", { ascending: false })
 
   const { data: subData } = await supabase
     .from("subscriptions")

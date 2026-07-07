@@ -1,86 +1,57 @@
 "use client"
 
-import { useState, useMemo, useEffect } from "react"
+import { useState, useMemo } from "react"
 import Link from "next/link"
 import { Card, CardContent } from "@/components/ui/card"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { createClient } from "@/lib/supabase/client"
 import { User, SlidersHorizontal, X } from "lucide-react"
-import type { Profile } from "@/lib/types"
 
-function maskCpf(cpf: string) {
-  const d = cpf.replace(/\D/g, "")
-  if (d.length !== 11) return cpf
-  return `***.${d.slice(3, 6)}.${d.slice(6, 9)}-**`
+function formatCurrency(value: number | null | undefined) {
+  return new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(value ?? 0)
 }
 
 type FilterStatus = "todos" | "ativo" | "inativo"
 type SortBy = "default" | "lucro" | "roi"
 
-interface ProfileStats {
-  lucro: number
-  roi: number
+interface ProfileDashboard {
+  profile_id: string
+  user_id: string
+  nome: string
+  sobrenome: string
+  apelido: string | null
+  foto_url: string | null
+  saldo_total: number
+  lucro_realizado: number
+  lucro_pendente: number
+  total_investido: number
+  total_apostas: number
+  apostas_finalizadas: number
+  roi_percentual: number
+  bonus_total: number
 }
 
 interface Props {
-  profiles: Profile[]
+  profiles: ProfileDashboard[]
   userId: string
   planLimit: number
 }
 
 export default function PerfisClient({ profiles: initialProfiles, planLimit }: Props) {
-  const [profiles, setProfiles] = useState(initialProfiles)
+  const [profiles] = useState(initialProfiles)
 
   const [showFilter, setShowFilter] = useState(false)
   const [filterStatus, setFilterStatus] = useState<FilterStatus>("todos")
   const [sortBy, setSortBy] = useState<SortBy>("default")
-  const [stats, setStats] = useState<Record<string, ProfileStats>>({})
-  const [statsLoaded, setStatsLoaded] = useState(false)
 
   const atLimit = profiles.length >= planLimit
-
   const hasActiveFilters = filterStatus !== "todos" || sortBy !== "default"
-
-  async function loadStats() {
-    if (statsLoaded) return
-    const supabase = createClient()
-    const { data } = await supabase
-      .from("movimentacoes_financeiras")
-      .select("profile_id, tipo, valor")
-      .in("profile_id", profiles.map(p => p.id))
-    const acc: Record<string, { depositos: number; lucro: number; perda: number }> = {}
-    for (const m of data ?? []) {
-      if (!acc[m.profile_id]) acc[m.profile_id] = { depositos: 0, lucro: 0, perda: 0 }
-      const v = parseFloat(String(m.valor)) || 0
-      if (m.tipo === "deposito") acc[m.profile_id].depositos += v
-      if (m.tipo === "lucro") acc[m.profile_id].lucro += v
-      if (m.tipo === "perda") acc[m.profile_id].perda += v
-    }
-    const result: Record<string, ProfileStats> = {}
-    for (const id of Object.keys(acc)) {
-      const { depositos, lucro, perda } = acc[id]
-      const lucroLiq = lucro - perda
-      result[id] = {
-        lucro: lucroLiq,
-        roi: depositos > 0 ? (lucroLiq / depositos) * 100 : 0,
-      }
-    }
-    setStats(result)
-    setStatsLoaded(true)
-  }
-
-  useEffect(() => {
-    if (sortBy === "lucro" || sortBy === "roi") loadStats()
-  }, [sortBy])
 
   const displayed = useMemo(() => {
     let list = [...profiles]
-    if (filterStatus === "ativo") list = list.filter(p => p.ativo)
-    if (filterStatus === "inativo") list = list.filter(p => !p.ativo)
-    if (sortBy === "lucro") list.sort((a, b) => (stats[b.id]?.lucro ?? 0) - (stats[a.id]?.lucro ?? 0))
-    if (sortBy === "roi") list.sort((a, b) => (stats[b.id]?.roi ?? 0) - (stats[a.id]?.roi ?? 0))
+    if (sortBy === "lucro") list.sort((a, b) => b.lucro_realizado - a.lucro_realizado)
+    if (sortBy === "roi") list.sort((a, b) => b.roi_percentual - a.roi_percentual)
     return list
-  }, [profiles, filterStatus, sortBy, stats])
+  }, [profiles, filterStatus, sortBy])
 
   function clearFilters() {
     setFilterStatus("todos")
@@ -125,23 +96,6 @@ export default function PerfisClient({ profiles: initialProfiles, planLimit }: P
         <Card>
           <CardContent className="p-4">
             <div className="flex flex-wrap items-center gap-3">
-              <p className="text-xs font-semibold text-[var(--text-muted)] uppercase tracking-wide flex-shrink-0">Status</p>
-              {(["todos", "ativo", "inativo"] as FilterStatus[]).map(s => (
-                <button
-                  key={s}
-                  onClick={() => setFilterStatus(s)}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-medium border transition-colors ${
-                    filterStatus === s
-                      ? "bg-[#1e3a8a]/10 border-[#1e3a8a]/30 text-[var(--accent-text)]"
-                      : "border-[var(--border)] text-[var(--text-secondary)]"
-                  }`}
-                >
-                  {s === "todos" ? "Todos" : s === "ativo" ? "Ativos" : "Inativos"}
-                </button>
-              ))}
-
-              <div className="w-px h-4 bg-[var(--border)] hidden sm:block" />
-
               <p className="text-xs font-semibold text-[var(--text-muted)] uppercase tracking-wide flex-shrink-0">Ordenar</p>
               {([
                 { value: "default", label: "Padrão" },
@@ -184,39 +138,39 @@ export default function PerfisClient({ profiles: initialProfiles, planLimit }: P
           </CardContent>
         </Card>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-          {displayed.map(profile => (
-            <Link key={profile.id} href={`/perfis/${profile.id}`}>
-              <Card className="hover:border-[#1e3a8a]/40 hover:bg-[#1e3a8a]/5 transition-all cursor-pointer">
-                <CardContent className="p-5">
-                  <div className="flex items-start gap-4">
-                    <Avatar className="h-12 w-12 flex-shrink-0">
-                      {profile.foto_url && <AvatarImage src={profile.foto_url} />}
-                      <AvatarFallback>
-                        {profile.nome.charAt(0)}{profile.sobrenome.charAt(0)}
-                      </AvatarFallback>
-                    </Avatar>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 flex-wrap">
-                        <h3 className="font-semibold text-[var(--text-primary)] truncate">
-                          {profile.apelido || `${profile.nome} ${profile.sobrenome}`}
-                        </h3>
-                        <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium flex-shrink-0 ${
-                          profile.ativo ? "bg-green-500/10 text-green-600" : "bg-red-500/10 text-red-500"
-                        }`}>
-                          <span className={`w-1.5 h-1.5 rounded-full ${profile.ativo ? "bg-green-500" : "bg-red-500"}`} />
-                          {profile.ativo ? "Ativo" : "Inativo"}
-                        </span>
-                      </div>
-                      {profile.cpf && (
-                        <p className="text-xs text-[var(--text-muted)] font-mono mt-0.5">
-                          {maskCpf(profile.cpf)}
-                        </p>
-                      )}
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+          {displayed.map(p => (
+            <Link
+              key={p.profile_id}
+              href={`/perfis/${p.profile_id}`}
+              className="flex flex-col gap-3 p-4 rounded-xl border border-[var(--border-subtle)] hover:border-[#1e3a8a]/40 hover:bg-[#1e3a8a]/5 transition-all"
+            >
+              <div className="flex items-center gap-3">
+                <Avatar className="h-9 w-9 flex-shrink-0">
+                  {p.foto_url && <AvatarImage src={p.foto_url} alt={p.apelido ?? p.nome} />}
+                  <AvatarFallback className="bg-[#1e3a8a]/20 text-[var(--accent-text)] text-sm font-bold">
+                    {p.nome.charAt(0)}{p.sobrenome.charAt(0)}
+                  </AvatarFallback>
+                </Avatar>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-semibold text-[var(--text-primary)] truncate">{p.apelido ?? `${p.nome} ${p.sobrenome}`}</p>
+                  <p className="text-xs text-[var(--text-secondary)]">{p.total_apostas} aposta{p.total_apostas !== 1 ? "s" : ""}</p>
+                </div>
+              </div>
+              <div className="grid grid-cols-3 gap-2 pt-2 border-t border-[var(--border-subtle)]">
+                <div>
+                  <p className="text-[10px] text-[var(--text-muted)] uppercase tracking-wide">Saldo</p>
+                  <p className="text-xs font-bold text-[#3b82f6] truncate">{formatCurrency(p.saldo_total)}</p>
+                </div>
+                <div>
+                  <p className="text-[10px] text-[var(--text-muted)] uppercase tracking-wide">Lucro</p>
+                  <p className={`text-xs font-bold truncate ${p.lucro_realizado >= 0 ? "text-green-500" : "text-red-500"}`}>{formatCurrency(p.lucro_realizado)}</p>
+                </div>
+                <div>
+                  <p className="text-[10px] text-[var(--text-muted)] uppercase tracking-wide">ROI</p>
+                  <p className={`text-xs font-bold truncate ${p.roi_percentual >= 0 ? "text-[#a855f7]" : "text-red-500"}`}>{parseFloat(String(p.roi_percentual)).toFixed(1)}%</p>
+                </div>
+              </div>
             </Link>
           ))}
         </div>
