@@ -82,7 +82,7 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
   const [apFilterCustomTo, setApFilterCustomTo] = useState("")
   const [apFilterEsporte, setApFilterEsporte] = useState("")
   const [apFilterCompeticao, setApFilterCompeticao] = useState("")
-  const [apSortBy, setApSortBy] = useState<"data_desc" | "data_asc" | "valor_desc" | "roi_desc">("data_desc")
+  const [apSortBy, setApSortBy] = useState<"data_desc" | "data_asc" | "inv_desc" | "inv_asc" | "roi_desc" | "roi_asc" | "stake_desc" | "stake_asc" | "lucro_desc" | "lucro_asc" | "ganhos_desc" | "ganhos_asc" | "perda_desc" | "perda_asc">("data_desc")
   const [apShowFilter, setApShowFilter] = useState(false)
   const { toast } = useToast()
   const router = useRouter()
@@ -795,8 +795,18 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
               return true
             }).sort((a, b) => {
               if (apSortBy === "data_asc") return new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
-              if (apSortBy === "valor_desc") return b.investimento_total - a.investimento_total
+              if (apSortBy === "inv_desc") return b.investimento_total - a.investimento_total
+              if (apSortBy === "inv_asc") return a.investimento_total - b.investimento_total
               if (apSortBy === "roi_desc") return b.roi_percentual - a.roi_percentual
+              if (apSortBy === "roi_asc") return a.roi_percentual - b.roi_percentual
+              if (apSortBy === "stake_desc") return parseFloat(String(b.lucro_garantido ?? 0)) - parseFloat(String(a.lucro_garantido ?? 0))
+              if (apSortBy === "stake_asc") return parseFloat(String(a.lucro_garantido ?? 0)) - parseFloat(String(b.lucro_garantido ?? 0))
+              if (apSortBy === "lucro_desc") return parseFloat(String(b.resultado_real ?? b.lucro_garantido ?? 0)) - parseFloat(String(a.resultado_real ?? a.lucro_garantido ?? 0))
+              if (apSortBy === "lucro_asc") return parseFloat(String(a.resultado_real ?? a.lucro_garantido ?? 0)) - parseFloat(String(b.resultado_real ?? b.lucro_garantido ?? 0))
+              if (apSortBy === "ganhos_desc") return Math.max(0, parseFloat(String(b.resultado_real ?? 0))) - Math.max(0, parseFloat(String(a.resultado_real ?? 0)))
+              if (apSortBy === "ganhos_asc") return Math.max(0, parseFloat(String(a.resultado_real ?? 0))) - Math.max(0, parseFloat(String(b.resultado_real ?? 0)))
+              if (apSortBy === "perda_desc") return Math.min(0, parseFloat(String(a.resultado_real ?? 0))) - Math.min(0, parseFloat(String(b.resultado_real ?? 0)))
+              if (apSortBy === "perda_asc") return Math.min(0, parseFloat(String(b.resultado_real ?? 0))) - Math.min(0, parseFloat(String(a.resultado_real ?? 0)))
               return new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
             })
 
@@ -804,56 +814,84 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
 
             return (
               <>
-                {/* Filter card — hidden; filter button is inline with date groups */}
-                <Card className="hidden">
-                  <CardContent className="p-4 space-y-4">
-                    <div className="flex items-center justify-between">
-                      <button
-                        onClick={() => setApShowFilter(v => !v)}
-                        className="flex items-center gap-2 text-sm font-medium text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors"
-                      >
-                        <Filter className="h-4 w-4" />
-                        Filtrar
-                        <ChevronDown className={`h-3.5 w-3.5 transition-transform ${apShowFilter ? "rotate-180" : ""}`} />
-                      </button>
-                      {hasActiveFilter && (
-                        <button
-                          onClick={() => { setApFilterStatus("todos"); setApFilterPeriod("todos"); setApFilterCustomDate(""); setApFilterCustomFrom(""); setApFilterCustomTo(""); setApFilterEsporte(""); setApFilterCompeticao("") }}
-                          className="text-xs text-[var(--text-secondary)] hover:text-[var(--text-primary)] flex items-center gap-1 transition-colors"
-                        >
-                          <X className="h-3 w-3" />
-                          Limpar
-                        </button>
-                      )}
-                    </div>
+                {/* Fixed filter bar */}
+                <div className="flex items-center gap-2 flex-wrap">
+                  {(["todos", "pendente", "finalizada", "cancelada"] as const).map(s => (
+                    <button
+                      key={s}
+                      onClick={() => setApFilterStatus(s)}
+                      className={`px-3 py-1.5 rounded-lg border text-xs font-medium transition-colors ${
+                        apFilterStatus === s
+                          ? s === "pendente" ? "bg-yellow-500/10 border-yellow-500/40 text-yellow-600"
+                            : s === "finalizada" ? "bg-green-500/10 border-green-500/40 text-green-600"
+                            : s === "cancelada" ? "bg-red-500/10 border-red-500/40 text-red-500"
+                            : "bg-[#1e3a8a] border-[#1e3a8a] text-white"
+                          : "border-[var(--border)] text-[var(--text-secondary)] hover:bg-[var(--bg-elevated)]"
+                      }`}
+                    >
+                      {{ todos: "Todos", pendente: "Pendentes", finalizada: "Finalizadas", cancelada: "Canceladas" }[s]}
+                    </button>
+                  ))}
 
-                    {apShowFilter && <>
-                      {/* Status + Ordenar */}
-                      <div className="grid grid-cols-2 gap-3">
-                        <div className="space-y-1.5">
-                          <Label className="text-xs">Status</Label>
-                          <Select value={apFilterStatus} onValueChange={setApFilterStatus}>
-                            <SelectTrigger><SelectValue /></SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="todos">Todos</SelectItem>
-                              <SelectItem value="pendente">Pendentes</SelectItem>
-                              <SelectItem value="finalizada">Finalizadas</SelectItem>
-                              <SelectItem value="cancelada">Canceladas</SelectItem>
-                            </SelectContent>
-                          </Select>
-                        </div>
-                        <div className="space-y-1.5">
-                          <Label className="text-xs">Ordenar por</Label>
-                          <Select value={apSortBy} onValueChange={v => setApSortBy(v as typeof apSortBy)}>
-                            <SelectTrigger className="text-xs"><SelectValue /></SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="data_desc">Data (mais recente)</SelectItem>
-                              <SelectItem value="data_asc">Data (mais antigo)</SelectItem>
-                              <SelectItem value="valor_desc">Maior investimento</SelectItem>
-                              <SelectItem value="roi_desc">Maior ROI</SelectItem>
-                            </SelectContent>
-                          </Select>
-                        </div>
+                  <div className="w-px h-4 bg-[var(--border)]" />
+
+                  {([
+                    { value: "inv_desc",    label: "Maior invest." },
+                    { value: "inv_asc",     label: "Menor invest." },
+                    { value: "roi_desc",    label: "Maior ROI" },
+                    { value: "roi_asc",     label: "Menor ROI" },
+                    { value: "stake_desc",  label: "Maior stake" },
+                    { value: "stake_asc",   label: "Menor stake" },
+                    { value: "lucro_desc",  label: "Maior lucro" },
+                    { value: "lucro_asc",   label: "Menor lucro" },
+                    { value: "ganhos_desc", label: "Maior ganhos" },
+                    { value: "ganhos_asc",  label: "Menor ganhos" },
+                    { value: "perda_desc",  label: "Maior perda" },
+                    { value: "perda_asc",   label: "Menor perda" },
+                  ] as { value: typeof apSortBy; label: string }[]).map(({ value, label }) => (
+                    <button
+                      key={value}
+                      onClick={() => setApSortBy(value)}
+                      className={`px-3 py-1.5 rounded-lg border text-xs font-medium transition-colors ${
+                        apSortBy === value
+                          ? "bg-[#1e3a8a]/10 border-[#1e3a8a]/30 text-[var(--accent-text)]"
+                          : "border-[var(--border)] text-[var(--text-secondary)] hover:bg-[var(--bg-elevated)]"
+                      }`}
+                    >
+                      {label}
+                    </button>
+                  ))}
+
+                  <div className="w-px h-4 bg-[var(--border)]" />
+
+                  {/* Period/esporte/competicao advanced filter toggle */}
+                  <button
+                    onClick={() => setApShowFilter(v => !v)}
+                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-xs font-medium transition-colors ${
+                      apShowFilter || apFilterPeriod !== "todos" || apFilterEsporte || apFilterCompeticao
+                        ? "bg-[#1e3a8a]/10 border-[#1e3a8a]/30 text-[var(--accent-text)]"
+                        : "border-[var(--border)] text-[var(--text-secondary)] hover:bg-[var(--bg-elevated)]"
+                    }`}
+                  >
+                    <SlidersHorizontal className="w-3 h-3" />
+                    Mais filtros{(apFilterPeriod !== "todos" || apFilterEsporte || apFilterCompeticao) ? " •" : ""}
+                  </button>
+                </div>
+
+                {/* Advanced filter panel */}
+                {apShowFilter && (
+                  <Card>
+                    <CardContent className="p-4 space-y-4">
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs font-semibold text-[var(--text-muted)] uppercase tracking-wide">Filtros avançados</span>
+                        {hasActiveFilter && (
+                          <button
+                            onClick={() => { setApFilterStatus("todos"); setApFilterPeriod("todos"); setApFilterCustomDate(""); setApFilterCustomFrom(""); setApFilterCustomTo(""); setApFilterEsporte(""); setApFilterCompeticao("") }}
+                            className="text-xs text-[var(--text-secondary)] hover:text-[var(--text-primary)] flex items-center gap-1 transition-colors"
+                          >
+                            <X className="h-3 w-3" /> Limpar tudo
+                          </button>
+                        )}
                       </div>
 
                       {/* Esporte + Competição */}
@@ -918,71 +956,13 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
                           </div>
                         )}
                       </div>
-                    </>}
-                  </CardContent>
-                </Card>
-
-                {/* Filter panel — shown when inline Filtrar button is active */}
-                {apShowFilter && (
-                  <Card>
-                    <CardContent className="p-4 space-y-4">
-                      <div className="flex items-center justify-between">
-                        <span className="text-xs font-semibold text-[var(--text-muted)] uppercase tracking-wide">Filtros</span>
-                        {hasActiveFilter && (
-                          <button
-                            onClick={() => { setApFilterStatus("todos"); setApFilterPeriod("todos"); setApFilterCustomDate(""); setApFilterCustomFrom(""); setApFilterCustomTo(""); setApFilterEsporte(""); setApFilterCompeticao("") }}
-                            className="text-xs text-[var(--text-secondary)] hover:text-[var(--text-primary)] flex items-center gap-1 transition-colors"
-                          >
-                            <X className="h-3 w-3" /> Limpar
-                          </button>
-                        )}
-                      </div>
-                      <div className="grid grid-cols-2 gap-3">
-                        <div className="space-y-1.5">
-                          <Label className="text-xs">Status</Label>
-                          <Select value={apFilterStatus} onValueChange={setApFilterStatus}>
-                            <SelectTrigger><SelectValue /></SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="todos">Todos</SelectItem>
-                              <SelectItem value="pendente">Pendente</SelectItem>
-                              <SelectItem value="finalizada">Finalizada</SelectItem>
-                              <SelectItem value="cancelada">Cancelada</SelectItem>
-                            </SelectContent>
-                          </Select>
-                        </div>
-                        <div className="space-y-1.5">
-                          <Label className="text-xs">Ordenar</Label>
-                          <Select value={apSortBy} onValueChange={v => setApSortBy(v as typeof apSortBy)}>
-                            <SelectTrigger><SelectValue /></SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="data_desc">Mais recente</SelectItem>
-                              <SelectItem value="data_asc">Mais antiga</SelectItem>
-                              <SelectItem value="valor_desc">Maior valor</SelectItem>
-                              <SelectItem value="roi_desc">Maior ROI</SelectItem>
-                            </SelectContent>
-                          </Select>
-                        </div>
-                      </div>
                     </CardContent>
                   </Card>
                 )}
 
                 {/* List */}
                 {apFiltered.length === 0 ? (
-                  <div className="space-y-2">
-                    <div className="flex justify-end md:hidden">
-                      <button
-                        onClick={() => setApShowFilter(v => !v)}
-                        className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg border text-xs font-medium transition-colors ${
-                          apShowFilter || hasActiveFilter
-                            ? "bg-[#1e3a8a]/10 border-[#1e3a8a]/30 text-[var(--accent-text)]"
-                            : "border-[var(--border)] text-[var(--text-secondary)] hover:bg-[var(--bg-elevated)]"
-                        }`}
-                      >
-                        {apShowFilter ? <X className="w-3 h-3" /> : <SlidersHorizontal className="w-3 h-3" />}
-                        Filtrar{hasActiveFilter && !apShowFilter ? " •" : ""}
-                      </button>
-                    </div>
+                  <div>
                     <Card>
                       <CardContent className="flex flex-col items-center justify-center py-16">
                         <BookOpen className="h-12 w-12 text-gray-300 mb-4" />
@@ -1015,23 +995,10 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
                     <>
                       {/* Desktop */}
                       <div className="hidden md:block space-y-6">
-                        {groups.map(([dateKey, apostasGroup], groupIdx) => (
+                        {groups.map(([dateKey, apostasGroup]) => (
                           <div key={dateKey}>
-                            <div className="flex items-center justify-between px-1 mb-2">
+                            <div className="flex items-center px-1 mb-2">
                               <p className="text-xs font-semibold text-[var(--text-muted)]">{formatGroupDate(dateKey)}</p>
-                              {groupIdx === groups.length - 1 && (
-                                <button
-                                  onClick={() => setApShowFilter(v => !v)}
-                                  className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg border text-xs font-medium transition-colors ${
-                                    apShowFilter || hasActiveFilter
-                                      ? "bg-[#1e3a8a]/10 border-[#1e3a8a]/30 text-[var(--accent-text)]"
-                                      : "border-[var(--border)] text-[var(--text-secondary)] hover:bg-[var(--bg-elevated)]"
-                                  }`}
-                                >
-                                  {apShowFilter ? <X className="w-3 h-3" /> : <SlidersHorizontal className="w-3 h-3" />}
-                                  Filtrar{hasActiveFilter && !apShowFilter ? " •" : ""}
-                                </button>
-                              )}
                             </div>
                             <div className="space-y-3">
                               {apostasGroup.map(aposta => (
@@ -1049,23 +1016,10 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
 
                       {/* Mobile */}
                       <div className="md:hidden space-y-6">
-                        {groups.map(([dateKey, apostasGroup], groupIdx) => (
+                        {groups.map(([dateKey, apostasGroup]) => (
                           <div key={dateKey}>
-                            <div className="flex items-center justify-between px-1 mb-2">
+                            <div className="flex items-center px-1 mb-2">
                               <p className="text-xs font-semibold text-[var(--text-muted)]">{formatGroupDate(dateKey)}</p>
-                              {groupIdx === 0 && (
-                                <button
-                                  onClick={() => setApShowFilter(v => !v)}
-                                  className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg border text-xs font-medium transition-colors ${
-                                    apShowFilter || hasActiveFilter
-                                      ? "bg-[#1e3a8a]/10 border-[#1e3a8a]/30 text-[var(--accent-text)]"
-                                      : "border-[var(--border)] text-[var(--text-secondary)] hover:bg-[var(--bg-elevated)]"
-                                  }`}
-                                >
-                                  {apShowFilter ? <X className="w-3 h-3" /> : <SlidersHorizontal className="w-3 h-3" />}
-                                  Filtrar{hasActiveFilter && !apShowFilter ? " •" : ""}
-                                </button>
-                              )}
                             </div>
                             <div className="space-y-3">
                               {apostasGroup.map(aposta => (
