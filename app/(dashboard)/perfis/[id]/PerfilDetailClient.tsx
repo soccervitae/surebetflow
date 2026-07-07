@@ -31,6 +31,7 @@ interface Props {
   dashboard: ProfileDashboard | null
   apostas: Aposta[]
   userToken: string
+  maxApostas?: number
 }
 
 function statusBadge(status: string) {
@@ -41,7 +42,7 @@ function statusBadge(status: string) {
   }
 }
 
-export default function PerfilDetailClient({ profile, dashboard, apostas, userToken }: Props) {
+export default function PerfilDetailClient({ profile, dashboard, apostas, userToken, maxApostas = Infinity }: Props) {
   const [currentProfile, setCurrentProfile] = useState(profile)
   const [currentApostas, setCurrentApostas] = useState(apostas)
   const [showCalculadoraSheet, setShowCalculadoraSheet] = useState(false)
@@ -1437,6 +1438,8 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
               profiles={[currentProfile]}
               defaultProfileId={currentProfile.id}
               profileName={currentProfile.apelido ?? `${currentProfile.nome} ${currentProfile.sobrenome}`}
+              maxApostas={maxApostas}
+              totalApostas={currentApostas.length}
               onSaved={async () => {
                 setShowCalculadoraSheet(false)
                 const supabase = createClient()
@@ -1466,6 +1469,8 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
             profiles={[currentProfile]}
             defaultProfileId={currentProfile.id}
             profileName={currentProfile.apelido ?? `${currentProfile.nome} ${currentProfile.sobrenome}`}
+            maxApostas={maxApostas}
+            totalApostas={currentApostas.length}
             onSaved={async () => {
               setShowCalculadoraModal(false)
               const supabase = createClient()

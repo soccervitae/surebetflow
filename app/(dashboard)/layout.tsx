@@ -23,7 +23,7 @@ const navItems = [
   { href: "/apostas", icon: ClipboardList, label: "Apostas" },
   { href: "/financeiro", icon: Wallet, label: "Financeiro" },
   { href: "/tutorial", icon: BookOpen, label: "Tutorial" },
-  { href: "/suporte", icon: MessageCircle, label: "SureBet AI" },
+  { href: "/suporte", icon: MessageCircle, label: "Suporte" },
   { href: "/configuracoes", icon: Settings, label: "Minha Conta" },
 ]
 
@@ -400,7 +400,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                     className="flex items-center gap-2.5 px-4 py-3 text-sm text-[var(--text-primary)] hover:bg-[var(--bg-elevated)] transition-colors border-t border-[var(--border)]"
                   >
                     <MessageCircle className="w-4 h-4 text-[var(--text-muted)]" />
-                    SureBet AI
+                    Suporte
                   </Link>
                   <Link
                     href="/configuracoes"

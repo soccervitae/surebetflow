@@ -4,8 +4,8 @@ import { redirect } from "next/navigation"
 import SuporteClient from "./SuporteClient"
 
 export const metadata: Metadata = {
-  title: "SureBet AI",
-  description: "Tire suas dúvidas sobre a SurebetFlow com nosso assistente virtual.",
+  title: "Suporte",
+  description: "Envie mensagens e acompanhe seus tickets de suporte.",
 }
 
 export default async function SuportePage() {
@@ -13,5 +13,11 @@ export default async function SuportePage() {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect("/login")
 
-  return <SuporteClient />
+  const { data: tickets } = await supabase
+    .from("tickets")
+    .select("*, ticket_mensagens(id, is_admin, lida)")
+    .eq("user_id", user.id)
+    .order("updated_at", { ascending: false })
+
+  return <SuporteClient tickets={tickets ?? []} userId={user.id} />
 }

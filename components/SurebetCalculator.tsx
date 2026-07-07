@@ -24,6 +24,8 @@ interface Props {
   defaultProfileId?: string
   profileName?: string
   onSaved?: () => void
+  maxApostas?: number
+  totalApostas?: number
 }
 
 function normalizeName(s: string) {
@@ -127,7 +129,7 @@ function parseSurebetText(text: string): { event: string; sport: string; legs: P
   return { event, sport, legs: parsedLegs }
 }
 
-export default function SurebetCalculator({ profiles, defaultProfileId, profileName, onSaved }: Props) {
+export default function SurebetCalculator({ profiles, defaultProfileId, profileName, onSaved, maxApostas = Infinity, totalApostas = 0 }: Props) {
   const filteredProfiles = defaultProfileId ? profiles.filter(p => p.id === defaultProfileId) : profiles
   const [numLegs, setNumLegs] = useState(2)
   const tipo = numLegs >= 3 ? "3-way" : "2-way"
@@ -153,6 +155,8 @@ export default function SurebetCalculator({ profiles, defaultProfileId, profileN
   const [userStakes, setUserStakes] = useState<(number | null)[]>([null, null, null])
   const [roundStakes, setRoundStakes] = useState(false)
   const [roundTo, setRoundTo] = useState(1)
+  const [lastRoundBtn, setLastRoundBtn] = useState<number | null>(null)
+  const [roundBtnCount, setRoundBtnCount] = useState(0)
   const [unmatchedBookmakers, setUnmatchedBookmakers] = useState<string[]>([])
   const { toast } = useToast()
   const supabase = createClient()
@@ -352,10 +356,24 @@ export default function SurebetCalculator({ profiles, defaultProfileId, profileN
     ? impliedProbs.map(p => parseFloat(((p / sumProbs) * investment).toFixed(2)))
     : odds.map(() => 0)
 
-  const stakes = computedStakes.map((computed, i) => {
-    const raw = userStakes[i] ?? computed
-    return roundStakes ? Math.round(raw / roundTo) * roundTo : raw
-  })
+  const stakes = (() => {
+    const rawStakes = computedStakes.map((computed, i) => userStakes[i] ?? computed)
+    if (!roundStakes || roundTo <= 1) return rawStakes
+    const total = rawStakes.reduce((a, b) => a + b, 0)
+    const result: number[] = []
+    let allocated = 0
+    for (let i = 0; i < rawStakes.length; i++) {
+      if (i < rawStakes.length - 1) {
+        const rounded = Math.round(rawStakes[i] / roundTo) * roundTo
+        result.push(rounded)
+        allocated += rounded
+      } else {
+        // Last leg gets the remainder to keep total constant
+        result.push(parseFloat((total - allocated).toFixed(2)))
+      }
+    }
+    return result
+  })()
 
   // Após arredondamento os stakes podem ser desiguais, então:
   // retorno garantido = pior payout entre todas as pernas
@@ -368,7 +386,13 @@ export default function SurebetCalculator({ profiles, defaultProfileId, profileN
   const lucroGarantido = guaranteedReturn > 0 ? guaranteedReturn - totalStaked : 0
   const roi = totalStaked > 0 && isArbitrage ? ((lucroGarantido / totalStaked) * 100) : 0
 
+  const atApostasLimit = isFinite(maxApostas) && totalApostas >= maxApostas
+
   async function handleSave() {
+    if (atApostasLimit) {
+      toast({ title: `Limite de ${maxApostas} apostas atingido. Faça upgrade para continuar.`, variant: "destructive" })
+      return
+    }
     if (!evento.trim()) {
       toast({ title: "Informe o nome do evento", variant: "destructive" })
       return
@@ -736,6 +760,7 @@ export default function SurebetCalculator({ profiles, defaultProfileId, profileN
         {legs.slice(0, numLegs).map((leg, i) => {
           const allPBs = Object.values(profileBets).flat() as (ProfileBet & { bet?: { nome: string } })[]
           const selectedPB = allPBs.find(pb => pb.id === leg.profileBetId)
+          const usedProfileBetIds = legs.slice(0, numLegs).map((l, k) => k !== i ? l.profileBetId : null).filter(Boolean)
           const saldo = selectedPB ? parseFloat(String(selectedPB.saldo)) || 0 : 0
           const stake = stakes[i] ?? 0
           const showSaldoWarning = selectedPB && saldo > 0 && stake > 0 && stake > saldo
@@ -758,11 +783,13 @@ export default function SurebetCalculator({ profiles, defaultProfileId, profileN
                       {filteredProfiles.map(profile => {
                         const bets = profileBets[profile.id] ?? []
                         if (bets.length === 0) return null
-                        return bets.map(pb => (
-                          <SelectItem key={pb.id} value={pb.id}>
-                            {(pb as ProfileBet & { bet?: { nome: string } }).bet?.nome ?? "Casa"}
-                          </SelectItem>
-                        ))
+                        return bets
+                          .filter(pb => !usedProfileBetIds.includes(pb.id))
+                          .map(pb => (
+                            <SelectItem key={pb.id} value={pb.id}>
+                              {(pb as ProfileBet & { bet?: { nome: string } }).bet?.nome ?? "Casa"}
+                            </SelectItem>
+                          ))
                       })}
                     </SelectContent>
                   </Select>
@@ -851,26 +878,49 @@ export default function SurebetCalculator({ profiles, defaultProfileId, profileN
           type="checkbox"
           id="round-stakes"
           checked={roundStakes}
-          onChange={e => setRoundStakes(e.target.checked)}
+          onChange={e => {
+            setRoundStakes(e.target.checked)
+            if (!e.target.checked) { setRoundTo(1); setLastRoundBtn(null); setRoundBtnCount(0) }
+          }}
           className="w-4 h-4 accent-[#1e3a8a] cursor-pointer flex-shrink-0"
         />
         <label htmlFor="round-stakes" className="font-medium text-[var(--text-primary)] cursor-pointer select-none flex-1">
-          Arredondar aposta até:
+          Arredondar:
         </label>
-        <div className="flex items-center gap-1">
-          <button
-            type="button"
-            disabled={!roundStakes || roundTo <= 1}
-            onClick={() => setRoundTo(v => Math.max(1, v - 1))}
-            className="w-7 h-7 rounded-lg border border-[var(--border)] flex items-center justify-center text-[var(--text-secondary)] hover:bg-[var(--bg-elevated)] disabled:opacity-30 transition-colors text-base leading-none"
-          >−</button>
-          <span className="w-8 text-center text-sm font-mono font-semibold text-[var(--text-primary)]">{roundTo}</span>
-          <button
-            type="button"
-            disabled={!roundStakes || roundTo >= 100}
-            onClick={() => setRoundTo(v => Math.min(100, v + 1))}
-            className="w-7 h-7 rounded-lg border border-[var(--border)] flex items-center justify-center text-[var(--text-secondary)] hover:bg-[var(--bg-elevated)] disabled:opacity-30 transition-colors text-base leading-none"
-          >+</button>
+        <div className="flex items-center gap-1.5">
+          {[1, 5, 10].map(base => {
+            const isActive = roundStakes && lastRoundBtn === base
+            const count = isActive ? roundBtnCount : 0
+            const value = base * (count || 1)
+            return (
+              <button
+                key={base}
+                type="button"
+                disabled={!roundStakes}
+                onClick={() => {
+                  if (lastRoundBtn === base) {
+                    const next = roundBtnCount + 1
+                    setRoundBtnCount(next)
+                    setRoundTo(base * next)
+                  } else {
+                    setLastRoundBtn(base)
+                    setRoundBtnCount(1)
+                    setRoundTo(base)
+                  }
+                }}
+                className={`px-3 py-1.5 rounded-lg border text-xs font-semibold transition-all disabled:opacity-30 ${
+                  isActive
+                    ? "border-[#1e3a8a] bg-[#1e3a8a] text-white"
+                    : "border-[var(--border)] text-[var(--text-secondary)] hover:border-[#1e3a8a]/40 hover:text-[var(--text-primary)]"
+                }`}
+              >
+                {isActive && count > 1 ? `${value}` : `${base}`}
+              </button>
+            )
+          })}
+          {roundStakes && roundTo > 1 && (
+            <span className="text-xs text-[var(--text-muted)] font-mono">= {roundTo}</span>
+          )}
         </div>
       </div>
 
@@ -916,11 +966,32 @@ export default function SurebetCalculator({ profiles, defaultProfileId, profileN
         </CardContent>
       </Card>
 
+      {atApostasLimit && (
+        <div className="rounded-xl border border-amber-400/40 bg-amber-50 dark:bg-amber-950/20 p-4 flex items-start gap-3">
+          <AlertTriangle className="h-5 w-5 text-amber-500 flex-shrink-0 mt-0.5" />
+          <div className="flex-1">
+            <p className="text-sm font-semibold text-amber-800 dark:text-amber-300">
+              Limite do plano gratuito atingido
+            </p>
+            <p className="text-xs text-amber-700 dark:text-amber-400 mt-0.5">
+              Você já registrou {totalApostas} de {maxApostas} apostas permitidas.
+              Faça upgrade para continuar registrando.
+            </p>
+            <Link
+              href="/assinatura"
+              className="inline-flex items-center gap-1.5 mt-2 px-3 py-1.5 rounded-lg bg-amber-500 hover:bg-amber-600 text-white text-xs font-semibold transition-colors"
+            >
+              Ver planos
+            </Link>
+          </div>
+        </div>
+      )}
+
       <Button
         className="w-full"
         size="lg"
         onClick={handleSave}
-        disabled={!isArbitrage || saving}
+        disabled={!isArbitrage || saving || atApostasLimit}
       >
         {saving ? (
           <><Loader2 className="h-4 w-4 mr-2 animate-spin" />Salvando aposta...</>
