@@ -191,7 +191,30 @@ const SECTIONS: Section[] = [
               ))}
             </div>
 
-            <Tip text="Sempre que possível, troque a conta bancária da casa para o seu próprio PIX ou conta. A maioria das casas permite isso nas configurações de saque ou financeiro da conta." />
+            {/* Pulo do gato */}
+            <div className="p-4 rounded-xl border border-[#a855f7]/30 bg-[#a855f7]/8 space-y-3">
+              <div className="flex items-center gap-2">
+                <Star className="w-4 h-4 text-[#a855f7]" />
+                <p className="text-xs font-bold text-[#a855f7] uppercase tracking-wide">O pulo do gato — crie a conta bancária você mesmo</p>
+              </div>
+              <p className="text-sm text-[var(--text-secondary)] leading-relaxed">
+                Peça para o parceiro abrir conta em um banco digital (Nubank, Inter, PicPay, etc.), mas <strong className="text-[var(--text-primary)]">você mesmo faz o cadastro no seu celular</strong>. Dessa forma todos os dados de acesso ficam sob o seu controle desde o início.
+              </p>
+              <div className="space-y-2">
+                <Step num={1} text="Baixe o aplicativo do banco no seu celular e inicie o cadastro com os dados do parceiro (nome, CPF, data de nascimento)." />
+                <Step num={2} text="Use o e-mail criado por você para essa parceria — o mesmo do passo 3. Assim o acesso ao banco e à bet ficam centralizados no mesmo e-mail que só você controla." />
+                <Step num={3} text="Crie a senha do banco você mesmo e guarde em local seguro. O parceiro não precisa saber a senha." />
+                <Step num={4} text="A única participação do parceiro será o reconhecimento facial, necessário para validar a abertura da conta e para autorizar transferências quando solicitado." />
+                <Step num={5} text="Após a conta aberta, troque a conta bancária cadastrada na bet para essa nova conta. Quando o saque cair, você mesmo faz a transferência pelo app do banco." />
+              </div>
+              <div className="flex items-start gap-2 pt-1">
+                <CheckCircle className="w-4 h-4 text-green-500 shrink-0 mt-0.5" />
+                <p className="text-xs text-[var(--text-secondary)] leading-relaxed">
+                  Com isso você tem acesso total: ao e-mail, ao banco e à bet. O parceiro só é acionado quando a casa exige reconhecimento facial — e nada mais.
+                </p>
+              </div>
+            </div>
+
             <Warn text="Nunca coloque saldo alto em uma conta cujo saque vai para a conta do parceiro sem ter estabelecido antes um acordo claro e de preferência registrado." />
           </div>
         ),
