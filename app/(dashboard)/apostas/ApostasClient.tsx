@@ -100,9 +100,7 @@ export default function ApostasClient({ apostas: initialApostas, profiles, betCo
   const [filterCustomDate, setFilterCustomDate] = useState("")
   const [filterCustomFrom, setFilterCustomFrom] = useState("")
   const [filterCustomTo, setFilterCustomTo] = useState("")
-  const [filterEsporte, setFilterEsporte] = useState("")
-  const [filterCompeticao, setFilterCompeticao] = useState("")
-  const [sortBy, setSortBy] = useState<"data_desc" | "data_asc" | "valor_desc" | "roi_desc">("data_desc")
+const [sortBy, setSortBy] = useState<"data_desc" | "data_asc" | "valor_desc" | "roi_desc">("data_desc")
   const [finalizarDialog, setFinalizarDialog] = useState<Aposta | null>(null)
   const [deletarDialog, setDeletarDialog] = useState<Aposta | null>(null)
   const [showFilter, setShowFilter] = useState(false)
@@ -190,9 +188,7 @@ export default function ApostasClient({ apostas: initialApostas, profiles, betCo
     const created = new Date(a.created_at)
     if (from && created < from) return false
     if (to && created > to) return false
-    if (filterEsporte && !(a.esporte ?? "").toLowerCase().includes(filterEsporte.toLowerCase())) return false
-    if (filterCompeticao && !(a.competicao ?? "").toLowerCase().includes(filterCompeticao.toLowerCase())) return false
-    return true
+return true
   }).sort((a, b) => {
     if (sortBy === "data_asc") return new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
     if (sortBy === "valor_desc") return b.investimento_total - a.investimento_total
@@ -306,7 +302,7 @@ export default function ApostasClient({ apostas: initialApostas, profiles, betCo
         </div>
         <div className="flex items-center gap-2">
           {(() => {
-            const hasActive = filterStatus !== "todos" || filterProfile !== "todos" || filterPeriod !== "todos" || !!filterEsporte || !!filterCompeticao
+            const hasActive = filterStatus !== "todos" || filterProfile !== "todos" || filterPeriod !== "todos"
             return (
               <button
                 onClick={() => setShowFilter(v => !v)}
@@ -337,9 +333,9 @@ export default function ApostasClient({ apostas: initialApostas, profiles, betCo
           <CardContent className="p-4 space-y-3">
             <div className="flex items-center justify-between">
               <p className="text-xs font-semibold text-[var(--text-muted)] uppercase tracking-wide">Filtros</p>
-              {(filterStatus !== "todos" || filterProfile !== "todos" || filterPeriod !== "todos" || filterEsporte || filterCompeticao) && (
+              {(filterStatus !== "todos" || filterProfile !== "todos" || filterPeriod !== "todos") && (
                 <button
-                  onClick={() => { setFilterStatus("todos"); setFilterProfile("todos"); setFilterPeriod("todos"); setFilterCustomDate(""); setFilterCustomFrom(""); setFilterCustomTo(""); setFilterEsporte(""); setFilterCompeticao("") }}
+                  onClick={() => { setFilterStatus("todos"); setFilterProfile("todos"); setFilterPeriod("todos"); setFilterCustomDate(""); setFilterCustomFrom(""); setFilterCustomTo("") }}
                   className="text-xs text-[var(--accent-text)] font-medium"
                 >
                   Limpar
@@ -460,12 +456,6 @@ export default function ApostasClient({ apostas: initialApostas, profiles, betCo
               </div>
             )}
 
-            {/* Row 3: Esporte + Competição */}
-            <div className="flex items-center gap-2 flex-wrap">
-              <p className="text-xs font-semibold text-[var(--text-muted)] uppercase tracking-wide w-16 flex-shrink-0">Busca</p>
-              <Input value={filterEsporte} onChange={e => setFilterEsporte(e.target.value)} placeholder="Esporte" className="text-xs h-8 w-36" />
-              <Input value={filterCompeticao} onChange={e => setFilterCompeticao(e.target.value)} placeholder="Competição" className="text-xs h-8 w-44" />
-            </div>
           </CardContent>
         </Card>
       )}
