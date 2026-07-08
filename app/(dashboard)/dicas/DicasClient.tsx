@@ -62,6 +62,33 @@ const SECTIONS: Section[] = [
     subtitle: "Como verificar e iniciar uma parceria com segurança",
     items: [
       {
+        title: "Com quem fazer parceria?",
+        content: (
+          <div className="space-y-4">
+            <p className="text-sm text-[var(--text-secondary)] leading-relaxed">
+              Antes de qualquer passo técnico, a escolha do parceiro certo é o fator mais importante. Parcerias à distância com pessoas desconhecidas trazem riscos desnecessários — prefira sempre alguém de confiança e de fácil acesso.
+            </p>
+            <div className="space-y-2">
+              {[
+                { label: "Alguém que mora perto de você", desc: "Facilita encontros presenciais para reconhecimento facial, assinatura de documentos e resolução de qualquer problema que exija a presença física do titular." },
+                { label: "Um amigo ou colega de trabalho", desc: "Pessoas com quem você já tem contato frequente e uma relação de confiança estabelecida, o que facilita a comunicação e reduz riscos." },
+                { label: "Um familiar", desc: "Parentes próximos costumam ser opções seguras por já existir um vínculo de confiança e proximidade no dia a dia." },
+                { label: "Namorado(a) ou companheiro(a)", desc: "A proximidade e o contato diário tornam a operação mais simples e o controle mais fácil de manter." },
+              ].map(({ label, desc }) => (
+                <div key={label} className="flex items-start gap-3 p-3 rounded-lg border border-[var(--border-subtle)] bg-[var(--bg-elevated)]">
+                  <CheckCircle className="w-4 h-4 text-[#10b981] shrink-0 mt-0.5" />
+                  <div>
+                    <p className="text-xs font-semibold text-[var(--text-primary)]">{label}</p>
+                    <p className="text-xs text-[var(--text-secondary)] mt-0.5">{desc}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+            <Warn text="Evite fazer parceria com pessoas que você nunca viu pessoalmente ou que residem em outra cidade/estado. Em caso de reconhecimento facial obrigatório pela casa de apostas, a distância pode inviabilizar a operação." />
+          </div>
+        ),
+      },
+      {
         title: "Passo 1 — Descubra quais casas o parceiro tem conta",
         content: (
           <div className="space-y-4">
