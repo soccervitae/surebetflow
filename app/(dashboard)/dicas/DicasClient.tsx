@@ -64,11 +64,23 @@ const SECTIONS: Section[] = [
       {
         title: "Passo 1 — Descubra quais casas o parceiro tem conta",
         content: (
-          <div className="space-y-3">
+          <div className="space-y-4">
             <p className="text-sm text-[var(--text-secondary)] leading-relaxed">
               Antes de qualquer coisa, pergunte à pessoa quais casas de apostas ela já possui cadastro. Isso determina quais surebets vocês poderão operar juntos e se vale a pena avançar na parceria.
             </p>
             <Tip text="Quanto mais casas o parceiro tiver, maior o leque de surebets disponíveis para vocês explorarem juntos." />
+            <div className="border border-[var(--border)] rounded-xl p-4 space-y-3 bg-[var(--bg-elevated)]">
+              <p className="text-sm font-semibold text-[var(--text-primary)]">E se o parceiro não tiver conta na bet desejada?</p>
+              <p className="text-sm text-[var(--text-secondary)] leading-relaxed">
+                Sem problema — você mesmo cria a conta para ele. Use o e-mail exclusivo da parceria e defina a senha você mesmo. Assim o acesso fica totalmente sob seu controle desde o início.
+              </p>
+              <div className="space-y-2 pt-1">
+                <Step num={1} text="Acesse o site ou app da casa de apostas desejada." />
+                <Step num={2} text="Cadastre usando o e-mail criado para a parceria e uma senha que só você saiba." />
+                <Step num={3} text="Preencha os dados pessoais do parceiro (nome, CPF, data de nascimento)." />
+              </div>
+            </div>
+            <Warn text="Documento oficial com foto legível é obrigatório. Todas as casas de apostas exigem o envio de um documento (RG ou CNH) do titular para liberar saques — exigência da nova regulamentação brasileira. Tenha esse documento em mãos antes de criar a conta." />
           </div>
         ),
       },
