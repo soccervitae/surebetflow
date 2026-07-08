@@ -157,12 +157,12 @@ const SECTIONS: Section[] = [
             <div className="space-y-2">
               {[
                 {
-                  icon: CheckCircle,
-                  color: "text-green-500",
-                  border: "border-green-500/20",
-                  bg: "bg-green-500/5",
-                  label: "Opção ideal — Trocar a conta bancária para a sua",
-                  desc: "A solução mais segura é trocar a conta bancária cadastrada na casa de apostas para uma conta que seja sua. Assim, todos os saques caem diretamente para você, sem depender do parceiro.",
+                  icon: AlertTriangle,
+                  color: "text-amber-500",
+                  border: "border-amber-500/20",
+                  bg: "bg-amber-500/5",
+                  label: "Trocar a conta bancária — atenção à regra do CPF",
+                  desc: "As casas de apostas só aceitam conta bancária com o mesmo CPF do titular do cadastro. Ou seja, não é possível colocar uma conta sua — o saque sempre vai para uma conta no nome do parceiro. A troca só é útil se o parceiro tiver mais de uma conta bancária e quiser usar uma específica.",
                 },
                 {
                   icon: AlertTriangle,
