@@ -467,6 +467,7 @@ export default async function LandingPage() {
                   "Controle de bônus por casa de apostas",
                   "Dashboard financeiro completo",
                   "Histórico completo de apostas",
+                  "Dicas de Parcerias",
                   "Suporte por ticket",
                 ].map(f => (
                   <li key={f} className="flex items-center gap-2">
@@ -503,6 +504,7 @@ export default async function LandingPage() {
                   "Controle de bônus por casa de apostas",
                   "Dashboard financeiro completo",
                   "Histórico completo de apostas",
+                  "Dicas de Parcerias",
                   "Suporte prioritário por ticket",
                 ].map(f => (
                   <li key={f} className="flex items-center gap-2">
