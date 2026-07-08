@@ -196,6 +196,65 @@ const SECTIONS: Section[] = [
           </div>
         ),
       },
+      {
+        title: "Passo 5 — Como remunerar o parceiro pela conta",
+        content: (
+          <div className="space-y-3">
+            <p className="text-sm text-[var(--text-secondary)] leading-relaxed">
+              O parceiro está cedendo o acesso à conta da bet dele para você operar. Por isso é justo combinar uma remuneração — e existem duas formas principais de fazer isso.
+            </p>
+
+            <p className="text-xs font-semibold text-[var(--text-muted)] uppercase tracking-wide">Formas de remuneração</p>
+
+            <div className="space-y-2">
+              {[
+                {
+                  icon: Wallet,
+                  color: "text-[#3b82f6]",
+                  border: "border-[#3b82f6]/20",
+                  bg: "bg-[#3b82f6]/5",
+                  label: "Valor fixo pelo acesso",
+                  desc: "Você combina um valor mensal fixo pelo uso da conta, independente do resultado das apostas. Bom para o parceiro pois garante uma renda fixa. Bom para você se o volume de apostas for alto.",
+                },
+                {
+                  icon: TrendingUp,
+                  color: "text-[#a855f7]",
+                  border: "border-[#a855f7]/20",
+                  bg: "bg-[#a855f7]/5",
+                  label: "Porcentagem sobre o lucro (recomendado)",
+                  desc: "Você repassa ao parceiro uma porcentagem do lucro gerado pelas apostas na conta dele. Mais justo para ambos: se não houver lucro, ninguém perde. A sugestão é entre 10% e 30% do lucro líquido.",
+                },
+              ].map(({ icon: Icon, color, border, bg, label, desc }) => (
+                <div key={label} className={`flex items-start gap-3 p-3 rounded-lg border ${border} ${bg}`}>
+                  <Icon className={`w-4 h-4 ${color} shrink-0 mt-0.5`} />
+                  <div>
+                    <p className={`text-xs font-semibold ${color}`}>{label}</p>
+                    <p className="text-xs text-[var(--text-secondary)] mt-0.5 leading-relaxed">{desc}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <p className="text-xs font-semibold text-[var(--text-muted)] uppercase tracking-wide">Referência de porcentagem</p>
+
+            <div className="grid grid-cols-3 gap-2">
+              {[
+                { faixa: "10% – 15%", desc: "Parceiro pouco envolvido, conta com acesso total seu e conta bancária já na sua titularidade.", color: "text-green-500", border: "border-green-500/20", bg: "bg-green-500/5" },
+                { faixa: "15% – 25%", desc: "Parceiro que ainda recebe o saque na conta dele e repassa para você após cada operação.", color: "text-amber-500", border: "border-amber-500/20", bg: "bg-amber-500/5" },
+                { faixa: "25% – 30%", desc: "Parceiro muito envolvido: precisa estar disponível com frequência para reconhecimento facial ou validações.", color: "text-[#3b82f6]", border: "border-[#3b82f6]/20", bg: "bg-[#3b82f6]/5" },
+              ].map(({ faixa, desc, color, border, bg }) => (
+                <div key={faixa} className={`p-3 rounded-lg border ${border} ${bg} flex flex-col gap-1`}>
+                  <p className={`text-sm font-bold ${color}`}>{faixa}</p>
+                  <p className="text-[11px] text-[var(--text-secondary)] leading-relaxed">{desc}</p>
+                </div>
+              ))}
+            </div>
+
+            <Tip text="Registre o acordo por escrito, mesmo que seja via mensagem no WhatsApp. Isso evita desentendimentos futuros sobre o valor combinado." />
+            <Warn text="Evite porcentagens acima de 30%. Se o custo da parceria for muito alto, o lucro líquido para você deixa de compensar o trabalho de operar a conta." />
+          </div>
+        ),
+      },
     ],
   },
   {
