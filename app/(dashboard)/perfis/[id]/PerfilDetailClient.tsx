@@ -810,83 +810,35 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
               return new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
             })
 
-            const hasActiveFilter = apFilterStatus !== "todos" || apFilterPeriod !== "todos" || apFilterEsporte || apFilterCompeticao
+            const hasActiveFilter = apFilterStatus !== "todos" || apSortBy !== "data_desc" || apFilterPeriod !== "todos"
 
             return (
               <>
-                {/* Fixed filter bar */}
-                <div className="flex items-center gap-2 flex-wrap">
-                  {(["todos", "pendente", "finalizada", "cancelada"] as const).map(s => (
-                    <button
-                      key={s}
-                      onClick={() => setApFilterStatus(s)}
-                      className={`px-3 py-1.5 rounded-lg border text-xs font-medium transition-colors ${
-                        apFilterStatus === s
-                          ? s === "pendente" ? "bg-yellow-500/10 border-yellow-500/40 text-yellow-600"
-                            : s === "finalizada" ? "bg-green-500/10 border-green-500/40 text-green-600"
-                            : s === "cancelada" ? "bg-red-500/10 border-red-500/40 text-red-500"
-                            : "bg-[#1e3a8a] border-[#1e3a8a] text-white"
-                          : "border-[var(--border)] text-[var(--text-secondary)] hover:bg-[var(--bg-elevated)]"
-                      }`}
-                    >
-                      {{ todos: "Todos", pendente: "Pendentes", finalizada: "Finalizadas", cancelada: "Canceladas" }[s]}
-                    </button>
-                  ))}
-
-                  <div className="w-px h-4 bg-[var(--border)]" />
-
-                  {([
-                    { value: "inv_desc",    label: "Maior invest." },
-                    { value: "inv_asc",     label: "Menor invest." },
-                    { value: "roi_desc",    label: "Maior ROI" },
-                    { value: "roi_asc",     label: "Menor ROI" },
-                    { value: "stake_desc",  label: "Maior stake" },
-                    { value: "stake_asc",   label: "Menor stake" },
-                    { value: "lucro_desc",  label: "Maior lucro" },
-                    { value: "lucro_asc",   label: "Menor lucro" },
-                    { value: "ganhos_desc", label: "Maior ganhos" },
-                    { value: "ganhos_asc",  label: "Menor ganhos" },
-                    { value: "perda_desc",  label: "Maior perda" },
-                    { value: "perda_asc",   label: "Menor perda" },
-                  ] as { value: typeof apSortBy; label: string }[]).map(({ value, label }) => (
-                    <button
-                      key={value}
-                      onClick={() => setApSortBy(value)}
-                      className={`px-3 py-1.5 rounded-lg border text-xs font-medium transition-colors ${
-                        apSortBy === value
-                          ? "bg-[#1e3a8a]/10 border-[#1e3a8a]/30 text-[var(--accent-text)]"
-                          : "border-[var(--border)] text-[var(--text-secondary)] hover:bg-[var(--bg-elevated)]"
-                      }`}
-                    >
-                      {label}
-                    </button>
-                  ))}
-
-                  <div className="w-px h-4 bg-[var(--border)]" />
-
-                  {/* Period/esporte/competicao advanced filter toggle */}
+                {/* Filtrar button */}
+                <div className="flex items-center justify-end">
                   <button
                     onClick={() => setApShowFilter(v => !v)}
                     className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-xs font-medium transition-colors ${
-                      apShowFilter || apFilterPeriod !== "todos" || apFilterEsporte || apFilterCompeticao
+                      apShowFilter || hasActiveFilter
                         ? "bg-[#1e3a8a]/10 border-[#1e3a8a]/30 text-[var(--accent-text)]"
                         : "border-[var(--border)] text-[var(--text-secondary)] hover:bg-[var(--bg-elevated)]"
                     }`}
                   >
-                    <SlidersHorizontal className="w-3 h-3" />
-                    Mais filtros{(apFilterPeriod !== "todos" || apFilterEsporte || apFilterCompeticao) ? " •" : ""}
+                    {apShowFilter ? <X className="w-3 h-3" /> : <SlidersHorizontal className="w-3 h-3" />}
+                    Filtrar
+                    {hasActiveFilter && !apShowFilter && <span className="h-1.5 w-1.5 rounded-full bg-[#1e3a8a]" />}
                   </button>
                 </div>
 
-                {/* Advanced filter panel */}
+                {/* Collapsible filter panel */}
                 {apShowFilter && (
                   <Card>
                     <CardContent className="p-4 space-y-4">
                       <div className="flex items-center justify-between">
-                        <span className="text-xs font-semibold text-[var(--text-muted)] uppercase tracking-wide">Filtros avançados</span>
+                        <span className="text-xs font-semibold text-[var(--text-muted)] uppercase tracking-wide">Filtros</span>
                         {hasActiveFilter && (
                           <button
-                            onClick={() => { setApFilterStatus("todos"); setApFilterPeriod("todos"); setApFilterCustomDate(""); setApFilterCustomFrom(""); setApFilterCustomTo(""); setApFilterEsporte(""); setApFilterCompeticao("") }}
+                            onClick={() => { setApFilterStatus("todos"); setApSortBy("data_desc"); setApFilterPeriod("todos"); setApFilterCustomDate(""); setApFilterCustomFrom(""); setApFilterCustomTo(""); setApFilterEsporte(""); setApFilterCompeticao("") }}
                             className="text-xs text-[var(--text-secondary)] hover:text-[var(--text-primary)] flex items-center gap-1 transition-colors"
                           >
                             <X className="h-3 w-3" /> Limpar tudo
@@ -894,23 +846,59 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
                         )}
                       </div>
 
-                      {/* Esporte + Competição */}
-                      <div className="grid grid-cols-2 gap-3">
-                        <div className="space-y-1.5">
-                          <Label className="text-xs">Esporte</Label>
-                          <Input value={apFilterEsporte} onChange={e => setApFilterEsporte(e.target.value)} placeholder="ex: Futebol" className="text-xs h-9" />
-                        </div>
-                        <div className="space-y-1.5">
-                          <Label className="text-xs">Competição</Label>
-                          <Input value={apFilterCompeticao} onChange={e => setApFilterCompeticao(e.target.value)} placeholder="ex: Champions League" className="text-xs h-9" />
+                      {/* Status */}
+                      <div className="space-y-2">
+                        <Label className="text-xs text-[var(--text-muted)] uppercase tracking-wide">Status</Label>
+                        <div className="flex flex-wrap gap-2">
+                          {(["todos", "pendente", "finalizada", "cancelada"] as const).map(s => (
+                            <button
+                              key={s}
+                              onClick={() => setApFilterStatus(s)}
+                              className={`px-3 py-1.5 rounded-lg border text-xs font-medium transition-colors ${
+                                apFilterStatus === s
+                                  ? s === "pendente" ? "bg-yellow-500/10 border-yellow-500/40 text-yellow-600"
+                                    : s === "finalizada" ? "bg-green-500/10 border-green-500/40 text-green-600"
+                                    : s === "cancelada" ? "bg-red-500/10 border-red-500/40 text-red-500"
+                                    : "bg-[#1e3a8a] border-[#1e3a8a] text-white"
+                                  : "border-[var(--border)] text-[var(--text-secondary)] hover:bg-[var(--bg-elevated)]"
+                              }`}
+                            >
+                              {{ todos: "Todos", pendente: "Pendentes", finalizada: "Finalizadas", cancelada: "Canceladas" }[s]}
+                            </button>
+                          ))}
                         </div>
                       </div>
 
-                      {/* Period pills */}
+                      {/* Ordenar */}
                       <div className="space-y-2">
-                        <Label className="text-xs flex items-center gap-1">
-                          <CalendarIcon className="h-3 w-3" />
-                          Período
+                        <Label className="text-xs text-[var(--text-muted)] uppercase tracking-wide">Ordenar</Label>
+                        <Select value={apSortBy} onValueChange={v => setApSortBy(v as typeof apSortBy)}>
+                          <SelectTrigger className="text-xs h-9 w-full sm:w-56">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="data_desc">Mais recente</SelectItem>
+                            <SelectItem value="data_asc">Mais antigo</SelectItem>
+                            <SelectItem value="inv_desc">Maior investimento</SelectItem>
+                            <SelectItem value="inv_asc">Menor investimento</SelectItem>
+                            <SelectItem value="roi_desc">Maior ROI</SelectItem>
+                            <SelectItem value="roi_asc">Menor ROI</SelectItem>
+                            <SelectItem value="stake_desc">Maior stake</SelectItem>
+                            <SelectItem value="stake_asc">Menor stake</SelectItem>
+                            <SelectItem value="lucro_desc">Maior lucro</SelectItem>
+                            <SelectItem value="lucro_asc">Menor lucro</SelectItem>
+                            <SelectItem value="ganhos_desc">Maior ganhos</SelectItem>
+                            <SelectItem value="ganhos_asc">Menor ganhos</SelectItem>
+                            <SelectItem value="perda_desc">Maior perda</SelectItem>
+                            <SelectItem value="perda_asc">Menor perda</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+
+                      {/* Período */}
+                      <div className="space-y-2">
+                        <Label className="text-xs text-[var(--text-muted)] uppercase tracking-wide flex items-center gap-1">
+                          <CalendarIcon className="h-3 w-3" /> Período
                         </Label>
                         <div className="flex flex-wrap gap-2">
                           {(["todos", "dia", "semana", "mes"] as const).map(p => (
@@ -956,6 +944,7 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
                           </div>
                         )}
                       </div>
+
                     </CardContent>
                   </Card>
                 )}

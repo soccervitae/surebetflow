@@ -4,7 +4,7 @@ import { useState, useMemo } from "react"
 import Link from "next/link"
 import { Card, CardContent } from "@/components/ui/card"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { User } from "lucide-react"
+import { User, SlidersHorizontal, X } from "lucide-react"
 
 function formatCurrency(value: number | null | undefined) {
   return new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(value ?? 0)
@@ -41,6 +41,7 @@ export default function PerfisClient({ profiles: initialProfiles, planLimit }: P
   const [profiles] = useState(initialProfiles)
   const [filterStatus, setFilterStatus] = useState<FilterStatus>("todos")
   const [sortBy, setSortBy] = useState<SortBy>("default")
+  const [showFilters, setShowFilters] = useState(false)
 
   const atLimit = profiles.length >= planLimit
 
@@ -57,6 +58,8 @@ export default function PerfisClient({ profiles: initialProfiles, planLimit }: P
     return list
   }, [profiles, filterStatus, sortBy])
 
+  const hasActiveFilters = filterStatus !== "todos" || sortBy !== "default"
+
   return (
     <div className="space-y-4">
       {/* Header */}
@@ -65,6 +68,20 @@ export default function PerfisClient({ profiles: initialProfiles, planLimit }: P
           <h1 className="text-2xl font-bold text-[var(--text-primary)]">Perfis</h1>
           <p className="text-[var(--text-secondary)] text-sm mt-1">Gerencie seus perfis de apostador</p>
         </div>
+        <button
+          onClick={() => setShowFilters(v => !v)}
+          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-xs font-medium transition-colors ${
+            showFilters || hasActiveFilters
+              ? "bg-[#1e3a8a]/10 border-[#1e3a8a]/30 text-[var(--accent-text)]"
+              : "border-[var(--border)] text-[var(--text-secondary)] hover:bg-[var(--bg-elevated)]"
+          }`}
+        >
+          {showFilters ? <X className="h-3.5 w-3.5" /> : <SlidersHorizontal className="h-3.5 w-3.5" />}
+          Filtrar
+          {hasActiveFilters && !showFilters && (
+            <span className="ml-0.5 h-1.5 w-1.5 rounded-full bg-[#1e3a8a]" />
+          )}
+        </button>
       </div>
 
       {atLimit && (
@@ -76,47 +93,52 @@ export default function PerfisClient({ profiles: initialProfiles, planLimit }: P
         </p>
       )}
 
-      {/* Fixed filter bar */}
-      <div className="flex items-center gap-2 flex-wrap">
-        {(["todos", "ativo", "inativo"] as const).map(s => (
-          <button
-            key={s}
-            onClick={() => setFilterStatus(s)}
-            className={`px-3 py-1.5 rounded-lg border text-xs font-medium transition-colors ${
-              filterStatus === s
-                ? s === "ativo" ? "bg-green-500/10 border-green-500/40 text-green-600"
-                  : s === "inativo" ? "bg-red-500/10 border-red-500/40 text-red-500"
-                  : "bg-[#1e3a8a] border-[#1e3a8a] text-white"
-                : "border-[var(--border)] text-[var(--text-secondary)] hover:bg-[var(--bg-elevated)]"
-            }`}
-          >
-            {{ todos: "Todos", ativo: "Ativos", inativo: "Inativos" }[s]}
-          </button>
-        ))}
+      {/* Collapsible filter bar */}
+      {showFilters && (
+        <div className="flex items-center gap-2 flex-wrap p-3 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-elevated)]">
+          <span className="text-[10px] font-semibold text-[var(--text-muted)] uppercase tracking-wider mr-1">Status</span>
+          {(["todos", "ativo", "inativo"] as const).map(s => (
+            <button
+              key={s}
+              onClick={() => setFilterStatus(s)}
+              className={`px-3 py-1.5 rounded-lg border text-xs font-medium transition-colors ${
+                filterStatus === s
+                  ? s === "ativo" ? "bg-green-500/10 border-green-500/40 text-green-600"
+                    : s === "inativo" ? "bg-red-500/10 border-red-500/40 text-red-500"
+                    : "bg-[#1e3a8a] border-[#1e3a8a] text-white"
+                  : "border-[var(--border)] text-[var(--text-secondary)] hover:bg-[var(--bg-elevated)]"
+              }`}
+            >
+              {{ todos: "Todos", ativo: "Ativos", inativo: "Inativos" }[s]}
+            </button>
+          ))}
 
-        <div className="w-px h-4 bg-[var(--border)]" />
+          <div className="w-px h-4 bg-[var(--border)]" />
 
-        {([
-          { value: "saldo_desc", label: "Maior saldo" },
-          { value: "saldo_asc",  label: "Menor saldo" },
-          { value: "lucro_desc", label: "Maior lucro" },
-          { value: "lucro_asc",  label: "Menor lucro" },
-          { value: "roi_desc",   label: "Maior ROI" },
-          { value: "roi_asc",    label: "Menor ROI" },
-        ] as { value: SortBy; label: string }[]).map(({ value, label }) => (
-          <button
-            key={value}
-            onClick={() => setSortBy(value)}
-            className={`px-3 py-1.5 rounded-lg border text-xs font-medium transition-colors ${
-              sortBy === value
-                ? "bg-[#1e3a8a]/10 border-[#1e3a8a]/30 text-[var(--accent-text)]"
-                : "border-[var(--border)] text-[var(--text-secondary)] hover:bg-[var(--bg-elevated)]"
-            }`}
-          >
-            {label}
-          </button>
-        ))}
-      </div>
+          <span className="text-[10px] font-semibold text-[var(--text-muted)] uppercase tracking-wider mr-1">Ordenar</span>
+          {([
+            { value: "default",    label: "Padrão" },
+            { value: "saldo_desc", label: "Maior saldo" },
+            { value: "saldo_asc",  label: "Menor saldo" },
+            { value: "lucro_desc", label: "Maior lucro" },
+            { value: "lucro_asc",  label: "Menor lucro" },
+            { value: "roi_desc",   label: "Maior ROI" },
+            { value: "roi_asc",    label: "Menor ROI" },
+          ] as { value: SortBy; label: string }[]).map(({ value, label }) => (
+            <button
+              key={value}
+              onClick={() => setSortBy(value)}
+              className={`px-3 py-1.5 rounded-lg border text-xs font-medium transition-colors ${
+                sortBy === value
+                  ? "bg-[#1e3a8a]/10 border-[#1e3a8a]/30 text-[var(--accent-text)]"
+                  : "border-[var(--border)] text-[var(--text-secondary)] hover:bg-[var(--bg-elevated)]"
+              }`}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
+      )}
 
       {displayed.length === 0 ? (
         <Card>
