@@ -347,7 +347,7 @@ export default function ApostasClient({ apostas: initialApostas, profiles, betCo
               )}
             </div>
 
-            {/* Status */}
+            {/* Row 1: Status + Ordenar */}
             <div className="flex items-center gap-2 flex-wrap">
               <p className="text-xs font-semibold text-[var(--text-muted)] uppercase tracking-wide w-16 flex-shrink-0">Status</p>
               {(["todos", "pendente", "finalizada", "cancelada"] as const).map(s => (
@@ -366,11 +366,8 @@ export default function ApostasClient({ apostas: initialApostas, profiles, betCo
                   {{ todos: "Todos", pendente: "Pendentes", finalizada: "Finalizadas", cancelada: "Canceladas" }[s]}
                 </button>
               ))}
-            </div>
-
-            {/* Ordenar */}
-            <div className="flex items-center gap-2 flex-wrap">
-              <p className="text-xs font-semibold text-[var(--text-muted)] uppercase tracking-wide w-16 flex-shrink-0">Ordenar</p>
+              <div className="w-px h-4 bg-[var(--border)]" />
+              <p className="text-xs font-semibold text-[var(--text-muted)] uppercase tracking-wide flex-shrink-0">Ordenar</p>
               {([
                 { value: "data_desc",  label: "Mais recente" },
                 { value: "data_asc",   label: "Mais antigo" },
@@ -391,39 +388,34 @@ export default function ApostasClient({ apostas: initialApostas, profiles, betCo
               ))}
             </div>
 
-            {/* Perfil */}
-            {profiles.length > 1 && (
-              <div className="flex items-center gap-2 flex-wrap">
-                <p className="text-xs font-semibold text-[var(--text-muted)] uppercase tracking-wide w-16 flex-shrink-0">Perfil</p>
+            {/* Row 2: Perfil + Período */}
+            <div className="flex items-center gap-2 flex-wrap">
+              <p className="text-xs font-semibold text-[var(--text-muted)] uppercase tracking-wide w-16 flex-shrink-0">Perfil</p>
+              <button
+                onClick={() => setFilterProfile("todos")}
+                className={`px-3 py-1.5 rounded-lg border text-xs font-medium transition-colors ${
+                  filterProfile === "todos"
+                    ? "bg-[#1e3a8a] border-[#1e3a8a] text-white"
+                    : "border-[var(--border)] text-[var(--text-secondary)] hover:bg-[var(--bg-elevated)]"
+                }`}
+              >
+                Todos
+              </button>
+              {profiles.map(p => (
                 <button
-                  onClick={() => setFilterProfile("todos")}
+                  key={p.id}
+                  onClick={() => setFilterProfile(p.id)}
                   className={`px-3 py-1.5 rounded-lg border text-xs font-medium transition-colors ${
-                    filterProfile === "todos"
-                      ? "bg-[#1e3a8a] border-[#1e3a8a] text-white"
+                    filterProfile === p.id
+                      ? "bg-[#1e3a8a]/10 border-[#1e3a8a]/30 text-[var(--accent-text)]"
                       : "border-[var(--border)] text-[var(--text-secondary)] hover:bg-[var(--bg-elevated)]"
                   }`}
                 >
-                  Todos
+                  {p.apelido || `${p.nome} ${p.sobrenome}`}
                 </button>
-                {profiles.map(p => (
-                  <button
-                    key={p.id}
-                    onClick={() => setFilterProfile(p.id)}
-                    className={`px-3 py-1.5 rounded-lg border text-xs font-medium transition-colors ${
-                      filterProfile === p.id
-                        ? "bg-[#1e3a8a]/10 border-[#1e3a8a]/30 text-[var(--accent-text)]"
-                        : "border-[var(--border)] text-[var(--text-secondary)] hover:bg-[var(--bg-elevated)]"
-                    }`}
-                  >
-                    {p.apelido || `${p.nome} ${p.sobrenome}`}
-                  </button>
-                ))}
-              </div>
-            )}
-
-            {/* Período */}
-            <div className="flex items-center gap-2 flex-wrap">
-              <p className="text-xs font-semibold text-[var(--text-muted)] uppercase tracking-wide w-16 flex-shrink-0">Período</p>
+              ))}
+              <div className="w-px h-4 bg-[var(--border)]" />
+              <p className="text-xs font-semibold text-[var(--text-muted)] uppercase tracking-wide flex-shrink-0">Período</p>
               {(["todos", "dia", "semana", "mes"] as const).map(p => (
                 <button
                   key={p}
@@ -468,11 +460,11 @@ export default function ApostasClient({ apostas: initialApostas, profiles, betCo
               </div>
             )}
 
-            {/* Esporte + Competição */}
+            {/* Row 3: Esporte + Competição */}
             <div className="flex items-center gap-2 flex-wrap">
               <p className="text-xs font-semibold text-[var(--text-muted)] uppercase tracking-wide w-16 flex-shrink-0">Busca</p>
-              <Input value={filterEsporte} onChange={e => setFilterEsporte(e.target.value)} placeholder="Esporte" className="text-xs h-8 w-32" />
-              <Input value={filterCompeticao} onChange={e => setFilterCompeticao(e.target.value)} placeholder="Competição" className="text-xs h-8 w-40" />
+              <Input value={filterEsporte} onChange={e => setFilterEsporte(e.target.value)} placeholder="Esporte" className="text-xs h-8 w-36" />
+              <Input value={filterCompeticao} onChange={e => setFilterCompeticao(e.target.value)} placeholder="Competição" className="text-xs h-8 w-44" />
             </div>
           </CardContent>
         </Card>
