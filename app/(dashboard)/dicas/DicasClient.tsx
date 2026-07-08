@@ -54,6 +54,53 @@ function Step({ num, text }: { num: number; text: string }) {
 
 const SECTIONS: Section[] = [
   {
+    id: "parceria",
+    icon: ShieldCheck,
+    color: "text-[#10b981]",
+    bg: "bg-[#10b981]/10 border-[#10b981]/20",
+    title: "Parceria",
+    subtitle: "Como verificar e iniciar uma parceria com segurança",
+    items: [
+      {
+        title: "Passo 1 — Descubra quais casas o parceiro tem conta",
+        content: (
+          <div className="space-y-3">
+            <p className="text-sm text-[var(--text-secondary)] leading-relaxed">
+              Antes de qualquer coisa, pergunte à pessoa quais casas de apostas ela já possui cadastro. Isso determina quais surebets vocês poderão operar juntos e se vale a pena avançar na parceria.
+            </p>
+            <Tip text="Quanto mais casas o parceiro tiver, maior o leque de surebets disponíveis para vocês explorarem juntos." />
+          </div>
+        ),
+      },
+      {
+        title: "Passo 2 — Verifique se a conta está em ordem",
+        content: (
+          <div className="space-y-3">
+            <p className="text-sm text-[var(--text-secondary)] leading-relaxed">
+              Peça para o parceiro acessar a conta dele em cada casa e verificar a área de informações pessoais ou perfil. Os dados abaixo são obrigatórios e precisam estar confirmados pela casa antes de qualquer operação:
+            </p>
+            <div className="space-y-2">
+              {[
+                { icon: CheckCircle, color: "text-green-500", label: "E-mail verificado", desc: "A casa envia um link de confirmação. Se não confirmou, pode ter limitações de saque." },
+                { icon: CheckCircle, color: "text-green-500", label: "Telefone confirmado", desc: "Geralmente via código SMS. Contas sem telefone são frequentemente bloqueadas em saques." },
+                { icon: CheckCircle, color: "text-green-500", label: "Endereço cadastrado", desc: "Algumas casas exigem comprovante de residência para liberar saques acima de certos valores." },
+              ].map(({ icon: Icon, color, label, desc }) => (
+                <div key={label} className="flex items-start gap-3 p-3 rounded-lg border border-[var(--border-subtle)] bg-[var(--bg-elevated)]">
+                  <Icon className={`w-4 h-4 ${color} shrink-0 mt-0.5`} />
+                  <div>
+                    <p className="text-xs font-semibold text-[var(--text-primary)]">{label}</p>
+                    <p className="text-xs text-[var(--text-secondary)] mt-0.5">{desc}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+            <Warn text="Não opere com uma conta que ainda não confirmou e-mail, telefone ou endereço. Se a casa bloquear um saque por dados incompletos, você perde tempo e corre risco de perder o dinheiro apostado." />
+          </div>
+        ),
+      },
+    ],
+  },
+  {
     id: "parcerias",
     icon: UserPlus,
     color: "text-[#3b82f6]",
