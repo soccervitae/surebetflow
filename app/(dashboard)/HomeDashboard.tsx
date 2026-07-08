@@ -94,7 +94,7 @@ export default function HomeDashboard({
 
       {/* Dicas de Parcerias banner */}
       <Link
-        href="/dicas"
+        href="/dicas-de-parcerias"
         className="flex items-center gap-3 rounded-xl border border-[#10b981]/30 bg-[#10b981]/8 px-4 py-3 hover:bg-[#10b981]/15 transition-colors group"
       >
         <div className="p-2 bg-[#10b981]/15 rounded-lg flex-shrink-0">
@@ -260,7 +260,7 @@ export default function HomeDashboard({
 
       {/* Dicas de Parcerias banner */}
       <Link
-        href="/dicas"
+        href="/dicas-de-parcerias"
         className="flex items-center gap-3 rounded-xl border border-[#10b981]/30 bg-[#10b981]/8 px-4 py-3 hover:bg-[#10b981]/15 transition-colors group"
       >
         <div className="p-2 bg-[#10b981]/15 rounded-lg flex-shrink-0">

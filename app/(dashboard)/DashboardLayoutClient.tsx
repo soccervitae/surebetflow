@@ -21,7 +21,7 @@ const navItems = [
   { href: "/financeiro", label: "Financeiro", icon: DollarSign },
   { href: "/assinatura", label: "Assinatura", icon: CreditCard },
   { href: "/tutorial", label: "Tutorial", icon: HelpCircle },
-  { href: "/dicas", label: "Dicas de Parcerias", icon: Lightbulb },
+  { href: "/dicas-de-parcerias", label: "Dicas de Parcerias", icon: Lightbulb },
   { href: "/suporte", label: "SureBet AI", icon: MessageCircle },
   { href: "/configuracoes", label: "Configurações", icon: Settings },
 ]
