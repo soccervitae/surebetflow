@@ -98,6 +98,43 @@ const SECTIONS: Section[] = [
           </div>
         ),
       },
+      {
+        title: "Passo 3 — Troque o e-mail de cadastro por um que só você controla",
+        content: (
+          <div className="space-y-3">
+            <p className="text-sm text-[var(--text-secondary)] leading-relaxed">
+              Após confirmar que a conta está em ordem, o próximo passo é trocar o e-mail de cadastro da casa por um e-mail que <strong className="text-[var(--text-primary)]">somente você tem acesso</strong>. Isso é fundamental para manter o controle da operação.
+            </p>
+
+            <div className="space-y-2">
+              <Step num={1} text="Crie um e-mail novo exclusivo para esse parceiro. Use o nome ou apelido da pessoa para identificar facilmente — ex: joao.apostas@gmail.com ou roger.bets@gmail.com." />
+              <Step num={2} text="Acesse a conta do parceiro na casa de apostas e vá até as configurações de perfil ou segurança." />
+              <Step num={3} text="Troque o e-mail cadastrado para o novo e-mail criado por você e confirme a alteração." />
+              <Step num={4} text="Guarde o acesso a esse e-mail em local seguro. Ele será usado para receber notificações da casa, recuperar senha e fazer login quando necessário." />
+            </div>
+
+            <div className="p-3 rounded-xl border border-[#1e3a8a]/20 bg-[#1e3a8a]/5 space-y-2">
+              <p className="text-xs font-semibold text-[var(--accent-text)] uppercase tracking-wide">Por que fazer isso?</p>
+              <ul className="space-y-1.5">
+                {[
+                  "Você recebe todas as notificações importantes da casa (promoções, alertas de saque, verificações).",
+                  "Consegue fazer login e acompanhar o saldo sem precisar acionar o parceiro a todo momento.",
+                  "Mantém o controle mesmo se o parceiro não estiver disponível.",
+                  "O parceiro só precisa ser acionado quando a casa exigir reconhecimento facial ou biometria.",
+                ].map((t, i) => (
+                  <li key={i} className="flex items-start gap-2">
+                    <CheckCircle className="w-3.5 h-3.5 text-green-500 shrink-0 mt-0.5" />
+                    <span className="text-xs text-[var(--text-secondary)]">{t}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            <Warn text="Nunca use o e-mail pessoal do parceiro como e-mail da conta. Se o parceiro sair da operação, você perde o acesso e o controle da conta." />
+            <Tip text="Use o Gmail e ative a verificação em duas etapas no e-mail criado para garantir que ninguém mais acesse além de você." />
+          </div>
+        ),
+      },
     ],
   },
   {
