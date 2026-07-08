@@ -258,6 +258,21 @@ export default function HomeDashboard({
         </div>
       )}
 
+      {/* Dicas de Parcerias banner */}
+      <Link
+        href="/dicas"
+        className="flex items-center gap-3 rounded-xl border border-[#10b981]/30 bg-[#10b981]/8 px-4 py-3 hover:bg-[#10b981]/15 transition-colors group"
+      >
+        <div className="p-2 bg-[#10b981]/15 rounded-lg flex-shrink-0">
+          <Lightbulb className="h-4 w-4 text-[#10b981]" />
+        </div>
+        <div className="flex-1 min-w-0">
+          <p className="text-sm font-semibold text-[#10b981]">Dicas de Parcerias disponíveis</p>
+          <p className="text-xs text-[var(--text-secondary)] mt-0.5">Saiba como ampliar sua operação com novas parcerias.</p>
+        </div>
+        <ChevronRight className="h-4 w-4 text-[#10b981] flex-shrink-0 group-hover:translate-x-0.5 transition-transform" />
+      </Link>
+
       {/* Financeiro Recente */}
       {recentMovimentacoes.length > 0 && (() => {
         const items: MovimentacaoItem[] = recentMovimentacoes.map(mov => ({
