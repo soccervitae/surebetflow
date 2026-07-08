@@ -4,7 +4,7 @@ import Link from "next/link"
 import {
   ShieldCheck, Calculator, Wallet, Lock, BarChart3, TrendingUp,
   CheckCircle, ArrowRight, Zap, Users, Target, RefreshCw, ChevronDown, Gift,
-  Sparkles, ClipboardPaste, ImageIcon, Bot
+  Sparkles, ClipboardPaste, ImageIcon, Bot, Lightbulb
 } from "lucide-react"
 import Image from "next/image"
 
@@ -355,6 +355,46 @@ export default async function LandingPage() {
             <Link href="/cadastro" className="inline-flex items-center gap-2 bg-[#1e3a8a] hover:bg-[#1e40af] text-white font-semibold px-8 py-3.5 rounded-xl transition-colors">
               Criar minha conta <ArrowRight className="w-4 h-4" />
             </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* Dicas de Parcerias */}
+      <section className="border-y border-white/5 py-20 bg-[#0d1b3e]">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6">
+          <div className="flex flex-col lg:flex-row items-center gap-10">
+            <div className="flex-1 text-center lg:text-left">
+              <div className="inline-flex items-center gap-2 bg-[#10b981]/10 border border-[#10b981]/20 text-[#10b981] text-xs font-semibold px-3 py-1.5 rounded-full mb-4">
+                <Lightbulb className="w-3.5 h-3.5" />
+                Disponível no plano Pro
+              </div>
+              <h2 className="text-3xl font-bold text-white mb-4">Dicas de Parcerias</h2>
+              <p className="text-gray-400 text-lg mb-6 max-w-xl mx-auto lg:mx-0">
+                Aprenda como ampliar sua operação com novas parcerias de forma segura. Conteúdo exclusivo para assinantes sobre como estruturar, controlar e escalar seus perfis.
+              </p>
+              <Link
+                href="/cadastro"
+                className="inline-flex items-center gap-2 bg-[#10b981] hover:bg-[#0d9669] text-white font-semibold px-6 py-3 rounded-xl transition-colors"
+              >
+                Começar agora <ArrowRight className="w-4 h-4" />
+              </Link>
+            </div>
+            <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 gap-4 w-full max-w-lg">
+              {[
+                { icon: ShieldCheck, title: "Parcerias seguras", desc: "Saiba como escolher e verificar parceiros antes de operar." },
+                { icon: Users, title: "Controle total", desc: "Mantenha o acesso e o controle de todos os perfis da sua operação." },
+                { icon: Wallet, title: "Parte financeira", desc: "Entenda como estruturar saques, contas e remuneração do parceiro." },
+                { icon: TrendingUp, title: "Crescer com segurança", desc: "Dicas para escalar sua operação sem aumentar os riscos." },
+              ].map(({ icon: Icon, title, desc }) => (
+                <div key={title} className="bg-white/5 border border-white/10 rounded-xl p-4">
+                  <div className="w-8 h-8 bg-[#10b981]/15 rounded-lg flex items-center justify-center mb-3">
+                    <Icon className="w-4 h-4 text-[#10b981]" />
+                  </div>
+                  <p className="text-sm font-semibold text-white mb-1">{title}</p>
+                  <p className="text-xs text-gray-400 leading-relaxed">{desc}</p>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </section>
