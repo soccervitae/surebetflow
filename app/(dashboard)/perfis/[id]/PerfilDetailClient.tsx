@@ -833,12 +833,12 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
                 {/* Collapsible filter panel */}
                 {apShowFilter && (
                   <Card>
-                    <CardContent className="p-4 space-y-4">
-                      <div className="flex items-center justify-between">
+                    <CardContent className="p-3 space-y-2">
+                      <div className="flex items-center justify-between mb-1">
                         <span className="text-xs font-semibold text-[var(--text-muted)] uppercase tracking-wide">Filtros</span>
                         {hasActiveFilter && (
                           <button
-                            onClick={() => { setApFilterStatus("todos"); setApSortBy("data_desc"); setApFilterPeriod("todos"); setApFilterCustomDate(""); setApFilterCustomFrom(""); setApFilterCustomTo(""); setApFilterEsporte(""); setApFilterCompeticao("") }}
+                            onClick={() => { setApFilterStatus("todos"); setApSortBy("data_desc"); setApFilterPeriod("todos"); setApFilterCustomDate(""); setApFilterCustomFrom(""); setApFilterCustomTo("") }}
                             className="text-xs text-[var(--text-secondary)] hover:text-[var(--text-primary)] flex items-center gap-1 transition-colors"
                           >
                             <X className="h-3 w-3" /> Limpar tudo
@@ -846,34 +846,31 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
                         )}
                       </div>
 
-                      {/* Status */}
-                      <div className="space-y-2">
-                        <Label className="text-xs text-[var(--text-muted)] uppercase tracking-wide">Status</Label>
-                        <div className="flex flex-wrap gap-2">
-                          {(["todos", "pendente", "finalizada", "cancelada"] as const).map(s => (
-                            <button
-                              key={s}
-                              onClick={() => setApFilterStatus(s)}
-                              className={`px-3 py-1.5 rounded-lg border text-xs font-medium transition-colors ${
-                                apFilterStatus === s
-                                  ? s === "pendente" ? "bg-yellow-500/10 border-yellow-500/40 text-yellow-600"
-                                    : s === "finalizada" ? "bg-green-500/10 border-green-500/40 text-green-600"
-                                    : s === "cancelada" ? "bg-red-500/10 border-red-500/40 text-red-500"
-                                    : "bg-[#1e3a8a] border-[#1e3a8a] text-white"
-                                  : "border-[var(--border)] text-[var(--text-secondary)] hover:bg-[var(--bg-elevated)]"
-                              }`}
-                            >
-                              {{ todos: "Todos", pendente: "Pendentes", finalizada: "Finalizadas", cancelada: "Canceladas" }[s]}
-                            </button>
-                          ))}
-                        </div>
-                      </div>
+                      {/* Row: STATUS | ORDENAR | PERÍODO */}
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className="text-[10px] font-semibold text-[var(--text-muted)] uppercase tracking-wider w-14 flex-shrink-0">Status</span>
+                        {(["todos", "pendente", "finalizada", "cancelada"] as const).map(s => (
+                          <button
+                            key={s}
+                            onClick={() => setApFilterStatus(s)}
+                            className={`px-3 py-1.5 rounded-lg border text-xs font-medium transition-colors ${
+                              apFilterStatus === s
+                                ? s === "pendente" ? "bg-yellow-500/10 border-yellow-500/40 text-yellow-600"
+                                  : s === "finalizada" ? "bg-green-500/10 border-green-500/40 text-green-600"
+                                  : s === "cancelada" ? "bg-red-500/10 border-red-500/40 text-red-500"
+                                  : "bg-[#1e3a8a] border-[#1e3a8a] text-white"
+                                : "border-[var(--border)] text-[var(--text-secondary)] hover:bg-[var(--bg-elevated)]"
+                            }`}
+                          >
+                            {{ todos: "Todos", pendente: "Pendentes", finalizada: "Finalizadas", cancelada: "Canceladas" }[s]}
+                          </button>
+                        ))}
 
-                      {/* Ordenar */}
-                      <div className="space-y-2">
-                        <Label className="text-xs text-[var(--text-muted)] uppercase tracking-wide">Ordenar</Label>
+                        <div className="w-px h-4 bg-[var(--border)]" />
+
+                        <span className="text-[10px] font-semibold text-[var(--text-muted)] uppercase tracking-wider flex-shrink-0">Ordenar</span>
                         <Select value={apSortBy} onValueChange={v => setApSortBy(v as typeof apSortBy)}>
-                          <SelectTrigger className="text-xs h-9 w-full sm:w-56">
+                          <SelectTrigger className="text-xs h-8 w-44">
                             <SelectValue />
                           </SelectTrigger>
                           <SelectContent>
@@ -893,58 +890,54 @@ export default function PerfilDetailClient({ profile, dashboard, apostas, userTo
                             <SelectItem value="perda_asc">Menor perda</SelectItem>
                           </SelectContent>
                         </Select>
-                      </div>
 
-                      {/* Período */}
-                      <div className="space-y-2">
-                        <Label className="text-xs text-[var(--text-muted)] uppercase tracking-wide flex items-center gap-1">
-                          <CalendarIcon className="h-3 w-3" /> Período
-                        </Label>
-                        <div className="flex flex-wrap gap-2">
-                          {(["todos", "dia", "semana", "mes"] as const).map(p => (
-                            <button
-                              key={p}
-                              onClick={() => setApFilterPeriod(p)}
-                              className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors border ${
-                                apFilterPeriod === p
-                                  ? "bg-[#1e3a8a] border-[#1e3a8a] text-white"
-                                  : "border-[var(--border)] text-[var(--text-secondary)] hover:bg-[var(--bg-elevated)]"
-                              }`}
-                            >
-                              {{ todos: "Todos", dia: "Hoje", semana: "Semana", mes: "Mês" }[p]}
-                            </button>
-                          ))}
+                        <div className="w-px h-4 bg-[var(--border)]" />
+
+                        <span className="text-[10px] font-semibold text-[var(--text-muted)] uppercase tracking-wider flex-shrink-0">Período</span>
+                        {(["todos", "dia", "semana", "mes"] as const).map(p => (
                           <button
-                            onClick={() => setApFilterPeriod("custom")}
-                            title="Data personalizada"
-                            className={`flex items-center justify-center w-[34px] h-[34px] rounded-lg transition-colors border ${
-                              apFilterPeriod === "custom"
+                            key={p}
+                            onClick={() => setApFilterPeriod(p)}
+                            className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors border ${
+                              apFilterPeriod === p
                                 ? "bg-[#1e3a8a] border-[#1e3a8a] text-white"
                                 : "border-[var(--border)] text-[var(--text-secondary)] hover:bg-[var(--bg-elevated)]"
                             }`}
                           >
-                            <CalendarIcon className="h-3.5 w-3.5" />
+                            {{ todos: "Todos", dia: "Hoje", semana: "Semana", mes: "Mês" }[p]}
                           </button>
-                        </div>
-                        {apFilterPeriod === "custom" && (
-                          <div className="mt-2 space-y-2">
-                            <div className="flex gap-1 p-0.5 bg-[var(--bg-elevated)] rounded-lg w-fit">
-                              <button onClick={() => setApFilterCustomMode("single")} className={`px-3 py-1 rounded-md text-xs font-medium transition-colors ${apFilterCustomMode === "single" ? "bg-[var(--bg-surface)] text-[var(--text-primary)] shadow-sm" : "text-[var(--text-secondary)]"}`}>Data</button>
-                              <button onClick={() => setApFilterCustomMode("range")} className={`px-3 py-1 rounded-md text-xs font-medium transition-colors ${apFilterCustomMode === "range" ? "bg-[var(--bg-surface)] text-[var(--text-primary)] shadow-sm" : "text-[var(--text-secondary)]"}`}>Intervalo</button>
-                            </div>
-                            {apFilterCustomMode === "single" ? (
-                              <Input type="date" value={apFilterCustomDate} onChange={e => setApFilterCustomDate(e.target.value)} className="text-xs h-8 max-w-[160px]" />
-                            ) : (
-                              <div className="flex items-center gap-2">
-                                <Input type="date" value={apFilterCustomFrom} onChange={e => setApFilterCustomFrom(e.target.value)} className="text-xs h-8 max-w-[140px]" />
-                                <span className="text-[var(--text-muted)] text-xs">até</span>
-                                <Input type="date" value={apFilterCustomTo} onChange={e => setApFilterCustomTo(e.target.value)} className="text-xs h-8 max-w-[140px]" />
-                              </div>
-                            )}
-                          </div>
-                        )}
+                        ))}
+                        <button
+                          onClick={() => setApFilterPeriod("custom")}
+                          title="Data personalizada"
+                          className={`flex items-center justify-center w-[32px] h-[32px] rounded-lg transition-colors border ${
+                            apFilterPeriod === "custom"
+                              ? "bg-[#1e3a8a] border-[#1e3a8a] text-white"
+                              : "border-[var(--border)] text-[var(--text-secondary)] hover:bg-[var(--bg-elevated)]"
+                          }`}
+                        >
+                          <CalendarIcon className="h-3.5 w-3.5" />
+                        </button>
                       </div>
 
+                      {/* Custom date picker */}
+                      {apFilterPeriod === "custom" && (
+                        <div className="flex items-center gap-2 flex-wrap pt-1">
+                          <div className="flex gap-1 p-0.5 bg-[var(--bg-elevated)] rounded-lg w-fit">
+                            <button onClick={() => setApFilterCustomMode("single")} className={`px-3 py-1 rounded-md text-xs font-medium transition-colors ${apFilterCustomMode === "single" ? "bg-[var(--bg-surface)] text-[var(--text-primary)] shadow-sm" : "text-[var(--text-secondary)]"}`}>Data</button>
+                            <button onClick={() => setApFilterCustomMode("range")} className={`px-3 py-1 rounded-md text-xs font-medium transition-colors ${apFilterCustomMode === "range" ? "bg-[var(--bg-surface)] text-[var(--text-primary)] shadow-sm" : "text-[var(--text-secondary)]"}`}>Intervalo</button>
+                          </div>
+                          {apFilterCustomMode === "single" ? (
+                            <Input type="date" value={apFilterCustomDate} onChange={e => setApFilterCustomDate(e.target.value)} className="text-xs h-8 max-w-[160px]" />
+                          ) : (
+                            <div className="flex items-center gap-2">
+                              <Input type="date" value={apFilterCustomFrom} onChange={e => setApFilterCustomFrom(e.target.value)} className="text-xs h-8 max-w-[140px]" />
+                              <span className="text-[var(--text-muted)] text-xs">até</span>
+                              <Input type="date" value={apFilterCustomTo} onChange={e => setApFilterCustomTo(e.target.value)} className="text-xs h-8 max-w-[140px]" />
+                            </div>
+                          )}
+                        </div>
+                      )}
                     </CardContent>
                   </Card>
                 )}
