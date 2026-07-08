@@ -364,10 +364,6 @@ export default async function LandingPage() {
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
           <div className="flex flex-col lg:flex-row items-center gap-10">
             <div className="flex-1 text-center lg:text-left">
-              <div className="inline-flex items-center gap-2 bg-[#10b981]/10 border border-[#10b981]/20 text-[#10b981] text-xs font-semibold px-3 py-1.5 rounded-full mb-4">
-                <Lightbulb className="w-3.5 h-3.5" />
-                Disponível no plano Pro
-              </div>
               <h2 className="text-3xl font-bold text-white mb-4">Dicas de Parcerias</h2>
               <p className="text-gray-400 text-lg mb-6 max-w-xl mx-auto lg:mx-0">
                 Aprenda como ampliar sua operação com novas parcerias de forma segura. Conteúdo exclusivo para assinantes sobre como estruturar, controlar e escalar seus perfis.
