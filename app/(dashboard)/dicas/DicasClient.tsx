@@ -135,6 +135,67 @@ const SECTIONS: Section[] = [
           </div>
         ),
       },
+      {
+        title: "Passo 4 — A parte financeira: conta bancária e saques",
+        content: (
+          <div className="space-y-3">
+            <p className="text-sm text-[var(--text-secondary)] leading-relaxed">
+              Quando o parceiro criou a conta na casa de apostas, ele cadastrou uma conta bancária própria para depósitos e saques. Esse é o ponto mais crítico de toda a parceria e precisa ser tratado com muito cuidado.
+            </p>
+
+            <div className="p-3 rounded-xl border border-amber-500/20 bg-amber-500/5 space-y-2">
+              <p className="text-xs font-semibold text-amber-500 uppercase tracking-wide flex items-center gap-1.5">
+                <AlertTriangle className="w-3.5 h-3.5" /> O risco real
+              </p>
+              <p className="text-sm text-[var(--text-secondary)] leading-relaxed">
+                Se o saque cair na conta bancária do parceiro e você depender da boa vontade dele para repassar o valor, está correndo um risco sério. Infelizmente já houve casos em que parceiros retiveram o dinheiro, atrasaram os repasses ou simplesmente sumiram após receber os saques.
+              </p>
+            </div>
+
+            <p className="text-xs font-semibold text-[var(--text-muted)] uppercase tracking-wide">Suas opções</p>
+
+            <div className="space-y-2">
+              {[
+                {
+                  icon: CheckCircle,
+                  color: "text-green-500",
+                  border: "border-green-500/20",
+                  bg: "bg-green-500/5",
+                  label: "Opção ideal — Trocar a conta bancária para a sua",
+                  desc: "A solução mais segura é trocar a conta bancária cadastrada na casa de apostas para uma conta que seja sua. Assim, todos os saques caem diretamente para você, sem depender do parceiro.",
+                },
+                {
+                  icon: AlertTriangle,
+                  color: "text-amber-500",
+                  border: "border-amber-500/20",
+                  bg: "bg-amber-500/5",
+                  label: "Opção intermediária — Confiar no parceiro com regras claras",
+                  desc: "Se não for possível trocar a conta, estabeleça regras claras por escrito: prazo máximo de repasse após cada saque, valor mínimo para acionar o saque, e forma de comprovação do pagamento.",
+                },
+                {
+                  icon: AlertTriangle,
+                  color: "text-red-400",
+                  border: "border-red-400/20",
+                  bg: "bg-red-400/5",
+                  label: "Opção arriscada — Manter a conta do parceiro sem acordo formal",
+                  desc: "Operar sem nenhum acordo documentado é o maior erro. Se algo der errado, você não tem como provar que o dinheiro é seu ou cobrar de volta.",
+                },
+              ].map(({ icon: Icon, color, border, bg, label, desc }) => (
+                <div key={label} className={`flex items-start gap-3 p-3 rounded-lg border ${border} ${bg}`}>
+                  <Icon className={`w-4 h-4 ${color} shrink-0 mt-0.5`} />
+                  <div>
+                    <p className={`text-xs font-semibold ${color}`}>{label}</p>
+                    <p className="text-xs text-[var(--text-secondary)] mt-0.5 leading-relaxed">{desc}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <Tip text="Sempre que possível, troque a conta bancária da casa para o seu próprio PIX ou conta. A maioria das casas permite isso nas configurações de saque ou financeiro da conta." />
+            <Warn text="Nunca coloque saldo alto em uma conta cujo saque vai para a conta do parceiro sem ter estabelecido antes um acordo claro e de preferência registrado." />
+          </div>
+        ),
+      },
     ],
   },
   {
