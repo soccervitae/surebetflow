@@ -301,14 +301,9 @@ export default function TutorialClient() {
   return (
     <div className="max-w-5xl mx-auto overflow-x-hidden">
       {/* Header */}
-      <div className="flex items-center gap-3 mb-6">
-        <div className="hidden md:flex w-9 h-9 bg-[#1e3a8a]/10 rounded-xl items-center justify-center shrink-0">
-          <BookOpen className="w-5 h-5 text-[var(--accent-text)]" />
-        </div>
-        <div>
-          <h1 className="text-2xl font-bold text-[var(--text-primary)]">Tutorial</h1>
-          <p className="text-sm text-[var(--text-secondary)]">Aprenda a usar todas as funcionalidades do SureBetFlow</p>
-        </div>
+      <div className="mb-6">
+        <h1 className="text-2xl font-bold text-[var(--text-primary)]">Tutorial</h1>
+        <p className="text-sm text-[var(--text-secondary)]">Aprenda a usar todas as funcionalidades do SureBetFlow</p>
       </div>
 
       {/* Mobile: card grid */}
