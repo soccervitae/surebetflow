@@ -23,7 +23,7 @@ const navItems = [
   { href: "/apostas", icon: ClipboardList, label: "Apostas" },
   { href: "/financeiro", icon: Wallet, label: "Financeiro" },
   { href: "/tutorial", icon: BookOpen, label: "Tutorial" },
-  { href: "/dicas", icon: Lightbulb, label: "Dicas de Parcerias" },
+  { href: "/dicas-de-parcerias", icon: Lightbulb, label: "Dicas de Parcerias" },
   { href: "/suporte", icon: MessageCircle, label: "Suporte" },
   { href: "/configuracoes", icon: Settings, label: "Minha Conta" },
 ]
