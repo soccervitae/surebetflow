@@ -370,7 +370,7 @@ export default async function LandingPage() {
               </p>
               <Link
                 href="/cadastro"
-                className="inline-flex items-center gap-2 bg-[#10b981] hover:bg-[#0d9669] text-white font-semibold px-6 py-3 rounded-xl transition-colors"
+                className="inline-flex items-center gap-2 bg-[#1e3a8a] hover:bg-[#1e40af] text-white font-semibold px-6 py-3 rounded-xl transition-colors"
               >
                 Começar agora <ArrowRight className="w-4 h-4" />
               </Link>
