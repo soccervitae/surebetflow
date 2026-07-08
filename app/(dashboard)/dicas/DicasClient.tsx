@@ -611,7 +611,7 @@ export default function DicasClient() {
       </div>
 
       <p className="text-center text-xs text-[var(--text-muted)] pb-4">
-        Tem alguma dúvida? Use o <span className="text-[var(--accent-text)] font-medium">SureBet AI</span> no menu lateral para obter ajuda personalizada.
+        Tem alguma dúvida? Entre em contato pelo <span className="text-[var(--accent-text)] font-medium">Suporte</span> no menu lateral.
       </p>
     </div>
   )
