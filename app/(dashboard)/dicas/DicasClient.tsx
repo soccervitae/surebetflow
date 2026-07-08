@@ -557,7 +557,7 @@ export default function DicasClient() {
     <div className="space-y-6 max-w-3xl mx-auto">
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-bold text-[var(--text-primary)]">Dicas</h1>
+        <h1 className="text-2xl font-bold text-[var(--text-primary)]">Dicas de Parcerias</h1>
         <p className="text-[var(--text-secondary)] text-sm mt-1">
           Como encontrar novas parcerias e ter controle total dos seus perfis
         </p>
