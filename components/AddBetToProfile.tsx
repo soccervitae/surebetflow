@@ -13,7 +13,7 @@ import { useToast } from "@/hooks/useToast"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetFooter } from "@/components/ui/sheet"
 import Link from "next/link"
-import { Plus, Loader2, Search, Check } from "lucide-react"
+import { Plus, Loader2, Search, Check, SlidersHorizontal, X } from "lucide-react"
 import { useMediaQuery } from "@/hooks/useMediaQuery"
 import type { Bet, ProfileBet } from "@/lib/types"
 
@@ -56,6 +56,7 @@ export default function AddBetToProfile({ profileId, autoOpen = false, onSaved, 
   // Filtros da aba bets (desktop)
   const [betSort, setBetSort] = useState<"saldo_desc" | "saldo_asc" | "lucro_desc" | "lucro_asc" | "roi_desc" | "roi_asc">("saldo_desc")
   const [betStatusFilter, setBetStatusFilter] = useState<"todos" | "ativa" | "inativa">("todos")
+  const [showBetFilter, setShowBetFilter] = useState(false)
   const [editTelefone, setEditTelefone] = useState("")
   const [editSaving, setEditSaving] = useState(false)
 
@@ -690,41 +691,61 @@ export default function AddBetToProfile({ profileId, autoOpen = false, onSaved, 
         <p className="text-sm text-[var(--text-secondary)] text-center py-6">Nenhuma bet adicionada</p>
       ) : (
         <>
-          {/* Filtros desktop */}
-          <div className="hidden md:flex items-center gap-2 flex-wrap mb-1">
-            {/* Status */}
-            {(["todos", "ativa", "inativa"] as const).map(s => (
-              <button key={s} onClick={() => setBetStatusFilter(s)}
-                className={`px-3 py-1.5 rounded-lg border text-xs font-medium transition-colors ${
-                  betStatusFilter === s
-                    ? s === "ativa" ? "bg-green-500/10 border-green-500/40 text-green-600"
-                      : s === "inativa" ? "bg-red-500/10 border-red-500/40 text-red-500"
-                      : "bg-[#1e3a8a] border-[#1e3a8a] text-white"
-                    : "border-[var(--border)] text-[var(--text-secondary)] hover:bg-[var(--bg-elevated)]"
-                }`}>
-                {{ todos: "Todas", ativa: "Ativas", inativa: "Inativas" }[s]}
-              </button>
-            ))}
-            <div className="w-px h-4 bg-[var(--border)]" />
-            {/* Ordenação */}
-            {([
-              { value: "saldo_desc", label: "Maior saldo" },
-              { value: "saldo_asc",  label: "Menor saldo" },
-              { value: "lucro_desc", label: "Maior lucro" },
-              { value: "lucro_asc",  label: "Menor lucro" },
-              { value: "roi_desc",   label: "Maior ROI" },
-              { value: "roi_asc",    label: "Menor ROI" },
-            ] as { value: typeof betSort; label: string }[]).map(({ value, label }) => (
-              <button key={value} onClick={() => setBetSort(value)}
-                className={`px-3 py-1.5 rounded-lg border text-xs font-medium transition-colors ${
-                  betSort === value
-                    ? "bg-[#1e3a8a] border-[#1e3a8a] text-white"
-                    : "border-[var(--border)] text-[var(--text-secondary)] hover:bg-[var(--bg-elevated)]"
-                }`}>
-                {label}
-              </button>
-            ))}
+          {/* Botão Filtrar */}
+          <div className="hidden md:flex justify-end mb-2">
+            <button
+              onClick={() => setShowBetFilter(v => !v)}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-xs font-medium transition-colors ${
+                showBetFilter || betStatusFilter !== "todos" || betSort !== "saldo_desc"
+                  ? "bg-[#1e3a8a]/10 border-[#1e3a8a]/30 text-[var(--accent-text)]"
+                  : "border-[var(--border)] text-[var(--text-secondary)] hover:bg-[var(--bg-elevated)]"
+              }`}
+            >
+              {showBetFilter ? <X className="w-3 h-3" /> : <SlidersHorizontal className="w-3 h-3" />}
+              Filtrar
+              {(betStatusFilter !== "todos" || betSort !== "saldo_desc") && !showBetFilter && (
+                <span className="h-1.5 w-1.5 rounded-full bg-[#1e3a8a]" />
+              )}
+            </button>
           </div>
+
+          {/* Filtros colapsáveis */}
+          {showBetFilter && (
+            <div className="hidden md:flex items-center gap-2 flex-wrap mb-3 p-3 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-elevated)]">
+              <span className="text-[10px] font-semibold text-[var(--text-muted)] uppercase tracking-wider mr-1">Status</span>
+              {(["todos", "ativa", "inativa"] as const).map(s => (
+                <button key={s} onClick={() => setBetStatusFilter(s)}
+                  className={`px-3 py-1.5 rounded-lg border text-xs font-medium transition-colors ${
+                    betStatusFilter === s
+                      ? s === "ativa" ? "bg-green-500/10 border-green-500/40 text-green-600"
+                        : s === "inativa" ? "bg-red-500/10 border-red-500/40 text-red-500"
+                        : "bg-[#1e3a8a] border-[#1e3a8a] text-white"
+                      : "border-[var(--border)] text-[var(--text-secondary)] hover:bg-[var(--bg-elevated)]"
+                  }`}>
+                  {{ todos: "Todas", ativa: "Ativas", inativa: "Inativas" }[s]}
+                </button>
+              ))}
+              <div className="w-px h-4 bg-[var(--border)]" />
+              <span className="text-[10px] font-semibold text-[var(--text-muted)] uppercase tracking-wider mr-1">Ordenar</span>
+              {([
+                { value: "saldo_desc", label: "Maior saldo" },
+                { value: "saldo_asc",  label: "Menor saldo" },
+                { value: "lucro_desc", label: "Maior lucro" },
+                { value: "lucro_asc",  label: "Menor lucro" },
+                { value: "roi_desc",   label: "Maior ROI" },
+                { value: "roi_asc",    label: "Menor ROI" },
+              ] as { value: typeof betSort; label: string }[]).map(({ value, label }) => (
+                <button key={value} onClick={() => setBetSort(value)}
+                  className={`px-3 py-1.5 rounded-lg border text-xs font-medium transition-colors ${
+                    betSort === value
+                      ? "bg-[#1e3a8a]/10 border-[#1e3a8a]/30 text-[var(--accent-text)]"
+                      : "border-[var(--border)] text-[var(--text-secondary)] hover:bg-[var(--bg-elevated)]"
+                  }`}>
+                  {label}
+                </button>
+              ))}
+            </div>
+          )}
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
           {profileBets
