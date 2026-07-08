@@ -202,10 +202,11 @@ const SECTIONS: Section[] = [
               </p>
               <div className="space-y-2">
                 <Step num={1} text="Baixe o aplicativo do banco no seu celular e inicie o cadastro com os dados do parceiro (nome, CPF, data de nascimento)." />
-                <Step num={2} text="Use o e-mail criado por você para essa parceria — o mesmo do passo 3. Assim o acesso ao banco e à bet ficam centralizados no mesmo e-mail que só você controla." />
-                <Step num={3} text="Crie a senha do banco você mesmo e guarde em local seguro. O parceiro não precisa saber a senha." />
-                <Step num={4} text="A única participação do parceiro será o reconhecimento facial, necessário para validar a abertura da conta e para autorizar transferências quando solicitado." />
-                <Step num={5} text="Após a conta aberta, troque a conta bancária cadastrada na bet para essa nova conta. Quando o saque cair, você mesmo faz a transferência pelo app do banco." />
+                <Step num={2} text="No campo de telefone, use o seu próprio número. Assim você recebe os códigos SMS de verificação, notificações e confirmações diretamente, sem precisar acionar o parceiro a cada operação." />
+                <Step num={3} text="Use o e-mail criado por você para essa parceria — o mesmo do passo 3. Assim o acesso ao banco e à bet ficam centralizados no mesmo e-mail que só você controla." />
+                <Step num={4} text="Crie a senha do banco você mesmo e guarde em local seguro. O parceiro não precisa saber a senha." />
+                <Step num={5} text="A única participação do parceiro será o reconhecimento facial, necessário para validar a abertura da conta e para autorizar transferências quando solicitado." />
+                <Step num={6} text="Após a conta aberta, troque a conta bancária cadastrada na bet para essa nova conta. Quando o saque cair, você mesmo faz a transferência pelo app do banco." />
               </div>
               <div className="flex items-start gap-2 pt-1">
                 <CheckCircle className="w-4 h-4 text-green-500 shrink-0 mt-0.5" />
